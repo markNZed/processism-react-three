@@ -49,4 +49,3 @@ export const createSphere = (id, position, delay) => (
   
     </>
   );
-  
