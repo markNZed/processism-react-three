@@ -2,8 +2,20 @@ import { Sphere, CustomArrowHorizontal, CustomArrowVertical, CustomArrowDiagonal
 
 export const createSphere = (id, position, delay) => (
     <>
-      <Sphere id={id} position={position} delay={delay} />
-        {id}
+        <Sphere id={id} position={position} delay={delay} />
+        <Sphere id={id} position={[position[0] +2, position[1] , position[2]]} delay={delay+ 1000} />
+
+        <Sphere id={id} position={[position[0] , position[1] -2, position[2]]} delay={delay + 4000} />
+        <Sphere id={id} position={[position[0] +2, position[1] -2, position[2]]} delay={delay + 4000} />
+
+        <Sphere id={id} position={[position[0] +8, position[1] , position[2]]} delay={delay+ 7000} />
+        <Sphere id={id} position={[position[0] +10, position[1] , position[2]]} delay={delay+ 7000} />
+
+        <Sphere id={id} position={[position[0] +8, position[1] -2, position[2]]} delay={delay + 7000} />
+        <Sphere id={id} position={[position[0] +10, position[1] -2, position[2]]} delay={delay + 7000} />
+
+
+        
     </>
   );
   

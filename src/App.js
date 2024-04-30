@@ -13,11 +13,11 @@ export default function App() {
 
       <group position={[-1, 0, 0]}>
         {createSphere("entity1", [-4, 2, 0], 1000)}
-        {createSphere("entity2", [-2, 2, 0], 2000)}
+        {/* {createSphere("entity2", [-2, 2, 0], 2000)}
 
         
         {createSphere("entity3", [-4, 0, 0], 5000)}
-        {createSphere("entity4", [-2, 0, 0], 5000)}
+        {createSphere("entity4", [-2, 0, 0], 5000)} */}
         <Circle id="circle1" position={[-3, 1, -1.5]} delay={6000} />
 
         {createArrowHorizontal("arrow1 and arrow4", 3000, [-4, 2, 0], [-2, 2, 0])}
@@ -27,10 +27,7 @@ export default function App() {
       </group>
 
       <group position={[1, 0, 0]}>
-        {createSphere("entity1_1", [2, 0, 0], 8000)}
-        {createSphere("entity1_2", [4, 2, 0], 8000)}
-        {createSphere("entity1_3", [4, 0, 0], 8000)}
-        {createSphere("entity1_4", [2, 2, 0], 8000)}
+
 
         
 
