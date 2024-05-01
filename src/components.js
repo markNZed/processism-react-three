@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useContext } from 'react'
 import {  useFrame, useThree, extend } from '@react-three/fiber'
 import * as THREE from 'three'
 import { ArrowHelper, DoubleSide } from 'three'
 import { Text } from '@react-three/drei'
 import {  a } from '@react-spring/three';
+import { PositionContext } from './PositionContext';
 
 export function Sphere({ id, delay, ...props }) {
   const ref = useRef()
@@ -11,6 +12,13 @@ export function Sphere({ id, delay, ...props }) {
   const [clicked, click] = useState(false)
   const [visible, setVisible] = useState(false)
   const [opacity, setOpacity] = useState(0)
+  const { updatePosition } = useContext(PositionContext);
+  useFrame(() => {
+    if (ref.current) {
+      const newPosition = ref.current.position.clone();
+      updatePosition(id, newPosition);
+    }
+  });
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), delay)
     return () => clearTimeout(timer)
@@ -64,20 +72,27 @@ export function Circle({ id, delay, ...props }) {
   )
 }
 
-export function DoubleArrow({ id, from, to, delay }) {
+export function DoubleArrow({ from, to, delay }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
-  const direction = new THREE.Vector3().subVectors(to, from).normalize();
-  const inverseDirection = new THREE.Vector3().subVectors(from, to).normalize();
   return (
     <a.group visible={visible}>
-      <FatArrow from={from} to={to} direction={direction} delay={delay} />
-      <FatArrow from={to} to={from} direction={inverseDirection} delay={delay} />
+      <FatArrow from={from} to={to} delay={delay} />
+      <FatArrow from={to} to={from} delay={delay} />
     </a.group>
   );
+}
+
+// Arrow component that dynamically positions itself based on sphere positions
+export function DynamicDoubleArrow({ fromId, toId, ...props }) {
+  const { positions } = useContext(PositionContext);
+  const from = positions[fromId];
+  const to = positions[toId];
+  if (!from || !to) return null; // Don't render until positions are available
+  return <DoubleArrow from={from} to={to} delay={props.delay} {...props} />
 }
 
 // Extending React Three Fiber to include ArrowHelper
