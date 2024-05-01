@@ -5,6 +5,7 @@ import { ArrowHelper, DoubleSide } from 'three'
 import { Text } from '@react-three/drei'
 import {  a } from '@react-spring/three';
 import { PositionContext } from './PositionContext';
+import { AnimationContext } from './AnimationContext';
 
 export function Sphere({ id, delay, ...props }) {
   const ref = useRef()
@@ -13,6 +14,7 @@ export function Sphere({ id, delay, ...props }) {
   const [visible, setVisible] = useState(false)
   const [opacity, setOpacity] = useState(0)
   const { updatePosition } = useContext(PositionContext);
+  const { sphere } = useContext(AnimationContext);
   useFrame(() => {
     if (ref.current) {
       const newPosition = ref.current.position.clone();
@@ -36,13 +38,14 @@ export function Sphere({ id, delay, ...props }) {
     <a.mesh
       {...props}
       ref={ref}
-      scale={clicked ? 0.75 : 0.5}
+      //scale={clicked ? 0.75 : 0.5}
+      scale={sphere.scale}
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => (event.stopPropagation(), hover(true))}
       onPointerOut={(event) => hover(false)}
       visible={visible}
       material-opacity={opacity}>
-      <sphereGeometry args={[1, 32, 32]} />
+      <sphereGeometry args={[0.5, 32, 32]} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'blue'} opacity={0} transparent />
     </a.mesh>
   )
