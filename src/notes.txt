@@ -1,0 +1,10 @@
+animate the fade in
+
+emergentEntity
+  circle
+    top down
+    bottom up
+    spheres
+    relation arrows
+
+

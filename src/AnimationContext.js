@@ -1,24 +1,38 @@
-import React, { createContext, useState } from 'react';
-import { useAnimationSequence } from './useAnimationSequence';
+import React, { createContext, useState, useEffect } from 'react';
 
 export const AnimationContext = createContext();
 
 export function AnimationController({ children }) {
+
+  // To hide things we need to initialise here
   const [animationState, setAnimationState] = useState({
-    sphere: { scale: 1 },
-    arrow: { position: 0 },
-    text: { opacity: 0 }
+    'emergent1.boundary': {
+      visible: false,
+      fadeInDuration: 0,
+    }
   });
 
-  // Define animation steps
-  const steps = [
-    { delay: 11000, action: () => setAnimationState(prev => ({ ...prev, sphere: { scale: 0.5 } })) },
-    { delay: 2000, action: () => setAnimationState(prev => ({ ...prev, arrow: { position: 10 } })) },
-    { delay: 3000, action: () => setAnimationState(prev => ({ ...prev, text: { opacity: 1 } })) }
-  ];
+  useEffect(() => {
+    // Define animation for multiple spheres by ID
+    const animate = (id, delay, newState) => {
+      setTimeout(() => {
+        setAnimationState(prevStates => ({
+          ...prevStates,
+          [id]: { ...prevStates[id], ...newState }
+        }));
+      }, delay);
+    }; 
 
-  // Use custom hook to handle animation sequence
-  useAnimationSequence(steps);
+    // Example animations for different spheres
+    animate('emergent1.sphere1', 1000, { scale: 2 });
+    animate('emergent1.boundary', 2000, { visible: true });
+    animate('emergent1.sphere2', 2000, { scale: 1.5 });
+    animate('emergent1.sphere3', 3000, { scale: 0.8 });
+
+    return () => {
+      // Clear all timeouts if necessary
+    };
+  }, []);
 
   return (
     <AnimationContext.Provider value={animationState}>
