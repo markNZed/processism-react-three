@@ -1,4 +1,5 @@
-import { Sphere, CustomArrowHorizontal, CustomArrowVertical, CustomArrowDiagonal, CustomArrowTopUPbottomDown } from './components';
+import { Sphere, FatArrow, DoubleArrow } from './components';
+import * as THREE from 'three'
 
 export const createSphere = (id, position, delay) => (
     <>
@@ -14,38 +15,38 @@ export const createSphere = (id, position, delay) => (
   );
   export const createArrowHorizontal = (id, delay, start, end) => (
     <>
-      <CustomArrowHorizontal id={id} delay={delay} start={start} end={end} />
-      <CustomArrowHorizontal id={id} delay={delay + 2000} start={[start[0], 0, start[2]]} end={[end[0], 0, end[2]]} />
-      <CustomArrowHorizontal id={id} delay={delay + 5000} start={[-start[0]+2, 2, start[2]]} end={[-end[0] +2, 2, end[2]]} />
-      <CustomArrowHorizontal id={id} delay={delay + 5000} start={[-start[0] +2, 0, start[2]]} end={[-end[0] +2, 0, end[2]]} />
+      <DoubleArrow id={id} delay={delay} from={start} to={end} />
+      <DoubleArrow id={id} delay={delay + 2000} from={new THREE.Vector3(start.x, 0, start.z)} to={new THREE.Vector3(end.x, 0, end.z)} />
+      <DoubleArrow id={id} delay={delay + 5000} from={new THREE.Vector3(-start.x + 2, 2, start.z)} to={new THREE.Vector3(-end.x + 2, 2, end.z)} />
+      <DoubleArrow id={id} delay={delay + 5000} from={new THREE.Vector3(-start.x + 2, 0, start.z)} to={new THREE.Vector3(-end.x + 2, 0, end.z)} />
     </>
   );
   export const createArrowVertical = (id, delay, start, end) => (
     <>
-      <CustomArrowVertical id={`${id}_1`} delay={delay} start={start} end={end} />
-      <CustomArrowVertical id={`${id}_2`} delay={delay} start={[start[0] + 2, start[1], start[2]]} end={[end[0] + 2, end[1], end[2]]} />
-      <CustomArrowVertical id={`${id}_3`} delay={delay + 3000} start={[-start[0], start[1], start[2]]} end={[-end[0], end[1], end[2]]} />
-      <CustomArrowVertical id={`${id}_4`} delay={delay + 3000} start={[-start[0] + 2, start[1], start[2]]} end={[-end[0] + 2, end[1], end[2]]} />
+      <DoubleArrow id={`${id}_1`} delay={delay} from={start} to={end} />
+      <DoubleArrow id={`${id}_2`} delay={delay} from={new THREE.Vector3(start.x + 2, start.y, start.z)} to={new THREE.Vector3(end.x + 2, end.y, end.z)} />
+      <DoubleArrow id={`${id}_3`} delay={delay + 3000} from={new THREE.Vector3(-start.x, start.y, start.z)} to={new THREE.Vector3(-end.x, end.y, end.z)} />
+      <DoubleArrow id={`${id}_4`} delay={delay + 3000} from={new THREE.Vector3(-start.x + 2, start.y, start.z)} to={new THREE.Vector3(-end.x + 2, end.y, end.z)} />
     </>
   );
-  export const createArrowDiagonal = (id, delay, start, end,type='diagonal') => (
+  export const createArrowDiagonal = (id, delay, start, end) => (
     <>
-      <CustomArrowDiagonal id={`${id}_1`} delay={delay} start={start} end={end} type={type} />
-      <CustomArrowDiagonal id={`${id}_2`} delay={delay} start={[start[0] , start[1], start[2]]} end={[end[0] , end[1], end[2]]} type={"diagonal2"} />
-      <CustomArrowDiagonal id={`${id}_3`} delay={delay + 3000} start={[-start[0] +2, start[1], start[2]]} end={[-end[0] + 2, end[1], end[2]]} type={type} />
-      <CustomArrowDiagonal id={`${id}_4`} delay={delay + 3000} start={[-start[0] + 2, start[1], start[2]]} end={[-end[0] + 2, end[1], end[2]]} type={"diagonal2"} />
+      <DoubleArrow id={`${id}_1`} delay={delay} from={start} to={end} />
+      <DoubleArrow id={`${id}_2`} delay={delay} from={new THREE.Vector3(start.x - 2, start.y, start.z)} to={new THREE.Vector3(end.x + 2, end.y, end.z)} />
+      <DoubleArrow id={`${id}_3`} delay={delay + 3000} from={new THREE.Vector3(-start.x + 2, start.y, start.z)} to={new THREE.Vector3(-end.x + 2, end.y, end.z)} />
+      <DoubleArrow id={`${id}_4`} delay={delay + 3000} from={new THREE.Vector3(-start.x + 4, start.y, start.z)} to={new THREE.Vector3(-end.x, end.y, end.z)} />
     </>
   );
-  export const createBottomUpTopDown = (id, delay, start, end, type='Bottom_UP') => (
+  export const createBottomUpTopDown = (id, delay, start, end) => (
     <>
-      <CustomArrowTopUPbottomDown id={id} delay={delay} start={[start[0] +1, start[1], start[2]]} end={[end[0]+1, end[1], end[2]]}  type={type} />
-      <CustomArrowTopUPbottomDown id={id} delay={delay} start={[start[0] -1, start[1], start[2]]} end={[end[0]- 1, end[1], end[2]]}  type={type} />
-      <CustomArrowTopUPbottomDown id={id} delay={delay} start={[start[0] +1, start[1]+2, start[2]]} end={[end[0]+1, end[1]+2, end[2]]}  type={type} />
-      <CustomArrowTopUPbottomDown id={id} delay={delay} start={[start[0] -1, start[1]+2, start[2]]} end={[end[0]- 1, end[1]+2, end[2]]}  type={type} />
-      <CustomArrowTopUPbottomDown id={`${id}_1`} delay={delay}  start={[-start[0] -1, start[1], start[2]]} end={[-end[0]-1, end[1], end[2]]} type={'top_DOWN'} />
-      <CustomArrowTopUPbottomDown id={`${id}_2`} delay={delay} start={[-start[0] -1, start[1]+2, start[2]]} end={[-end[0]-1, end[1]+2, end[2]]} type={'top_DOWN'} />    
-      <CustomArrowTopUPbottomDown id={`${id}_3`}delay={delay} start={[-start[0]+1, start[1]+2, start[2]]} end={[-end[0]+1, end[1]+2, end[2]]} type={'top_DOWN'} />
-      <CustomArrowTopUPbottomDown id={`${id}_4`} delay={delay } start={[-start[0] + 1, start[1], start[2]]} end={[-end[0] + 1, end[1], end[2]]} type={'top_DOWN'} /> 
-  
+      <FatArrow id={`${id}_1`} delay={delay} from={start} to={end} />
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(start.x + 2, start.y, start.z)} to={new THREE.Vector3(end.x + 2, end.y, end.z)} />
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(start.x + 2, start.y + 2, start.z)} to={new THREE.Vector3(end.x + 2, end.y + 2, end.z)} />
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(start.x, start.y + 2, start.z)} to={new THREE.Vector3(end.x, end.y + 2, end.z)} />
+
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(-end.x, end.y, end.z)} to={new THREE.Vector3(-start.x, start.y, start.z)} />
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(-end.x - 2, end.y, end.z)} to={new THREE.Vector3(-start.x - 2, start.y, start.z)} />
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(-end.x, end.y + 2, end.z)} to={new THREE.Vector3(-start.x, start.y + 2, start.z)} />
+      <FatArrow id={`${id}_1`} delay={delay} from={new THREE.Vector3(-end.x - 2, end.y + 2, end.z)} to={new THREE.Vector3(-start.x - 2, start.y + 2, start.z)} />
     </>
   );
