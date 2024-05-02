@@ -38,7 +38,7 @@ export default function App() {
     <Canvas style={{ background: '#a8a7b5' }} 
       camera={{ 
         position: [0, 0, 1],
-        zoom: 20,
+        zoom: 35,
         left: window.innerWidth / -2,
         right: window.innerWidth / 2,
         top: window.innerHeight / 2,

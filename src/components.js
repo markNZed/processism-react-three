@@ -214,72 +214,46 @@ export function DynamicDoubleArrow({ id, fromId, toId, fromOffset, toOffset, ...
 
 export function FatArrow({ id, from, to, color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.03, margin = 0.6 }) {
   const ref = useRef();
-  const [opacity, setOpacity] = useState(0);
-
   const { positions, updatePosition, animationState } = useStore(state => ({
     positions: state.positions,
     updatePosition: state.updatePosition,
     animationState: state.animationStates[id] || {}
   }));
 
-  // Update global state whenever the position changes
-  useFrame(() => {
-      if (ref.current && positions[id]) {
-        //console.log("positions[id]", positions[id], ref.current.position)
-        if (!ref.current.position.equals(positions[id])) {
-          updatePosition(id, ref.current.position.clone());
-        }
-      }
+  const { visible = true, opacity = 1.0, fadeInDuration = 1000 } = animationState;
+
+  // React Spring animation for opacity
+  const springProps = useSpring({
+    to: { opacity: visible ? opacity : 0 },  // Animate to 'opacity' if visible, otherwise animate to 0
+    from: { opacity: 0 },                   // Start from fully transparent
+    config: { duration: fadeInDuration }
   });
 
-  // Extracting values from animationControl with default values
-  const { visible = true, fadeInDuration = 1000} = animationState || {};
+  // Define geometry and material inline or as constants if they don't rely on props
+  const direction = new THREE.Vector3().subVectors(to, from).normalize();
+  const adjustedFrom = from.clone().add(direction.clone().multiplyScalar(margin));
+  const adjustedTo = to.clone().sub(direction.clone().multiplyScalar(margin));
+  const arrowLineLength = adjustedFrom.distanceTo(adjustedTo);
 
-  useFrame(() => {
-    if (visible && opacity < 1) {
-        const newOpacity = Math.min(opacity + 0.01, 1);
-        setOpacity(newOpacity);
-        if (ref.current) {
-            ref.current.children.forEach(child => {
-                child.material.opacity = newOpacity;
-                child.material.transparent = true;
-                child.material.needsUpdate = true;
-            });
-        }
-    }
-  });
+  const lineGeometry = new THREE.CylinderGeometry(lineWidth, lineWidth, arrowLineLength, 32);
+  const coneGeometry = new THREE.ConeGeometry(headWidth, headLength, 32);
 
-  useEffect(() => {
-    if (!ref.current) return;
-
-    if (visible) {
-        const direction = new THREE.Vector3().subVectors(to, from).normalize();
-        const adjustedFrom = from.clone().add(direction.clone().multiplyScalar(margin)); // Move 'from' point along the direction
-        const adjustedTo = to.clone().sub(direction.clone().multiplyScalar(margin)); // Pull 'to' back by the margin
-        const arrowLineLength = adjustedFrom.distanceTo(adjustedTo);
-
-        const lineGeometry = new THREE.CylinderGeometry(lineWidth, lineWidth, arrowLineLength, 12);
-        const lineMaterial = new THREE.MeshBasicMaterial({ color, opacity: 0, transparent: true });
-        const lineMesh = new THREE.Mesh(lineGeometry, lineMaterial);
-        lineMesh.position.copy(adjustedFrom.clone().lerp(adjustedTo, 0.5));
-        lineMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
-        ref.current.add(lineMesh);
-
-        const coneGeometry = new THREE.ConeGeometry(headWidth, headLength, 12);
-        const coneMaterial = new THREE.MeshBasicMaterial({ color, opacity: 0, transparent: true });
-        const coneMesh = new THREE.Mesh(coneGeometry, coneMaterial);
-        coneMesh.position.copy(adjustedTo);
-        coneMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
-        ref.current.add(coneMesh);
-    } else {
-        // Cleanup
-        ref.current.children.forEach(child => {
-            child.geometry.dispose();
-            child.material.dispose();
-            ref.current.remove(child);
-        });
-    }
-  }, [visible, from, to, color, headLength, headWidth, lineWidth, margin]);
-
-  return <group ref={ref} />;
+  return (
+    <group ref={ref}>
+      <a.mesh
+        geometry={lineGeometry}
+        position={adjustedFrom.clone().lerp(adjustedTo, 0.5)}
+        quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
+      >
+        <animated.meshBasicMaterial color={color} transparent={true} opacity={springProps.opacity} />
+      </a.mesh>
+      <a.mesh
+        geometry={coneGeometry}
+        position={adjustedTo}
+        quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
+      >
+        <animated.meshBasicMaterial color={color} transparent={true} opacity={springProps.opacity} />
+      </a.mesh>
+    </group>
+  );
 }

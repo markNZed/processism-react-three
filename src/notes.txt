@@ -1,3 +1,5 @@
+Create HOC for animated components
+
 get basic animations working, using AnimationController to set goals and React Spring to animate
 add text and compare with manim animation
 FatArrow is not using React Spring
