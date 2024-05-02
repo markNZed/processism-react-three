@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {EmergentEntity, DynamicDoubleArrow } from './components';
+import {EmergentEntity, DynamicDoubleArrow } from './animationComponents';
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
