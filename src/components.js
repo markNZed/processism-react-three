@@ -3,8 +3,6 @@ import {  useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { DoubleSide } from 'three'
 import {  a } from '@react-spring/three';
-import { PositionContext } from './PositionContext';
-import { AnimationContext } from './AnimationContext';
 import { useSpring, animated } from '@react-spring/three';
 import useStore from './useStore';
 
@@ -18,15 +16,19 @@ export function EmergentEntity({ id, initialPosition, causation, ...props }) {
 
   // Set initial position
   useEffect(() => {
-      if (ref.current) {
-          ref.current.position.copy(initialPosition);
-      }
-  }, [initialPosition]);
+    if (ref.current) {
+        ref.current.position.copy(initialPosition|| new THREE.Vector3(0, 0, 0));
+        const newPosition = initialPosition || new THREE.Vector3(0, 0, 0);
+        //console.log("newPosition", newPosition)
+        if (!positions[id] || !newPosition.equals(positions[id])) {
+          updatePosition(id, newPosition);
+        }
+    }
+}, [initialPosition]);
 
   // Update global state whenever the position changes
   useFrame(() => {
     if (ref.current && positions[id]) {
-      //console.log("positions[id]", positions[id], ref.current.position)
       if (!ref.current.position.equals(positions[id])) {
         updatePosition(id, ref.current.position.clone());
       }
@@ -71,18 +73,23 @@ export function Sphere({ id, initialPosition, radius = 0.5, finalOpacity = 1.0, 
   const ref = useRef()
   const [hovered, hover] = useState(false)
   const [clicked, click] = useState(false)
-  const animationStates = useContext(AnimationContext);
-  const animationControl = animationStates[id] || { scale: 1 }; // Default or fallback state
 
-  const { positions, updatePosition } = useStore(state => ({
+  const { positions, updatePosition, animationState } = useStore(state => ({
     positions: state.positions,
-    updatePosition: state.updatePosition
+    updatePosition: state.updatePosition,
+    animationState: state.animationStates[id]
   }));
+
+  const animationControl = animationState || { scale: 1 }; // Default or fallback state
 
   // Set initial position
   useEffect(() => {
       if (ref.current) {
           ref.current.position.copy(initialPosition|| new THREE.Vector3(0, 0, 0));
+          const newPosition = initialPosition || new THREE.Vector3(0, 0, 0);
+          if (!positions[id] || !newPosition.equals(positions[id])) {
+              updatePosition(id, newPosition);
+          }
       }
   }, [initialPosition]);
 
@@ -90,13 +97,13 @@ export function Sphere({ id, initialPosition, radius = 0.5, finalOpacity = 1.0, 
   useFrame(() => {
     if (ref.current && positions[id]) {
       if (!ref.current.position.equals(positions[id])) {
-        updatePosition(id, ref.current.position.clone());
+        updatePosition(id, initialPosition|| new THREE.Vector3(0, 0, 0));
       }
     }
   });
 
   // Extracting values from animationControl with default values
-  const { visible = true, opacity = 1, fadeInDuration = 2000} = animationStates[id] || {};
+  const { visible = true, opacity = 1, fadeInDuration = 2000} = animationControl || {};
 
   useFrame(() => {
     if (ref.current) {
@@ -112,7 +119,6 @@ export function Sphere({ id, initialPosition, radius = 0.5, finalOpacity = 1.0, 
     config: { duration: fadeInDuration }
   });
 
-  useFrame((state, delta) => (ref.current.rotation.x += delta))
   return (
     <a.mesh
       {...props}
@@ -133,17 +139,21 @@ export function Sphere({ id, initialPosition, radius = 0.5, finalOpacity = 1.0, 
 
 export function Circle({ id, initialPosition, ...props }) {
   const ref = useRef()
-  const animationStates = useContext(AnimationContext);
 
-  const { positions, updatePosition } = useStore(state => ({
+  const { positions, updatePosition, animationState } = useStore(state => ({
     positions: state.positions,
-    updatePosition: state.updatePosition
+    updatePosition: state.updatePosition,
+    animationState: state.animationStates[id] || { visible: true, opacity: 0.5, fadeInDuration: 1000 } // Provide default values
   }));
 
   // Set initial position
   useEffect(() => {
       if (ref.current) {
           ref.current.position.copy(initialPosition|| new THREE.Vector3(0, 0, 0));
+          const newPosition = initialPosition || new THREE.Vector3(0, 0, 0);
+          if (!positions[id] || !newPosition.equals(positions[id])) {
+              updatePosition(id, newPosition);
+          }
       }
   }, [initialPosition]);
 
@@ -158,7 +168,7 @@ export function Circle({ id, initialPosition, ...props }) {
   });
 
   // Extracting values from animationControl with default values
-  const { visible = true, opacity = 0.5, fadeInDuration = 1000} = animationStates[id] || {};
+  const { visible = true, opacity = 0.5, fadeInDuration = 1000} = animationState || {};
 
   // React Spring animation for opacity
   const springProps = useSpring({
@@ -176,8 +186,15 @@ export function Circle({ id, initialPosition, ...props }) {
 }
 
 export function DoubleArrow({ id, from, to }) {
-  const animationStates = useContext(AnimationContext);
-  const { visible = true } = animationStates[id] || {};
+
+  const { positions, updatePosition, animationState } = useStore(state => ({
+    positions: state.positions,
+    updatePosition: state.updatePosition,
+    animationState: state.animationStates[id]
+  }));
+
+  const { visible = true } = animationState || {};
+
   return (
     <a.group visible={visible}>
       <FatArrow id={`${id}.from`} from={from} to={to} />
@@ -196,17 +213,34 @@ export function DynamicDoubleArrow({ id, fromId, toId, fromOffset, toOffset, ...
 }
 
 export function FatArrow({ id, from, to, color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.03, margin = 0.6 }) {
-  const arrowGroup = useRef();
+  const ref = useRef();
   const [opacity, setOpacity] = useState(0);
-  const animationStates = useContext(AnimationContext);
-  const { visible = true } = animationStates[id] || {};
+
+  const { positions, updatePosition, animationState } = useStore(state => ({
+    positions: state.positions,
+    updatePosition: state.updatePosition,
+    animationState: state.animationStates[id] || {}
+  }));
+
+  // Update global state whenever the position changes
+  useFrame(() => {
+      if (ref.current && positions[id]) {
+        //console.log("positions[id]", positions[id], ref.current.position)
+        if (!ref.current.position.equals(positions[id])) {
+          updatePosition(id, ref.current.position.clone());
+        }
+      }
+  });
+
+  // Extracting values from animationControl with default values
+  const { visible = true, fadeInDuration = 1000} = animationState || {};
 
   useFrame(() => {
     if (visible && opacity < 1) {
         const newOpacity = Math.min(opacity + 0.01, 1);
         setOpacity(newOpacity);
-        if (arrowGroup.current) {
-            arrowGroup.current.children.forEach(child => {
+        if (ref.current) {
+            ref.current.children.forEach(child => {
                 child.material.opacity = newOpacity;
                 child.material.transparent = true;
                 child.material.needsUpdate = true;
@@ -216,7 +250,7 @@ export function FatArrow({ id, from, to, color = 'red', headLength = 0.2, headWi
   });
 
   useEffect(() => {
-    if (!arrowGroup.current) return;
+    if (!ref.current) return;
 
     if (visible) {
         const direction = new THREE.Vector3().subVectors(to, from).normalize();
@@ -229,24 +263,23 @@ export function FatArrow({ id, from, to, color = 'red', headLength = 0.2, headWi
         const lineMesh = new THREE.Mesh(lineGeometry, lineMaterial);
         lineMesh.position.copy(adjustedFrom.clone().lerp(adjustedTo, 0.5));
         lineMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
-        arrowGroup.current.add(lineMesh);
+        ref.current.add(lineMesh);
 
         const coneGeometry = new THREE.ConeGeometry(headWidth, headLength, 12);
         const coneMaterial = new THREE.MeshBasicMaterial({ color, opacity: 0, transparent: true });
         const coneMesh = new THREE.Mesh(coneGeometry, coneMaterial);
         coneMesh.position.copy(adjustedTo);
         coneMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
-        arrowGroup.current.add(coneMesh);
+        ref.current.add(coneMesh);
     } else {
         // Cleanup
-        arrowGroup.current.children.forEach(child => {
+        ref.current.children.forEach(child => {
             child.geometry.dispose();
             child.material.dispose();
-            arrowGroup.current.remove(child);
+            ref.current.remove(child);
         });
     }
   }, [visible, from, to, color, headLength, headWidth, lineWidth, margin]);
 
-  return <group ref={arrowGroup} />;
+  return <group ref={ref} />;
 }
-

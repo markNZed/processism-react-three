@@ -3,7 +3,7 @@ import {EmergentEntity, DynamicDoubleArrow } from './components';
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { AnimationController } from './AnimationContext';
+import { AnimationController } from './AnimationController';
 import useStore from './useStore';
 
 function CameraAdjuster() {
