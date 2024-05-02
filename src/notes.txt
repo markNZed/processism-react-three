@@ -1,3 +1,11 @@
+use the threejs position system, not the context
+get basic animations working, using Contextto set goals and React Spring to animate
+
+Use React Spring on the threejs 
+
+https://www.framer.com/motion/
+Do we need a physics system? https://github.com/pmndrs/react-three-rapier but can we "mix" this
+
 animate the fade in
 
 emergentEntity
@@ -6,5 +14,6 @@ emergentEntity
     bottom up
     spheres
     relation arrows
+
 
 
