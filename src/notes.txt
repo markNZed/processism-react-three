@@ -1,4 +1,5 @@
 Create HOC for animated components
+  EmergentEntity to use HOC
 
 get basic animations working, using AnimationController to set goals and React Spring to animate
 add text and compare with manim animation

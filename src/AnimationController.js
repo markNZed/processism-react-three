@@ -12,7 +12,8 @@ export function AnimationController({ children }) {
 
     // Initial setup for animation states
     setInitialAnimationState({
-      'emergent1.boundary': { visible: false, fadeInDuration: 0},
+      'emergent1.boundary': { visible: false, fadeInDuration: 0, opacity: 0.5 },
+      'emergent2.boundary': { opacity: 0.5 },
     });
 
     const animate = (id, delay, newState) => {

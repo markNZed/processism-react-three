@@ -1,28 +1,16 @@
-import { useEffect, useRef, useState, useContext } from 'react'
-import {  useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
-import { DoubleSide } from 'three'
-import {  a } from '@react-spring/three';
-import { useSpring, animated } from '@react-spring/three';
-import useStore from '../useStore';
-import {FatArrow} from './';
+// DoubleArrow.js
+import React from 'react';
+import { animated } from '@react-spring/three';
+import { FatArrow } from './';  // Ensure this correctly imports FatArrow
+import withAnimationAndPosition from '../withAnimationAndPosition';  // Ensure correct path
 
-function DoubleArrow({ id, from, to }) {
+const DoubleArrow = React.forwardRef(({ from, to, position, opacity, visible, ...props }) => {
+    return (
+        <animated.group {...props} position={position} visible={visible}>
+            <FatArrow id={`${props.id}.from`} from={from} to={to} />
+            <FatArrow id={`${props.id}.to`} from={to} to={from} />
+        </animated.group>
+    );
+});
 
-  const { positions, updatePosition, animationState } = useStore(state => ({
-    positions: state.positions,
-    updatePosition: state.updatePosition,
-    animationState: state.animationStates[id]
-  }));
-
-  const { visible = true } = animationState || {};
-
-  return (
-    <a.group visible={visible}>
-      <FatArrow id={`${id}.from`} from={from} to={to} />
-      <FatArrow id={`${id}.to`} from={to} to={from} />
-    </a.group>
-  );
-}
-
-export default DoubleArrow;
+export default withAnimationAndPosition(DoubleArrow);
