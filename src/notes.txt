@@ -1,5 +1,6 @@
 use the threejs position system, not the context
-get basic animations working, using Contextto set goals and React Spring to animate
+get basic animations working, using Context to set goals and React Spring to animate
+add text and compare with manim animation
 
 Use React Spring on the threejs 
 

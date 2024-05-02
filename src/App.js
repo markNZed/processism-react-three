@@ -3,8 +3,8 @@ import {EmergentEntity, DynamicDoubleArrow } from './components';
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import { PositionProvider } from './PositionContext';
 import { AnimationController } from './AnimationContext';
+import useStore from './useStore';
 
 function CameraAdjuster() {
   const { camera, gl } = useThree(); // Access R3F context
@@ -31,6 +31,9 @@ function CameraAdjuster() {
 }
 
 export default function App() {
+
+  const positions = useStore(state => state.positions);
+
   return (
     <Canvas style={{ background: '#a8a7b5' }} 
       camera={{ 
@@ -47,13 +50,12 @@ export default function App() {
     > 
       <CameraAdjuster />
       <AnimationController>
-        <PositionProvider>
           <ambientLight intensity={Math.PI / 2} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={1.0} />
           <pointLight position={[-10, -10, -10]} decay={0} intensity={1.0} />
           
-          <EmergentEntity id="emergent1" position={new THREE.Vector3(-3, 0, 0)} causation={"bottomup"} />
-          <EmergentEntity id="emergent2" position={new THREE.Vector3(3, 0, 0)} causation={"topdown"} />
+          <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-3, 0, 0)} causation={"bottomup"} />
+          <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(3, 0, 0)} causation={"topdown"} />
 
           <DynamicDoubleArrow 
             id={"inter_emergent"} 
@@ -63,7 +65,6 @@ export default function App() {
             toOffset={new THREE.Vector3(-4, 1.0, 0)}/>
 
           <OrbitControls />
-        </PositionProvider>
       </AnimationController>
     </Canvas>
   )

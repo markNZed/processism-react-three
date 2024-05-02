@@ -6,20 +6,35 @@ import {  a } from '@react-spring/three';
 import { PositionContext } from './PositionContext';
 import { AnimationContext } from './AnimationContext';
 import { useSpring, animated } from '@react-spring/three';
+import useStore from './useStore';
 
-export function EmergentEntity({ id, position, causation, ...props }) {
+export function EmergentEntity({ id, initialPosition, causation, ...props }) {
 
   const ref = useRef()
-  const { updatePosition } = useContext(PositionContext);
+  const { positions, updatePosition } = useStore(state => ({
+    positions: state.positions,
+    updatePosition: state.updatePosition
+  }));
+
+  // Set initial position
+  useEffect(() => {
+      if (ref.current) {
+          ref.current.position.copy(initialPosition);
+      }
+  }, [initialPosition]);
+
+  // Update global state whenever the position changes
   useFrame(() => {
-    if (ref.current) {
-      const newPosition = ref.current.position.clone();
-      updatePosition(id, newPosition);
+    if (ref.current && positions[id]) {
+      //console.log("positions[id]", positions[id], ref.current.position)
+      if (!ref.current.position.equals(positions[id])) {
+        updatePosition(id, ref.current.position.clone());
+      }
     }
   });
 
-  const firstSpherePosition = new THREE.Vector3(position.x - 5, position.y + 2, position.z - 2)
-  const causationPosition = new THREE.Vector3(position.x - 5, position.y, position.z - 2)
+  const firstSpherePosition = new THREE.Vector3(initialPosition.x - 5, initialPosition.y + 2, initialPosition.z - 2)
+  const causationPosition = new THREE.Vector3(initialPosition.x - 5, initialPosition.y, initialPosition.z - 2)
 
   const causationArrows = (id, start, end) => (
     <>
@@ -31,12 +46,12 @@ export function EmergentEntity({ id, position, causation, ...props }) {
   );
 
   return (
-    <group ref={ref} position={position}>
-      <Circle id={`${id}.boundary`} position={[position.x - 4, position.y + 1, position.z]} />
-      <Sphere id={`${id}.sphere1`} position={firstSpherePosition} radius={0.5}/>
-      <Sphere id={`${id}.sphere2`} position={new THREE.Vector3(firstSpherePosition.x + 2, firstSpherePosition.y, firstSpherePosition.z)} radius={0.5} />
-      <Sphere id={`${id}.sphere3`} position={new THREE.Vector3(firstSpherePosition.x, firstSpherePosition.y - 2, firstSpherePosition.z)} radius={0.5} />
-      <Sphere id={`${id}.sphere4`} position={new THREE.Vector3(firstSpherePosition.x + 2, firstSpherePosition.y - 2, firstSpherePosition.z)} radius={0.5} />
+    <group ref={ref} initialPosition={initialPosition}>
+      <Circle id={`${id}.boundary`} initialPosition={new THREE.Vector3(initialPosition.x - 4, initialPosition.y + 1, initialPosition.z)} />
+      <Sphere id={`${id}.sphere1`} initialPosition={firstSpherePosition} radius={0.5}/>
+      <Sphere id={`${id}.sphere2`} initialPosition={new THREE.Vector3(firstSpherePosition.x + 2, firstSpherePosition.y, firstSpherePosition.z)} radius={0.5} />
+      <Sphere id={`${id}.sphere3`} initialPosition={new THREE.Vector3(firstSpherePosition.x, firstSpherePosition.y - 2, firstSpherePosition.z)} radius={0.5} />
+      <Sphere id={`${id}.sphere4`} initialPosition={new THREE.Vector3(firstSpherePosition.x + 2, firstSpherePosition.y - 2, firstSpherePosition.z)} radius={0.5} />
       <DynamicDoubleArrow id={`${id}_1`} fromId={`${id}.sphere1`} toId={`${id}.sphere2`} />
       <DynamicDoubleArrow id={`${id}_2`} fromId={`${id}.sphere3`} toId={`${id}.sphere4`} />
       <DynamicDoubleArrow id={`${id}_1`} fromId={`${id}.sphere1`} toId={`${id}.sphere3`} />
@@ -52,13 +67,33 @@ export function EmergentEntity({ id, position, causation, ...props }) {
   );
 };
 
-export function Sphere({ id, delay, radius = 0.5, finalOpacity = 1.0, ...props }) {
+export function Sphere({ id, initialPosition, radius = 0.5, finalOpacity = 1.0, ...props }) {
   const ref = useRef()
   const [hovered, hover] = useState(false)
   const [clicked, click] = useState(false)
-  const { updatePosition } = useContext(PositionContext);
   const animationStates = useContext(AnimationContext);
   const animationControl = animationStates[id] || { scale: 1 }; // Default or fallback state
+
+  const { positions, updatePosition } = useStore(state => ({
+    positions: state.positions,
+    updatePosition: state.updatePosition
+  }));
+
+  // Set initial position
+  useEffect(() => {
+      if (ref.current) {
+          ref.current.position.copy(initialPosition|| new THREE.Vector3(0, 0, 0));
+      }
+  }, [initialPosition]);
+
+  // Update global state whenever the position changes
+  useFrame(() => {
+    if (ref.current && positions[id]) {
+      if (!ref.current.position.equals(positions[id])) {
+        updatePosition(id, ref.current.position.clone());
+      }
+    }
+  });
 
   // Extracting values from animationControl with default values
   const { visible = true, opacity = 1, fadeInDuration = 2000} = animationStates[id] || {};
@@ -96,9 +131,31 @@ export function Sphere({ id, delay, radius = 0.5, finalOpacity = 1.0, ...props }
   )
 }
 
-export function Circle({ id, ...props }) {
+export function Circle({ id, initialPosition, ...props }) {
   const ref = useRef()
   const animationStates = useContext(AnimationContext);
+
+  const { positions, updatePosition } = useStore(state => ({
+    positions: state.positions,
+    updatePosition: state.updatePosition
+  }));
+
+  // Set initial position
+  useEffect(() => {
+      if (ref.current) {
+          ref.current.position.copy(initialPosition|| new THREE.Vector3(0, 0, 0));
+      }
+  }, [initialPosition]);
+
+  // Update global state whenever the position changes
+  useFrame(() => {
+      if (ref.current && positions[id]) {
+        //console.log("positions[id]", positions[id], ref.current.position)
+        if (!ref.current.position.equals(positions[id])) {
+          updatePosition(id, ref.current.position.clone());
+        }
+      }
+  });
 
   // Extracting values from animationControl with default values
   const { visible = true, opacity = 0.5, fadeInDuration = 1000} = animationStates[id] || {};
@@ -131,14 +188,14 @@ export function DoubleArrow({ id, from, to }) {
 
 // Arrow component that dynamically positions itself based on sphere positions
 export function DynamicDoubleArrow({ id, fromId, toId, fromOffset, toOffset, ...props }) {
-  const { positions } = useContext(PositionContext);
+  const { positions } = useStore(state => ({ positions: state.positions }));
   const from = positions[fromId] ? positions[fromId].clone().add(fromOffset || new THREE.Vector3(0, 0, 0)) : null;
   const to = positions[toId] ? positions[toId].clone().add(toOffset || new THREE.Vector3(0, 0, 0)) : null;
   if (!from || !to) return null; // Don't render until positions are available
   return <DoubleArrow id={id} from={from} to={to} {...props} />
 }
 
-export function FatArrow({ id, from, to, delay, color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.03, margin = 0.6 }) {
+export function FatArrow({ id, from, to, color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.03, margin = 0.6 }) {
   const arrowGroup = useRef();
   const [opacity, setOpacity] = useState(0);
   const animationStates = useContext(AnimationContext);
