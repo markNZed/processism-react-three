@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {EmergentEntity, DynamicDoubleArrow } from './animationComponents';
 import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { AnimationController } from './AnimationController';
 import useStore from './useStore';
@@ -35,7 +35,7 @@ export default function App() {
   const positions = useStore(state => state.positions);
 
   return (
-    <Canvas style={{ background: '#a8a7b5' }} 
+    <Canvas
       camera={{ 
         position: [0, 0, 1],
         zoom: 35,
@@ -50,9 +50,6 @@ export default function App() {
     > 
       <CameraAdjuster />
       <AnimationController>
-          <ambientLight intensity={Math.PI / 2} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={1.0} />
-          <pointLight position={[-10, -10, -10]} decay={0} intensity={1.0} />
           
           <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-5, 0, 0)} causation={"bottomup"} />
           <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(5, 0, 0)} causation={"topdown"} />
@@ -64,8 +61,8 @@ export default function App() {
             toId={"emergent2"} 
             toOffset={new THREE.Vector3(-3, 0, 0)}
           />
-
           <OrbitControls />
+          <Environment preset="sunset" />
       </AnimationController>
     </Canvas>
   )
