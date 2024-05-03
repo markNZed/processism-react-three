@@ -6,12 +6,21 @@ import useStore from './useStore';
 
 function withAnimationAndPosition(Component) {
     return function WrappedComponent({ id, initialPosition, ...props }) {
+
         const ref = useRef();
         const { positions, updatePosition, animationState } = useStore(state => ({
             positions: state.positions,
             updatePosition: state.updatePosition,
             animationState: state.animationStates[id]
         }));
+
+        if (initialPosition === undefined) {
+            if (props.from) {
+                initialPosition = props.from;
+            } else if (props.fromId && positions[props.fromId]) {
+                initialPosition = positions[props.fromId]
+            }
+        }
 
         const { visible = true, opacity = 1, scale = 1, fadeInDuration = 1000 } = animationState || {};
 
@@ -24,22 +33,25 @@ function withAnimationAndPosition(Component) {
 
         // Set initial position
         useEffect(() => {
-            if (ref.current && !positions[id]) {
-                const newPosition = initialPosition || new THREE.Vector3(0, 0, 0);
-                updatePosition(id, newPosition);
+            if (ref.current && positions[id] === undefined) {
+                updatePosition(id, initialPosition);
             }
-        }, [initialPosition]);
+        }, []); // Empty dependency array means this runs only once on mount
+        
 
         useFrame(() => {
-            if (ref.current && positions[id] && !ref.current.position.equals(positions[id])) {
-                updatePosition(id, ref.current.position.clone());
+            // ref.current.position is local position and initialPosition is world position ?
+            if (ref.current && ref.current.position && positions[id] && !ref.current.position.equals(positions[id])) {
+                //console.log("Updating position", id, JSON.parse(JSON.stringify(ref.current.position)), JSON.parse(JSON.stringify(ref.current)));
+                //updatePosition(id, ref.current.position.clone());
             }
         });
 
         return (
             <Component
                 ref={ref}
-                position={positions[id]}
+                id={id}
+                initialPosition={initialPosition}
                 opacity={springProps.opacity}
                 scale={scale}
                 {...props}

@@ -4,12 +4,13 @@ import { a, animated } from '@react-spring/three';
 import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure correct path
 import * as THREE from 'three'
 
-const Circle = React.forwardRef(({ position, opacity, scale, color = 'green', radius = 3.5, ...props }, ref) => {
+const Circle = React.forwardRef(({ id, initialPosition, opacity, scale, color = 'green', radius = 3.5, ...props }, ref) => {
+
     return (
         <a.mesh
             {...props}
             ref={ref}
-            position={position}
+            position={initialPosition}
             scale={scale}
             material-opacity={opacity}
             depthWrite={false}

@@ -4,7 +4,8 @@ import { animated } from '@react-spring/three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 
-const FatArrow = React.forwardRef(({ position, opacity, color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.03, margin = 0.6, ...props }, ref) => {
+const FatArrow = React.forwardRef(({ id, opacity, color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.03, margin = 0.6, ...props }, ref) => {
+
     const direction = new THREE.Vector3().subVectors(props.to, props.from).normalize();
     const adjustedFrom = props.from.clone().add(direction.clone().multiplyScalar(margin));
     const adjustedTo = props.to.clone().sub(direction.clone().multiplyScalar(margin));

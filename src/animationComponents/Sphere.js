@@ -1,13 +1,13 @@
 import React from 'react';
 import { animated } from '@react-spring/three';
-import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure correct path
+import withAnimationAndPosition from '../withAnimationAndPosition';
 
-const Sphere = React.forwardRef(({ position, opacity, scale, onClick, onPointerOver, onPointerOut, color = 'blue', radius = 0.5, ...props }, ref) => {
+const Sphere = React.forwardRef(({ id, initialPosition, opacity, scale, onClick, onPointerOver, onPointerOut, color = 'blue', radius = 0.5, ...props }, ref) => {
     return (
         <animated.mesh
             {...props}
             ref={ref}
-            position={position}
+            position={initialPosition}
             scale={scale}
             onClick={onClick}
             onPointerOver={onPointerOver}

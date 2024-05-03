@@ -54,15 +54,16 @@ export default function App() {
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={1.0} />
           <pointLight position={[-10, -10, -10]} decay={0} intensity={1.0} />
           
-          <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-3, 0, 0)} causation={"bottomup"} />
-          <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(3, 0, 0)} causation={"topdown"} />
+          <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-5, 0, 0)} causation={"bottomup"} />
+          <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(5, 0, 0)} causation={"topdown"} />
 
           <DynamicDoubleArrow 
             id={"inter_emergent"} 
             fromId={"emergent1"} 
-            fromOffset={new THREE.Vector3(-4, 1.0, 0)} 
+            fromOffset={new THREE.Vector3(3, 0, 0)} 
             toId={"emergent2"} 
-            toOffset={new THREE.Vector3(-4, 1.0, 0)}/>
+            toOffset={new THREE.Vector3(-3, 0, 0)}
+          />
 
           <OrbitControls />
       </AnimationController>
