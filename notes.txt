@@ -1,3 +1,4 @@
+Move all components to using motion animation and variants.
 
 add text and compare with manim animation
 
