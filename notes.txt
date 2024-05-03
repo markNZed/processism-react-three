@@ -3,7 +3,7 @@ add text and compare with manim animation
 
 Use React Spring on the threejs 
 
-https://www.framer.com/motion/
+https://www.framer.com/motion/three-introduction/
 Do we need a physics system? https://github.com/pmndrs/react-three-rapier but can we "mix" this
 
 

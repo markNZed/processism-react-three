@@ -1,6 +1,5 @@
 // FatArrow.js
 import React from 'react';
-import { animated } from '@react-spring/three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 
@@ -16,20 +15,20 @@ const FatArrow = React.forwardRef(({ id, opacity, color = 'red', headLength = 0.
 
     return (
         <group ref={ref} {...props}>
-            <animated.mesh
+            <mesh
                 geometry={lineGeometry}
                 position={adjustedFrom.clone().lerp(adjustedTo, 0.5)}
                 quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
             >
-                <animated.meshBasicMaterial color={color} transparent={true} opacity={opacity} />
-            </animated.mesh>
-            <animated.mesh
+                <meshBasicMaterial color={color} transparent={true} opacity={opacity} />
+            </mesh>
+            <mesh
                 geometry={coneGeometry}
                 position={adjustedTo}
                 quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
             >
-                <animated.meshBasicMaterial color={color} transparent={true} opacity={opacity} />
-            </animated.mesh>
+                <meshBasicMaterial color={color} transparent={true} opacity={opacity} />
+            </mesh>
         </group>
     );
 });
