@@ -10,3 +10,6 @@ To work with this project on a remote server (assuming the server has SSH, Docke
 * There may be directory permission problems (the directory on the server is owned by a different user than the user in the docker container)
   * From the terminal inside VS Code: `sudo chown -R node:node /workspaces/react-three`
   * Then need to complete the setup manually: `npm install` `npm start`
+* Needed to configure Git from VS Code terminal 
+  * git config --global user.email "your_email@example.com"
+  * git config --global user.name "your_name"

@@ -21,7 +21,7 @@ const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, fromId, toId
 
     if (!from || !to) {
         // Optionally log or handle missing data
-        console.log(`Waiting for positions: fromId=${fromId}, toId=${toId}`);
+        //console.log(`Waiting for positions: fromId=${fromId}, toId=${toId}`);
         return null; // Return null to avoid rendering until necessary data is available
     }
     
