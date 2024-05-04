@@ -34,6 +34,8 @@ export default function App() {
 
   const positions = useStore(state => state.positions);
 
+  const emergentEntityRadius = 3.5;
+
   return (
     <Canvas
       camera={{ 
@@ -49,20 +51,22 @@ export default function App() {
       orthographic
     > 
       <CameraAdjuster />
-      <AnimationController>
+        <AnimationController>
           
-          <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-5, 0, 0)} causation={"bottomup"} />
-          <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(5, 0, 0)} causation={"topdown"} />
+          <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-5, 0, 0)} initialRadius={emergentEntityRadius} causation={"bottomup"} />
+          <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(5, 0, 0)} initialRadius={emergentEntityRadius} causation={"topdown"} />
 
           <DynamicDoubleArrow 
             id={"inter_emergent"} 
             fromId={"emergent1"} 
-            fromOffset={new THREE.Vector3(3, 0, 0)} 
             toId={"emergent2"} 
-            toOffset={new THREE.Vector3(-3, 0, 0)}
+            margin={emergentEntityRadius}
           />
+
           <OrbitControls />
+
           <Environment preset="sunset" />
+
       </AnimationController>
     </Canvas>
   )

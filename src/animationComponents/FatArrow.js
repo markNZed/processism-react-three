@@ -4,7 +4,7 @@ import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 import { motion } from "framer-motion-3d"
 
-const FatArrow = React.forwardRef(({ id, animationState, margin = 0.6, ...props }, ref) => {
+const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props }, ref) => {
 
     // This animates something that motion does not support
     const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05 } = animationState;

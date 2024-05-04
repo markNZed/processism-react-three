@@ -2,10 +2,10 @@ import React from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import { motion } from "framer-motion-3d"
 
-const Sphere = React.forwardRef(({ id, initialPosition, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
+const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialRadius, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { scale = 1, color = 'blue', radius = 0.5 } = animationState;
+    const { scale = 1, color = 'blue', radius = initialRadius } = animationState;
 
     // Define animation variants
     const variants = {

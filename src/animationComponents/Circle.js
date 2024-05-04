@@ -3,10 +3,10 @@ import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure co
 import * as THREE from 'three';
 import { motion } from "framer-motion-3d"
 
-const Circle = React.forwardRef(({id, initialPosition, animationState, ...props}, ref) => {
+const Circle = React.forwardRef(({id, initialPosition, animationState, initialRadius, ...props}, ref) => {
 
     // This animates something that motion does not support
-    const { radius = 3.5 } = animationState;
+    const { radius = initialRadius } = animationState;
 
     // Define animation variants
     const variants = {

@@ -1,15 +1,5 @@
-Move all components to using motion animation and variants.
-  Sphere
-  FatArrow (can we pass down animations from DouobleArrow etc ?)
-
- All the fixed values like this probably need to be calculated not set.
-
 add text and compare with manim animation
 
-Use React Spring on the threejs 
+Can we pass down variants from DouobleArrow etc ?
 
-https://www.framer.com/motion/three-introduction/
-Do we need a physics system? https://github.com/pmndrs/react-three-rapier but can we "mix" this
-
-
-
+Do we need a physics system? https://github.com/pmndrs/react-three-rapier can we "mix" this (I think yes)
