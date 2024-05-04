@@ -30,7 +30,7 @@ export function AnimationController({ children }) {
     animate('emergent2.Circle',  2000, { duration: 1, variant: "visible", opacity: 0.5 });
     animate('emergent1.Sphere2', 2000, { scale: 1.5 });
     animate('emergent1.Sphere3', 3000, { scale: 0.8 });
-    animate('emergent1', 5000, { variant: "testing" });
+    animate('emergent1', 5000, { variant: "oneSphere" });
 
     return () => {
       timeouts.forEach(clearTimeout);  // Clear all timeouts

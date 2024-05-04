@@ -14,21 +14,39 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
 
   // Effect to update child component's animation state based on the parent's variant
   useEffect(() => {
-    if (animationState.variant === 'testing') {
-      updateAnimationState(`${id}.Circle`, {opacity: 1});
+    switch (animationState.variant) {
+      // Add additional cases as needed
+      case 'oneSphere':
+        updateAnimationState(`${id}.Circle`, { variant: "hidden" });
+        updateAnimationState(`${id}.causation.FatArrow1`, { variant: "hidden" });
+        updateAnimationState(`${id}.causation.FatArrow2`, { variant: "hidden" });
+        updateAnimationState(`${id}.causation.FatArrow3`, { variant: "hidden" });
+        updateAnimationState(`${id}.causation.FatArrow4`, { variant: "hidden" });
+        updateAnimationState(`${id}.Sphere2`, { variant: "hidden" });
+        updateAnimationState(`${id}.Sphere3`, { variant: "hidden" });
+        updateAnimationState(`${id}.Sphere4`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow1`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow2`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow3`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow4`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow5`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow6`, { variant: "hidden" });
+        break;
+      default:
+        break;
     }
-  }, [animationState.variant, updateAnimationState]);
-
+  }, [animationState.variant, updateAnimationState, id]);
+  
   // Define animation variants
   const variants = {
     hidden: { opacity: 0 },
     visible: { opacity: animationState.opacity ?? 1.0 },
-    testing: { }, // Nothing to animate here but we can use this to animate children 
+    oneSphere : {},
   };
 
   const causationArrows = (id, start, end) => (
     <>
-      <FatArrow id={`${id}.FatArrow2`} from={new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z)} to={new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)} />
+      <FatArrow id={`${id}.FatArrow1`} from={new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z)} to={new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)} />
       <FatArrow id={`${id}.FatArrow2`} from={new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z)} to={new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z)} />
       <FatArrow id={`${id}.FatArrow3`} from={new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z)} to={new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z)} />
       <FatArrow id={`${id}.FatArrow4`} from={new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z)} to={new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z)} />
@@ -50,8 +68,8 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow6`} fromId={`${id}.Sphere2`} toId={`${id}.Sphere3`} margin={sphereRadius} />
        {
         causation === "bottomup" ?
-        causationArrows(`${id}.bottomup`, initialPosition, new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z - causationLength)) :
-        causationArrows(`${id}.topdown`, new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z - causationLength), initialPosition)
+        causationArrows(`${id}.causation`, initialPosition, new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z - causationLength)) :
+        causationArrows(`${id}.causation`, new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z - causationLength), initialPosition)
       }
     </group>
   );

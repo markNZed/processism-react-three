@@ -38,7 +38,4 @@ useStore.subscribe(
     animationStates => console.log("Animation states have changed:", animationStates)
 );
 
-
-
-
 export default useStore;
