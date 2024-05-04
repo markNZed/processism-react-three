@@ -1,18 +1,29 @@
 import * as THREE from 'three'
 import {FatArrow, Circle, Sphere, DynamicDoubleArrow } from './';
-import React from 'react';
+import React, { useEffect } from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
+import useStore from '../useStore';
 
 const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, causation, initialRadius, ...props }, ref) => {
+
+  const { updateAnimationState } = useStore();
 
   const sphereRadius = initialRadius / 4;
   const causationLength = initialRadius / 2;
   const sphereOffset = initialRadius/3;
 
+  // Effect to update child component's animation state based on the parent's variant
+  useEffect(() => {
+    if (animationState.variant === 'testing') {
+      updateAnimationState(`${id}.Circle`, {opacity: 1});
+    }
+  }, [animationState.variant, updateAnimationState]);
+
   // Define animation variants
   const variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: animationState.opacity ?? 1.0 }
+    visible: { opacity: animationState.opacity ?? 1.0 },
+    testing: { }, // Nothing to animate here but we can use this to animate children 
   };
 
   const causationArrows = (id, start, end) => (
