@@ -3,7 +3,7 @@ import {FatArrow, Circle, Sphere, DynamicDoubleArrow } from './';
 import React from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 
-const EmergentEntity = React.forwardRef(({ id, initialPosition, causation, ...props }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, causation, ...props }, ref) => {
 
   const firstSpherePosition = new THREE.Vector3(initialPosition.x - 1, initialPosition.y + 1, initialPosition.z - 2)
   const causationPosition = new THREE.Vector3(initialPosition.x - 1, initialPosition.y - 1, initialPosition.z - 2)

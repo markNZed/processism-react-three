@@ -13,10 +13,6 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, ...props}
         hidden: { opacity: 0 },
         visible: { opacity: 0.5, color: "rgb(0, 128, 0)" }
     };
-    
-
-    // JSON.parse(JSON.stringify())
-    console.log("Circle", JSON.stringify(animationState));
 
     // Circle component now only responsible for setting up its geometry and material.
     // All animations and dynamic property updates are handled by HOC via props.

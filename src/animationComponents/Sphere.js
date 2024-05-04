@@ -1,7 +1,18 @@
 import React from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
+import { motion } from "framer-motion-3d"
 
-const Sphere = React.forwardRef(({ id, initialPosition, opacity, scale, onClick, onPointerOver, onPointerOut, color = 'blue', radius = 0.5, ...props }, ref) => {
+const Sphere = React.forwardRef(({ id, initialPosition, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
+
+    // This animates something that motion does not support
+    const { scale = 1, color = 'blue', radius = 0.5 } = animationState;
+
+    // Define animation variants
+    const variants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1.0 }
+    };
+
     return (
         <mesh
             {...props}
@@ -11,11 +22,17 @@ const Sphere = React.forwardRef(({ id, initialPosition, opacity, scale, onClick,
             onClick={onClick}
             onPointerOver={onPointerOver}
             onPointerOut={onPointerOut}
-            material-opacity={opacity}
             depthWrite={false}
         >
             <sphereGeometry args={[radius, 32, 32]} />
-            <meshStandardMaterial color={color} opacity={opacity} transparent />
+            <motion.meshStandardMaterial
+                color={color}
+                initial="visible"
+                transparent={true} 
+                animate={animationState.variant}
+                variants={variants}
+                transition={{ duration: animationState.duration || 0 }}
+            />
         </mesh>
     );
 });
