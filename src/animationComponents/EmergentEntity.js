@@ -9,6 +9,12 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
   const causationLength = initialRadius / 2;
   const sphereOffset = initialRadius/3;
 
+  // Define animation variants
+  const variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: animationState.opacity ?? 1.0 }
+  };
+
   const causationArrows = (id, start, end) => (
     <>
       <FatArrow id={`${id}.FatArrow2`} from={new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z)} to={new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)} />

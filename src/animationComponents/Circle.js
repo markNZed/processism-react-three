@@ -11,7 +11,7 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, initialRa
     // Define animation variants
     const variants = {
         hidden: { opacity: 0 },
-        visible: { opacity: 0.5, color: "rgb(0, 128, 0)" }
+        visible: { opacity: animationState.opacity ?? 1.0, color: "rgb(0, 128, 0)" }
     };
 
     // Circle component now only responsible for setting up its geometry and material.

@@ -20,7 +20,7 @@ const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props },
     // Define animation variants
     const variants = {
         hidden: { opacity: 0 },
-        visible: { opacity: 1 }
+        visible: { opacity: animationState.opacity ?? 1.0 }
     };
 
     return (

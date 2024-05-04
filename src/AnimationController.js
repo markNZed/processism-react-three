@@ -14,7 +14,7 @@ export function AnimationController({ children }) {
 
     // Initial setup for animation states
     setInitialAnimationState({
-      'emergent1.Circle': { duration: 1, variant: "visible" },
+      'emergent1.Circle': { duration: 1, variant: "visible", opacity: 0.5 },
     });
 
     const animate = (id, delay, newState) => {
@@ -27,7 +27,7 @@ export function AnimationController({ children }) {
     // Example animations for different spheres
     animate('emergent1.Sphere1', 1000, { scale: 1.5 });
     animate('emergent1.Circle',  2000, { radius: 4 });
-    animate('emergent2.Circle',  2000, { duration: 1, variant: "visible" });
+    animate('emergent2.Circle',  2000, { duration: 1, variant: "visible", opacity: 0.5 });
     animate('emergent1.Sphere2', 2000, { scale: 1.5 });
     animate('emergent1.Sphere3', 3000, { scale: 0.8 });
 

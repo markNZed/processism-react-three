@@ -10,7 +10,7 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
     // Define animation variants
     const variants = {
         hidden: { opacity: 0 },
-        visible: { opacity: 1.0 }
+        visible: { opacity: animationState.opacity ?? 1.0 }
     };
 
     return (

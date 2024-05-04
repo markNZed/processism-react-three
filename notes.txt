@@ -1,5 +1,6 @@
-add text and compare with manim animation
-
-Can we pass down variants from DouobleArrow etc ?
-
-Do we need a physics system? https://github.com/pmndrs/react-three-rapier can we "mix" this (I think yes)
+add text objects
+Pass down variants from DouobleArrow etc ?
+Having variants in the emergentEntity for the "appearance" of the parts and adding text.
+Handling of the position updates needs more work
+Compare with manim animation
+Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option
