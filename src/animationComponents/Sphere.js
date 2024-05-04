@@ -34,7 +34,7 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
     });
 
     return (
-        <>
+        <group visible={visible} >
         <Text ref={textRef} color="black" anchorX="center" anchorY="middle" position={textPosition} scale={0.5} >
         Sphere
         </Text>
@@ -47,7 +47,6 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
             onPointerOver={onPointerOver}
             onPointerOut={onPointerOut}
             depthWrite={false}
-            visible={visible}
         >
             <sphereGeometry args={[radius, 32, 32]} />
             <motion.meshStandardMaterial
@@ -59,7 +58,7 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
                 transition={{ duration: animationState.duration || 0 }}
             />
         </mesh>
-        </>
+        </group>
     );
 });
 
