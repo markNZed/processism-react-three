@@ -11,10 +11,10 @@ const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, animationSta
 
     // Effect to update and log only on changes
     useEffect(() => {
-        updateAnimationState(`${id}.DoubleArrow`, { variant: animationState.variant });
-        // Log the update
-        console.log(`Updated animation state for ${id}.DoubleArrow to`, animationState.variant);
-    }, [animationState.variant, id, updateAnimationState]);
+        if (Object.keys(animationState).length > 0) {
+            updateAnimationState(`${id}.DoubleArrow`, animationState);
+        }
+    }, [animationState, id, updateAnimationState]);
 
     const { positions } = useStore(state => ({ positions: state.positions }));
 
@@ -43,7 +43,6 @@ const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, animationSta
             from={from}
             to={to}
             margin={margin}
-            animationState={animationState}
         />
     );
 });

@@ -10,16 +10,16 @@ const DoubleArrow = React.forwardRef(({ id, animationState, from, to, visible, m
 
     // Effect to update and log only on changes
     useEffect(() => {
-        updateAnimationState(`${id}.from`, { variant: animationState.variant });
-        updateAnimationState(`${id}.to`, { variant: animationState.variant });
-        // Log the update
-        console.log(`Updated animation state for ${id}.FatArrow to`, animationState.variant);
-    }, [animationState.variant, id, updateAnimationState]);
+        if (Object.keys(animationState).length > 0) {
+            updateAnimationState(`${id}.from`, animationState);
+            updateAnimationState(`${id}.to`, animationState);
+        }
+    }, [animationState, id, updateAnimationState]);
 
     return (
         <group {...props} visible={visible} ref={ref} >
-            <FatArrow id={`${id}.from`} from={from} to={to} margin={margin} animationState={animationState} />
-            <FatArrow id={`${id}.to`} from={to} to={from}  margin={margin} animationState={animationState} />
+            <FatArrow id={`${id}.from`} from={from} to={to} margin={margin} />
+            <FatArrow id={`${id}.to`} from={to} to={from}  margin={margin} />
         </group>
     );
 });

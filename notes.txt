@@ -1,4 +1,5 @@
 add text objects
+Use visibility instead of opacity = 0
 Handling of the position updates needs more work
 Compare with manim animation
 Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option
