@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure correct path
 import * as THREE from 'three';
 import { motion } from "framer-motion-3d"
@@ -14,6 +14,10 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, initialRa
         visible: { opacity: animationState.opacity ?? 1.0, color: "rgb(0, 128, 0)" }
     };
 
+    // Cylinder to simulate a circle with thickness
+    const cylinderHeight = 0.1; // This is the "thickness" of the circle
+    const radialSegments = 32; // This can be adjusted for smoother circles
+
     // Circle component now only responsible for setting up its geometry and material.
     // All animations and dynamic property updates are handled by HOC via props.
     return (
@@ -23,8 +27,12 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, initialRa
             position={initialPosition}
             depthWrite={false}
             visible={visible}
+            rotation={[Math.PI / 2, 0, 0]} // Rotate the cylinder to align it as a circle in the xz-plane
         >
-            <circleGeometry args={[radius, 32]} />
+            <cylinderGeometry
+                args={[radius, radius, cylinderHeight, radialSegments]}
+                attach="geometry"
+            />
             <motion.meshBasicMaterial 
               transparent side={THREE.DoubleSide} 
               initial="hidden"
