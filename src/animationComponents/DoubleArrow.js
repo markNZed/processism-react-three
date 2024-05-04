@@ -4,7 +4,7 @@ import { FatArrow } from './';  // Ensure this correctly imports FatArrow
 import withAnimationAndPosition from '../withAnimationAndPosition';  // Ensure correct path
 import useStore from '../useStore';
 
-const DoubleArrow = React.forwardRef(({ id, animationState, from, to, visible, margin, ...props }, ref) => {
+const DoubleArrow = React.forwardRef(({ id, animationState, from, to, margin, ...props }, ref) => {
 
     const { updateAnimationState } = useStore();
 
@@ -17,7 +17,7 @@ const DoubleArrow = React.forwardRef(({ id, animationState, from, to, visible, m
     }, [animationState, id, updateAnimationState]);
 
     return (
-        <group {...props} visible={visible} ref={ref} >
+        <group {...props} ref={ref} >
             <FatArrow id={`${id}.from`} from={from} to={to} margin={margin} />
             <FatArrow id={`${id}.to`} from={to} to={from}  margin={margin} />
         </group>

@@ -6,7 +6,7 @@ import { motion } from "framer-motion-3d"
 const Circle = React.forwardRef(({id, initialPosition, animationState, initialRadius, ...props}, ref) => {
 
     // This animates something that motion does not support
-    const { radius = initialRadius } = animationState;
+    const { radius = initialRadius, visible = true } = animationState;
 
     // Define animation variants
     const variants = {
@@ -22,6 +22,7 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, initialRa
             ref={ref}
             position={initialPosition}
             depthWrite={false}
+            visible={visible}
         >
             <circleGeometry args={[radius, 32]} />
             <motion.meshBasicMaterial 

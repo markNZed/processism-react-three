@@ -5,7 +5,7 @@ import { motion } from "framer-motion-3d"
 const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialRadius, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { scale = 1, color = 'blue', radius = initialRadius } = animationState;
+    const { scale = 1, color = 'blue', radius = initialRadius, visible = true } = animationState;
 
     // Define animation variants
     const variants = {
@@ -23,6 +23,7 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
             onPointerOver={onPointerOver}
             onPointerOut={onPointerOut}
             depthWrite={false}
+            visible={visible}
         >
             <sphereGeometry args={[radius, 32, 32]} />
             <motion.meshStandardMaterial

@@ -17,20 +17,20 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
     switch (animationState.variant) {
       // Add additional cases as needed
       case 'oneSphere':
-        updateAnimationState(`${id}.Circle`, { variant: "hidden" });
-        updateAnimationState(`${id}.causation.FatArrow1`, { variant: "hidden" });
-        updateAnimationState(`${id}.causation.FatArrow2`, { variant: "hidden" });
-        updateAnimationState(`${id}.causation.FatArrow3`, { variant: "hidden" });
-        updateAnimationState(`${id}.causation.FatArrow4`, { variant: "hidden" });
-        updateAnimationState(`${id}.Sphere2`, { variant: "hidden" });
-        updateAnimationState(`${id}.Sphere3`, { variant: "hidden" });
-        updateAnimationState(`${id}.Sphere4`, { variant: "hidden" });
+        updateAnimationState(`${id}.Circle`, { visible: false });
+        updateAnimationState(`${id}.causation.FatArrow1`, { visible: false });
+        updateAnimationState(`${id}.causation.FatArrow2`, { visible: false });
+        updateAnimationState(`${id}.causation.FatArrow3`, { visible: false });
+        updateAnimationState(`${id}.causation.FatArrow4`, { visible: false });
+        updateAnimationState(`${id}.Sphere2`, { visible: false });
+        updateAnimationState(`${id}.Sphere3`, { visible: false });
+        updateAnimationState(`${id}.Sphere4`, { visible: false });
         updateAnimationState(`${id}.DynamicDoubleArrow1`, { variant: "hidden" });
-        updateAnimationState(`${id}.DynamicDoubleArrow2`, { variant: "hidden" });
-        updateAnimationState(`${id}.DynamicDoubleArrow3`, { variant: "hidden" });
-        updateAnimationState(`${id}.DynamicDoubleArrow4`, { variant: "hidden" });
-        updateAnimationState(`${id}.DynamicDoubleArrow5`, { variant: "hidden" });
-        updateAnimationState(`${id}.DynamicDoubleArrow6`, { variant: "hidden" });
+        updateAnimationState(`${id}.DynamicDoubleArrow2`, { visible: false });
+        updateAnimationState(`${id}.DynamicDoubleArrow3`, { visible: false });
+        updateAnimationState(`${id}.DynamicDoubleArrow4`, { visible: false });
+        updateAnimationState(`${id}.DynamicDoubleArrow5`, { visible: false });
+        updateAnimationState(`${id}.DynamicDoubleArrow6`, { visible: false });
         break;
       default:
         break;

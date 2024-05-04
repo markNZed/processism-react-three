@@ -7,7 +7,7 @@ import { motion } from "framer-motion-3d"
 const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05 } = animationState;
+    const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05, visible = true } = animationState;
 
     const direction = new THREE.Vector3().subVectors(props.to, props.from).normalize();
     const adjustedFrom = props.from.clone().add(direction.clone().multiplyScalar(margin));
@@ -24,7 +24,7 @@ const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props },
     };
 
     return (
-        <group ref={ref} {...props}>
+        <group ref={ref} {...props} visible={visible}>
             <mesh
                 geometry={lineGeometry}
                 position={adjustedFrom.clone().lerp(adjustedTo, 0.5)}
