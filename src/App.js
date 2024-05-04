@@ -32,8 +32,6 @@ function CameraAdjuster() {
 
 export default function App() {
 
-  const positions = useStore(state => state.positions);
-
   const emergentEntityRadius = 3.5;
 
   return (

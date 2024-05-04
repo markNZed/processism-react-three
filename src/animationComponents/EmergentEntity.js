@@ -3,6 +3,7 @@ import {FatArrow, Circle, Sphere, DynamicDoubleArrow } from './';
 import React, { useEffect } from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import useStore from '../useStore';
+import { Text } from '@react-three/drei'
 
 const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, causation, initialRadius, ...props }, ref) => {
 
@@ -55,6 +56,9 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
 
   return (
     <group ref={ref} initialPosition={initialPosition}>
+      <Text color="black" anchorX="center" anchorY="top">
+        hello world!
+      </Text>
       <Circle id={`${id}.Circle`} initialPosition={initialPosition} initialRadius={initialRadius} />
       <Sphere id={`${id}.Sphere1`} initialPosition={new THREE.Vector3(initialPosition.x - sphereOffset, initialPosition.y + sphereOffset, initialPosition.z - causationLength)} initialRadius={sphereRadius} />
       <Sphere id={`${id}.Sphere2`} initialPosition={new THREE.Vector3(initialPosition.x + sphereOffset, initialPosition.y + sphereOffset, initialPosition.z - causationLength)} initialRadius={sphereRadius} />
