@@ -1,4 +1,3 @@
-DynamicDoubleArrow1 not hiding in emergetnEntity variant oneSphere
 add text objects
 Handling of the position updates needs more work
 Compare with manim animation

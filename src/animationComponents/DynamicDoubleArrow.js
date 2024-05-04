@@ -1,11 +1,20 @@
 // DynamicDoubleArrow.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import useStore from '../useStore';
 import { DoubleArrow } from './';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 
-const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, fromId, toId, fromOffset, toOffset, margin, ...props }, ref) => {
+const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, animationState, fromId, toId, fromOffset, toOffset, margin, ...props }, ref) => {
+
+    const { updateAnimationState } = useStore();
+
+    // Effect to update and log only on changes
+    useEffect(() => {
+        updateAnimationState(`${id}.DoubleArrow`, { variant: animationState.variant });
+        // Log the update
+        console.log(`Updated animation state for ${id}.DoubleArrow to`, animationState.variant);
+    }, [animationState.variant, id, updateAnimationState]);
 
     const { positions } = useStore(state => ({ positions: state.positions }));
 
@@ -34,6 +43,7 @@ const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, fromId, toId
             from={from}
             to={to}
             margin={margin}
+            animationState={animationState}
         />
     );
 });
