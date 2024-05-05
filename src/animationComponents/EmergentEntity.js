@@ -7,7 +7,7 @@ import {CustomText } from './';
 
 const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...props }, ref) => {
 
-  const { updateAnimationState,batchUpdateAnimationStates } = useStore();
+  const { updateAnimationState, batchUpdateAnimationStates } = useStore();
 
   const { radius, position, visible } = { ...initialState, ...animationState };
   

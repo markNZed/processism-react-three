@@ -16,12 +16,23 @@ const useStore = create(subscribeWithSelector((set, get) => ({
   setInitialAnimationState: (initialStates) => set({
     animationStates: { ...initialStates }
   }),
-  updateAnimationState: (id, newState) => set(state => ({
-    animationStates: {
-      ...state.animationStates,
-      [id]: { ...state.animationStates[id], ...newState }
+  why: {},
+  updateAnimationState: (id, newState) => set(state => {
+    const newStateWithGlobal = { ...newState };
+    if ('why' in newState) {
+      // If 'why' is provided in newState, update the global 'why' value
+      state.why = id + ': ' + newState.why;
+    } else {
+      state.why = id;
     }
-  })),
+    return {
+      ...state,
+      animationStates: {
+        ...state.animationStates,
+        [id]: { ...state.animationStates[id], ...newStateWithGlobal }
+      },
+    };
+  }),
   batchUpdateAnimationStates: (updates) => set(state => {
     const newState = { ...state.animationStates };
     Object.entries(updates).forEach(([id, update]) => {
@@ -41,9 +52,14 @@ useStore.subscribe(
 
 */
 
+// Subscribe only to changes in animationStates but log 'why' as well
 useStore.subscribe(
-    state => state.animationStates,
-    animationStates => console.log("Animation states have changed:", animationStates)
+  state => state.animationStates,  // Only listen to changes in animationStates
+  animationStates => {
+      const why = useStore.getState().why;  // Retrieve 'why' at the time of logging
+      console.log("Animation states have changed:", animationStates, "Why:", why);
+  }
 );
+
 
 export default useStore;

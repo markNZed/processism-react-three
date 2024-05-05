@@ -34,7 +34,7 @@ export function AnimationController({ children }) {
 
         // Delay, id, animationState
         const animationSteps = [
-            [1, 'emergent1', { variant: "twoSphere" }],
+            [1, 'emergent1', { variant: "twoSphere", why: "Showing second sphere" }],
             [1, 'emergent1', { variant: "relation" }],
             [1, 'emergent1', { variant: "allRelations" }],
             [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
