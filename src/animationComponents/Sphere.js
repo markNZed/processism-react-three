@@ -30,7 +30,8 @@ const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, on
                 position: textPosition,
                 text: initialState.text,
                 scale: 0.5
-            }}/>
+            }}
+        />
         <mesh
             {...props}
             ref={ref}

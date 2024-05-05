@@ -55,7 +55,7 @@ export default function App() {
             initialState={{
               position: new THREE.Vector3(-emergentEntityRadius*1.5, 0, 0), 
               radius: emergentEntityRadius,
-              causation: "bottomup",
+              text: "Emergent Entity",
             }} 
           />
           <EmergentEntity 
@@ -64,8 +64,8 @@ export default function App() {
               position: new THREE.Vector3(emergentEntityRadius*1.5, 0, 0), 
               radius: emergentEntityRadius,
               causation: "bottomup",
+              text: "Emergent Entity",
             }} 
-            causation={"topdown"} 
           />
 
           <DynamicDoubleArrow 

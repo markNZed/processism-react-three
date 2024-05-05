@@ -3,6 +3,7 @@ import {FatArrow, Circle, Sphere, DynamicDoubleArrow } from './';
 import React, { useEffect } from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import useStore from '../useStore';
+import {CustomText } from './';
 
 const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...props }, ref) => {
 
@@ -76,7 +77,6 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
   const variants = {
     hidden: { opacity: 0 },
     visible: { opacity: animationState.opacity ?? 1.0 },
-    oneSphere : {},
   };
 
   const spherePosition1 = new THREE.Vector3(
@@ -109,8 +109,19 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
     </group>
   );
 
+  // Calculate text position based on initialState position and any offset
+  const textPosition = new THREE.Vector3(0, radius * 1.2, 0);
+
   return (
     <group ref={ref} position={position} visible={visible} >
+      <CustomText 
+        id={`${id}.text`} 
+        initialState={{
+            position: textPosition,
+            text: initialState.text,
+            scale: 0.5
+        }}
+      />
       <Circle id={`${id}.Circle`} initialState={{radius: radius}} />
       <Sphere id={`${id}.Sphere1`} initialState={{position: spherePosition1, radius: sphereRadius, text: "Entity"}} />
       <Sphere id={`${id}.Sphere2`} initialState={{position: spherePosition2, radius: sphereRadius}} />
