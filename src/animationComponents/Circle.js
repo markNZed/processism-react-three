@@ -6,12 +6,12 @@ import { motion } from "framer-motion-3d"
 const Circle = React.forwardRef(({id, initialState, animationState, ...props}, ref) => {
 
     // This animates something that motion does not support
-    const { radius, visible = true, position } = { ...initialState, ...animationState };
+    const { radius, visible = true, position, color = "rgb(0, 128, 0)" } = { ...initialState, ...animationState };
 
     // Define animation variants
     const variants = {
         hidden: { opacity: 0 },
-        visible: { opacity: animationState.opacity ?? 1.0, color: "rgb(0, 128, 0)" }
+        visible: { opacity: animationState.opacity ?? 1.0 }
     };
 
     // Cylinder to simulate a circle with thickness
@@ -35,10 +35,11 @@ const Circle = React.forwardRef(({id, initialState, animationState, ...props}, r
             />
             <motion.meshBasicMaterial 
               transparent side={THREE.DoubleSide} 
-              initialState="hidden"
+              initialState="visble"
               animate={animationState.variant}
               variants={variants}
               transition={{ duration: animationState.duration || 0 }}
+              color={color}
             />
         </mesh>
     );

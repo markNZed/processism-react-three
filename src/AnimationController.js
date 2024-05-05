@@ -13,14 +13,13 @@ export function AnimationController({ children }) {
         // Initial setup for animation states
         setInitialAnimationState({
             'inter_emergent': { visible: false },
-            'emergent1.Circle': { opacity: 0 },
-            'emergent1.causation': { visible: false },
+            'emergent1': { variant: "oneSphere" },
+            'emergent1.Circle': { variant: "hidden" },
             'emergent2': { visible: false },
-            'emergent2.causation': { visible: false },
-            'emergent2.Circle': { opacity: 0 },
+            'emergent2.Circle': { variant: "hidden" },
         });
 
-        const delta = 0.3; // set to 1 for normal speed
+        const delta = 1; // set to 1 for normal speed
 
         const scheduleAnimations = (animations) => {
             let cumulativeDelay = 0; // Initialize cumulative delay
