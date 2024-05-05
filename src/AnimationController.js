@@ -23,7 +23,7 @@ export function AnimationController({ children }) {
         const scheduleAnimations = (animations) => {
             let cumulativeDelay = 0; // Initialize cumulative delay
 
-            animations.forEach(([id, delay, newState]) => {
+            animations.forEach(([delay, id, newState]) => {
                 cumulativeDelay += delay * 1000; // Increase cumulative delay by current delay
                 const timeout = setTimeout(() => {
                     updateAnimationState(id, newState);
@@ -32,17 +32,17 @@ export function AnimationController({ children }) {
             });
         };
 
-        // id, relative delay, animationState
+        // Delay, id, animationState
         const animationSteps = [
-            ['emergent1', 0, { variant: "oneSphere" }],
-            ['emergent1', 1, { variant: "twoSphere" }],
-            ['emergent1', 1, { variant: "relation" }],
-            ['emergent1', 1, { variant: "allRelations" }],
-            ['emergent1.Circle', 1, { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            ['emergent2', 0, { visible: true }],
-            ['inter_emergent', 0.5, { visible: true }],
-            ['emergent1.causation', 0.5, { visible: true }],
-            ['emergent2.causation', 0.5, { visible: true }]
+            [0, 'emergent1', { variant: "oneSphere" }],
+            [1, 'emergent1', { variant: "twoSphere" }],
+            [1, 'emergent1', { variant: "relation" }],
+            [1, 'emergent1', { variant: "allRelations" }],
+            [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
+            [0, 'emergent2', { visible: true }],
+            [0.5, 'inter_emergent', { visible: true }],
+            [0.5, 'emergent1.causation', { visible: true }],
+            [0.5, 'emergent2.causation', { visible: true }]
         ];
 
         // Schedule all animation groups
