@@ -1,43 +1,37 @@
 import React, { useRef, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { motion } from "framer-motion-3d"
+import { motion } from "framer-motion-3d";
 import useStore from './useStore';
-import * as THREE from 'three'
+import { Vector3 } from 'three';
 
 function withAnimationAndPosition(Component) {
-    const MotionComponent = motion(Component); // Create a motion-enhanced component
+    const MotionComponent = motion(Component);
 
     return function WrappedComponent({ id, initialState, ...props }) {
         const ref = useRef();
-        const { positions, updatePosition, animationState } = useStore(state => ({
-            positions: state.positions,
-            updatePosition: state.updatePosition,
-            animationState: state.animationStates[id] || {}
-        }));
+        const getPosition = useStore(state => state.getPosition);
+        const updatePosition = useStore(state => state.updatePosition);
+        const animationState = useStore(state => state.animationStates[id] || {});
 
-        // Set initialState position
         useEffect(() => {
-            if (ref.current && !positions[id] && initialState) {
-                const newPosition = initialState.position || new THREE.Vector3(0, 0, 0);
-                updatePosition(id, newPosition);
+            if (ref.current && initialState) {
+                const position = getPosition(id) || initialState.position || new Vector3(0, 0, 0);
+                ref.current.position.copy(position);
             }
-        }, [initialState, id, positions, updatePosition]);
+        }, [id, getPosition, initialState]);
 
-        // Synchronize Three.js object's position with the stored position
-        useFrame(() => {
-            // Local position vs global positions :(
-            if (ref.current && positions[id] && !ref.current.position.equals(positions[id])) {
-                //ref.current.position.copy(positions[id]);
+        useEffect(() => {
+            if (ref.current && !getPosition(id) && initialState && initialState.position) {
+                updatePosition(id, initialState.position);
             }
-        });
+        }, [initialState, id, getPosition, updatePosition]);
 
         return (
             <MotionComponent
                 ref={ref}
                 id={id}
-                initialState={initialState}
                 {...props}
                 animationState={animationState}
+                initialState={initialState}
             />
         );
     };

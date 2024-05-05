@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware'
 
-const useStore = create(subscribeWithSelector(set => ({
+const useStore = create(subscribeWithSelector((set, get) => ({
   positions: {
   },
   updatePosition: (id, newPosition) => set(state => ({
@@ -10,6 +10,7 @@ const useStore = create(subscribeWithSelector(set => ({
       [id]: newPosition
     }
   })),
+  getPosition: id => get().positions[id],
   animationStates: {
   },
   setInitialAnimationState: (initialStates) => set({
