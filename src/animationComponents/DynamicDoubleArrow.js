@@ -28,6 +28,8 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, initialState,
     const from = calculatePositionWithOffset(fromId, fromOffset);
     const to = calculatePositionWithOffset(toId, toOffset);
 
+    console.log(id, "from", from, "to", to);
+
     if (!from || !to) {
         // Optionally log or handle missing data
         //console.log(`Waiting for positions: fromId=${fromId}, toId=${toId}`);

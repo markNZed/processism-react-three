@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import useStore from '../useStore';
 
-const EmergentEntity = React.forwardRef(({ id, initialState, animationState, causation, ...props }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...props }, ref) => {
 
   const { updateAnimationState } = useStore();
 
@@ -47,24 +47,24 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, cau
   };
 
   const spherePosition1 = new THREE.Vector3(
-    position.x - sphereOffset, 
-    position.y + sphereOffset, 
-    position.z - causationLength
+    - sphereOffset, 
+    + sphereOffset, 
+    - causationLength
   );
   const spherePosition2 = new THREE.Vector3(
-    position.x + sphereOffset, 
-    position.y + sphereOffset, 
-    position.z - causationLength
+    + sphereOffset, 
+    + sphereOffset, 
+    - causationLength
   );
   const spherePosition3 = new THREE.Vector3(
-    position.x - sphereOffset, 
-    position.y - sphereOffset, 
-    position.z - causationLength
+    - sphereOffset, 
+    - sphereOffset, 
+    - causationLength
   );
   const spherePosition4 = new THREE.Vector3(
-    position.x + sphereOffset, 
-    position.y - sphereOffset, 
-    position.z - causationLength
+    + sphereOffset, 
+    - sphereOffset, 
+    - causationLength
   );
 
   const causationArrows = (id, start, end) => (
@@ -77,8 +77,8 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, cau
   );
 
   return (
-    <group ref={ref} position={position}>
-      <Circle id={`${id}.Circle`} initialState={{position: position, radius: radius}} />
+    <group ref={ref} position={position} >
+      <Circle id={`${id}.Circle`} initialState={{radius: radius}} />
       <Sphere id={`${id}.Sphere1`} initialState={{position: spherePosition1, radius: sphereRadius, text: "Entity"}} />
       <Sphere id={`${id}.Sphere2`} initialState={{position: spherePosition2, radius: sphereRadius}} />
       <Sphere id={`${id}.Sphere3`} initialState={{position: spherePosition3, radius: sphereRadius}} />
@@ -90,9 +90,9 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, cau
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow5`} fromId={`${id}.Sphere1`} toId={`${id}.Sphere4`} margin={sphereRadius} />
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow6`} fromId={`${id}.Sphere2`} toId={`${id}.Sphere3`} margin={sphereRadius} />
        {
-        causation === "bottomup" ?
-        causationArrows(`${id}.causation`, position, new THREE.Vector3(position.x, position.y, position.z - causationLength)) :
-        causationArrows(`${id}.causation`, new THREE.Vector3(position.x, position.y, position.z - causationLength), position)
+        initialState.causation === "bottomup" ?
+        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -causationLength)) :
+        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength), new THREE.Vector3(0, 0, 0))
       }
     </group>
   );
