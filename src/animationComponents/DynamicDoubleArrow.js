@@ -5,7 +5,7 @@ import { DoubleArrow } from './';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 
-const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, animationState, fromId, toId, fromOffset, toOffset, margin, ...props }, ref) => {
+const DynamicDoubleArrow = React.forwardRef(({ id, animationState, initialState, fromId, toId, fromOffset, toOffset, margin, ...props }, ref) => {
 
     const { updateAnimationState } = useStore();
 
@@ -43,6 +43,7 @@ const DynamicDoubleArrow = React.forwardRef(({ id, initialPosition, animationSta
             from={from}
             to={to}
             margin={margin}
+            initialState={initialState}
         />
     );
 });

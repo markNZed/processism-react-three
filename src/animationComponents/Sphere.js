@@ -1,16 +1,13 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import { motion } from "framer-motion-3d"
-import { Text } from '@react-three/drei'
-import { useThree, useFrame } from '@react-three/fiber';
+import {CustomText } from './';
 import * as THREE from 'three'
 
-const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialRadius, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
-
-    const textRef = useRef();  // Ref for the text
+const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { scale = 1, color = 'blue', radius = initialRadius, visible = true } = animationState;
+    const { scale = 1, color = 'blue', radius, visible = true, text = null, position } = { ...initialState, ...animationState };
 
     // Define animation variants
     const variants = {
@@ -18,30 +15,26 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
         visible: { opacity: animationState.opacity ?? 1.0 }
     };
 
-    // Calculate text position above the sphere
-    const textPosition = [
-        initialPosition.x,  // x position remains the same as the sphere
-        initialPosition.y + radius * scale + 0.2, // y position is above the sphere, add a small offset to avoid z-fighting
-        initialPosition.z  // z position remains the same as the sphere
-    ];
-
-    const { camera } = useThree();  // Access the camera from the R3F context
-
-    useFrame(() => {
-        if (textRef.current) {
-            textRef.current.quaternion.copy(camera.quaternion);  // Make text face the camera each frame
-        }
-    });
+    // Calculate text position based on initialState position and any offset
+    const textPosition = new THREE.Vector3(
+        position.x,
+        position.y + radius * 1.2, // Adjust Y position to be slightly above whatever it is annotating or positioned at
+        position.z
+    );
 
     return (
         <group visible={visible} >
-        <Text ref={textRef} color="black" anchorX="center" anchorY="middle" position={textPosition} scale={0.5} >
-        Sphere
-        </Text>
+        <CustomText 
+            id={`${id}.FatArrow1`} 
+            initialState={{
+                position: textPosition,
+                text: initialState.text,
+                scale: 0.5
+            }}/>
         <mesh
             {...props}
             ref={ref}
-            position={initialPosition}
+            position={position}
             scale={scale}
             onClick={onClick}
             onPointerOver={onPointerOver}
@@ -51,7 +44,7 @@ const Sphere = React.forwardRef(({ id, initialPosition, animationState, initialR
             <sphereGeometry args={[radius, 32, 32]} />
             <motion.meshStandardMaterial
                 color={color}
-                initial="visible"
+                initialState="visible"
                 transparent={true} 
                 animate={animationState.variant}
                 variants={variants}

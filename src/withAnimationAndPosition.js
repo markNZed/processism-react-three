@@ -7,7 +7,7 @@ import * as THREE from 'three'
 function withAnimationAndPosition(Component) {
     const MotionComponent = motion(Component); // Create a motion-enhanced component
 
-    return function WrappedComponent({ id, initialPosition, ...props }) {
+    return function WrappedComponent({ id, initialState, ...props }) {
         const ref = useRef();
         const { positions, updatePosition, animationState } = useStore(state => ({
             positions: state.positions,
@@ -15,13 +15,13 @@ function withAnimationAndPosition(Component) {
             animationState: state.animationStates[id] || {}
         }));
 
-        // Set initial position
+        // Set initialState position
         useEffect(() => {
-            if (ref.current && !positions[id]) {
-                const newPosition = initialPosition || new THREE.Vector3(0, 0, 0);
+            if (ref.current && !positions[id] && initialState) {
+                const newPosition = initialState.position || new THREE.Vector3(0, 0, 0);
                 updatePosition(id, newPosition);
             }
-        }, [initialPosition, id, positions, updatePosition]);
+        }, [initialState, id, positions, updatePosition]);
 
         // Synchronize Three.js object's position with the stored position
         useFrame(() => {
@@ -35,7 +35,7 @@ function withAnimationAndPosition(Component) {
             <MotionComponent
                 ref={ref}
                 id={id}
-                initialPosition={initialPosition}
+                initialState={initialState}
                 {...props}
                 animationState={animationState}
             />

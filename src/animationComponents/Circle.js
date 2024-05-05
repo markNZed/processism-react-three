@@ -3,10 +3,10 @@ import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure co
 import * as THREE from 'three';
 import { motion } from "framer-motion-3d"
 
-const Circle = React.forwardRef(({id, initialPosition, animationState, initialRadius, ...props}, ref) => {
+const Circle = React.forwardRef(({id, initialState, animationState, ...props}, ref) => {
 
     // This animates something that motion does not support
-    const { radius = initialRadius, visible = true } = animationState;
+    const { radius, visible = true, position } = { ...initialState, ...animationState };
 
     // Define animation variants
     const variants = {
@@ -24,7 +24,7 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, initialRa
         <mesh
             {...props}
             ref={ref}
-            position={initialPosition}
+            position={position}
             depthWrite={false}
             visible={visible}
             rotation={[Math.PI / 2, 0, 0]} // Rotate the cylinder to align it as a circle in the xz-plane
@@ -35,7 +35,7 @@ const Circle = React.forwardRef(({id, initialPosition, animationState, initialRa
             />
             <motion.meshBasicMaterial 
               transparent side={THREE.DoubleSide} 
-              initial="hidden"
+              initialState="hidden"
               animate={animationState.variant}
               variants={variants}
               transition={{ duration: animationState.duration || 0 }}

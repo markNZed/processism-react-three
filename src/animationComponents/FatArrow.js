@@ -4,10 +4,10 @@ import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 import { motion } from "framer-motion-3d"
 
-const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props }, ref) => {
+const FatArrow = React.forwardRef(({ id, animationState, initialState, margin = 0, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05, visible = true } = animationState;
+    const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05, visible = true } = { ...initialState, ...animationState };
 
     const direction = new THREE.Vector3().subVectors(props.to, props.from).normalize();
     const adjustedFrom = props.from.clone().add(direction.clone().multiplyScalar(margin));
@@ -33,7 +33,7 @@ const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props },
                 <motion.meshBasicMaterial
                     color={color} 
                     transparent={true} 
-                    initial="visible"
+                    initialState="visible"
                     animate={animationState.variant}
                     variants={variants}
                     transition={{ duration: animationState.duration || 0 }}
@@ -47,7 +47,7 @@ const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props },
                 <motion.meshBasicMaterial 
                     color={color} 
                     transparent={true} 
-                    initial="visible"
+                    initialState="visible"
                     animate={animationState.variant}
                     variants={variants}
                     transition={{ duration: animationState.duration || 0 }}

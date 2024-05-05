@@ -4,7 +4,6 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { AnimationController } from './AnimationController';
-import useStore from './useStore';
 
 function CameraAdjuster() {
   const { camera, gl } = useThree(); // Access R3F context
@@ -51,8 +50,23 @@ export default function App() {
       <CameraAdjuster />
         <AnimationController>
           
-          <EmergentEntity id="emergent1" initialPosition={new THREE.Vector3(-5, 0, 0)} initialRadius={emergentEntityRadius} causation={"bottomup"} />
-          <EmergentEntity id="emergent2" initialPosition={new THREE.Vector3(5, 0, 0)} initialRadius={emergentEntityRadius} causation={"topdown"} />
+          <EmergentEntity 
+            id="emergent1" 
+            initialState={{
+              position: new THREE.Vector3(-5, 0, 0), 
+              radius: emergentEntityRadius,
+              causation: "bottomup",
+            }} 
+          />
+          <EmergentEntity 
+            id="emergent2" 
+            initialState={{
+              position: new THREE.Vector3(5, 0, 0), 
+              radius: emergentEntityRadius,
+              causation: "bottomup",
+            }} 
+            causation={"topdown"} 
+          />
 
           <DynamicDoubleArrow 
             id={"inter_emergent"} 

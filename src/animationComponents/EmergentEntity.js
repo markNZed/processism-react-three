@@ -3,15 +3,16 @@ import {FatArrow, Circle, Sphere, DynamicDoubleArrow } from './';
 import React, { useEffect } from 'react';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import useStore from '../useStore';
-import { Text } from '@react-three/drei'
 
-const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, causation, initialRadius, ...props }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, initialState, animationState, causation, ...props }, ref) => {
 
   const { updateAnimationState } = useStore();
 
-  const sphereRadius = initialRadius / 4;
-  const causationLength = initialRadius / 2;
-  const sphereOffset = initialRadius/3;
+  const { radius, position } = { ...initialState, ...animationState };
+
+  const sphereRadius = radius / 4;
+  const causationLength = radius / 2;
+  const sphereOffset = radius/3;
 
   // Effect to update child component's animation state based on the parent's variant
   useEffect(() => {
@@ -45,6 +46,27 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
     oneSphere : {},
   };
 
+  const spherePosition1 = new THREE.Vector3(
+    position.x - sphereOffset, 
+    position.y + sphereOffset, 
+    position.z - causationLength
+  );
+  const spherePosition2 = new THREE.Vector3(
+    position.x + sphereOffset, 
+    position.y + sphereOffset, 
+    position.z - causationLength
+  );
+  const spherePosition3 = new THREE.Vector3(
+    position.x - sphereOffset, 
+    position.y - sphereOffset, 
+    position.z - causationLength
+  );
+  const spherePosition4 = new THREE.Vector3(
+    position.x + sphereOffset, 
+    position.y - sphereOffset, 
+    position.z - causationLength
+  );
+
   const causationArrows = (id, start, end) => (
     <>
       <FatArrow id={`${id}.FatArrow1`} from={new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z)} to={new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)} />
@@ -55,15 +77,12 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
   );
 
   return (
-    <group ref={ref} initialPosition={initialPosition}>
-      <Text color="black" anchorX="center" anchorY="top">
-        hello world!
-      </Text>
-      <Circle id={`${id}.Circle`} initialPosition={initialPosition} initialRadius={initialRadius} />
-      <Sphere id={`${id}.Sphere1`} initialPosition={new THREE.Vector3(initialPosition.x - sphereOffset, initialPosition.y + sphereOffset, initialPosition.z - causationLength)} initialRadius={sphereRadius} />
-      <Sphere id={`${id}.Sphere2`} initialPosition={new THREE.Vector3(initialPosition.x + sphereOffset, initialPosition.y + sphereOffset, initialPosition.z - causationLength)} initialRadius={sphereRadius} />
-      <Sphere id={`${id}.Sphere3`} initialPosition={new THREE.Vector3(initialPosition.x - sphereOffset, initialPosition.y - sphereOffset, initialPosition.z - causationLength)} initialRadius={sphereRadius} />
-      <Sphere id={`${id}.Sphere4`} initialPosition={new THREE.Vector3(initialPosition.x + sphereOffset, initialPosition.y - sphereOffset, initialPosition.z - causationLength)} initialRadius={sphereRadius} />
+    <group ref={ref} position={position}>
+      <Circle id={`${id}.Circle`} initialState={{position: position, radius: radius}} />
+      <Sphere id={`${id}.Sphere1`} initialState={{position: spherePosition1, radius: sphereRadius, text: "Entity"}} />
+      <Sphere id={`${id}.Sphere2`} initialState={{position: spherePosition2, radius: sphereRadius}} />
+      <Sphere id={`${id}.Sphere3`} initialState={{position: spherePosition3, radius: sphereRadius}} />
+      <Sphere id={`${id}.Sphere4`} initialState={{position: spherePosition4, radius: sphereRadius}} />
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow1`} fromId={`${id}.Sphere1`} toId={`${id}.Sphere2`} margin={sphereRadius} />
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow2`} fromId={`${id}.Sphere3`} toId={`${id}.Sphere4`} margin={sphereRadius} />
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow3`} fromId={`${id}.Sphere1`} toId={`${id}.Sphere3`} margin={sphereRadius} />
@@ -72,8 +91,8 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition, animationState, 
       <DynamicDoubleArrow id={`${id}.DynamicDoubleArrow6`} fromId={`${id}.Sphere2`} toId={`${id}.Sphere3`} margin={sphereRadius} />
        {
         causation === "bottomup" ?
-        causationArrows(`${id}.causation`, initialPosition, new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z - causationLength)) :
-        causationArrows(`${id}.causation`, new THREE.Vector3(initialPosition.x, initialPosition.y, initialPosition.z - causationLength), initialPosition)
+        causationArrows(`${id}.causation`, position, new THREE.Vector3(position.x, position.y, position.z - causationLength)) :
+        causationArrows(`${id}.causation`, new THREE.Vector3(position.x, position.y, position.z - causationLength), position)
       }
     </group>
   );
