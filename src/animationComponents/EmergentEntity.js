@@ -35,6 +35,7 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
           [`${id}.Sphere3`]: { visible: false },
           [`${id}.Sphere4`]: { visible: false },
           [`${id}.relations`]: { visible: false },
+          [`${id}.text`]: { visible: false },
         });
         break;
       case 'twoSphere':
@@ -65,6 +66,7 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
           [`${id}.Sphere2`]: { visible: true },
           [`${id}.Sphere3`]: { visible: true },
           [`${id}.Sphere4`]: { visible: true },
+          [`${id}.text`]: { visible: true },
         });
         break;
       default:
@@ -122,7 +124,7 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
       {
         initialState.causation === "bottomup" ?
         causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength * 0.05), new THREE.Vector3(0, 0, -(causationLength - sphereRadius))) :
-        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -(causationLength + sphereRadius)), new THREE.Vector3(0, 0, -causationLength * 0.05))
+        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -(causationLength - sphereRadius)), new THREE.Vector3(0, 0, -causationLength * 0.05))
       }
     </group>
   );

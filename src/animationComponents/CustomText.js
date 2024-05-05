@@ -7,7 +7,7 @@ import withAnimationAndPosition from '../withAnimationAndPosition';
 const MotionText = motion(DreiText);
 
 const CustomText = React.forwardRef(({ id, animationState, initialState, ...props }, ref) => {
-    const { text, color = 'black', scale = 1, position } = { ...initialState, ...animationState };
+    const { text, color = 'black', scale = 1, visible = true, position } = { ...initialState, ...animationState };
 
     const textRef = useRef();  // Ref for the text
     const { camera } = useThree();  // Access the camera from the R3F context
@@ -32,6 +32,7 @@ const CustomText = React.forwardRef(({ id, animationState, initialState, ...prop
         <MotionText
             ref={textRef}
             color={color}
+            visible={visible}
             anchorX="center"
             anchorY="middle"
             position={position}

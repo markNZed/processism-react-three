@@ -14,9 +14,9 @@ export function AnimationController({ children }) {
         setInitialAnimationState({
             'inter_emergent': { visible: false },
             'emergent1': { variant: "oneSphere" },
-            'emergent1.Circle': { variant: "hidden" },
+            'emergent1.Circle': { variant: "hidden" }, // initializes opcaity to 0
             'emergent2': { visible: false },
-            'emergent2.Circle': { variant: "hidden" },
+            'emergent2.Circle': { variant: "hidden" }, // initializes opcaity to 0
         });
 
         const delta = 1; // set to 1 for normal speed
@@ -35,12 +35,11 @@ export function AnimationController({ children }) {
 
         // Delay, id, animationState
         const animationSteps = [
-            [0, 'emergent1', { variant: "oneSphere" }],
             [1, 'emergent1', { variant: "twoSphere" }],
             [1, 'emergent1', { variant: "relation" }],
             [1, 'emergent1', { variant: "allRelations" }],
             [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [0, 'emergent2', { visible: true }],
+            [1, 'emergent2', { visible: true }],
             [0, 'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
             [0.5, 'inter_emergent', { visible: true }],
             [0.5, 'emergent1.causation', { visible: true }],
