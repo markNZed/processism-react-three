@@ -19,21 +19,34 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
     switch (animationState.variant) {
       // Add additional cases as needed
       case 'oneSphere':
-        updateAnimationState(`${id}.Circle`, { visible: false });
-        updateAnimationState(`${id}.causation.FatArrow1`, { visible: false });
-        updateAnimationState(`${id}.causation.FatArrow2`, { visible: false });
-        updateAnimationState(`${id}.causation.FatArrow3`, { visible: false });
-        updateAnimationState(`${id}.causation.FatArrow4`, { visible: false });
-        updateAnimationState(`${id}.Sphere2`, { visible: false });
-        updateAnimationState(`${id}.Sphere3`, { visible: false });
-        updateAnimationState(`${id}.Sphere4`, { visible: false });
-        updateAnimationState(`${id}.DynamicDoubleArrow1`, { variant: "hidden" });
-        updateAnimationState(`${id}.DynamicDoubleArrow2`, { visible: false });
-        updateAnimationState(`${id}.DynamicDoubleArrow3`, { visible: false });
-        updateAnimationState(`${id}.DynamicDoubleArrow4`, { visible: false });
-        updateAnimationState(`${id}.DynamicDoubleArrow5`, { visible: false });
-        updateAnimationState(`${id}.DynamicDoubleArrow6`, { visible: false });
-        break;
+        const updates = {};
+        const defaultInvisibleIds = [
+            `${id}.Circle`,
+            `${id}.causation.FatArrow1`,
+            `${id}.causation.FatArrow2`,
+            `${id}.causation.FatArrow3`,
+            `${id}.causation.FatArrow4`,
+            `${id}.Sphere2`,
+            `${id}.Sphere3`,
+            `${id}.Sphere4`,
+            `${id}.DynamicDoubleArrow2`,
+            `${id}.DynamicDoubleArrow3`,
+            `${id}.DynamicDoubleArrow4`,
+            `${id}.DynamicDoubleArrow5`,
+            `${id}.DynamicDoubleArrow6`
+        ];
+
+        // Set the default visible: false
+        defaultInvisibleIds.forEach(id => {
+            updates[id] = { visible: false };
+        });
+
+        // Handle special cases
+        updates[`${id}.DynamicDoubleArrow1`] = { variant: "hidden" };
+
+        // Perform batch update
+        useStore.getState().batchUpdateAnimationStates(updates);
+    break;
       default:
         break;
     }

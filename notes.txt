@@ -1,4 +1,4 @@
-add text objects
+updateAnimationState helper for EmergentEntity
 Compare with old manim animation
 Handling of the position updates needs more work
 Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option

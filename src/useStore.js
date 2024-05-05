@@ -20,7 +20,14 @@ const useStore = create(subscribeWithSelector(set => ({
       ...state.animationStates,
       [id]: { ...state.animationStates[id], ...newState }
     }
-  }))
+  })),
+  batchUpdateAnimationStates: (updates) => set(state => {
+    const newState = { ...state.animationStates };
+    Object.entries(updates).forEach(([id, update]) => {
+      newState[id] = { ...newState[id], ...update };
+    });
+    return { animationStates: newState };
+  }),
 })));
 
 /*
