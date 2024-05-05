@@ -79,26 +79,10 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
     visible: { opacity: animationState.opacity ?? 1.0 },
   };
 
-  const spherePosition1 = new THREE.Vector3(
-    - sphereOffset, 
-    + sphereOffset, 
-    - causationLength
-  );
-  const spherePosition2 = new THREE.Vector3(
-    + sphereOffset, 
-    + sphereOffset, 
-    - causationLength
-  );
-  const spherePosition3 = new THREE.Vector3(
-    - sphereOffset, 
-    - sphereOffset, 
-    - causationLength
-  );
-  const spherePosition4 = new THREE.Vector3(
-    + sphereOffset, 
-    - sphereOffset, 
-    - causationLength
-  );
+  const spherePosition1 = new THREE.Vector3(-sphereOffset, +sphereOffset, -causationLength);
+  const spherePosition2 = new THREE.Vector3(+sphereOffset, +sphereOffset, -causationLength);
+  const spherePosition3 = new THREE.Vector3(-sphereOffset, -sphereOffset, -causationLength);
+  const spherePosition4 = new THREE.Vector3(+sphereOffset, -sphereOffset, -causationLength);
 
   const causationArrows = (id, start, end) => (
     <group visible={causationAnimationState.visible}>
@@ -137,8 +121,8 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
       </group>
       {
         initialState.causation === "bottomup" ?
-        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -causationLength)) :
-        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength), new THREE.Vector3(0, 0, 0))
+        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength * 0.05), new THREE.Vector3(0, 0, -(causationLength - sphereRadius))) :
+        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -(causationLength + sphereRadius)), new THREE.Vector3(0, 0, -causationLength * 0.05))
       }
     </group>
   );
