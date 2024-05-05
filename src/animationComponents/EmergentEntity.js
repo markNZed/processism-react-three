@@ -6,7 +6,7 @@ import useStore from '../useStore';
 
 const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...props }, ref) => {
 
-  const { updateAnimationState } = useStore();
+  const { updateAnimationState,batchUpdateAnimationStates } = useStore();
 
   const { radius, position, visible } = { ...initialState, ...animationState };
   
@@ -26,44 +26,51 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
   // Effect to update child component's animation state based on the this variant
   useEffect(() => {
     switch (animationState.variant) {
-      // Add additional cases as needed
       case 'oneSphere':
-        updateAnimationState(`${id}.Circle`, { visible: false });
-        updateAnimationState(`${id}.causation`, { visible: false });
-        updateAnimationState(`${id}.Sphere2`, { visible: false });
-        updateAnimationState(`${id}.Sphere3`, { visible: false });
-        updateAnimationState(`${id}.Sphere4`, { visible: false });
-        updateAnimationState(`${id}.relations`, { visible: false });
+        batchUpdateAnimationStates({
+          [`${id}.Circle`]: { visible: false },
+          [`${id}.causation`]: { visible: false },
+          [`${id}.Sphere2`]: { visible: false },
+          [`${id}.Sphere3`]: { visible: false },
+          [`${id}.Sphere4`]: { visible: false },
+          [`${id}.relations`]: { visible: false },
+        });
         break;
       case 'twoSphere':
-        updateAnimationState(`${id}.Sphere2`, { visible: true });
+        batchUpdateAnimationStates({
+          [`${id}.Sphere2`]: { visible: true },
+        });
         break;
       case 'relation':
-        updateAnimationState(`${id}.relations`, { visible: true });
-        updateAnimationState(`${id}.relations.1`, { visible: true });
-        updateAnimationState(`${id}.relations.2`, { visible: false });
-        updateAnimationState(`${id}.relations.3`, { visible: false });
-        updateAnimationState(`${id}.relations.4`, { visible: false });
-        updateAnimationState(`${id}.relations.5`, { visible: false });
-        updateAnimationState(`${id}.relations.6`, { visible: false });
+        batchUpdateAnimationStates({
+          [`${id}.relations`]: { visible: true },
+          [`${id}.relations.1`]: { visible: true },
+          [`${id}.relations.2`]: { visible: false },
+          [`${id}.relations.3`]: { visible: false },
+          [`${id}.relations.4`]: { visible: false },
+          [`${id}.relations.5`]: { visible: false },
+          [`${id}.relations.6`]: { visible: false },
+        });
         break;
       case 'allRelations':
-        updateAnimationState(`${id}.relations.1`, { visible: true });
-        updateAnimationState(`${id}.relations.2`, { visible: true });
-        updateAnimationState(`${id}.relations.3`, { visible: true });
-        updateAnimationState(`${id}.relations.4`, { visible: true });
-        updateAnimationState(`${id}.relations.5`, { visible: true });
-        updateAnimationState(`${id}.relations.6`, { visible: true });
-        updateAnimationState(`${id}.Sphere1`, { visible: true });
-        updateAnimationState(`${id}.Sphere2`, { visible: true });
-        updateAnimationState(`${id}.Sphere3`, { visible: true });
-        updateAnimationState(`${id}.Sphere4`, { visible: true });
+        batchUpdateAnimationStates({
+          [`${id}.relations.1`]: { visible: true },
+          [`${id}.relations.2`]: { visible: true },
+          [`${id}.relations.3`]: { visible: true },
+          [`${id}.relations.4`]: { visible: true },
+          [`${id}.relations.5`]: { visible: true },
+          [`${id}.relations.6`]: { visible: true },
+          [`${id}.Sphere1`]: { visible: true },
+          [`${id}.Sphere2`]: { visible: true },
+          [`${id}.Sphere3`]: { visible: true },
+          [`${id}.Sphere4`]: { visible: true },
+        });
         break;
-    break;
       default:
+        // Handle default case if needed
         break;
     }
-  }, [animationState.variant, updateAnimationState, id]);
+  }, [animationState.variant, batchUpdateAnimationStates, id]);  
   
   // Define animation variants
   const variants = {
