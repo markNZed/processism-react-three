@@ -14,16 +14,15 @@ export function AnimationController({ children }) {
         setInitialAnimationState({
             'inter_emergent': { visible: false },
             'emergent1': { variant: "oneSphere" },
-            'emergent1.Circle': { variant: "hidden" }, // initializes opcaity to 0
+            'emergent1.Circle': { variant: "hidden" }, // initializes opacity to 0
             'emergent2': { visible: false },
-            'emergent2.Circle': { variant: "hidden" }, // initializes opcaity to 0
+            'emergent2.Circle': { variant: "hidden" }, // initializes opacity to 0
         });
 
         const delta = 1; // set to 1 for normal speed
 
         const scheduleAnimations = (animations) => {
             let cumulativeDelay = 0; // Initialize cumulative delay
-
             animations.forEach(([delay, id, newState]) => {
                 cumulativeDelay += delay * 1000 * delta; // Increase cumulative delay by current delay
                 const timeout = setTimeout(() => {
