@@ -53,7 +53,7 @@ export default function App() {
           <EmergentEntity 
             id="emergent1" 
             initialState={{
-              position: new THREE.Vector3(-emergentEntityRadius*2, 0, 0), 
+              position: new THREE.Vector3(-emergentEntityRadius*1.5, 0, 0), 
               radius: emergentEntityRadius,
               causation: "bottomup",
             }} 
@@ -61,7 +61,7 @@ export default function App() {
           <EmergentEntity 
             id="emergent2" 
             initialState={{
-              position: new THREE.Vector3(emergentEntityRadius*2, 0, 0), 
+              position: new THREE.Vector3(emergentEntityRadius*1.5, 0, 0), 
               radius: emergentEntityRadius,
               causation: "bottomup",
             }} 

@@ -2,40 +2,56 @@ import React, { useEffect } from 'react';
 import useStore from './useStore';
 
 export function AnimationController({ children }) {
+    const { setInitialAnimationState, updateAnimationState } = useStore(state => ({
+        setInitialAnimationState: state.setInitialAnimationState,
+        updateAnimationState: state.updateAnimationState
+    }));
 
-  const { setInitialAnimationState, updateAnimationState } = useStore(state => ({
-    setInitialAnimationState: state.setInitialAnimationState,
-    updateAnimationState: state.updateAnimationState
-  }));
+    useEffect(() => {
+        const timeouts = [];
 
-  useEffect(() => {
+        // Initial setup for animation states
+        setInitialAnimationState({
+            'inter_emergent': { visible: false },
+            'emergent1.Circle': { opacity: 0 },
+            'emergent1.causation': { visible: false },
+            'emergent2': { visible: false },
+            'emergent2.causation': { visible: false },
+            'emergent2.Circle': { opacity: 0 },
+        });
 
-    const timeouts = [];
+        const scheduleAnimations = (animations) => {
+            let cumulativeDelay = 0; // Initialize cumulative delay
 
-    // Initial setup for animation states
-    setInitialAnimationState({
-      'emergent1.Circle': { duration: 1, variant: "visible", opacity: 0.5 },
-    });
+            animations.forEach(([id, delay, newState]) => {
+                cumulativeDelay += delay * 1000; // Increase cumulative delay by current delay
+                const timeout = setTimeout(() => {
+                    updateAnimationState(id, newState);
+                }, cumulativeDelay); // Use cumulative delay for timeout
+                timeouts.push(timeout);
+            });
+        };
 
-    const animate = (id, delay, newState) => {
-      const timeout = setTimeout(() => {
-        updateAnimationState(id, newState);
-      }, delay);
-      timeouts.push(timeout);
-    };
+        // id, relative delay, animationState
+        const animationSteps = [
+            ['emergent1', 0, { variant: "oneSphere" }],
+            ['emergent1', 1, { variant: "twoSphere" }],
+            ['emergent1', 1, { variant: "relation" }],
+            ['emergent1', 1, { variant: "allRelations" }],
+            ['emergent1.Circle', 1, { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
+            ['emergent2', 0, { visible: true }],
+            ['inter_emergent', 0.5, { visible: true }],
+            ['emergent1.causation', 0.5, { visible: true }],
+            ['emergent2.causation', 0.5, { visible: true }]
+        ];
 
-    // Example animations for different spheres
-    animate('emergent1.Sphere1', 1000, { scale: 1.5 });
-    animate('emergent1.Circle',  2000, { radius: 4 });
-    animate('emergent2.Circle',  2000, { duration: 1, variant: "visible", opacity: 0.5 });
-    animate('emergent1.Sphere2', 2000, { scale: 1.5 });
-    animate('emergent1.Sphere3', 3000, { scale: 0.8 });
-    animate('emergent1', 5000, { variant: "oneSphere" });
+        // Schedule all animation groups
+        scheduleAnimations(animationSteps);
 
-    return () => {
-      timeouts.forEach(clearTimeout);  // Clear all timeouts
-    };
-  }, [updateAnimationState]);
+        return () => {
+            timeouts.forEach(clearTimeout);  // Clear all timeouts
+        };
+    }, [setInitialAnimationState, updateAnimationState]);
 
-  return <>{children}</>;
+    return <>{children}</>;
 }
