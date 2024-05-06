@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import useStore from './useStore';
+import * as THREE from 'three'
 
 export function AnimationController({ children }) {
     const { setInitialAnimationState, updateAnimationState } = useStore(state => ({
@@ -19,7 +20,7 @@ export function AnimationController({ children }) {
             'emergent2.Circle': { variant: "hidden" }, // initializes opacity to 0
         });
 
-        const delta = 1; // set to 1 for normal speed
+        const delta = 0.1; // set to 1 for normal speed
 
         const scheduleAnimations = (animations) => {
             let cumulativeDelay = 0; // Initialize cumulative delay
@@ -40,9 +41,11 @@ export function AnimationController({ children }) {
             [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
             [1, 'emergent2', { visible: true }],
             [0, 'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
+            [0, 'camera', { position:[ 0, -20, 0] }],
             [0.5, 'inter_emergent', { visible: true }],
             [0.5, 'emergent1.causation', { visible: true }],
-            [0.5, 'emergent2.causation', { visible: true }]
+            [0.5, 'emergent2.causation', { visible: true }],
+
         ];
 
         // Schedule all animation groups

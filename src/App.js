@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import {EmergentEntity, DynamicDoubleArrow } from './animationComponents';
+import {EmergentEntity, DynamicDoubleArrow, Camera } from './animationComponents';
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { AnimationController } from './AnimationController';
+//import { MotionCanvas } from "framer-motion-3d"
 
 function CameraAdjuster() {
   const { camera, gl } = useThree(); // Access R3F context
@@ -33,22 +34,22 @@ export default function App() {
 
   const emergentEntityRadius = 3.5;
 
+  // Initial and animated states for the camera
+  const cameraInitialState = {
+      position: [0, 0, 1],
+      zoom: 35,
+      left: window.innerWidth / -2,
+      right: window.innerWidth / 2,
+      top: window.innerHeight / 2,
+      bottom: window.innerHeight / -2,
+      near: -100,
+      far: 100
+  };
+
   return (
-    <Canvas
-      camera={{ 
-        position: [0, 0, 1],
-        zoom: 35,
-        left: window.innerWidth / -2,
-        right: window.innerWidth / 2,
-        top: window.innerHeight / 2,
-        bottom: window.innerHeight / -2,
-        near: -100,
-        far: 100
-      }}
-      orthographic
-    > 
-      <CameraAdjuster />
-        <AnimationController>
+    <Canvas orthographic >
+
+      <AnimationController>
           
           <EmergentEntity 
             id="emergent1" 
@@ -58,6 +59,7 @@ export default function App() {
               text: "Emergent Entity",
             }} 
           />
+
           <EmergentEntity 
             id="emergent2" 
             initialState={{
@@ -79,7 +81,15 @@ export default function App() {
 
           <Environment preset="sunset" />
 
+          <Camera
+            id={"camera"}
+            initialState={cameraInitialState}
+          />
+
       </AnimationController>
+
+      <CameraAdjuster />
+
     </Canvas>
   )
 }

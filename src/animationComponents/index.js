@@ -6,3 +6,4 @@ export { default as DoubleArrow } from './DoubleArrow';
 export { default as DynamicDoubleArrow } from './DynamicDoubleArrow';
 export { default as FatArrow } from './FatArrow';
 export { default as CustomText } from './CustomText';
+export { default as Camera } from './Camera';

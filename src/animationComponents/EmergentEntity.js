@@ -5,16 +5,16 @@ import withAnimationAndPosition from '../withAnimationAndPosition';
 import useStore from '../useStore';
 import {CustomText } from './';
 
-const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...props }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
   const { updateAnimationState, batchUpdateAnimationStates } = useStore();
 
-  const { radius, position, visible } = { ...initialState, ...animationState };
+  const { radius, position, visible } = animationState;
   
   useEffect(() => {
     // causation is not a Component but a group
-    updateAnimationState(`${id}.causation`, initialState);
-    updateAnimationState(`${id}.relations`, initialState);
+    updateAnimationState(`${id}.causation`, animationState);
+    updateAnimationState(`${id}.relations`, animationState);
   }, []);
 
   const causationAnimationState = useStore(state => state.animationStates[`${id}.causation`] || {});
@@ -104,7 +104,7 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
         id={`${id}.text`} 
         initialState={{
             position: textPosition,
-            text: initialState.text,
+            text: animationState.text,
             scale: 0.5
         }}
       />
@@ -122,7 +122,7 @@ const EmergentEntity = React.forwardRef(({ id, initialState, animationState, ...
         <DynamicDoubleArrow id={`${id}.relations.6`} fromId={`${id}.Sphere2`} toId={`${id}.Sphere3`} margin={sphereRadius} />
       </group>
       {
-        initialState.causation === "bottomup" ?
+        animationState.causation === "bottomup" ?
         causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength * 0.05), new THREE.Vector3(0, 0, -(causationLength - sphereRadius))) :
         causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -(causationLength - sphereRadius)), new THREE.Vector3(0, 0, -causationLength * 0.05))
       }
