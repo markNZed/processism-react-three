@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { Text as DreiText } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { motion } from "framer-motion-3d"
@@ -9,7 +9,7 @@ const MotionText = motion(DreiText);
 const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const { text, color = 'black', scale = 1, visible = true, position } = animationState;
 
-    // The text orientation did not work when I used ref instead of textRef. I don't understand why.
+    // We need textRef because we modify the ref in useFrame and cannot modify ref from parent
     const textRef = useRef();
 
     const { camera } = useThree();  // Access the camera from the R3F context
@@ -29,6 +29,9 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
             textRef.current.quaternion.copy(camera.quaternion);
         }
     });
+
+    // This will expose textRef as ref to the parent component
+    useImperativeHandle(ref, () => textRef.current);
 
     return isValidPosition && text ? (
         <MotionText
