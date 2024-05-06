@@ -8,6 +8,8 @@ const MotionText = motion(DreiText);
 
 const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const { text, color = 'black', scale = 1, visible = true, position } = animationState;
+
+    // The text orientation did not work when I used ref instead of textRef. I don't understand why.
     const textRef = useRef();
 
     const { camera } = useThree();  // Access the camera from the R3F context
