@@ -27,10 +27,10 @@ function withAnimationAndPosition(Component) {
 
         return (
             <MotionComponent
+                {...props}
                 ref={ref}
                 id={id}
                 animationState={{ ...initialState, ...animationState }}
-                {...props}
             />
         );
     };

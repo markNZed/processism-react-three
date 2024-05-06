@@ -3,12 +3,12 @@ import React, { useEffect } from 'react';
 import { FatArrow } from './';  // Ensure this correctly imports FatArrow
 import withAnimationAndPosition from '../withAnimationAndPosition';  // Ensure correct path
 
-const DoubleArrow = React.forwardRef(({ id, animationState, from, to, margin, ...props }, ref) => {
+const DoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
     return (
         <group {...props} ref={ref} >
-            <FatArrow id={`${id}.from`} initialState={animationState} from={from} to={to} margin={margin} {...props}/>
-            <FatArrow id={`${id}.to`} initialState={animationState} from={to} to={from}  margin={margin} {...props} />
+            <FatArrow {...props} id={`${id}.from`} initialState={animationState} />
+            <FatArrow {...props} id={`${id}.to`} initialState={{...animationState, from: animationState.to, to: animationState.from}} />
         </group>
     );
 });

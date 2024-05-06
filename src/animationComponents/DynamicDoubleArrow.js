@@ -5,9 +5,11 @@ import { DoubleArrow } from './';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 
-const DynamicDoubleArrow = React.forwardRef(({ id, animationState, fromId, toId, fromOffset, toOffset, margin, ...props }, ref) => {
+const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
     const { positions } = useStore(state => ({ positions: state.positions }));
+
+    const { fromId, toId, fromOffset, toOffset, margin } = animationState;
 
     // Utility function to calculate position with offset
     const calculatePositionWithOffset = (positionId, offset) => {
@@ -30,12 +32,13 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, fromId, toId,
     return (
         <group ref={ref} >
             <DoubleArrow 
-                initialState={animationState}
-                id={`${id}.DoubleArrow`}
-                from={from}
-                to={to}
-                margin={margin}
                 {...props}
+                id={`${id}.DoubleArrow`}
+                initialState={{
+                    ...animationState,      
+                    from: from,
+                    to: to,
+                }}
             />
         </group>
     );

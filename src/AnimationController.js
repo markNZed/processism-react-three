@@ -20,7 +20,7 @@ export function AnimationController({ children }) {
             'emergent2.Circle': { variant: "hidden" }, // initializes opacity to 0
         });
 
-        const delta = 0.1; // set to 1 for normal speed
+        const delta = 1; // set to 1 for normal speed, 0.1 for 10x faster
 
         const scheduleAnimations = (animations) => {
             let cumulativeDelay = 0; // Initialize cumulative delay

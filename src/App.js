@@ -71,10 +71,12 @@ export default function App() {
           />
 
           <DynamicDoubleArrow 
-            id={"inter_emergent"} 
-            fromId={"emergent1"} 
-            toId={"emergent2"} 
-            margin={emergentEntityRadius}
+            id={"inter_emergent"}
+            initialState={{
+              fromId: "emergent1", 
+              toId: "emergent2",
+              margin: emergentEntityRadius,
+            }}
           />
 
           <OrbitControls />

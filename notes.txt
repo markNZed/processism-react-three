@@ -1,5 +1,3 @@
-remove initialState frm component  - use in HOC
-DoubleArrow margin should be in animationState
 Compare with old manim animation
 Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option
 WDS_SOCKET_PORT=0 only in CodeSpace ?

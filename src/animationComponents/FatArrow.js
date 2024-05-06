@@ -4,14 +4,14 @@ import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three'
 import { motion } from "framer-motion-3d"
 
-const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props }, ref) => {
+const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05, visible = true } = animationState;
+    const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05, visible = true, margin = 0, from, to } = animationState;
 
-    const direction = new THREE.Vector3().subVectors(props.to, props.from).normalize();
-    const adjustedFrom = props.from.clone().add(direction.clone().multiplyScalar(margin));
-    const adjustedTo = props.to.clone().sub(direction.clone().multiplyScalar(margin));
+    const direction = new THREE.Vector3().subVectors(to, from).normalize();
+    const adjustedFrom = from.clone().add(direction.clone().multiplyScalar(margin));
+    const adjustedTo = to.clone().sub(direction.clone().multiplyScalar(margin));
     const arrowLineLength = adjustedFrom.distanceTo(adjustedTo);
 
     const lineGeometry = new THREE.CylinderGeometry(lineWidth, lineWidth, arrowLineLength, 32);
@@ -24,7 +24,7 @@ const FatArrow = React.forwardRef(({ id, animationState, margin = 0, ...props },
     };
 
     return (
-        <group ref={ref} {...props} visible={visible}>
+        <group {...props} ref={ref} visible={visible}>
             <mesh
                 geometry={lineGeometry}
                 position={adjustedFrom.clone().lerp(adjustedTo, 0.5)}

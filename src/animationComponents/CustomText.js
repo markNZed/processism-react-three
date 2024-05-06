@@ -8,6 +8,7 @@ const MotionText = motion(DreiText);
 
 const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const { text, color = 'black', scale = 1, visible = true, position } = animationState;
+    const textRef = useRef();
 
     const { camera } = useThree();  // Access the camera from the R3F context
 
@@ -22,21 +23,21 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
     // Use Frame hook to update text orientation to always face the camera
     useFrame(() => {
-        if (ref.current && isValidPosition) {
-            ref.current.quaternion.copy(camera.quaternion);
+        if (textRef.current && isValidPosition) {
+            textRef.current.quaternion.copy(camera.quaternion);
         }
     });
 
     return isValidPosition && text ? (
         <MotionText
-            ref={ref}
+            {...props}
+            ref={textRef}
             color={color}
             visible={visible}
             anchorX="center"
             anchorY="middle"
             position={position}
             scale={[scale, scale, scale]}
-            {...props}
             animate={animationState.variant}
             variants={variants}
             transition={{ duration: animationState.duration || 0 }}
