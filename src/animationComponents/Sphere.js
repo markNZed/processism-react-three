@@ -1,8 +1,8 @@
+import { motion } from "framer-motion-3d";
 import React from 'react';
+import * as THREE from 'three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
-import { motion } from "framer-motion-3d"
-import {CustomText } from './';
-import * as THREE from 'three'
+import { CustomText } from './';
 
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
@@ -24,8 +24,8 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
 
     return (
         <group visible={visible} >
-            <CustomText 
-                id={`${id}.FatArrow1`} 
+            <CustomText
+                id={`${id}.text`}
                 initialState={{
                     position: textPosition,
                     text: animationState.text,
@@ -46,7 +46,7 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
                 <motion.meshStandardMaterial
                     color={color}
                     initialState="visible"
-                    transparent={true} 
+                    transparent={true}
                     animate={animationState.variant}
                     variants={variants}
                     transition={{ duration: animationState.duration || 0 }}
