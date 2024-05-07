@@ -1,16 +1,15 @@
-import * as THREE from 'three'
-import {FatArrow, Circle, Sphere, DynamicDoubleArrow } from './';
 import React, { useEffect } from 'react';
-import withAnimationAndPosition from '../withAnimationAndPosition';
+import * as THREE from 'three';
 import useStore from '../useStore';
-import {CustomText } from './';
+import withAnimationAndPosition from '../withAnimationAndPosition';
+import { Circle, CustomText, DynamicDoubleArrow, FatArrow, Sphere } from './';
 
 const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
   const { updateAnimationState, batchUpdateAnimationStates } = useStore();
 
   const { radius, position, visible } = animationState;
-  
+
   useEffect(() => {
     // causation is not a Component but a group
     updateAnimationState(`${id}.causation`, animationState);
@@ -66,15 +65,14 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere2`]: { visible: true },
           [`${id}.Sphere3`]: { visible: true },
           [`${id}.Sphere4`]: { visible: true },
-          [`${id}.text`]: { visible: true },
         });
         break;
       default:
         // Handle default case if needed
         break;
     }
-  }, [animationState.variant, batchUpdateAnimationStates, id]);  
-  
+  }, [animationState.variant, batchUpdateAnimationStates, id]);
+
   // Define animation variants
   const variants = {
     hidden: { opacity: 0 },
@@ -104,9 +102,10 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
       <CustomText 
         id={`${id}.text`} 
         initialState={{
-            position: textPosition,
-            text: animationState.text,
-            scale: 0.5
+          visible: false,
+          position: textPosition,
+          text: animationState.text,
+          scale: 0.5
         }}
       />
       <Circle id={`${id}.Circle`} initialState={{radius: radius}} />
@@ -124,8 +123,8 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
       </group>
       {
         animationState.causation === "bottomup" ?
-        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength * 0.05), new THREE.Vector3(0, 0, -(causationLength - sphereRadius))) :
-        causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -(causationLength - sphereRadius)), new THREE.Vector3(0, 0, -causationLength * 0.05))
+          causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -causationLength * 0.05), new THREE.Vector3(0, 0, -(causationLength - sphereRadius))) :
+          causationArrows(`${id}.causation`, new THREE.Vector3(0, 0, -(causationLength - sphereRadius)), new THREE.Vector3(0, 0, -causationLength * 0.05))
       }
     </group>
   );
