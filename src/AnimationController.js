@@ -48,7 +48,7 @@ export function AnimationController({ children }) {
             [2,   'emergent1.text', { visible: false }],
             [1,   'emergent2', { visible: true }],
             [0,   'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [0,   'camera', { position: [0, -20, 0] }],
+            [0,   'camera', { position: [0, -20, 0], duration: 3000 }],
             [1,   'emergent1.text', { visible: true, text: "Bottom-up" }],
             [1,   'emergent1.causation', { visible: true }],
             [0.5, 'inter_emergent', { visible: true }],
