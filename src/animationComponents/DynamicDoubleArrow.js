@@ -7,22 +7,19 @@ import * as THREE from 'three';
 const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const { fromId, toId } = animationState;
     const { components } = useStore(state => ({ components: state.components }));
-    const { positions } = useStore(state => ({ positions: state.positions }));
 
-    // State to keep track of positions
-    const [fromPosition, setFromPosition] = useState(null);
-    const [toPosition, setToPosition] = useState(null);
+    // State to keep track of ends
+    const [ends, setEnds] = useState({ from: null, to: null });
 
     const getMeshPosition = (componentId) => {
-        let componentRef = components[componentId]?.current;
+        const componentRef = components[componentId]?.current;
         if (componentRef) {
-            if (componentRef.userData && componentRef.userData.meshId) {
-                // If there's a userData.meshId, we try to get that specific mesh
-                componentRef = components[componentRef.userData.meshId]?.current || componentRef;
-            }
+            // Access userData and meshId to find the specific mesh
+            const meshId = componentRef.userData?.meshId;
+            const finalRef = meshId && components[meshId]?.current || componentRef;
             // Use matrixWorld to get the absolute world position
-            let worldPosition = new THREE.Vector3();
-            worldPosition.setFromMatrixPosition(componentRef.matrixWorld);
+            const worldPosition = new THREE.Vector3();
+            worldPosition.setFromMatrixPosition(finalRef.matrixWorld);
             return worldPosition;
         }
         return null;
@@ -36,20 +33,17 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
         }
         let nearestPoint = calculateNearestPoint(componentRef, targetPosition);
         // Transform world coordinates to local coordinates relative to the parent
-        const parentId = getParentId(id)
+        const parentPosition = getParentPosition(id);
+        return nearestPoint.sub(parentPosition); // Transform to parent-relative coordinates
+    };
+
+    const getParentPosition = (childId) => {
+        const parentId = getParentId(childId);
         if (parentId) {
-            let parentRef = components[parentId]?.current;
-            if (parentRef) {
-                // Assuming the parent's world position needs to be obtained to make coordinates relative
-                let parentPos = new THREE.Vector3().setFromMatrixPosition(parentRef.matrixWorld);
-                // Transform nearestPoint to coordinates relative to the parent
-                if (nearestPoint) {
-                    // Subtract the parent's world position from the nearest point's world position
-                    nearestPoint.sub(parentPos);
-                }
-            }
+            const parentRef = components[parentId]?.current;
+            return parentRef ? new THREE.Vector3().setFromMatrixPosition(parentRef.matrixWorld) : new THREE.Vector3();
         }
-        return nearestPoint;
+        return new THREE.Vector3(); // Return default position if no parent
     };
 
     useEffect(() => {
@@ -59,13 +53,12 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
         if (fromMeshPosition && toMeshPosition) {
             const newFromPosition = getEdgePosition(fromId, toMeshPosition);
             const newToPosition = getEdgePosition(toId, fromMeshPosition);
-            setFromPosition(newFromPosition);
-            setToPosition(newToPosition);
+            setEnds({ from: newFromPosition, to: newToPosition });
         }
     }, [fromId, toId, components]);
 
-    // Ensure both positions are available before rendering the arrow
-    if (!fromPosition || !toPosition) return null;
+    // Ensure both ends are available before rendering the arrow
+    if (!ends.from || !ends.to) return null;
 
     return (
         <group ref={ref}>
@@ -74,8 +67,8 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
                 id={`${id}.DoubleArrow`}
                 initialState={{
                     ...animationState,
-                    from: fromPosition,
-                    to: toPosition,
+                    from: ends.from,
+                    to: ends.to,
                 }}
             />
         </group>
