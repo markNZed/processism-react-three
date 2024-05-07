@@ -75,7 +75,6 @@ export default function App() {
             initialState={{
               fromId: "emergent1", 
               toId: "emergent2",
-              margin: emergentEntityRadius,
             }}
           />
 
