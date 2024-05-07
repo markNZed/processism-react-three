@@ -14,4 +14,4 @@ To work with this project on a remote server (assuming the server has SSH, Docke
   * git config --global user.email "your_email@example.com"
   * git config --global user.name "your_name"
 
-[Build](https://marknzed.github.io/react-three/build/index.html)
+[Build](https://marknzed.github.io/react-three)
