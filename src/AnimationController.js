@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import useStore from './useStore';
-import * as THREE from 'three'
 
 export function AnimationController({ children }) {
     const { setInitialAnimationState, updateAnimationState } = useStore(state => ({
@@ -15,9 +14,11 @@ export function AnimationController({ children }) {
         setInitialAnimationState({
             'inter_emergent': { visible: false },
             'emergent1': { variant: "oneSphere" },
+            'emergent1.Sphere1.text': { visible: false },
             'emergent1.Circle': { variant: "hidden" }, // initializes opacity to 0
             'emergent2': { visible: false },
             'emergent2.Circle': { variant: "hidden" }, // initializes opacity to 0
+            'emergent2.text': { visible: false }, // initializes opacity to 0
         });
 
         const delta = 1; // set to 1 for normal speed, 0.1 for 10x faster
@@ -35,16 +36,22 @@ export function AnimationController({ children }) {
 
         // Delay, id, animationState
         const animationSteps = [
+            [2, 'emergent1.Sphere1.text', { visible: true }],
+            [1, 'emergent1.Sphere1.text', { visible: false }],
             [1, 'emergent1', { variant: "twoSphere", why: "Showing second sphere" }],
             [1, 'emergent1', { variant: "relation" }],
             [1, 'emergent1', { variant: "allRelations" }],
             [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
+            [1, 'emergent1.text', { visible: true }],
+            [2, 'emergent1.text', { visible: false }],
             [1, 'emergent2', { visible: true }],
             [0, 'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [0, 'camera', { position:[ 0, -20, 0] }],
+            [0, 'camera', { position: [0, -20, 0] }],
             [0.5, 'inter_emergent', { visible: true }],
-            [0.5, 'emergent1.causation', { visible: true }],
-            [0.5, 'emergent2.causation', { visible: true }],
+            [1, 'emergent2.text', { visible: true, text: "Bottom-up" }],
+            [1, 'emergent2.causation', { visible: true }],
+            [1, 'emergent1.text', { visible: true, text: "Top-down" }],
+            [1, 'emergent1.causation', { visible: true }],
 
         ];
 
