@@ -97,7 +97,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
   const textPosition = new THREE.Vector3(0, radius * 1.2, 0);
 
   return (
-    // We set a mesh for this object so we cn get a ref for DynamicDoubleArrow above this component
+    // We set a mesh for this object so we can get a ref for DynamicDoubleArrow above this component
     <group ref={ref} position={position} visible={visible} userData={{ meshId: `${id}.Circle` }} >
       <CustomText 
         id={`${id}.text`} 

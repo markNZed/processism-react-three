@@ -1,4 +1,3 @@
-DynamicDoubleArrow should calculate margin
 Compare with old manim animation
 Move to using Motion for Canvas and Camera control ?
 Allow multiple scenes
