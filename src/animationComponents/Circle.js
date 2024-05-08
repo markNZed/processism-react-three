@@ -34,7 +34,8 @@ const Circle = React.forwardRef(({id, animationState, ...props}, ref) => {
                 attach="geometry"
             />
             <motion.meshBasicMaterial 
-              transparent side={THREE.DoubleSide} 
+              transparent 
+              side={THREE.DoubleSide} 
               initialState="visble"
               animate={animationState.variant}
               variants={variants}

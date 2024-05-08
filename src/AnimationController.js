@@ -15,10 +15,12 @@ export function AnimationController({ children }) {
             'inter_emergent': { visible: false },
             'emergent1': { variant: "oneSphere" },
             'emergent1.Sphere1.text': { variant: 'hidden' },
+            'emergent1.Sphere1': { text: "Entity" },
             'emergent1.Circle': { variant: "hidden" }, // initializes opacity to 0
             'emergent2': { visible: false },
             'emergent2.Circle': { variant: "hidden" }, // initializes opacity to 0
-            'emergent2.text': { visible: false }, // initializes opacity to 0
+            'emergent2.text': { visible: false },
+            'emergent2.causation': { visible: false },
         });
 
         const delta = 1; // set to 1 for normal speed, 0.1 for 10x faster
@@ -47,12 +49,12 @@ export function AnimationController({ children }) {
             [2, 'emergent1.text', { visible: false }],
             [1, 'emergent2', { visible: true }],
             [0, 'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [0, 'camera', { position: [0, -25, 10] }],
+            [0, 'camera', { position: [0, -25, 10], duration: 3000 }],
+            [1,   'emergent1.text', { visible: true, text: "Bottom-up" }],
+            [1,   'emergent1.causation', { visible: true }],
             [0.5, 'inter_emergent', { visible: true }],
-            [1, 'emergent2.text', { visible: true, text: "Bottom-up" }],
-            [1, 'emergent2.causation', { visible: true }],
-            [1, 'emergent1.text', { visible: true, text: "Top-down" }],
-            [1, 'emergent1.causation', { visible: true }],
+            [1,   'emergent2.text', { visible: true, text: "Top-down" }],
+            [1,   'emergent2.causation', { visible: true }],
 
         ];
 

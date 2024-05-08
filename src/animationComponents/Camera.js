@@ -5,7 +5,7 @@ import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure co
 
 const Camera = React.forwardRef(({ id, animationState }, ref) => {
     const { camera } = useThree();
-    const { zoom = 1, position = [0, 0, 1] } = animationState;
+    const { zoom = 1, position = [0, 0, 1], duration = 1000 } = animationState;
 
     useSpring({
         from: {
@@ -20,7 +20,7 @@ const Camera = React.forwardRef(({ id, animationState }, ref) => {
             posY: position[1],
             posZ: position[2]
         },
-        config: { duration: 1000 },
+        config: { duration: duration },
         onChange: ({ value }) => {
             camera.zoom = value.zoom;
             camera.position.set(value.posX, value.posY, value.posZ);

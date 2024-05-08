@@ -56,6 +56,7 @@ export default function App() {
             initialState={{
               position: new THREE.Vector3(-emergentEntityRadius*1.5, 0, 0), 
               radius: emergentEntityRadius,
+              causation: "bottomup",
               text: "Emergent Entity",
             }} 
           />
@@ -65,7 +66,7 @@ export default function App() {
             initialState={{
               position: new THREE.Vector3(emergentEntityRadius*1.5, 0, 0), 
               radius: emergentEntityRadius,
-              causation: "bottomup",
+              causation: "topdown",
               text: "Emergent Entity",
             }} 
           />
@@ -75,7 +76,6 @@ export default function App() {
             initialState={{
               fromId: "emergent1", 
               toId: "emergent2",
-              margin: emergentEntityRadius,
             }}
           />
 

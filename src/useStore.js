@@ -1,18 +1,23 @@
 import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware'
+import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
-const useStore = create(subscribeWithSelector((set, get) => ({
-  positions: {
-  },
+const useStore = create(devtools(subscribeWithSelector((set, get) => ({
+  positions: {},
+  components: {}, // Object to store component references
   updatePosition: (id, newPosition) => set(state => ({
-    positions: {
-      ...state.positions,
-      [id]: newPosition
-    }
+    positions: { ...state.positions, [id]: newPosition }
   })),
   getPosition: id => get().positions[id],
-  animationStates: {
-  },
+  registerComponent: (id, ref) => set(state => ({
+    components: { ...state.components, [id]: ref }
+  })),
+  unregisterComponent: (id) => set(state => {
+    const newComponents = { ...state.components };
+    delete newComponents[id];
+    return { components: newComponents };
+  }),
+  getComponentRef: id => get().components[id], // Function to get component ref by id
+  animationStates: {},
   setInitialAnimationState: (initialStates) => set({
     animationStates: { ...initialStates }
   }),
@@ -42,7 +47,7 @@ const useStore = create(subscribeWithSelector((set, get) => ({
     });
     return { animationStates: newState };
   }),
-})));
+}), { name: 'AnimationStore' }))); // Properly configure the naming for DevTools
 
 /*
 
@@ -60,9 +65,10 @@ useStore.subscribe(
   animationStates => {
       const why = useStore.getState().why;  // Retrieve 'why' at the time of logging
       const lastUpdateAnimationState = useStore.getState().lastUpdateAnimationState;
-      console.log("Animation states have changed:", lastUpdateAnimationState, "Why:", why);
+      console.log("Animation:", why, lastUpdateAnimationState);
   }
 );
 
-
 export default useStore;
+
+

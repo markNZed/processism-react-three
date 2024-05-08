@@ -1,5 +1,5 @@
-Move to using Motion for Canvas and Camera control ?
 Compare with old manim animation
+Move to using Motion for Canvas and Camera control ?
 Allow multiple scenes
 Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option
 WDS_SOCKET_PORT=0 only in CodeSpace ?
