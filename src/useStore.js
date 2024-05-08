@@ -21,16 +21,14 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   setInitialAnimationState: (initialStates) => set({
     animationStates: { ...initialStates }
   }),
-  whyAnimationState: {},
   lastUpdateAnimationState: {},
   updateAnimationState: (id, newState) => set(state => {
-    const newStateWithGlobal = { ...newState };
     if ('why' in newState) {
-      // If 'why' is provided in newState, update the global 'why' value
-      state.why = id + ': ' + newState.why;
+      newState.why = id + ': ' + newState.why;
     } else {
-      state.why = id;
+      newState.why = id;
     }
+    const newStateWithGlobal = { ...newState };
     state.lastUpdateAnimationState = newStateWithGlobal;
     return {
       ...state,
@@ -59,13 +57,12 @@ useStore.subscribe(
 
 */
 
-// Subscribe only to changes in animationStates but log 'why' as well
+// Subscribe only to changes in animationStates
 useStore.subscribe(
   state => state.animationStates,  // Only listen to changes in animationStates
   animationStates => {
-      const why = useStore.getState().why;  // Retrieve 'why' at the time of logging
       const lastUpdateAnimationState = useStore.getState().lastUpdateAnimationState;
-      console.log("Animation:", why, lastUpdateAnimationState);
+      console.log("Animation:", lastUpdateAnimationState.why, lastUpdateAnimationState);
   }
 );
 

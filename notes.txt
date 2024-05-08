@@ -1,3 +1,11 @@
+animationState should hold position 
+How to get position of mesh that was moved by physics
+  Should we use ref to get position ?
+  It seems Rapier overwrites the position ?
+  Could always use Rapier RigidBody and not Motion
+    Can Motion update the position of the RigidBody ? Probably not expecting Rapier
+  Have different strategy for different objects e.g. treat as RigidBody only 
+DynamicDoubleArrow not getting latest position - probably not re-rendering because not depending on position ? 
 Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Move to using Motion for Canvas and Camera control ?
 Allow multiple scenes

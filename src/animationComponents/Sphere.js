@@ -1,15 +1,19 @@
 import { motion } from "framer-motion-3d";
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useImperativeHandle } from 'react';
 import * as THREE from 'three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import { CustomText } from './';
-import { RigidBody } from '@react-three/rapier';
+import { RigidBody, vec3 } from '@react-three/rapier';
+import { useFrame } from '@react-three/fiber';
+import useStore from '../useStore';
 
-const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
+const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
     const { scale = 1, color = 'blue', radius, visible = true, text = null, position } = animationState;
     const [simulationInit, setSimulationInit] = useState(true);
+    const lastRapierPosition = useRef();
+    const updatePosition = useStore(state => state.updatePosition);
 
     // Define animation variants
     const variants = {
@@ -25,11 +29,12 @@ const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, on
     );
 
     const rigidBodyRef = useRef();
+    //useImperativeHandle(ref, () => rigidBodyRef.current);
 
     useEffect(() => {position
         if (rigidBodyRef.current && props.simulationReady && simulationInit) {
             setSimulationInit(false);
-            rigidBodyRef.current.applyImpulse({ x: 5, y: 5, z: 5 }, true);
+            rigidBodyRef.current.applyImpulse({ x: .5, y: .5, z: .5 }, true);
         }
         // A continuous force
         //rigidBodyRef.current.addForce({ x: 0, y: 10, z: 0 }, true);
@@ -39,9 +44,21 @@ const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, on
         //rigidBodyRef.current.addTorque({ x: 0, y: 10, z: 0 }, true);
     }, [props]);
 
-    useEffect(() => {
-        console.log("Position", visible, position);
-    }, []);
+    useFrame(() => {
+        //console.log('Sphere ref:', ref.current);
+        //console.log('RigidBody ref:', rigidBodyRef.current);
+        if (rigidBodyRef.current) {
+            const position = rigidBodyRef.current.translation();
+            if (position.x !== lastRapierPosition.x || position.y !== lastRapierPosition.y || position.z !== lastRapierPosition.z) {
+                //console.log(id, "rigidBodyRef position", lastRapierPosition.current, position)
+                lastRapierPosition.current = position;
+                rigidBodyRef.current.translation(position);
+                updatePosition(id, position);
+            };
+        }
+    });
+
+    //You can set the translation of the rapier body, and r3/rapier will update the three mesh
 
     return (
         <group visible={visible} >
@@ -54,17 +71,9 @@ const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, on
                     variant: 'hidden'
                 }}
             />
-            {/*}
-            <RigidBody ref={rigidBodyRef} position={position}>
-              <mesh>
-                  <sphereGeometry args={[1, 32, 32]} />
-                  <meshStandardMaterial color={"pink"} />
-              </mesh>
-            </RigidBody>
-            */}
+            {/*<RigidBody ref={rigidBodyRef}>*/}
             <mesh
                 {...props}
-                //initial={animationState.initialState}
                 ref={ref}
                 position={position}
                 scale={scale}
@@ -83,6 +92,7 @@ const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, on
                     transition={{ duration: animationState.duration || 0 }}
                 />
             </mesh>
+            {/*</RigidBody>*/}
         </group>
     );
 });

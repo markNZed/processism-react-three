@@ -16,6 +16,7 @@ function withAnimationAndPosition(Component) {
         const unregisterComponent = useStore(state => state.unregisterComponent);
         const animationState = useStore(state => state.animationStates[id] || {});
         const [simulationReady, setSimulationReady] = useState(false);
+        const currentPos = getPosition(id);
 
         // Register and unregister component ref
         useEffect(() => {
@@ -29,25 +30,26 @@ function withAnimationAndPosition(Component) {
             };
         }, [id, registerComponent, unregisterComponent]);
 
-        // Update component position on mount and when id or position changes
-        useEffect(() => {
-            if (ref.current && initialState) {
-                const position = getPosition(id) || initialState.position || new Vector3(0, 0, 0);
-                ref.current.position.copy(position);
-            }
-        }, [id, getPosition, initialState]);
-
-        // Initialize or update position state
+        // Initialize position state
         useEffect(() => {
             if (ref.current && !getPosition(id) && initialState && initialState.position) {
                 updatePosition(id, initialState.position);
             }
         }, [id, getPosition, updatePosition, initialState, ref.current]); // Ensure ref.current is also in the dependency array
 
-        // Impulses at the mounting of a component were missed in teh Rapier engine, so this makes sure we see a frame 
+        // Impulses at the mounting of a component were missed in the Rapier engine, so this makes sure we see a frame 
         useFrame(() => {
-            if (ref.current && !simulationReady) {
-                setSimulationReady(true);
+            if (ref.current) {
+                if (!simulationReady) {
+                    setSimulationReady(true);
+                }
+                const lastPosition = ref.current.position;
+                if (currentPos && lastPosition && (currentPos.x !== lastPosition.x || currentPos.y !== lastPosition.y || currentPos.z !== lastPosition.z)) {
+                    //ref.current.position.set(currentPos.x, currentPos.y, currentPos.z)
+                    if (id == "emergent1.Sphere1") {
+                        //console.log("updatePosition(id, currentPos)", id, currentPos); //vector3
+                    }
+                }
             }
         });
 
@@ -59,6 +61,7 @@ function withAnimationAndPosition(Component) {
                 animationState={{ ...initialState, ...animationState }}
                 initialState={initialState}
                 simulationReady={simulationReady}
+                position={currentPos}
             />
         );
     };
