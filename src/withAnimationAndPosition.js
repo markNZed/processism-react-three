@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from "framer-motion-3d";
 import useStore from './useStore';
 import { Vector3 } from 'three';
+import { useFrame } from '@react-three/fiber';
 
 function withAnimationAndPosition(Component) {
     // Unsure if we need to wrap this here with motion
@@ -14,6 +15,7 @@ function withAnimationAndPosition(Component) {
         const registerComponent = useStore(state => state.registerComponent);
         const unregisterComponent = useStore(state => state.unregisterComponent);
         const animationState = useStore(state => state.animationStates[id] || {});
+        const [simulationReady, setSimulationReady] = useState(false);
 
         // Register and unregister component ref
         useEffect(() => {
@@ -42,6 +44,13 @@ function withAnimationAndPosition(Component) {
             }
         }, [id, getPosition, updatePosition, initialState, ref.current]); // Ensure ref.current is also in the dependency array
 
+        // Impulses at the mounting of a component were missed in teh Rapier engine, so this makes sure we see a frame 
+        useFrame(() => {
+            if (ref.current && !simulationReady) {
+                setSimulationReady(true);
+            }
+        });
+
         return (
             <MotionComponent
                 {...props}
@@ -49,6 +58,7 @@ function withAnimationAndPosition(Component) {
                 id={id}
                 animationState={{ ...initialState, ...animationState }}
                 initialState={initialState}
+                simulationReady={simulationReady}
             />
         );
     };

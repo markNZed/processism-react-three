@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {EmergentEntity, DynamicDoubleArrow, Camera } from './animationComponents';
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { AnimationController } from './AnimationController';
@@ -61,7 +61,7 @@ export default function App() {
             <EmergentEntity 
               id="emergent1" 
               initialState={{
-                position: new THREE.Vector3(-emergentEntityRadius*1.5, 0, 0), 
+                position: new THREE.Vector3(-emergentEntityRadius*2, 0, 0), 
                 radius: emergentEntityRadius,
                 causation: "bottomup",
                 text: "Emergent Entity",
@@ -71,7 +71,7 @@ export default function App() {
             <EmergentEntity 
               id="emergent2" 
               initialState={{
-                position: new THREE.Vector3(emergentEntityRadius*1.5, 0, 0), 
+                position: new THREE.Vector3(emergentEntityRadius*2, 0, 0), 
                 radius: emergentEntityRadius,
                 causation: "topdown",
                 text: "Emergent Entity",
