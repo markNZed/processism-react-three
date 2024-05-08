@@ -1,10 +1,11 @@
 import { motion } from "framer-motion-3d";
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import { CustomText } from './';
+import { RigidBody } from '@react-three/rapier';
 
-const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
+const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
     const { scale = 1, color = 'blue', radius, visible = true, text = null, position } = animationState;
@@ -22,6 +23,25 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         position.z
     );
 
+    const rigidBodyRef = useRef();
+
+    useEffect(() => {
+        // Need to wait for initialisation or we miss the impulse
+        const timer = setTimeout(() => {
+            if (rigidBodyRef.current) {
+                console.log("HERE impulse");
+                rigidBodyRef.current.applyImpulse({ x: 10, y: 10, z: 10 }, true);
+                // A continuous force
+                //rigidBodyRef.current.addForce({ x: 0, y: 10, z: 0 }, true);
+                // A one-off torque rotation
+                //rigidBodyRef.current.applyTorqueImpulse({ x: 0, y: 10, z: 0 }, true);
+                // A continuous torque
+                //rigidBodyRef.current.addTorque({ x: 0, y: 10, z: 0 }, true);
+            }
+        }, 2000);
+    }, []);
+  
+
     return (
         <group visible={visible} >
             <CustomText
@@ -32,8 +52,17 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
                     scale: 0.5
                 }}
             />
+            {/*}
+            <RigidBody mass={1} ref={rigidBodyRef} position={position}>
+              <mesh>
+                  <sphereGeometry args={[1, 32, 32]} />
+                  <meshStandardMaterial color={"pink"} />
+              </mesh>
+            </RigidBody>
+            */}
             <mesh
                 {...props}
+                //initial={animationState.initialState}
                 ref={ref}
                 position={position}
                 scale={scale}

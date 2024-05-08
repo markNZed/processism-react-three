@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useImperativeHandle } from 'react';
+import React, { useRef, useImperativeHandle } from 'react';
 import { Text as DreiText } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { motion } from "framer-motion-3d"

@@ -4,6 +4,7 @@ import useStore from './useStore';
 import { Vector3 } from 'three';
 
 function withAnimationAndPosition(Component) {
+    // Unsure if we need to wrap this here with motion
     const MotionComponent = motion(Component);
 
     return function WrappedComponent({ id, initialState, ...props }) {
@@ -47,6 +48,7 @@ function withAnimationAndPosition(Component) {
                 ref={ref}
                 id={id}
                 animationState={{ ...initialState, ...animationState }}
+                initialState={initialState}
             />
         );
     };

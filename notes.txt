@@ -1,3 +1,4 @@
+Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Compare with old manim animation
 Move to using Motion for Canvas and Camera control ?
 Allow multiple scenes
