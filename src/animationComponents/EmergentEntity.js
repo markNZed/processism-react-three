@@ -21,7 +21,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 
   const sphereRadius = radius / 4;
   const causationLength = radius / 2;
-  const sphereOffset = radius/3;
+  const sphereOffset = radius / 3;
 
   // Effect to update child component's animation state based on the this variant
   useEffect(() => {
@@ -35,13 +35,21 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere4`]: { visible: false },
           [`${id}.relations`]: { visible: false },
           [`${id}.text`]: { visible: false },
+          [`${id}.Sphere1.text`]: { visible: false },
+        });
+        break;
+      case 'oneSphere-details':
+        batchUpdateAnimationStates({
+          [`${id}.Sphere1.text`]: { visible: true },
         });
         break;
       case 'twoSphere':
         batchUpdateAnimationStates({
           [`${id}.Sphere2`]: { visible: true },
+          [`${id}.Sphere1.text`]: { visible: false },
         });
         break;
+
       case 'relation':
         batchUpdateAnimationStates({
           [`${id}.relations`]: { visible: true },
@@ -66,6 +74,15 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere3`]: { visible: true },
           [`${id}.Sphere4`]: { visible: true },
         });
+      case 'accumulation-description':
+        batchUpdateAnimationStates({
+          [`${id}.text2`]: { visible: true },
+        });
+        break;
+      case 'accumulation-description-end':
+        batchUpdateAnimationStates({
+          [`${id}.text2`]: { visible: false },
+        });
         break;
       default:
         // Handle default case if needed
@@ -86,15 +103,16 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 
   const causationArrows = (id, start, end) => (
     <group visible={causationAnimationState.visible}>
-      <FatArrow id={`${id}.FatArrow1`} initialState={{from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)}} />
-      <FatArrow id={`${id}.FatArrow2`} initialState={{from: new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z)}} />
-      <FatArrow id={`${id}.FatArrow3`} initialState={{from: new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z)}} />
-      <FatArrow id={`${id}.FatArrow4`} initialState={{from: new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z)}} />
+      <FatArrow id={`${id}.FatArrow1`} initialState={{ from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow2`} initialState={{ from: new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow3`} initialState={{ from: new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow4`} initialState={{ from: new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z) }} />
     </group>
   );
 
   // Calculate text position based on initialState position and any offset
   const textPosition = new THREE.Vector3(0, radius * 1.2, 0);
+  const text2Position = new THREE.Vector3(0, radius * .5, 0);
 
   return (
     <group ref={ref} position={position} visible={visible} >
@@ -107,18 +125,27 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           scale: 0.5
         }}
       />
-      <Circle id={`${id}.Circle`} initialState={{radius: radius}} />
-      <Sphere id={`${id}.Sphere1`} initialState={{position: spherePosition1, radius: sphereRadius, text: "Entity"}} />
-      <Sphere id={`${id}.Sphere2`} initialState={{position: spherePosition2, radius: sphereRadius}} />
-      <Sphere id={`${id}.Sphere3`} initialState={{position: spherePosition3, radius: sphereRadius}} />
-      <Sphere id={`${id}.Sphere4`} initialState={{position: spherePosition4, radius: sphereRadius}} />
+      <CustomText
+        id={`${id}.text2`}
+        initialState={{
+          visible: false,
+          position: text2Position,
+          text: "Accumulation",
+          scale: 0.1
+        }}
+      />
+      <Circle id={`${id}.Circle`} initialState={{ radius: radius }} />
+      <Sphere id={`${id}.Sphere1`} initialState={{ position: spherePosition1, radius: sphereRadius, text: "Entity" }} />
+      <Sphere id={`${id}.Sphere2`} initialState={{ position: spherePosition2, radius: sphereRadius }} />
+      <Sphere id={`${id}.Sphere3`} initialState={{ position: spherePosition3, radius: sphereRadius }} />
+      <Sphere id={`${id}.Sphere4`} initialState={{ position: spherePosition4, radius: sphereRadius }} />
       <group visible={relationsAnimationState.visible}>
-        <DynamicDoubleArrow id={`${id}.relations.1`} initialState={{fromId: `${id}.Sphere1`, toId: `${id}.Sphere2`, margin: sphereRadius}} />
-        <DynamicDoubleArrow id={`${id}.relations.2`} initialState={{fromId: `${id}.Sphere3`, toId: `${id}.Sphere4`, margin: sphereRadius}} />
-        <DynamicDoubleArrow id={`${id}.relations.3`} initialState={{fromId: `${id}.Sphere1`, toId: `${id}.Sphere3`, margin: sphereRadius}} />
-        <DynamicDoubleArrow id={`${id}.relations.4`} initialState={{fromId: `${id}.Sphere2`, toId: `${id}.Sphere4`, margin: sphereRadius}} />
-        <DynamicDoubleArrow id={`${id}.relations.5`} initialState={{fromId: `${id}.Sphere1`, toId: `${id}.Sphere4`, margin: sphereRadius}} />
-        <DynamicDoubleArrow id={`${id}.relations.6`} initialState={{fromId: `${id}.Sphere2`, toId: `${id}.Sphere3`, margin: sphereRadius}} />
+        <DynamicDoubleArrow id={`${id}.relations.1`} initialState={{ fromId: `${id}.Sphere1`, toId: `${id}.Sphere2`, margin: sphereRadius }} />
+        <DynamicDoubleArrow id={`${id}.relations.2`} initialState={{ fromId: `${id}.Sphere3`, toId: `${id}.Sphere4`, margin: sphereRadius }} />
+        <DynamicDoubleArrow id={`${id}.relations.3`} initialState={{ fromId: `${id}.Sphere1`, toId: `${id}.Sphere3`, margin: sphereRadius }} />
+        <DynamicDoubleArrow id={`${id}.relations.4`} initialState={{ fromId: `${id}.Sphere2`, toId: `${id}.Sphere4`, margin: sphereRadius }} />
+        <DynamicDoubleArrow id={`${id}.relations.5`} initialState={{ fromId: `${id}.Sphere1`, toId: `${id}.Sphere4`, margin: sphereRadius }} />
+        <DynamicDoubleArrow id={`${id}.relations.6`} initialState={{ fromId: `${id}.Sphere2`, toId: `${id}.Sphere3`, margin: sphereRadius }} />
       </group>
       {
         animationState.causation === "bottomup" ?

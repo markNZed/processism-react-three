@@ -36,11 +36,12 @@ export function AnimationController({ children }) {
 
         // Delay, id, animationState
         const animationSteps = [
-            [2, 'emergent1.Sphere1.text', { visible: true }],
-            [1, 'emergent1.Sphere1.text', { visible: false }],
+            [1, 'emergent1', { variant: "oneSphere-details", }],
             [1, 'emergent1', { variant: "twoSphere", why: "Showing second sphere" }],
             [1, 'emergent1', { variant: "relation" }],
             [1, 'emergent1', { variant: "allRelations" }],
+            [1, 'emergent1', { variant: "accumulation-description" }],
+            [1, 'emergent1', { variant: "accumulation-description-end" }],
             [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
             [1, 'emergent1.text', { visible: true }],
             [2, 'emergent1.text', { visible: false }],
