@@ -1,8 +1,8 @@
 // FatArrow.js
+import { motion } from "framer-motion-3d";
 import React from 'react';
+import * as THREE from 'three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
-import * as THREE from 'three'
-import { motion } from "framer-motion-3d"
 
 const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
@@ -20,7 +20,7 @@ const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     // Define animation variants
     const variants = {
         hidden: { opacity: 0 },
-        visible: { opacity: animationState.opacity ?? 1.0 }
+        visible: { opacity: animationState.opacity ?? 1.0, duration: .5 }
     };
 
     return (
@@ -31,8 +31,8 @@ const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
                 quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
             >
                 <motion.meshBasicMaterial
-                    color={color} 
-                    transparent={true} 
+                    color={color}
+                    transparent={true}
                     initialState="visible"
                     animate={animationState.variant}
                     variants={variants}
@@ -44,9 +44,9 @@ const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
                 position={adjustedTo}
                 quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
             >
-                <motion.meshBasicMaterial 
-                    color={color} 
-                    transparent={true} 
+                <motion.meshBasicMaterial
+                    color={color}
+                    transparent={true}
                     initialState="visible"
                     animate={animationState.variant}
                     variants={variants}

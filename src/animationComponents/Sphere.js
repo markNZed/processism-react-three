@@ -49,7 +49,8 @@ const Sphere = React.forwardRef(({ id, animationState, initialState, onClick, on
                 initialState={{
                     position: textPosition,
                     text: animationState.text,
-                    scale: 0.5
+                    scale: 0.5,
+                    variant: 'hidden'
                 }}
             />
             {/*}
