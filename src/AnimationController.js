@@ -14,7 +14,7 @@ export function AnimationController({ children }) {
         setInitialAnimationState({
             'inter_emergent': { visible: false },
             'emergent1': { variant: "oneSphere" },
-            'emergent1.Sphere1.text': { visible: false },
+            'emergent1.Sphere1.text': { variant: 'hidden' },
             'emergent1.Circle': { variant: "hidden" }, // initializes opacity to 0
             'emergent2': { visible: false },
             'emergent2.Circle': { variant: "hidden" }, // initializes opacity to 0

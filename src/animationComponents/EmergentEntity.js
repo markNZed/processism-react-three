@@ -35,18 +35,17 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere4`]: { visible: false },
           [`${id}.relations`]: { visible: false },
           [`${id}.text`]: { visible: false },
-          [`${id}.Sphere1.text`]: { visible: false },
         });
         break;
       case 'oneSphere-details':
         batchUpdateAnimationStates({
-          [`${id}.Sphere1.text`]: { visible: true },
+          [`${id}.Sphere1.text`]: { variant: 'visible', duration: .5 },
         });
         break;
       case 'twoSphere':
         batchUpdateAnimationStates({
           [`${id}.Sphere2`]: { visible: true },
-          [`${id}.Sphere1.text`]: { visible: false },
+          [`${id}.Sphere1.text`]: { variant: 'hidden', duration: .5 },
         });
         break;
 
@@ -112,7 +111,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 
   // Calculate text position based on initialState position and any offset
   const textPosition = new THREE.Vector3(0, radius * 1.2, 0);
-  const text2Position = new THREE.Vector3(0, radius * .5, 0);
+  const text2Position = new THREE.Vector3(0, radius * .75, 0);
 
   return (
     <group ref={ref} position={position} visible={visible} >
@@ -125,13 +124,21 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           scale: 0.5
         }}
       />
+
+      {/* <FatArrow id={`${id}.custom-FatArrow1`} 
+      initialState={{ 
+        from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), 
+        to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)
+       }} 
+      /> */}
+
       <CustomText
         id={`${id}.text2`}
         initialState={{
           visible: false,
           position: text2Position,
           text: "Accumulation",
-          scale: 0.1
+          scale: 0.2
         }}
       />
       <Circle id={`${id}.Circle`} initialState={{ radius: radius }} />
