@@ -21,7 +21,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 
   const sphereRadius = radius / 4;
   const causationLength = radius / 2;
-  const sphereOffset = radius/3;
+  const sphereOffset = radius / 3;
 
   // Effect to update child component's animation state based on the this variant
   useEffect(() => {
@@ -37,11 +37,18 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.text`]: { visible: false },
         });
         break;
+      case 'oneSphere-details':
+        batchUpdateAnimationStates({
+          [`${id}.Sphere1.text`]: { variant: 'visible', duration: .5 },
+        });
+        break;
       case 'twoSphere':
         batchUpdateAnimationStates({
           [`${id}.Sphere2`]: { visible: true },
+          [`${id}.Sphere1.text`]: { variant: 'hidden', duration: .5 },
         });
         break;
+
       case 'relation':
         batchUpdateAnimationStates({
           [`${id}.relations`]: { visible: true },
@@ -66,6 +73,15 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere3`]: { visible: true },
           [`${id}.Sphere4`]: { visible: true },
         });
+      case 'accumulation-description':
+        batchUpdateAnimationStates({
+          [`${id}.text2`]: { visible: true },
+        });
+        break;
+      case 'accumulation-description-end':
+        batchUpdateAnimationStates({
+          [`${id}.text2`]: { visible: false },
+        });
         break;
       default:
         // Handle default case if needed
@@ -84,28 +100,30 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
   const spherePosition3 = new THREE.Vector3(-sphereOffset, -sphereOffset, -causationLength);
   const spherePosition4 = new THREE.Vector3(+sphereOffset, -sphereOffset, -causationLength);
 
+  const fatArrowVarient = causationAnimationState.visible ? 'visible' : 'hidden';
   const causationArrows = (id, start, end) => (
     <group visible={causationAnimationState.visible}>
-      <FatArrow id={`${id}.FatArrow1`} initialState={{from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z)}} />
-      <FatArrow id={`${id}.FatArrow2`} initialState={{from: new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z)}} />
-      <FatArrow id={`${id}.FatArrow3`} initialState={{from: new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z)}} />
-      <FatArrow id={`${id}.FatArrow4`} initialState={{from: new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z)}} />
+      <FatArrow id={`${id}.FatArrow1`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow2`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow3`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow4`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z) }} />
     </group>
   );
 
   // Calculate text position based on initialState position and any offset
   const textPosition = new THREE.Vector3(0, radius * 1.2, 0);
+  const text2Position = new THREE.Vector3(0, radius * .75, 0);
 
   return (
     // We set a mesh for this object so we can get a ref for DynamicDoubleArrow above this component
     <group ref={ref} position={position} visible={visible} userData={{ meshId: `${id}.Circle` }} >
-      <CustomText 
-        id={`${id}.text`} 
+      <CustomText
+        id={`${id}.text2`}
         initialState={{
           visible: false,
-          position: textPosition,
-          text: animationState.text,
-          scale: 0.5
+          position: text2Position,
+          text: "Accumulation",
+          scale: 0.2
         }}
       />
       <Circle id={`${id}.Circle`} initialState={{radius: radius}} />

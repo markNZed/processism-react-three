@@ -1,7 +1,9 @@
-import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { Text as DreiText } from '@react-three/drei';
-import { useThree, useFrame } from '@react-three/fiber';
-import { motion } from "framer-motion-3d"
+import { useFrame, useThree } from '@react-three/fiber';
+import { motion } from "framer-motion-3d";
+import React, { useImperativeHandle, useRef } from 'react';
+import * as THREE from 'three';
+
 import withAnimationAndPosition from '../withAnimationAndPosition';
 
 const MotionText = motion(DreiText);
@@ -16,10 +18,10 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
     // Define motion variants
     const variants = {
-        hidden: { opacity: 0, scale: 0.5 },
-        visible: { opacity: 1, scale: 1 }
+        hidden: { opacity: 0, },
+        visible: { opacity: 1, }
     };
-    
+
     // Verify position is not undefined
     const isValidPosition = position && 'x' in position && 'y' in position && 'z' in position;
 
@@ -48,6 +50,14 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
             transition={{ duration: animationState.duration || 0 }}
         >
             {text}
+            <motion.meshBasicMaterial
+                transparent side={THREE.DoubleSide}
+                initialState="visble"
+                animate={animationState.variant}
+                variants={variants}
+                transition={{ duration: animationState.duration || 0 }}
+                color={color}
+            />
         </MotionText>
     ) : null;
 });
