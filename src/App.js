@@ -6,6 +6,7 @@ import * as THREE from 'three'
 import { AnimationController } from './AnimationController';
 //import { MotionCanvas } from "framer-motion-3d"
 import { Physics } from '@react-three/rapier';
+import useStore from './useStore';
 
 function CameraAdjuster() {
   const { camera, gl } = useThree(); // Access R3F context
@@ -33,6 +34,8 @@ function CameraAdjuster() {
 
 export default function App() {
 
+  const usePhysics = useStore(state => state.usePhysics);
+
   const emergentEntityRadius = 3.5;
 
   // Initial and animated states for the camera
@@ -47,46 +50,54 @@ export default function App() {
       far: 100
   };
 
+  const scene = (
+    <>
+      <EmergentEntity 
+        id="emergent1" 
+        initialState={{
+          position: new THREE.Vector3(-emergentEntityRadius*2, 0, 0), 
+          radius: emergentEntityRadius,
+          causation: "bottomup",
+          text: "Emergent Entity",
+        }} 
+      />
+
+      <EmergentEntity 
+        id="emergent2" 
+        initialState={{
+          position: new THREE.Vector3(emergentEntityRadius*2, 0, 0), 
+          radius: emergentEntityRadius,
+          causation: "topdown",
+          text: "Emergent Entity",
+        }} 
+      />
+
+      <DynamicDoubleArrow 
+        id={"inter_emergent"}
+        initialState={{
+          fromId: "emergent1", 
+          toId: "emergent2",
+        }}
+      />
+    </>
+  )
+
   return (
     <Canvas orthographic >
 
       <AnimationController>
 
-          <Physics 
-            gravity={[0, 0, 0]}
-            // Need colliders to allow for impulse to work
-            //colliders={false}
-          >
-          
-            <EmergentEntity 
-              id="emergent1" 
-              initialState={{
-                position: new THREE.Vector3(-emergentEntityRadius*2, 0, 0), 
-                radius: emergentEntityRadius,
-                causation: "bottomup",
-                text: "Emergent Entity",
-              }} 
-            />
-
-            <EmergentEntity 
-              id="emergent2" 
-              initialState={{
-                position: new THREE.Vector3(emergentEntityRadius*2, 0, 0), 
-                radius: emergentEntityRadius,
-                causation: "topdown",
-                text: "Emergent Entity",
-              }} 
-            />
-
-            <DynamicDoubleArrow 
-              id={"inter_emergent"}
-              initialState={{
-                fromId: "emergent1", 
-                toId: "emergent2",
-              }}
-            />
-
-          </Physics>
+          {usePhysics ? (
+            <Physics 
+              gravity={[0, 0, 0]}
+              // Need colliders to allow for impulse to work
+              //colliders={false}
+            >
+              {scene}
+            </Physics>
+          ) : 
+            scene
+          }
 
           <OrbitControls />
 

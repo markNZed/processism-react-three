@@ -1,3 +1,4 @@
+usePhysics should be global
 How to manage dependencies of positions ?
 Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Move to using Motion for Canvas and Camera control ?

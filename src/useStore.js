@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 const useStore = create(devtools(subscribeWithSelector((set, get) => ({
+  usePhysics: false, 
+  setUsePhysics: (usePhysics) => set({ usePhysics }), 
   components: {}, // Object to store component references
   registerComponent: (id, ref) => set(state => ({
     components: { ...state.components, [id]: ref }

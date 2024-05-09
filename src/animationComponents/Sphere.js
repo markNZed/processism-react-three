@@ -4,12 +4,14 @@ import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
 import { CustomText } from './';
 import { RigidBody } from '@react-three/rapier';
+import useStore from '../useStore';
 
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
     const { scale = 1, color = 'blue', radius, visible = true, text = null, position } = animationState;
     const [simulationInit, setSimulationInit] = useState(true);
+    const usePhysics = useStore(state => state.usePhysics);
 
     // Define animation variants
     const variants = {
@@ -39,7 +41,6 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         //rigidBodyRef.current.addTorque({ x: 0, y: 10, z: 0 }, true);
     }, [props]);
 
-    const usePhysics = false;
     const wrappedMesh = (
         <mesh
             {...props}
