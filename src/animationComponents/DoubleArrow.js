@@ -1,14 +1,21 @@
-// DoubleArrow.js
 import React, { useEffect } from 'react';
-import { FatArrow } from './';  // Ensure this correctly imports FatArrow
-import withAnimationAndPosition from '../withAnimationAndPosition';  // Ensure correct path
+import { FatArrow } from './';
+import withAnimationAndPosition from '../withAnimationAndPosition'; 
 
-const DoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
+const DoubleArrow = React.forwardRef(({ id, animationState, initialState, ...props }, ref) => {
 
     return (
-        <group {...props} ref={ref} >
-            <FatArrow {...props} id={`${id}.from`} initialState={animationState} />
-            <FatArrow {...props} id={`${id}.to`} initialState={{...animationState, from: animationState.to, to: animationState.from}} />
+        <group ref={ref} >
+            <FatArrow {...props} 
+              id={`${id}.from`} 
+              initialState={initialState} 
+              animationState={animationState}
+            />
+            <FatArrow {...props} 
+              id={`${id}.to`} 
+              initialState={{...initialState, from: animationState.to, to: animationState.from}} 
+              animationState={{...animationState, from: animationState.to, to: animationState.from}} 
+            />
         </group>
     );
 });

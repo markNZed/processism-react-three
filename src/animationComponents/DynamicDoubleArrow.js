@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import useStore from '../useStore';
 import { DoubleArrow } from './';
 import withAnimationAndPosition from '../withAnimationAndPosition';
@@ -7,70 +7,78 @@ import * as THREE from 'three';
 const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const { fromId, toId } = animationState;
     const { components } = useStore(state => ({ components: state.components }));
+    const fromIdPosition = useStore(state => state.positions[fromId]);
+    const toIdPosition = useStore(state => state.positions[toId]);
+    const { updateAnimationState } = useStore();
+    const localRef = useRef(); // So we can write to the ref
+    useImperativeHandle(ref, () => localRef.current);
+    const [lastFrom, setLastFrom] = useState();
+    const [lastTo, setLastTo] = useState();
 
     // State to keep track of ends
     const [ends, setEnds] = useState({ from: null, to: null });
 
-    const getMeshPosition = (componentId) => {
-        const componentRef = components[componentId]?.current;
-        if (componentRef) {
-            // Access userData and meshId to find the specific mesh
-            const meshId = componentRef.userData?.meshId;
-            const finalRef = meshId && components[meshId]?.current || componentRef;
-            // Use matrixWorld to get the absolute world position
-            const worldPosition = new THREE.Vector3();
-            worldPosition.setFromMatrixPosition(finalRef.matrixWorld);
-            return worldPosition;
+    function vectorsAreClose(v1, v2, epsilon = 0.0001) {
+        if (!v1 || !v2) {
+            return false;
         }
-        return null;
-    };
+        const diff = v1.clone().sub(v2);
+        return diff.lengthSq() < epsilon * epsilon; // Comparing squared values avoids a sqrt
+    }
 
     const getEdgePosition = (componentId, targetPosition) => {
         let componentRef = components[componentId]?.current;
-        if (componentRef && componentRef.userData && componentRef.userData.meshId) {
-            const meshRef = components[componentRef.userData.meshId]?.current;
-            componentRef = meshRef;
+        if (componentRef) {
+            if (componentRef.userData && componentRef.userData.meshId) {
+                const meshRef = components[componentRef.userData.meshId]?.current;
+                componentRef = meshRef;
+            }
+            let nearestPoint = calculateNearestPoint(componentRef, targetPosition);
+            const localPosition = new THREE.Vector3();
+            // Convert world position to local position
+            localRef.current.worldToLocal(localPosition.copy(nearestPoint));
+            //console.log("DynamicDoubleArrow nearestPoint", id, nearestPoint, localPosition)
+            return localPosition
+        } else {
+            console.log("Problem with ref", id, componentRef);
+            return null
         }
-        let nearestPoint = calculateNearestPoint(componentRef, targetPosition);
-        // Transform world coordinates to local coordinates relative to the parent
-        const parentPosition = getParentPosition(id);
-        return nearestPoint.sub(parentPosition); // Transform to parent-relative coordinates
-    };
-
-    const getParentPosition = (childId) => {
-        const parentId = getParentId(childId);
-        if (parentId) {
-            const parentRef = components[parentId]?.current;
-            return parentRef ? new THREE.Vector3().setFromMatrixPosition(parentRef.matrixWorld) : new THREE.Vector3();
-        }
-        return new THREE.Vector3(); // Return default position if no parent
     };
 
     useEffect(() => {
-        const fromMeshPosition = getMeshPosition(fromId);
-        const toMeshPosition = getMeshPosition(toId);
-
-        if (fromMeshPosition && toMeshPosition) {
-            const newFromPosition = getEdgePosition(fromId, toMeshPosition);
-            const newToPosition = getEdgePosition(toId, fromMeshPosition);
+        if (fromIdPosition 
+            && toIdPosition 
+            && localRef.current 
+            && (!vectorsAreClose(fromIdPosition, lastFrom) || !vectorsAreClose(toIdPosition, lastTo))
+        ) {
+            // Should compare positions to reduce renders
+            const newFromPosition = getEdgePosition(fromId, toIdPosition);
+            const newToPosition = getEdgePosition(toId, fromIdPosition);
             setEnds({ from: newFromPosition, to: newToPosition });
+            setLastTo(toIdPosition)
+            setLastFrom(fromIdPosition)
+            //console.log("DynamicDoubleArrow", id, fromIdPosition, toIdPosition, ends.from, ends.to)
         }
-    }, [fromId, toId, components]);
-
-    // Ensure both ends are available before rendering the arrow
-    if (!ends.from || !ends.to) return null;
+    }, [fromIdPosition, toIdPosition]);
 
     return (
-        <group ref={ref}>
-            <DoubleArrow
-                {...props}
-                id={`${id}.DoubleArrow`}
-                initialState={{
-                    ...animationState,
-                    from: ends.from,
-                    to: ends.to,
-                }}
-            />
+        <group ref={localRef}>
+            {ends.from && ends.to && (
+                <DoubleArrow
+                    {...props}
+                    id={`${id}.DoubleArrow`}
+                    initialState={{
+                        ...animationState,
+                        from: ends.from,
+                        to: ends.to,
+                    }}
+                    animationState={{
+                        ...animationState,
+                        from: ends.from,
+                        to: ends.to,
+                    }}
+                />
+            )}
         </group>
     );
 });
@@ -98,10 +106,4 @@ function calculateNearestPoint(mesh, targetPosition) {
         }
     }
     return nearestPoint;
-}
-
-function getParentId(childId) {
-    const parts = childId.split('.');
-    parts.pop(); // Remove the last element which is the childID part
-    return parts.join('.'); // Re-join the remaining parts to form the parentID
 }

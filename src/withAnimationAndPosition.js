@@ -43,13 +43,10 @@ function withAnimationAndPosition(Component) {
                 if (!simulationReady) {
                     setSimulationReady(true);
                 }
-                const lastPosition = ref.current.position;
-                if (currentPos && lastPosition && (currentPos.x !== lastPosition.x || currentPos.y !== lastPosition.y || currentPos.z !== lastPosition.z)) {
-                    //ref.current.position.set(currentPos.x, currentPos.y, currentPos.z)
-                    if (id == "emergent1.Sphere1") {
-                        //console.log("updatePosition(id, currentPos)", id, currentPos); //vector3
-                    }
-                }
+                const worldPosition = new Vector3();
+                ref.current.updateMatrixWorld();
+                ref.current.getWorldPosition(worldPosition);
+                updatePosition(id, worldPosition);
             }
         });
 

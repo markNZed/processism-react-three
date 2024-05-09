@@ -5,7 +5,7 @@ import { OrbitControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { AnimationController } from './AnimationController';
 //import { MotionCanvas } from "framer-motion-3d"
-import { Physics, RigidBody, SphereCollider, useRigidBody } from '@react-three/rapier';
+import { Physics } from '@react-three/rapier';
 
 function CameraAdjuster() {
   const { camera, gl } = useThree(); // Access R3F context

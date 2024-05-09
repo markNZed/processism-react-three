@@ -1,5 +1,5 @@
 import { motion } from "framer-motion-3d";
-import React, { useRef, useEffect, useState, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import { CustomText } from './';
@@ -29,12 +29,11 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
     );
 
     const rigidBodyRef = useRef();
-    //useImperativeHandle(ref, () => rigidBodyRef.current);
 
     useEffect(() => {position
         if (rigidBodyRef.current && props.simulationReady && simulationInit) {
             setSimulationInit(false);
-            rigidBodyRef.current.applyImpulse({ x: .5, y: .5, z: .5 }, true);
+            rigidBodyRef.current.applyImpulse({ x: .1, y: .1, z: .1 }, true);
         }
         // A continuous force
         //rigidBodyRef.current.addForce({ x: 0, y: 10, z: 0 }, true);
@@ -45,20 +44,38 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
     }, [props]);
 
     useFrame(() => {
-        //console.log('Sphere ref:', ref.current);
-        //console.log('RigidBody ref:', rigidBodyRef.current);
         if (rigidBodyRef.current) {
+            // You can set the translation of the rapier body, and r3/rapier will update the three mesh
+            // Should be world position
             const position = rigidBodyRef.current.translation();
-            if (position.x !== lastRapierPosition.x || position.y !== lastRapierPosition.y || position.z !== lastRapierPosition.z) {
-                //console.log(id, "rigidBodyRef position", lastRapierPosition.current, position)
-                lastRapierPosition.current = position;
-                rigidBodyRef.current.translation(position);
-                updatePosition(id, position);
-            };
+            lastRapierPosition.current = position;
+            updatePosition(id, position);
         }
     });
 
-    //You can set the translation of the rapier body, and r3/rapier will update the three mesh
+    const usePhysics = false;
+    const wrappedMesh = (
+        <mesh
+            {...props}
+            ref={ref}
+            position={position}
+            scale={scale}
+            onClick={onClick}
+            onPointerOver={onPointerOver}
+            onPointerOut={onPointerOut}
+            depthWrite={false}
+        >
+            <sphereGeometry args={[radius, 32, 32]} />
+            <motion.meshStandardMaterial
+                color={color}
+                initialState="visible"
+                transparent={true}
+                animate={animationState.variant}
+                variants={variants}
+                transition={{ duration: animationState.duration || 0 }}
+            />
+        </mesh>
+    );
 
     return (
         <group visible={visible} >
@@ -71,28 +88,11 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
                     variant: 'hidden'
                 }}
             />
-            {/*<RigidBody ref={rigidBodyRef}>*/}
-            <mesh
-                {...props}
-                ref={ref}
-                position={position}
-                scale={scale}
-                onClick={onClick}
-                onPointerOver={onPointerOver}
-                onPointerOut={onPointerOut}
-                depthWrite={false}
-            >
-                <sphereGeometry args={[radius, 32, 32]} />
-                <motion.meshStandardMaterial
-                    color={color}
-                    initialState="visible"
-                    transparent={true}
-                    animate={animationState.variant}
-                    variants={variants}
-                    transition={{ duration: animationState.duration || 0 }}
-                />
-            </mesh>
-            {/*</RigidBody>*/}
+            {usePhysics ? (
+                <RigidBody ref={rigidBodyRef}>
+                    {wrappedMesh}
+                </RigidBody>
+            ) : wrappedMesh}
         </group>
     );
 });

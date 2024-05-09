@@ -1,57 +1,46 @@
-// FatArrow.js
-import { motion } from "framer-motion-3d";
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
+import withAnimationAndPosition from '../withAnimationAndPosition'; 
 import * as THREE from 'three';
-import withAnimationAndPosition from '../withAnimationAndPosition';
 
 const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
-
-    // This animates something that motion does not support
     const { color = 'red', headLength = 0.2, headWidth = 0.15, lineWidth = 0.05, visible = true, margin = 0, from, to } = animationState;
 
-    const direction = new THREE.Vector3().subVectors(to, from).normalize();
-    const adjustedFrom = from.clone().add(direction.clone().multiplyScalar(margin));
-    const adjustedTo = to.clone().sub(direction.clone().multiplyScalar(margin));
-    const arrowLineLength = adjustedFrom.distanceTo(adjustedTo);
+    const lineMesh = useRef(null);
+    const coneMesh = useRef(null);
 
-    const lineGeometry = new THREE.CylinderGeometry(lineWidth, lineWidth, arrowLineLength, 32);
-    const coneGeometry = new THREE.ConeGeometry(headWidth, headLength, 32);
+    useEffect(() => {
+        if (lineMesh.current && coneMesh.current) {
+            //console.log("FatArrow", from, to)
+            const direction = new THREE.Vector3().subVectors(to, from).normalize();
+            const adjustedFrom = from.clone().add(direction.clone().multiplyScalar(margin));
+            const adjustedTo = to.clone().sub(direction.clone().multiplyScalar(margin));
+            const arrowLineLength = adjustedFrom.distanceTo(adjustedTo);
 
-    // Define animation variants
-    const variants = {
-        hidden: { opacity: 0 },
-        visible: { opacity: animationState.opacity ?? 1.0, duration: .5 }
-    };
+            // Update line geometry
+            const lineGeometry = new THREE.CylinderGeometry(lineWidth, lineWidth, arrowLineLength, 32);
+            lineMesh.current.geometry.dispose(); // Dispose old geometry
+            lineMesh.current.geometry = lineGeometry;
+
+            // Positioning logic remains the same
+            lineMesh.current.position.copy(adjustedFrom.clone().lerp(adjustedTo, 0.5));
+            lineMesh.current.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
+
+            // For the cone
+            const coneGeometry = new THREE.ConeGeometry(headWidth, headLength, 32);
+            coneMesh.current.geometry.dispose();
+            coneMesh.current.geometry = coneGeometry;
+            coneMesh.current.position.copy(adjustedTo);
+            coneMesh.current.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
+        }
+    }, [from, to, margin, lineWidth, headWidth, headLength]); // Dependency array includes all props affecting geometry
 
     return (
-        <group {...props} ref={ref} visible={visible}>
-            <mesh
-                geometry={lineGeometry}
-                position={adjustedFrom.clone().lerp(adjustedTo, 0.5)}
-                quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
-            >
-                <motion.meshBasicMaterial
-                    color={color}
-                    transparent={true}
-                    initialState="visible"
-                    animate={animationState.variant}
-                    variants={variants}
-                    transition={{ duration: animationState.duration || 0 }}
-                />
+        <group ref={ref} visible={visible}>
+            <mesh ref={lineMesh}>
+                <meshBasicMaterial color={color} />
             </mesh>
-            <mesh
-                geometry={coneGeometry}
-                position={adjustedTo}
-                quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction)}
-            >
-                <motion.meshBasicMaterial
-                    color={color}
-                    transparent={true}
-                    initialState="visible"
-                    animate={animationState.variant}
-                    variants={variants}
-                    transition={{ duration: animationState.duration || 0 }}
-                />
+            <mesh ref={coneMesh}>
+                <meshBasicMaterial color={color} />
             </mesh>
         </group>
     );
