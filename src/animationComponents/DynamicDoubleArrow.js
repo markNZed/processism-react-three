@@ -42,7 +42,6 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
         }
     };
 
-    // Note this is not dynamic when position changes
     useFrame(() => {
         const fromRef = getComponentRef(fromId);
         const toRef = getComponentRef(toId);
@@ -67,7 +66,6 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
                 setEnds({ from: newFromPosition, to: newToPosition });
                 setLastTo(toWorldPosition)
                 setLastFrom(fromWorldPosition)
-                //console.log("DynamicDoubleArrow", id, fromIdPosition, toIdPosition, ends.from, ends.to)
             }
         }
     });
