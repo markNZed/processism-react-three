@@ -3,17 +3,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import { CustomText } from './';
-import { RigidBody, vec3 } from '@react-three/rapier';
-import { useFrame } from '@react-three/fiber';
-import useStore from '../useStore';
+import { RigidBody } from '@react-three/rapier';
 
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
     const { scale = 1, color = 'blue', radius, visible = true, text = null, position } = animationState;
     const [simulationInit, setSimulationInit] = useState(true);
-    const lastRapierPosition = useRef();
-    const updatePosition = useStore(state => state.updatePosition);
 
     // Define animation variants
     const variants = {
@@ -30,10 +26,10 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
 
     const rigidBodyRef = useRef();
 
-    useEffect(() => {position
+    useEffect(() => {
         if (rigidBodyRef.current && props.simulationReady && simulationInit) {
             setSimulationInit(false);
-            rigidBodyRef.current.applyImpulse({ x: .1, y: .1, z: .1 }, true);
+            rigidBodyRef.current.applyImpulse({ x: 1, y: 1, z: 1 }, true);
         }
         // A continuous force
         //rigidBodyRef.current.addForce({ x: 0, y: 10, z: 0 }, true);
@@ -42,16 +38,6 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         // A continuous torque
         //rigidBodyRef.current.addTorque({ x: 0, y: 10, z: 0 }, true);
     }, [props]);
-
-    useFrame(() => {
-        if (rigidBodyRef.current) {
-            // You can set the translation of the rapier body, and r3/rapier will update the three mesh
-            // Should be world position
-            const position = rigidBodyRef.current.translation();
-            lastRapierPosition.current = position;
-            updatePosition(id, position);
-        }
-    });
 
     const usePhysics = false;
     const wrappedMesh = (

@@ -1,14 +1,7 @@
-animationState should hold position 
-How to get position of mesh that was moved by physics
-  Should we use ref to get position ?
-  It seems Rapier overwrites the position ?
-  Could always use Rapier RigidBody and not Motion
-    Can Motion update the position of the RigidBody ? Probably not expecting Rapier
-  Have different strategy for different objects e.g. treat as RigidBody only 
-DynamicDoubleArrow not getting latest position - probably not re-rendering because not depending on position ? 
+How to manage dependencies of positions ?
 Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Move to using Motion for Canvas and Camera control ?
 Allow multiple scenes
 Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option
+  All objects that interact with Rapier object should be in Rapier (no position syncing)
 WDS_SOCKET_PORT=0 only in CodeSpace ?
-React dev server not working?

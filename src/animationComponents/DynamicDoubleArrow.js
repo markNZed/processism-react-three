@@ -3,13 +3,11 @@ import useStore from '../useStore';
 import { DoubleArrow } from './';
 import withAnimationAndPosition from '../withAnimationAndPosition';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 
 const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const { fromId, toId } = animationState;
-    const { components } = useStore(state => ({ components: state.components }));
-    const fromIdPosition = useStore(state => state.positions[fromId]);
-    const toIdPosition = useStore(state => state.positions[toId]);
-    const { updateAnimationState } = useStore();
+    const getComponentRef = useStore(state => state.getComponentRef);
     const localRef = useRef(); // So we can write to the ref
     useImperativeHandle(ref, () => localRef.current);
     const [lastFrom, setLastFrom] = useState();
@@ -26,11 +24,10 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
         return diff.lengthSq() < epsilon * epsilon; // Comparing squared values avoids a sqrt
     }
 
-    const getEdgePosition = (componentId, targetPosition) => {
-        let componentRef = components[componentId]?.current;
-        if (componentRef) {
-            if (componentRef.userData && componentRef.userData.meshId) {
-                const meshRef = components[componentRef.userData.meshId]?.current;
+    const getEdgePosition = (componentRef, targetPosition) => {
+        if (componentRef.current) {
+            if (componentRef?.current?.userData?.meshId) {
+                const meshRef = getComponentRef(componentRef.current.userData.meshId);
                 componentRef = meshRef;
             }
             let nearestPoint = calculateNearestPoint(componentRef, targetPosition);
@@ -45,21 +42,35 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
         }
     };
 
-    useEffect(() => {
-        if (fromIdPosition 
-            && toIdPosition 
-            && localRef.current 
-            && (!vectorsAreClose(fromIdPosition, lastFrom) || !vectorsAreClose(toIdPosition, lastTo))
-        ) {
-            // Should compare positions to reduce renders
-            const newFromPosition = getEdgePosition(fromId, toIdPosition);
-            const newToPosition = getEdgePosition(toId, fromIdPosition);
-            setEnds({ from: newFromPosition, to: newToPosition });
-            setLastTo(toIdPosition)
-            setLastFrom(fromIdPosition)
-            //console.log("DynamicDoubleArrow", id, fromIdPosition, toIdPosition, ends.from, ends.to)
+    // Note this is not dynamic when position changes
+    useFrame(() => {
+        const fromRef = getComponentRef(fromId);
+        const toRef = getComponentRef(toId);
+        if (fromRef && toRef) {
+            // Vector to hold the world position
+            const fromWorldPosition = new THREE.Vector3();
+            // Calculate world position
+            fromRef.current.updateMatrixWorld();
+            fromRef.current.getWorldPosition(fromWorldPosition);
+            // Vector to hold the world position
+            const toWorldPosition = new THREE.Vector3();
+            // Calculate world position
+            toRef.current.updateMatrixWorld();
+            toRef.current.getWorldPosition(toWorldPosition);
+            if (fromWorldPosition 
+                && toWorldPosition 
+                && localRef.current 
+                && (!vectorsAreClose(fromWorldPosition, lastFrom) || !vectorsAreClose(toWorldPosition, lastTo))
+            ) {
+                const newFromPosition = getEdgePosition(getComponentRef(fromId), toWorldPosition);
+                const newToPosition = getEdgePosition(getComponentRef(toId), fromWorldPosition);
+                setEnds({ from: newFromPosition, to: newToPosition });
+                setLastTo(toWorldPosition)
+                setLastFrom(fromWorldPosition)
+                //console.log("DynamicDoubleArrow", id, fromIdPosition, toIdPosition, ends.from, ends.to)
+            }
         }
-    }, [fromIdPosition, toIdPosition]);
+    });
 
     return (
         <group ref={localRef}>
@@ -87,8 +98,8 @@ export default withAnimationAndPosition(DynamicDoubleArrow);
 
 // Helper functions
 
-function calculateNearestPoint(mesh, targetPosition) {
-    const vertices = mesh.geometry.attributes.position;
+function calculateNearestPoint(meshRef, targetPosition) {
+    const vertices = meshRef.current.geometry.attributes.position;
     let minDistance = Infinity;
     let nearestPoint = null;
     
@@ -97,7 +108,7 @@ function calculateNearestPoint(mesh, targetPosition) {
             vertices.getX(i),
             vertices.getY(i),
             vertices.getZ(i)
-        ).applyMatrix4(mesh.matrixWorld);
+        ).applyMatrix4(meshRef.current.matrixWorld);
         
         const distance = vertex.distanceTo(targetPosition);
         if (distance < minDistance) {

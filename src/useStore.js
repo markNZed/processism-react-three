@@ -2,12 +2,7 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 const useStore = create(devtools(subscribeWithSelector((set, get) => ({
-  positions: {},
   components: {}, // Object to store component references
-  updatePosition: (id, newPosition) => set(state => ({
-    positions: { ...state.positions, [id]: newPosition }
-  })),
-  getPosition: id => get().positions[id],
   registerComponent: (id, ref) => set(state => ({
     components: { ...state.components, [id]: ref }
   })),
@@ -46,16 +41,6 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
     return { animationStates: newState };
   }),
 }), { name: 'AnimationStore' }))); // Properly configure the naming for DevTools
-
-/*
-
-// Setting up a subscription to log specific or all changes
-useStore.subscribe(
-    state => state.positions, // Selecting what part of the state to subscribe to
-    positions => console.log("Positions have changed:", positions)
-);
-
-*/
 
 // Subscribe only to changes in animationStates
 useStore.subscribe(
