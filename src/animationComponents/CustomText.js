@@ -4,7 +4,7 @@ import { motion } from "framer-motion-3d";
 import React, { useImperativeHandle, useRef } from 'react';
 import * as THREE from 'three';
 
-import withAnimationAndPosition from '../withAnimationAndPosition';
+import withAnimationState from '../withAnimationState';
 
 const MotionText = motion(DreiText);
 
@@ -63,4 +63,4 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
 });
 
 // Wrap CustomText with the HOC before export
-export default withAnimationAndPosition(CustomText);
+export default withAnimationState(CustomText);

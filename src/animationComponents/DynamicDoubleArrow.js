@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import useStore from '../useStore';
 import { DoubleArrow } from './';
-import withAnimationAndPosition from '../withAnimationAndPosition';
+import withAnimationState from '../withAnimationState';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
@@ -92,7 +92,7 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
     );
 });
 
-export default withAnimationAndPosition(DynamicDoubleArrow);
+export default withAnimationState(DynamicDoubleArrow);
 
 // Helper functions
 

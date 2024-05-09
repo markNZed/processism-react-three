@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import { useSpring } from '@react-spring/three';
-import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure correct import path
+import withAnimationState from '../withAnimationState'; // Ensure correct import path
 
 const Camera = React.forwardRef(({ id, animationState, initialState }, ref) => {
     const { camera } = useThree();
@@ -48,4 +48,4 @@ const Camera = React.forwardRef(({ id, animationState, initialState }, ref) => {
     return null;
 });
 
-export default withAnimationAndPosition(Camera);
+export default withAnimationState(Camera);

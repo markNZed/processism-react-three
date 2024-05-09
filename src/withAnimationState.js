@@ -3,7 +3,7 @@ import { motion } from "framer-motion-3d";
 import useStore from './useStore';
 import { useFrame } from '@react-three/fiber';
 
-function withAnimationAndPosition(Component) {
+function withAnimationState(Component) {
     // Unsure if we need to wrap this here with motion
     const MotionComponent = motion(Component);
 
@@ -49,4 +49,4 @@ function withAnimationAndPosition(Component) {
     };
 }
 
-export default withAnimationAndPosition;
+export default withAnimationState;

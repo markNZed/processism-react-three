@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import withAnimationAndPosition from '../withAnimationAndPosition'; 
+import withAnimationState from '../withAnimationState'; 
 import * as THREE from 'three';
 
 const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
@@ -46,4 +46,4 @@ const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     );
 });
 
-export default withAnimationAndPosition(FatArrow);
+export default withAnimationState(FatArrow);

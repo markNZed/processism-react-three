@@ -1,7 +1,7 @@
 import { motion } from "framer-motion-3d";
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import withAnimationAndPosition from '../withAnimationAndPosition';
+import withAnimationState from '../withAnimationState';
 import { CustomText } from './';
 import { RigidBody } from '@react-three/rapier';
 
@@ -84,4 +84,4 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
 });
 
 // Automatically wrap Sphere with the HOC before export
-export default withAnimationAndPosition(Sphere);
+export default withAnimationState(Sphere);

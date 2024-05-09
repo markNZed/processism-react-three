@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FatArrow } from './';
-import withAnimationAndPosition from '../withAnimationAndPosition'; 
+import withAnimationState from '../withAnimationState'; 
 
 const DoubleArrow = React.forwardRef(({ id, animationState, initialState, ...props }, ref) => {
 
@@ -20,4 +20,4 @@ const DoubleArrow = React.forwardRef(({ id, animationState, initialState, ...pro
     );
 });
 
-export default withAnimationAndPosition(DoubleArrow);
+export default withAnimationState(DoubleArrow);

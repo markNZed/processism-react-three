@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import useStore from '../useStore';
-import withAnimationAndPosition from '../withAnimationAndPosition';
+import withAnimationState from '../withAnimationState';
 import { Circle, CustomText, DynamicDoubleArrow, FatArrow, Sphere } from './';
 
 const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) => {
@@ -157,4 +157,4 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 });
 
 // Automatically wrap EmergentEntity with the HOC before export
-export default withAnimationAndPosition(EmergentEntity);
+export default withAnimationState(EmergentEntity);

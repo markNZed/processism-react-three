@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import withAnimationAndPosition from '../withAnimationAndPosition'; // Ensure correct path
+import withAnimationState from '../withAnimationState'; // Ensure correct path
 import * as THREE from 'three';
 import { motion } from "framer-motion-3d"
 
@@ -47,4 +47,4 @@ const Circle = React.forwardRef(({id, animationState, ...props}, ref) => {
 });
 
 // Wrap Circle with the HOC to inject position, scale, and any other animations.
-export default withAnimationAndPosition(Circle);
+export default withAnimationState(Circle);
