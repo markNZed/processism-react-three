@@ -10,19 +10,6 @@ export function AnimationController({ children }) {
     useEffect(() => {
         const timeouts = [];
 
-        // Initial setup for animation states
-        setInitialAnimationState({
-            'inter_emergent': { visible: false },
-            'emergent1': { variant: "oneSphere" },
-            'emergent1': { labelText: "Emergent Entity" },
-            'emergent1.Sphere1': { labelText: "Entity" },
-            'emergent1.Circle': { variant: "hidden" },
-            'emergent2': { visible: false },
-            'emergent2.Circle': { variant: "hidden" },
-            'emergent2.label': { visible: false },
-            'emergent2.causation': { visible: false },
-        });
-
         const speed = 1; // set to 1 for normal speed, 10 for 10x faster
 
         const scheduleAnimations = (animations) => {
@@ -36,6 +23,19 @@ export function AnimationController({ children }) {
             });
         };
 
+        // Initial setup for animation states
+        setInitialAnimationState({
+            'inter_emergent': { visible: false },
+            'emergent1': { variant: "oneSphere" },
+            'emergent1': { labelText: "Emergent Entity" },
+            'emergent1.Sphere1': { labelText: "Entity" },
+            'emergent1.Circle': { variant: "hidden" },
+            'emergent2': { visible: false },
+            'emergent2.Circle': { variant: "hidden" },
+            'emergent2.label': { visible: false },
+            'emergent2.causation': { visible: false },
+        });
+        
         // Delay, id, animationState
         const animationSteps = [
             [1,   'emergent1', { variant: "oneSphere-details", }],
