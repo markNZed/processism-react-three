@@ -40,7 +40,7 @@ function withAnimationState(Component) {
                 {...props}
                 ref={ref}
                 id={id}
-                animationState={{ ...initialState, ...animationState }}
+                animationState={{ ...initialState, ...animationState, ...props.animationState }}
                 initialState={initialState}
                 simulationReady={simulationReady}
                 position={animationState.position || initialState.position}

@@ -13,7 +13,7 @@ const DoubleArrow = React.forwardRef(({ id, animationState, initialState, ...pro
             />
             <FatArrow {...props} 
               id={`${id}.to`} 
-              initialState={{...initialState, from: animationState.to, to: animationState.from}} 
+              initialState={{...initialState, from: initialState.to, to: initialState.from}} 
               animationState={{...animationState, from: animationState.to, to: animationState.from}} 
             />
         </group>

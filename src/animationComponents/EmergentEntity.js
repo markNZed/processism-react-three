@@ -10,12 +10,6 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 
   const { radius, position, visible } = animationState;
 
-  useEffect(() => {
-    // causation is not a Component but a group
-    updateAnimationState(`${id}.causation`, animationState);
-    updateAnimationState(`${id}.relations`, animationState);
-  }, []);
-
   const causationAnimationState = useStore(state => state.animationStates[`${id}.causation`] || {});
   const relationsAnimationState = useStore(state => state.animationStates[`${id}.relations`] || {});
 
@@ -33,7 +27,6 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere2`]: { visible: false },
           [`${id}.Sphere3`]: { visible: false },
           [`${id}.Sphere4`]: { visible: false },
-          [`${id}.relations`]: { visible: false },
           [`${id}.label`]: { visible: false },
         });
         break;
@@ -48,10 +41,8 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere1.label`]: { variant: 'hidden', duration: .5 },
         });
         break;
-
       case 'relation':
         batchUpdateAnimationStates({
-          [`${id}.relations`]: { visible: true },
           [`${id}.relations1`]: { visible: true },
           [`${id}.relations2`]: { visible: false },
           [`${id}.relations3`]: { visible: false },
@@ -123,7 +114,6 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
         initialState={{
           visible: false,
           position: labelPosition,
-          text: animationState.labelText,
           scale: 0.5
         }}
       />
@@ -132,7 +122,6 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
         initialState={{
           visible: false,
           position: label2Position,
-          text: animationState.label2Text,
           scale: 0.3
         }}
       />
@@ -142,12 +131,12 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
       <Sphere id={`${id}.Sphere3`} initialState={{position: spherePosition3, radius: sphereRadius}} />
       <Sphere id={`${id}.Sphere4`} initialState={{position: spherePosition4, radius: sphereRadius}} />
       <group visible={relationsAnimationState.visible}>
-        <DynamicDoubleArrow id={`${id}.relations1`} initialState={{fromId: `${id}.Sphere1`, toId: `${id}.Sphere2`}} />
-        <DynamicDoubleArrow id={`${id}.relations2`} initialState={{fromId: `${id}.Sphere3`, toId: `${id}.Sphere4`}} />
-        <DynamicDoubleArrow id={`${id}.relations3`} initialState={{fromId: `${id}.Sphere1`, toId: `${id}.Sphere3`}} />
-        <DynamicDoubleArrow id={`${id}.relations4`} initialState={{fromId: `${id}.Sphere2`, toId: `${id}.Sphere4`}} />
-        <DynamicDoubleArrow id={`${id}.relations5`} initialState={{fromId: `${id}.Sphere1`, toId: `${id}.Sphere4`}} />
-        <DynamicDoubleArrow id={`${id}.relations6`} initialState={{fromId: `${id}.Sphere2`, toId: `${id}.Sphere3`}} />
+        <DynamicDoubleArrow id={`${id}.relations1`} initialState={{visible: false, fromId: `${id}.Sphere1`, toId: `${id}.Sphere2`}} />
+        <DynamicDoubleArrow id={`${id}.relations2`} initialState={{visible: false, fromId: `${id}.Sphere3`, toId: `${id}.Sphere4`}} />
+        <DynamicDoubleArrow id={`${id}.relations3`} initialState={{visible: false, fromId: `${id}.Sphere1`, toId: `${id}.Sphere3`}} />
+        <DynamicDoubleArrow id={`${id}.relations4`} initialState={{visible: false, fromId: `${id}.Sphere2`, toId: `${id}.Sphere4`}} />
+        <DynamicDoubleArrow id={`${id}.relations5`} initialState={{visible: false, fromId: `${id}.Sphere1`, toId: `${id}.Sphere4`}} />
+        <DynamicDoubleArrow id={`${id}.relations6`} initialState={{visible: false, fromId: `${id}.Sphere2`, toId: `${id}.Sphere3`}} />
       </group>
       {
         animationState.causation === "bottomup" ?

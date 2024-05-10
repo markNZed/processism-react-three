@@ -36,6 +36,7 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
     };
   }),
   batchUpdateAnimationStates: (updates) => set(state => {
+    state.lastUpdateAnimationState = updates;
     const newState = { ...state.animationStates };
     Object.entries(updates).forEach(([id, update]) => {
       newState[id] = { ...newState[id], ...update };

@@ -9,7 +9,7 @@ import useStore from '../useStore';
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { scale = 1, color = 'blue', radius, visible = true, labelText = null, position } = animationState;
+    const { scale = 1, color = 'blue', radius, visible = true, position } = animationState;
     const [simulationInit, setSimulationInit] = useState(true);
     const usePhysics = useStore(state => state.usePhysics);
 
@@ -70,13 +70,12 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
                 id={`${id}.label`}
                 initialState={{
                     position: textPosition,
-                    text: animationState.labelText,
                     scale: 0.5,
                     variant: 'hidden'
                 }}
             />
             {usePhysics ? (
-                <RigidBody ref={rigidBodyRef}>
+                <RigidBody ref={rigidBodyRef} enabledTranslations={[true, true, false]}>
                     {wrappedMesh}
                 </RigidBody>
             ) : wrappedMesh}

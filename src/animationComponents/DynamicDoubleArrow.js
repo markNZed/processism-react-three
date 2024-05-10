@@ -3,26 +3,26 @@ import useStore from '../useStore';
 import { DoubleArrow } from './';
 import withAnimationState from '../withAnimationState';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import useMonitorPosition from '../hooks/useMonitorPosition';
 
-const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
+const DynamicDoubleArrow = React.forwardRef(({ id, animationState, initialState, ...props }, ref) => {
     const { fromId, toId } = animationState;
     const getComponentRef = useStore(state => state.getComponentRef);
     const localRef = useRef(); // So we can write to the ref
     useImperativeHandle(ref, () => localRef.current);
-    const [lastFrom, setLastFrom] = useState();
-    const [lastTo, setLastTo] = useState();
+    const [positions, setPositions] = useState({});
+
+    const updatePositions = (id, position) => {
+        setPositions(prev => ({ ...prev, [id]: position }));
+    };
+
+    const fromRef = getComponentRef(fromId);
+    const toRef = getComponentRef(toId);
+    useMonitorPosition(fromRef, updatePositions, 'from');
+    useMonitorPosition(toRef, updatePositions, 'to');
 
     // State to keep track of ends
     const [ends, setEnds] = useState({ from: null, to: null });
-
-    function vectorsAreClose(v1, v2, epsilon = 0.0001) {
-        if (!v1 || !v2) {
-            return false;
-        }
-        const diff = v1.clone().sub(v2);
-        return diff.lengthSq() < epsilon * epsilon; // Comparing squared values avoids a sqrt
-    }
 
     const getEdgePosition = (componentRef, targetPosition) => {
         if (componentRef.current) {
@@ -42,33 +42,13 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
         }
     };
 
-    useFrame(() => {
-        const fromRef = getComponentRef(fromId);
-        const toRef = getComponentRef(toId);
-        if (fromRef && toRef) {
-            // Vector to hold the world position
-            const fromWorldPosition = new THREE.Vector3();
-            // Calculate world position
-            fromRef.current.updateMatrixWorld();
-            fromRef.current.getWorldPosition(fromWorldPosition);
-            // Vector to hold the world position
-            const toWorldPosition = new THREE.Vector3();
-            // Calculate world position
-            toRef.current.updateMatrixWorld();
-            toRef.current.getWorldPosition(toWorldPosition);
-            if (fromWorldPosition 
-                && toWorldPosition 
-                && localRef.current 
-                && (!vectorsAreClose(fromWorldPosition, lastFrom) || !vectorsAreClose(toWorldPosition, lastTo))
-            ) {
-                const newFromPosition = getEdgePosition(getComponentRef(fromId), toWorldPosition);
-                const newToPosition = getEdgePosition(getComponentRef(toId), fromWorldPosition);
-                setEnds({ from: newFromPosition, to: newToPosition });
-                setLastTo(toWorldPosition)
-                setLastFrom(fromWorldPosition)
-            }
+    useEffect(() => {
+        if (positions.from && positions.to) {
+            const newFromPosition = getEdgePosition(getComponentRef(fromId), positions.to);
+            const newToPosition = getEdgePosition(getComponentRef(toId), positions.from);
+            setEnds({ from: newFromPosition, to: newToPosition });
         }
-    });
+    }, [positions]);
 
     return (
         <group ref={localRef}>
@@ -77,7 +57,7 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, ...props }, r
                     {...props}
                     id={`${id}.DoubleArrow`}
                     initialState={{
-                        ...animationState,
+                        ...initialState,
                         from: ends.from,
                         to: ends.to,
                     }}
