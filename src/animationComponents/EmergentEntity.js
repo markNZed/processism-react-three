@@ -73,6 +73,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere3`]: { visible: true },
           [`${id}.Sphere4`]: { visible: true },
         });
+        break;
       case 'accumulation-description':
         batchUpdateAnimationStates({
           [`${id}.text2`]: { visible: true },

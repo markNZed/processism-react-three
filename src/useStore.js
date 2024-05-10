@@ -4,7 +4,7 @@ import { devtools, subscribeWithSelector } from 'zustand/middleware';
 const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   usePhysics: false, 
   setUsePhysics: (usePhysics) => set({ usePhysics }), 
-  components: {}, // Object to store component references
+  components: {},
   registerComponent: (id, ref) => set(state => ({
     components: { ...state.components, [id]: ref }
   })),
@@ -13,7 +13,7 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
     delete newComponents[id];
     return { components: newComponents };
   }),
-  getComponentRef: id => get().components[id], // Function to get component ref by id
+  getComponentRef: id => get().components[id],
   animationStates: {},
   setInitialAnimationState: (initialStates) => set({
     animationStates: { ...initialStates }
@@ -42,11 +42,11 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
     });
     return { animationStates: newState };
   }),
-}), { name: 'AnimationStore' }))); // Properly configure the naming for DevTools
+}), { name: 'AnimationStore' }))); // Configure the naming for DevTools
 
 // Subscribe only to changes in animationStates
 useStore.subscribe(
-  state => state.animationStates,  // Only listen to changes in animationStates
+  state => state.animationStates,
   animationStates => {
       const lastUpdateAnimationState = useStore.getState().lastUpdateAnimationState;
       console.log("Animation:", lastUpdateAnimationState.why, lastUpdateAnimationState);
