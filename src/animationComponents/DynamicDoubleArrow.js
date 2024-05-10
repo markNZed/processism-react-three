@@ -31,14 +31,19 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, initialState,
                 componentRef = meshRef;
             }
             let nearestPoint = calculateNearestPoint(componentRef, targetPosition);
-            const localPosition = new THREE.Vector3();
-            // Convert world position to local position
-            localRef.current.worldToLocal(localPosition.copy(nearestPoint));
-            //console.log("DynamicDoubleArrow nearestPoint", id, nearestPoint, localPosition)
-            return localPosition
+            if (nearestPoint) {
+                const localPosition = new THREE.Vector3();
+                // Convert world position to local position
+                localRef.current.worldToLocal(localPosition.copy(nearestPoint));
+                //console.log("DynamicDoubleArrow nearestPoint", id, nearestPoint, localPosition)
+                return localPosition
+            } else {
+                console.log("Problem with nearestPoint", id, nearestPoint);
+                return null;
+            }
         } else {
             console.log("Problem with ref", id, componentRef);
-            return null
+            return null;
         }
     };
 

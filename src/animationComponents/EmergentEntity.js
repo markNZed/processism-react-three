@@ -8,7 +8,10 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
 
   const { updateAnimationState, batchUpdateAnimationStates } = useStore();
 
-  const { radius, position, visible } = animationState;
+  const { radius, visible, offset= new THREE.Vector3(0,0,0) } = animationState;
+  // Clone the position to avoid mutating the original data.
+  const position = new THREE.Vector3().copy(animationState.position);
+  position.add(offset);
 
   const causationAnimationState = useStore(state => state.animationStates[`${id}.causation`] || {});
   const relationsAnimationState = useStore(state => state.animationStates[`${id}.relations`] || {});

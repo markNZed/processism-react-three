@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import useStore from './useStore';
+import * as THREE from 'three';
 
 export function AnimationController({ children }) {
     const { batchUpdateAnimationStates, updateAnimationState } = useStore(state => ({
@@ -45,6 +46,7 @@ export function AnimationController({ children }) {
             [0.5, 'inter_emergent', { visible: true }],
             [1,   'emergent2.label', { visible: true, text: "Top-down" }],
             [1,   'emergent2.causation', { visible: true }],
+            [1,   'emergent1', { variant: "moved", offset: new THREE.Vector3(5,5,5) }],
 
         ];
 
