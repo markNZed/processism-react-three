@@ -34,18 +34,18 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
           [`${id}.Sphere3`]: { visible: false },
           [`${id}.Sphere4`]: { visible: false },
           [`${id}.relations`]: { visible: false },
-          [`${id}.text`]: { visible: false },
+          [`${id}.label`]: { visible: false },
         });
         break;
       case 'oneSphere-details':
         batchUpdateAnimationStates({
-          [`${id}.Sphere1.text`]: { variant: 'visible', duration: .5 },
+          [`${id}.Sphere1.label`]: { variant: 'visible', duration: .5 },
         });
         break;
       case 'twoSphere':
         batchUpdateAnimationStates({
           [`${id}.Sphere2`]: { visible: true },
-          [`${id}.Sphere1.text`]: { variant: 'hidden', duration: .5 },
+          [`${id}.Sphere1.label`]: { variant: 'hidden', duration: .5 },
         });
         break;
 
@@ -76,12 +76,12 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
         break;
       case 'accumulation-description':
         batchUpdateAnimationStates({
-          [`${id}.text2`]: { visible: true },
+          [`${id}.label2`]: { visible: true },
         });
         break;
       case 'accumulation-description-end':
         batchUpdateAnimationStates({
-          [`${id}.text2`]: { visible: false },
+          [`${id}.label2`]: { visible: false },
         });
         break;
       default:
@@ -111,28 +111,28 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
     </group>
   );
 
-  // Calculate text position based on initialState position and any offset
-  const textPosition = new THREE.Vector3(0, radius * 1.2, 0);
-  const text2Position = new THREE.Vector3(0, radius * .75, 0);
+  // Calculate label position based on initialState position and any offset
+  const labelPosition = new THREE.Vector3(0, radius * 1.2, 0);
+  const label2Position = new THREE.Vector3(0, radius * .75, 0);
 
   return (
     // We set a mesh for this object so we can get a ref for DynamicDoubleArrow above this component
     <group ref={ref} position={position} visible={visible} userData={{ meshId: `${id}.Circle` }} >
       <CustomText 
-        id={`${id}.text`} 
+        id={`${id}.label`} 
         initialState={{
           visible: false,
-          position: textPosition,
-          text: animationState.text,
+          position: labelPosition,
+          text: animationState.labelText,
           scale: 0.5
         }}
       />
       <CustomText
-        id={`${id}.text2`}
+        id={`${id}.label2`}
         initialState={{
           visible: false,
-          position: text2Position,
-          text: animationState.text2,
+          position: label2Position,
+          text: animationState.label2Text,
           scale: 0.3
         }}
       />

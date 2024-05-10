@@ -9,7 +9,7 @@ import useStore from '../useStore';
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
     // This animates something that motion does not support
-    const { scale = 1, color = 'blue', radius, visible = true, text = null, position } = animationState;
+    const { scale = 1, color = 'blue', radius, visible = true, labelText = null, position } = animationState;
     const [simulationInit, setSimulationInit] = useState(true);
     const usePhysics = useStore(state => state.usePhysics);
 
@@ -19,7 +19,7 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         visible: { opacity: animationState.opacity ?? 1.0 }
     };
 
-    // Calculate text position based on animationState position and any offset
+    // Calculate labelText position based on animationState position and any offset
     const textPosition = new THREE.Vector3(
         position.x,
         position.y + radius * 1.2, // Adjust Y position to be slightly above whatever it is annotating or positioned at
@@ -67,10 +67,10 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
     return (
         <group visible={visible} >
             <CustomText
-                id={`${id}.text`}
+                id={`${id}.label`}
                 initialState={{
                     position: textPosition,
-                    text: animationState.text,
+                    text: animationState.labelText,
                     scale: 0.5,
                     variant: 'hidden'
                 }}
