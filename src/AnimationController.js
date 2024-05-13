@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import useStore from './useStore';
 import * as THREE from 'three';
+import useStore from './useStore';
 
 export function AnimationController({ children }) {
     const { batchUpdateAnimationStates, updateAnimationState } = useStore(state => ({
@@ -25,28 +25,28 @@ export function AnimationController({ children }) {
             'emergent2.label': { visible: false },
             'emergent2.causation': { visible: false },
         });
-        
+
         // Delay, id, animationState
         const animationSteps = [
-            [1,   'emergent1', { variant: "oneSphere-details", }],
-            [1,   'emergent1', { variant: "twoSphere", why: "Showing second sphere" }],
-            [1,   'emergent1', { variant: "relation" }],
-            [1,   'emergent1', { variant: "allRelations" }],
-            [0,   'emergent1.label2', { text: "Accumulation" }],
-            [1,   'emergent1', { variant: "accumulation-description" }],
-            [1,   'emergent1', { variant: "accumulation-description-end" }],
-            [1,   'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [1,   'emergent1.label', { visible: true }],
-            [2,   'emergent1.label', { visible: false }],
-            [1,   'emergent2', { visible: true }],
-            [0,   'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [0,   'camera', { position: [0, -30, 10], duration: 2000 }],
-            [2,   'emergent1.label', { visible: true, text: "Bottom-up" }],
-            [1,   'emergent1.causation', { visible: true }],
+            [1, 'emergent1', { variant: "oneSphere-details", }],
+            [1, 'emergent1', { variant: "twoSphere", why: "Showing second sphere" }],
+            [1, 'emergent1', { variant: "relation" }],
+            [1, 'emergent1', { variant: "allRelations" }],
+            // [0, 'emergent1.label2', { text: "Accumulation" }],
+            [1, 'emergent1', { variant: "accumulation-description" }],
+            [1, 'emergent1', { variant: "accumulation-description-end" }],
+            [1, 'emergent1.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
+            // [1, 'emergent1.label', { visible: true }],
+            // [2, 'emergent1.label', { visible: false }],
+            [1, 'emergent2', { visible: true }],
+            [0, 'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
+            [0, 'camera', { position: [0, -30, 10], duration: 2000 }],
+            [2, 'emergent1.label', { visible: true, text: "Bottom-up" }],
+            [1, 'emergent1.causation', { visible: true }],
             [0.5, 'inter_emergent', { visible: true }],
-            [1,   'emergent2.label', { visible: true, text: "Top-down" }],
-            [1,   'emergent2.causation', { visible: true }],
-            [1,   'emergent1', { variant: "moved", offset: new THREE.Vector3(5,5,5) }],
+            [1, 'emergent2.label', { visible: true, text: "Top-down" }],
+            [1, 'emergent2.causation', { visible: true }],
+            [1, 'emergent1', { variant: "moved", offset: new THREE.Vector3(5, 5, 5) }],
 
         ];
 
