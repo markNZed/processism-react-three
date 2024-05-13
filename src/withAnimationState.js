@@ -1,13 +1,14 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { motion } from "framer-motion-3d";
-import useStore from './useStore';
 import { useFrame } from '@react-three/fiber';
+import { motion } from "framer-motion-3d";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import useStore from './useStore';
 
 function withAnimationState(Component) {
     // Unsure if we need to wrap this here with motion
     const MotionComponent = motion(Component);
 
-    return function WrappedComponent({ id, initialState, ...props }) {
+    return function WrappedComponent({ id, initialState: initialStateFromProp, ...props }) {
+        const initialState = useMemo(() => initialStateFromProp, [])
         const ref = useRef();
         const registerComponent = useStore(state => state.registerComponent);
         const unregisterComponent = useStore(state => state.unregisterComponent);
