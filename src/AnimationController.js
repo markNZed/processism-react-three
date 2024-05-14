@@ -41,9 +41,9 @@ export function AnimationController({ children }) {
             [0.5, 'inter_emergent', { visible: true }],
             [2, 'camera', { position: [0, -30, 10], duration: 2000 }],
             [2, 'emergent2Label', { text: 'Bottom Up', variant: "fadeIn" }],
-            [1, 'emergent1.causation', { visible: true }],
-            [1, 'emergent1Label', { text: 'Top Down', variant: "fadeIn" }],
             [1, 'emergent2.causation', { visible: true }],
+            [2, 'emergent1Label', { text: 'Top Down', variant: "fadeIn" }],
+            [1, 'emergent1.causation', { visible: true }],
             [1, 'emergent1', { variant: "moved", offset: new THREE.Vector3(5, 5, 5) }],
 
         ];

@@ -15,8 +15,8 @@ const MotionText = motion(DreiText);
 
 const variants = {
     hidden: { opacity: 0 },
-    fadeIn: { opacity: 1, transition: { duration: 1 } },
-    fadeOut: { opacity: 0, transition: { duration: 1 } },
+    fadeIn: { opacity: 1, transition: { duration: .5 } },
+    fadeOut: { opacity: 0, transition: { duration: .5 } },
     visible: { opacity: 1, }
 };
 
@@ -32,7 +32,6 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
 
     const [positions, setPositions] = useState({});
 
-    const [finalPosition, setFinalPosition] = useState(undefined);
 
     const updatePositions = (id, position) => {
         setPositions(prev => ({ ...prev, [id]: position }));
@@ -45,7 +44,7 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
     useEffect(() => {
         if (positions.target) {
             const newTargetPosition = positions.target.clone().add(offset);
-            setFinalPosition(newTargetPosition);
+            textRef.current.position.copy(newTargetPosition);
         }
     }, [positions, offset]);
 
@@ -62,7 +61,7 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
     // This will expose textRef as ref to the parent component
     useImperativeHandle(ref, () => textRef.current);
 
-    return finalPosition && text ? (
+    return text ? (
         <MotionText
             {...props}
             ref={textRef}
@@ -70,7 +69,6 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
             visible={visible}
             anchorX="center"
             anchorY="middle"
-            position={finalPosition}
             scale={[scale, scale, scale]}
             animate={animationState.variant}
             variants={variants}

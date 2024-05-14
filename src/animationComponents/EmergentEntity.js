@@ -58,7 +58,8 @@ function getAnimationUpdates(id, variant) {
     case 'allRelations':
       return {
         ...allVisible(id, true),
-        [`${id}.Circle`]: { visible: false }
+        [`${id}.Circle`]: { visible: false },
+        [`${id}.causation`]: { visible: false },
       };
     case 'all':
       return {
@@ -103,13 +104,12 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
   const spherePosition3 = new THREE.Vector3(-sphereOffset, -sphereOffset, -causationLength);
   const spherePosition4 = new THREE.Vector3(+sphereOffset, -sphereOffset, -causationLength);
 
-  const fatArrowVarient = causationAnimationState.visible ? 'visible' : 'hidden';
   const causationArrows = (id, start, end) => (
     <group visible={causationAnimationState.visible}>
-      <FatArrow id={`${id}.FatArrow1`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z) }} />
-      <FatArrow id={`${id}.FatArrow2`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z) }} />
-      <FatArrow id={`${id}.FatArrow3`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z) }} />
-      <FatArrow id={`${id}.FatArrow4`} initialState={{ variant: fatArrowVarient, duration: 1, from: new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow1`} initialState={{ from: new THREE.Vector3(start.x - sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y + sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow2`} initialState={{ from: new THREE.Vector3(start.x + sphereOffset, start.y + sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y + sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow3`} initialState={{ from: new THREE.Vector3(start.x - sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x - sphereOffset, end.y - sphereOffset, end.z) }} />
+      <FatArrow id={`${id}.FatArrow4`} initialState={{ from: new THREE.Vector3(start.x + sphereOffset, start.y - sphereOffset, start.z), to: new THREE.Vector3(end.x + sphereOffset, end.y - sphereOffset, end.z) }} />
     </group>
   );
 
