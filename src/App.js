@@ -1,60 +1,56 @@
-import { Environment, OrbitControls } from '@react-three/drei';
-import { Canvas, useThree } from '@react-three/fiber';
 import React, { useEffect } from 'react';
-//import { MotionCanvas } from "framer-motion-3d"
+import { Canvas, useThree } from '@react-three/fiber';
+import { Environment, OrbitControls } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import useStore from './useStore';
 import SceneManager from './SceneManager';
 
+/**
+ * Handles camera adjustments on window resize for react-three-fiber.
+ */
 function CameraAdjuster() {
-  const { camera, gl } = useThree(); // Access R3F context
+  const { camera, gl } = useThree();
 
   useEffect(() => {
-    function handleResize() {
-      // Calculate new dimensions
+    const handleResize = () => {
+      // Set camera bounds based on window dimensions
       camera.left = window.innerWidth / -2;
       camera.right = window.innerWidth / 2;
       camera.top = window.innerHeight / 2;
       camera.bottom = window.innerHeight / -2;
 
-      // Update camera and renderer
+      // Update the camera projection matrix and renderer size
       camera.updateProjectionMatrix();
       gl.setSize(window.innerWidth, window.innerHeight);
-    }
+    };
 
-    // Add and clean up the resize listener
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [camera, gl]); // Depend on camera and gl objects
+  }, [camera, gl]);
 
-  return null; // This component does not render anything itself
+  return null; // Component only handles side effects
 }
 
+/**
+ * Main component that renders the 3D scene.
+ */
 export default function App() {
-
   const usePhysics = useStore(state => state.usePhysics);
 
   return (
-    <Canvas orthographic >
-
-        {usePhysics ? (
-          <Physics
-            gravity={[0, 0, 0]}
-          // Need colliders to allow for impulse to work
-          //colliders={false}
-          >
-            <SceneManager />
-          </Physics>
-        ) :
+    <Canvas orthographic>
+      {/* Conditional rendering based on whether physics are enabled */}
+      {usePhysics ? (
+        <Physics gravity={[0, 0, 0]}>
           <SceneManager />
-        }
+        </Physics>
+      ) : (
+        <SceneManager />
+      )}
 
-        <OrbitControls />
-
-        <Environment preset="sunset" />
-
+      <OrbitControls />
+      <Environment preset="sunset" />
       <CameraAdjuster />
-
     </Canvas>
-  )
+  );
 }

@@ -1,3 +1,4 @@
+.gitignore build dir on main branch
 Maybe manage RigidBodyRef in HOC and provide a position function that tries rigid then mesh
 Error if sam eid registered twice
 Use React's useMemo and useCallback to memoize complex calculations and functions that don't need to be re-created on every render.
