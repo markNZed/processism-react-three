@@ -5,20 +5,6 @@ import withAnimationState from '../withAnimationState';
 import { Circle, DynamicDoubleArrow, FatArrow, Sphere } from './';
 
 
-// const defaultInnerState = (id) => ({
-//   [`${id}.Sphere1`]: { visible: false },
-//   [`${id}.Sphere2`]: { visible: false },
-//   [`${id}.Sphere3`]: { visible: false },
-//   [`${id}.Sphere4`]: { visible: false },
-//   [`${id}.Circle`]: { visible: false },
-//   [`${id}.causation`]: { visible: false },
-//   [`${id}.relations1`]: { visible: false },
-//   [`${id}.relations2`]: { visible: false },
-//   [`${id}.relations3`]: { visible: false },
-//   [`${id}.relations4`]: { visible: false },
-//   [`${id}.relations5`]: { visible: false },
-//   [`${id}.relations6`]: { visible: false },
-// })
 
 function allSphereVisible(id, visible) {
   return {
@@ -73,6 +59,10 @@ function getAnimationUpdates(id, variant) {
       return {
         ...allVisible(id, true),
         [`${id}.Circle`]: { visible: false }
+      };
+    case 'all':
+      return {
+        ...allVisible(id, true),
       };
     default:
       // Optionally handle the default case
