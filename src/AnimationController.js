@@ -38,12 +38,12 @@ export function AnimationController({ children }) {
             [1, 'emergent1Label', { duration: 1, variant: "fadeOut" }],
             [1, 'emergent2', { visible: true, variant: "allRelations" }],
             [1, 'emergent2.Circle', { duration: 1, variant: "visible", opacity: 0.5, visible: true }],
-            [0.5, 'inter_emergent', { visible: true }],
             [2, 'camera', { position: [0, -30, 10], duration: 2000 }],
-            [2, 'emergent2Label', { text: 'Bottom Up', variant: "fadeIn" }],
-            [1, 'emergent2.causation', { visible: true }],
-            [2, 'emergent1Label', { text: 'Top Down', variant: "fadeIn" }],
+            [2, 'emergent1Label', { text: 'Bottom Up', variant: "fadeIn" }],
             [1, 'emergent1.causation', { visible: true }],
+            [0.5, 'inter_emergent', { visible: true }],
+            [2, 'emergent2Label', { text: 'Top Down', variant: "fadeIn" }],
+            [1, 'emergent2.causation', { visible: true }],
             [1, 'emergent1', { variant: "moved", offset: new THREE.Vector3(5, 5, 5) }],
 
         ];
