@@ -2,25 +2,23 @@ import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import useStore from '../useStore';
 import withAnimationState from '../withAnimationState';
-import { Circle, CustomText, DynamicDoubleArrow, FatArrow, Sphere } from './';
+import { Circle, DynamicDoubleArrow, FatArrow, Sphere } from './';
 
 
-const defaultInnerState = (id) => ({
-  [`${id}.Sphere1`]: { visible: false },
-  [`${id}.Sphere2`]: { visible: false },
-  [`${id}.Sphere3`]: { visible: false },
-  [`${id}.Sphere4`]: { visible: false },
-  [`${id}.Circle`]: { visible: false },
-  [`${id}.label`]: { visible: false },
-  [`${id}.label2`]: { visible: false },
-  [`${id}.causation`]: { visible: false },
-  [`${id}.relations1`]: { visible: false },
-  [`${id}.relations2`]: { visible: false },
-  [`${id}.relations3`]: { visible: false },
-  [`${id}.relations4`]: { visible: false },
-  [`${id}.relations5`]: { visible: false },
-  [`${id}.relations6`]: { visible: false },
-})
+// const defaultInnerState = (id) => ({
+//   [`${id}.Sphere1`]: { visible: false },
+//   [`${id}.Sphere2`]: { visible: false },
+//   [`${id}.Sphere3`]: { visible: false },
+//   [`${id}.Sphere4`]: { visible: false },
+//   [`${id}.Circle`]: { visible: false },
+//   [`${id}.causation`]: { visible: false },
+//   [`${id}.relations1`]: { visible: false },
+//   [`${id}.relations2`]: { visible: false },
+//   [`${id}.relations3`]: { visible: false },
+//   [`${id}.relations4`]: { visible: false },
+//   [`${id}.relations5`]: { visible: false },
+//   [`${id}.relations6`]: { visible: false },
+// })
 
 function allSphereVisible(id, visible) {
   return {
@@ -46,8 +44,6 @@ function allVisible(id, visible) {
     ...allSphereVisible(id, visible),
     ...allRelationsVisible(id, visible),
     [`${id}.Circle`]: { visible },
-    [`${id}.label`]: { visible },
-    [`${id}.label2`]: { visible },
     [`${id}.causation`]: { visible },
   }
 }
@@ -60,16 +56,11 @@ function getAnimationUpdates(id, variant) {
         ...allVisible(id, false),
         [`${id}.Sphere1`]: { visible: true }
       };
-    // case 'oneSphere-details':
-    //   return {
-    //     [`${id}.Sphere1.label`]: { variant: 'visible', duration: 0.5 },
-    //   };
     case 'twoSphere':
       return {
         ...allVisible(id, false),
         [`${id}.Sphere1`]: { visible: true },
         [`${id}.Sphere2`]: { visible: true },
-        // [`${id}.Sphere1.label`]: { variant: 'hidden', duration: 0.5 },
       };
     case 'relation':
       return {
@@ -83,14 +74,6 @@ function getAnimationUpdates(id, variant) {
         ...allVisible(id, true),
         [`${id}.Circle`]: { visible: false }
       };
-    // case 'accumulation-description':
-    //   return {
-    //     [`${id}.label2`]: { visible: true },
-    //   };
-    // case 'accumulation-description-end':
-    //   return {
-    //     [`${id}.label2`]: { visible: false },
-    //   };
     default:
       // Optionally handle the default case
       return {};
@@ -140,21 +123,9 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
     </group>
   );
 
-  // Calculate label position based on initialState position and any offset
-  const labelPosition = new THREE.Vector3(0, radius * 1.2, 0);
-  const label2Position = new THREE.Vector3(0, radius * .75, 0);
-
   return (
     // We set a mesh for this object so we can get a ref for DynamicDoubleArrow above this component
     <group ref={ref} position={position} visible={visible} userData={{ meshId: `${id}.Circle` }} >
-      <CustomText
-        id={`${id}.label2`}
-        initialState={{
-          visible: false,
-          position: label2Position,
-          scale: 0.3
-        }}
-      />
       <Circle id={`${id}.Circle`} initialState={{ radius: radius }} />
       <Sphere id={`${id}.Sphere1`} initialState={{ position: spherePosition1, radius: sphereRadius }} />
       <Sphere id={`${id}.Sphere2`} initialState={{ position: spherePosition2, radius: sphereRadius }} />
