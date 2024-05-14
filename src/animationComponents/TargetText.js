@@ -32,7 +32,9 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
 
     // Define motion variants
     const variants = {
-        hidden: { opacity: 0, },
+        hidden: { opacity: 0 },
+        fadeIn: { opacity: 1, transition: { duration: 1 } },
+        fadeOut: { opacity: 0, transition: { duration: 1 } },
         visible: { opacity: 1, }
     };
 

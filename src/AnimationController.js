@@ -29,6 +29,8 @@ export function AnimationController({ children }) {
         // Delay, id, animationState
         const animationSteps = [
             [1, 'emergent1', { variant: "oneSphere-details", }],
+            [1, 'entityLabel', { variant: "fadeIn", }],
+            [1, 'entityLabel', { variant: "fadeOut", }],
             [1, 'emergent1', { variant: "twoSphere", why: "Showing second sphere" }],
             [1, 'emergent1', { variant: "relation" }],
             [1, 'emergent1', { variant: "allRelations" }],

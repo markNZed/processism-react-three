@@ -3,10 +3,9 @@ import { Canvas, useThree } from '@react-three/fiber';
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import { AnimationController } from './AnimationController';
-import { Camera, DynamicDoubleArrow, EmergentEntity } from './animationComponents';
+import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from './animationComponents';
 //import { MotionCanvas } from "framer-motion-3d"
 import { Physics } from '@react-three/rapier';
-import TargetText from './animationComponents/TargetText';
 import useStore from './useStore';
 
 function CameraAdjuster() {
@@ -79,6 +78,14 @@ export default function App() {
           visible: false,
         }}
       />
+
+      <TargetText
+        id={'entityLabel'}
+        targetId={'emergent1.Sphere1'}
+        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Hello", variant: 'hidden' }}
+        offset={new THREE.Vector3(0, 1, 0)}
+      >
+      </TargetText>
     </>
   )
 
@@ -108,12 +115,6 @@ export default function App() {
           initialState={cameraInitialState}
         />
 
-        <TargetText
-          targetId={'emergent1.Sphere1'}
-          initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Hello" }}
-          offset={new THREE.Vector3(0, 1, 0)}
-        >
-        </TargetText>
 
       </AnimationController>
 
