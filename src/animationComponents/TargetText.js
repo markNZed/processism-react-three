@@ -1,29 +1,27 @@
 import { Text as DreiText } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { motion } from "framer-motion-3d";
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import * as THREE from 'three';
+import useStore from '../useStore';
 
+import useMonitorPosition from '../hooks/useMonitorPosition';
 import withAnimationState from '../withAnimationState';
+
 
 const MotionText = motion(DreiText);
 
 // @ts-check
 
-const getMeshByUserDataValue = (scene, name, value) => {
-    const meshes = [];
-
-    scene.traverse((node) => {
-        if (node.userData[name] === value) {
-            meshes.push(node);
-        }
-    });
-
-    return meshes;
+const variants = {
+    hidden: { opacity: 0 },
+    fadeIn: { opacity: 1, transition: { duration: 1 } },
+    fadeOut: { opacity: 0, transition: { duration: 1 } },
+    visible: { opacity: 1, }
 };
 
 const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...props }, ref) => {
-    const { text, color = 'black', scale = 1, visible = true, position } = animationState;
+    const { text, color = 'black', scale = 1, visible = true } = animationState;
 
     // We need textRef because we modify the ref in useFrame and cannot modify ref from parent
     const textRef = useRef();
@@ -31,30 +29,32 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
     const { camera } = useThree();  // Access the camera from the R3F context
 
     // Define motion variants
-    const variants = {
-        hidden: { opacity: 0 },
-        fadeIn: { opacity: 1, transition: { duration: 1 } },
-        fadeOut: { opacity: 0, transition: { duration: 1 } },
-        visible: { opacity: 1, }
+
+    const [positions, setPositions] = useState({});
+
+    const [finalPosition, setFinalPosition] = useState(undefined);
+
+    const updatePositions = (id, position) => {
+        setPositions(prev => ({ ...prev, [id]: position }));
     };
 
+    const getComponentRef = useStore(state => state.getComponentRef);
+    const targetRef = getComponentRef(targetId);
+    useMonitorPosition(targetRef, updatePositions, 'target');
+
+    useEffect(() => {
+        if (positions.target) {
+            const newTargetPosition = positions.target.clone().add(offset);
+            setFinalPosition(newTargetPosition);
+        }
+    }, [positions, offset]);
+
     // Verify position is not undefined
-    const isValidPosition = position && 'x' in position && 'y' in position && 'z' in position;
+    // const isValidPosition = position && 'x' in position && 'y' in position && 'z' in position;
 
     // Use Frame hook to update text orientation to always face the camera
     useFrame((state) => {
-        const { scene } = state;
-        // const target = scene.getObjectByProperty('globalId', targetId);
-        const target = getMeshByUserDataValue(scene, 'globalId', targetId)[0];
-        if (target && textRef.current) {
-            const targetPosition = new THREE.Vector3();
-            target.getWorldPosition(targetPosition);
-            console.log('offset', offset);
-            targetPosition.add(offset);
-            textRef.current.position.copy(targetPosition);
-            // textRef.current.lookAt(targetPosition);
-        }
-        if (textRef.current && isValidPosition) {
+        if (textRef.current) {
             textRef.current.quaternion.copy(camera.quaternion);
         }
     });
@@ -62,7 +62,7 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
     // This will expose textRef as ref to the parent component
     useImperativeHandle(ref, () => textRef.current);
 
-    return isValidPosition && text ? (
+    return finalPosition && text ? (
         <MotionText
             {...props}
             ref={textRef}
@@ -70,7 +70,7 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
             visible={visible}
             anchorX="center"
             anchorY="middle"
-            position={position}
+            position={finalPosition}
             scale={[scale, scale, scale]}
             animate={animationState.variant}
             variants={variants}
