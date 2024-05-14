@@ -1,10 +1,9 @@
-import { motion } from "framer-motion-3d";
-import React, { useRef, useEffect, useState } from 'react';
-import * as THREE from 'three';
-import withAnimationState from '../withAnimationState';
-import { CustomText } from './';
 import { RigidBody } from '@react-three/rapier';
+import { motion } from "framer-motion-3d";
+import React, { useEffect, useRef, useState } from 'react';
 import useStore from '../useStore';
+import withAnimationState from '../withAnimationState';
+// @ts-check
 
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
 
@@ -18,13 +17,9 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         hidden: { opacity: 0 },
         visible: { opacity: animationState.opacity ?? 1.0 }
     };
+    const defaultVariant = "visible";
 
     // Calculate labelText position based on animationState position and any offset
-    const textPosition = new THREE.Vector3(
-        position.x,
-        position.y + radius * 1.2, // Adjust Y position to be slightly above whatever it is annotating or positioned at
-        position.z
-    );
 
     const rigidBodyRef = useRef();
 
@@ -45,6 +40,7 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         <mesh
             {...props}
             ref={ref}
+            userData={{ globalId: id }}
             position={position}
             scale={scale}
             onClick={onClick}
@@ -55,9 +51,9 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
             <sphereGeometry args={[radius, 32, 32]} />
             <motion.meshStandardMaterial
                 color={color}
-                initialState="visible"
+                initialState={defaultVariant}
                 transparent={true}
-                animate={animationState.variant}
+                animate={animationState.variant || defaultVariant }
                 variants={variants}
                 transition={{ duration: animationState.duration || 0 }}
             />
@@ -66,14 +62,6 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
 
     return (
         <group visible={visible} >
-            <CustomText
-                id={`${id}.label`}
-                initialState={{
-                    position: textPosition,
-                    scale: 0.5,
-                    variant: 'hidden'
-                }}
-            />
             {usePhysics ? (
                 <RigidBody ref={rigidBodyRef} enabledTranslations={[true, true, false]}>
                     {wrappedMesh}
