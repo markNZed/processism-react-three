@@ -2,47 +2,61 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 const useStore = create(devtools(subscribeWithSelector((set, get) => ({
+  currentScene: undefined, 
+  setCurrentScene: (currentScene) => set({ currentScene }), 
   usePhysics: false, 
   setUsePhysics: (usePhysics) => set({ usePhysics }), 
   components: {},
-  registerComponent: (id, ref) => set(state => ({
-    components: { ...state.components, [id]: ref }
-  })),
+  registerComponent: (id, ref) => set(state => {
+    const sceneId = `${state.currentScene}.${id}`;
+    return { components: { ...state.components, [sceneId]: ref } };
+  }),
   unregisterComponent: (id) => set(state => {
+    const sceneId = `${state.currentScene}.${id}`;
     const newComponents = { ...state.components };
-    delete newComponents[id];
+    delete newComponents[sceneId];
     return { components: newComponents };
   }),
-  getComponentRef: id => get().components[id],
+  getComponentRef: (id) => {
+    const sceneId = `${get().currentScene}.${id}`;
+    return get().components[sceneId];
+  },
   animationStates: {},
-  setInitialAnimationState: (initialStates) => set({
-    animationStates: { ...initialStates }
+  getAnimationState: (id) => {
+    const sceneId = `${get().currentScene}.${id}`;
+    return get().animationStates[sceneId];
+  },
+  setInitialAnimationState: (initialStates) => set(state => {
+    const sceneStates = Object.fromEntries(
+      Object.entries(initialStates).map(([key, value]) => [`${state.currentScene}.${key}`, value])
+    );
+    return {
+      animationStates: { ...state.animationStates, ...sceneStates }
+    };
   }),
   lastUpdateAnimationState: {},
   updateAnimationState: (id, newState) => set(state => {
-    if ('why' in newState) {
-      newState.why = id + ': ' + newState.why;
-    } else {
-      newState.why = id;
-    }
-    const newStateWithGlobal = { ...newState };
-    state.lastUpdateAnimationState = newStateWithGlobal;
+    const sceneId = `${state.currentScene}.${id}`;
+    const newStateWithGlobal = { ...newState, why: newState.why ? sceneId + ': ' + newState.why : sceneId };
     return {
-      ...state,
       animationStates: {
         ...state.animationStates,
-        [id]: { ...state.animationStates[id], ...newStateWithGlobal }
+        [sceneId]: { ...state.animationStates[sceneId], ...newStateWithGlobal }
       },
+      lastUpdateAnimationState: newStateWithGlobal
     };
   }),
   batchUpdateAnimationStates: (updates) => set(state => {
-    state.lastUpdateAnimationState = updates;
-    const newState = { ...state.animationStates };
-    Object.entries(updates).forEach(([id, update]) => {
-      newState[id] = { ...newState[id], ...update };
-    });
-    return { animationStates: newState };
+    const sceneUpdates = Object.fromEntries(
+      Object.entries(updates).map(([key, value]) => [`${state.currentScene}.${key}`, value])
+    );
+    const newState = { ...state.animationStates, ...sceneUpdates };
+    return {
+      animationStates: newState,
+      lastUpdateAnimationState: sceneUpdates
+    };
   }),
+  clearAllAnimationStates: () => set({ animationStates: {} }),
 }), { name: 'AnimationStore' }))); // Configure the naming for DevTools
 
 // Subscribe only to changes in animationStates

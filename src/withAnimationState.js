@@ -12,7 +12,7 @@ function withAnimationState(Component) {
         const ref = useRef();
         const registerComponent = useStore(state => state.registerComponent);
         const unregisterComponent = useStore(state => state.unregisterComponent);
-        const animationState = useStore(state => state.animationStates[id] || {});
+        const animationState = useStore(state => state.getAnimationState(id) || {});
         const [simulationReady, setSimulationReady] = useState(false);
 
         // Register and unregister component ref

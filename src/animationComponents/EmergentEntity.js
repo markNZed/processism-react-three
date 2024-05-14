@@ -81,8 +81,8 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
   const position = new THREE.Vector3().copy(animationState.position);
   position.add(offset);
 
-  const causationAnimationState = useStore(state => state.animationStates[`${id}.causation`] || {});
-  const relationsAnimationState = useStore(state => state.animationStates[`${id}.relations`] || {});
+  const causationAnimationState = useStore(state => state.getAnimationState(`${id}.causation`) || {});
+  const relationsAnimationState = useStore(state => state.getAnimationState(`${id}.relations`) || {});
 
   const sphereRadius = radius / 4;
   const causationLength = radius / 2;
