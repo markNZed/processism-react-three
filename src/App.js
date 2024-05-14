@@ -102,7 +102,7 @@ export default function App() {
         id={'accumulationDescription'}
         targetId={'emergent1.relations1'}
         initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Accumulation", variant: 'hidden', scale: .3 }}
-        offset={new THREE.Vector3(0, 3, 0)}
+        offset={new THREE.Vector3(0, 3, -1.5)}
       />
     </>
   )
