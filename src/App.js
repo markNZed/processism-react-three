@@ -82,8 +82,23 @@ export default function App() {
       <TargetText
         id={'entityLabel'}
         targetId={'emergent1.Sphere1'}
-        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Hello", variant: 'hidden' }}
-        offset={new THREE.Vector3(0, 1, 0)}
+        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Entity", variant: 'hidden', scale: .5 }}
+        offset={new THREE.Vector3(0, 1.5, 0)}
+      >
+      </TargetText>
+
+      <TargetText
+        id={'emergent1Label'}
+        targetId={'emergent1'}
+        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Emergent Entity", variant: 'hidden' }}
+        offset={new THREE.Vector3(0, 10, 0)}
+      >
+      </TargetText>
+      <TargetText
+        id={'accumulationDescription'}
+        targetId={'emergent1.relations1'}
+        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Accumulation", variant: 'hidden', scale: .3 }}
+        offset={new THREE.Vector3(0, 3, 0)}
       >
       </TargetText>
     </>
