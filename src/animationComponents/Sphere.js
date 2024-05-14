@@ -17,6 +17,7 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
         hidden: { opacity: 0 },
         visible: { opacity: animationState.opacity ?? 1.0 }
     };
+    const defaultVariant = "visible";
 
     // Calculate labelText position based on animationState position and any offset
 
@@ -50,9 +51,9 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
             <sphereGeometry args={[radius, 32, 32]} />
             <motion.meshStandardMaterial
                 color={color}
-                initialState="visible"
+                initialState={defaultVariant}
                 transparent={true}
-                animate={animationState.variant}
+                animate={animationState.variant || defaultVariant }
                 variants={variants}
                 transition={{ duration: animationState.duration || 0 }}
             />

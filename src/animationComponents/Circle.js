@@ -13,6 +13,7 @@ const Circle = React.forwardRef(({id, animationState, ...props}, ref) => {
         hidden: { opacity: 0 },
         visible: { opacity: animationState.opacity ?? 1.0 }
     };
+    const defaultVariant = "visible";
 
     // Cylinder to simulate a circle with thickness
     const cylinderHeight = 0.1; // This is the "thickness" of the circle
@@ -36,8 +37,8 @@ const Circle = React.forwardRef(({id, animationState, ...props}, ref) => {
             <motion.meshBasicMaterial 
               transparent 
               side={THREE.DoubleSide} 
-              initialState="visble"
-              animate={animationState.variant}
+              initialState={defaultVariant}
+              animate={animationState.variant || defaultVariant}
               variants={variants}
               transition={{ duration: animationState.duration || 0 }}
               color={color}

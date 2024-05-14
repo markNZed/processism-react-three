@@ -98,6 +98,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
     hidden: { opacity: 0 },
     visible: { opacity: animationState.opacity ?? 1.0 },
   };
+  const defaultVariant = "visible";
 
   const spherePosition1 = new THREE.Vector3(-sphereOffset, +sphereOffset, -causationLength);
   const spherePosition2 = new THREE.Vector3(+sphereOffset, +sphereOffset, -causationLength);

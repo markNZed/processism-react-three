@@ -21,6 +21,7 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
         hidden: { opacity: 0, },
         visible: { opacity: 1, }
     };
+    const defaultVariant = "visible";
 
     // Verify position is not undefined
     const isValidPosition = position && 'x' in position && 'y' in position && 'z' in position;
@@ -45,15 +46,15 @@ const CustomText = React.forwardRef(({ id, animationState, ...props }, ref) => {
             anchorY="middle"
             position={position}
             scale={[scale, scale, scale]}
-            animate={animationState.variant}
+            animate={animationState.variant || defaultVariant }
             variants={variants}
             transition={{ duration: animationState.duration || 0 }}
         >
             {text}
             <motion.meshBasicMaterial
                 transparent side={THREE.DoubleSide}
-                initialState="visble"
-                animate={animationState.variant}
+                initialState={defaultVariant}
+                animate={animationState.variant || defaultVariant }
                 variants={variants}
                 transition={{ duration: animationState.duration || 0 }}
                 color={color}

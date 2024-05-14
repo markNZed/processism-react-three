@@ -19,6 +19,7 @@ const variants = {
     fadeOut: { opacity: 0, transition: { duration: .5 } },
     visible: { opacity: 1, }
 };
+const defaultVariant = "visible";
 
 const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...props }, ref) => {
     const { text, color = 'black', scale = 1, visible = true } = animationState;
@@ -70,15 +71,15 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
             anchorX="center"
             anchorY="middle"
             scale={[scale, scale, scale]}
-            animate={animationState.variant}
+            animate={animationState.variant || defaultVariant }
             variants={variants}
             transition={{ duration: animationState.duration || 0 }}
         >
             {text}
             <motion.meshBasicMaterial
                 transparent side={THREE.DoubleSide}
-                initialState="visble"
-                animate={animationState.variant}
+                initialState={defaultVariant}
+                animate={animationState.variant || defaultVariant }
                 variants={variants}
                 transition={{ duration: animationState.duration || 0 }}
                 color={color}
