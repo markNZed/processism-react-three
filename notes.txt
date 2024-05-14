@@ -1,9 +1,14 @@
 Maybe manage RigidBodyRef in HOC and provide a position function that tries rigid then mesh
-usePhysics should be global
+Error if sam eid registered twice
+Use React's useMemo and useCallback to memoize complex calculations and functions that don't need to be re-created on every render.
 How to manage dependencies of positions ? e.g. component A 
 Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Move to using Motion for Canvas and Camera control ?
 Allow multiple scenes
+  Specific component for each scene
+  SceneManager to switch
+  SceneAnimation function could be defined in the scene
+allRelationsVisible could accept an array (not sur eit is better)
 Do we need a physics system? Not now. https://github.com/pmndrs/react-three-rapier is a good option
   All objects that interact with Rapier object should be in Rapier (no position syncing)
 WDS_SOCKET_PORT=0 only in CodeSpace ?
