@@ -46,7 +46,7 @@ export default function App() {
     right: window.innerWidth / 2,
     top: window.innerHeight / 2,
     bottom: window.innerHeight / -2,
-    near: -100,
+    near: 0.1,
     far: 100
   };
 
