@@ -7,35 +7,42 @@ const SceneManager = () => {
   const currentScene = useStore((state) => state.currentScene);
   const reloadScene = useStore((state) => state.reloadScene);
   const setReloadScene = useStore((state) => state.setReloadScene);
-  const [key, setKey] = useState(0);
   const setUsePhysics = useStore((state) => state.setUsePhysics);
+  const [key, setKey] = useState(0);
+  const [sceneInfo, setSceneInfo] = useState({ sceneComponent: null, isOrthographic: true });
 
   useEffect(() => {
-    // Update the key whenever the current scene changes to trigger remount
-    setKey(prevKey => prevKey + 1);
+    // Update the key whenever the scene reloads
+    setKey((prevKey) => prevKey + 1);
     setReloadScene(false);
   }, [reloadScene]);
 
-  let sceneComponent;
-  let isOrthographic = false;
+  useEffect(() => {
+    let sceneComponent;
+    let isOrthographic = false;
 
-  switch (currentScene) {
-    case 'SceneOne':
-      sceneComponent = <SceneOne />;
-      isOrthographic = true;
-      setUsePhysics(false);
-      break;
-    case 'SceneTwo':
-      sceneComponent = <SceneTwo />;
-      isOrthographic = true;
-      setUsePhysics(true);
-      break;
-    default:
-      isOrthographic = true;
-      break;
-  }
+    switch (currentScene) {
+      case 'SceneOne':
+        sceneComponent = <SceneOne />;
+        isOrthographic = true;
+        setUsePhysics(false);
+        break;
+      case 'SceneTwo':
+        sceneComponent = <SceneTwo />;
+        isOrthographic = true;
+        setUsePhysics(true);
+        break;
+      default:
+        sceneComponent = <SceneOne />;
+        isOrthographic = true;
+        setUsePhysics(false);
+        break;
+    }
 
-  return { sceneComponent, isOrthographic, key };
+    setSceneInfo({ sceneComponent, isOrthographic });
+  }, [currentScene, setUsePhysics]);
+
+  return { ...sceneInfo, key };
 };
 
 export default SceneManager;

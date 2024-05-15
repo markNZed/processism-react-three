@@ -11,6 +11,9 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   components: {},
   registerComponent: (id, ref) => set(state => {
     const sceneId = `${state.currentScene}.${id}`;
+    if (state.components[sceneId]) {
+      throw new Error(`Component with id "${sceneId}" is already registered`);
+    }
     return { components: { ...state.components, [sceneId]: ref } };
   }),
   unregisterComponent: (id) => set(state => {
