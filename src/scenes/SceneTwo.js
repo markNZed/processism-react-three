@@ -12,7 +12,7 @@ function SceneTwo() {
     const emergentEntityRadius = 3.5;
 
     // Delay, id, animationState
-    const animations = [
+    const animationSequence = [
         [0, 'inter_emergent', { visible: false }],
         [0, 'emergent1', { variant: "oneSphere" }],
         [0, 'emergent1.Circle', { variant: "hidden" }],
@@ -47,41 +47,39 @@ function SceneTwo() {
 
   return (
     <>
-        <AnimationController animations={animations} useStore={useStore}>
-        <Physics gravity={[0, 0, 0]}>
-        <Scene>
+        <AnimationController animations={animationSequence} useStore={useStore}>
+            <Physics gravity={[0, 0, 0]}>
+                <Scene>
+                    <EmergentEntity
+                        id="emergent1"
+                        initialState={{
+                        position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
+                        radius: emergentEntityRadius,
+                        causation: "bottomup",
+                        }}
+                    />
 
-        <EmergentEntity
-            id="emergent1"
-            initialState={{
-            position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
-            radius: emergentEntityRadius,
-            causation: "bottomup",
-            }}
-        />
+                    <TargetText
+                        id={'entityLabel'}
+                        targetId={'emergent1.Sphere1'}
+                        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Entity 1", variant: 'hidden', scale: .5 }}
+                        offset={new THREE.Vector3(0, 1.5, 0)}
+                    />
 
-        <TargetText
-            id={'entityLabel'}
-            targetId={'emergent1.Sphere1'}
-            initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Entity 1", variant: 'hidden', scale: .5 }}
-            offset={new THREE.Vector3(0, 1.5, 0)}
-        />
-
-        <TargetText
-            id={'emergent1Label'}
-            targetId={'emergent1'}
-            initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Emergent Entity", variant: 'hidden' }}
-            offset={new THREE.Vector3(0, 5, 0)}
-        />
-        <TargetText
-            id={'accumulationDescription'}
-            targetId={'emergent1.relations1'}
-            initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Accumulation", variant: 'hidden', scale: .3 }}
-            offset={new THREE.Vector3(0, 3, -1.5)}
-        />
-
-        </Scene>
-        </Physics>
+                    <TargetText
+                        id={'emergent1Label'}
+                        targetId={'emergent1'}
+                        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Emergent Entity", variant: 'hidden' }}
+                        offset={new THREE.Vector3(0, 5, 0)}
+                    />
+                    <TargetText
+                        id={'accumulationDescription'}
+                        targetId={'emergent1.relations1'}
+                        initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Accumulation", variant: 'hidden', scale: .3 }}
+                        offset={new THREE.Vector3(0, 3, -1.5)}
+                    />
+                </Scene>
+            </Physics>
         </AnimationController>
 
         <Camera

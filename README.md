@@ -17,8 +17,8 @@ To work with this project on a remote server (assuming the server has SSH, Docke
 To deploy to GitHub IO site: `npm run deploy` then [view](https://marknzed.github.io/react-three)
 
 
-
 Development Guidelines
 
-* A variant is best when we can animate using Motion. A property is best when we are animating outside of Motion. For example visibility does not need Motion. The camera is animated using react-spring not Motion. The basic idea of a variant it to define a "state" of the component.
-* The AnimationController should mainly control the sequencing of variants.
+* A variant is a state of an animationComponent and we make use of Framer Motion when possible. The animationState holds the variant and can hold other values which can animating outside of Motion. For example visibility does not need Motion. The camera is animated using react-spring not Motion.
+* A Scene consists of animationComponents that are instantiated and an animationSequence that orders the sequence in the animation.
+* The speed in AnimationController can be used to accelerate the animation sequence
