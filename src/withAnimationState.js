@@ -4,37 +4,45 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import useStore from './useStore';
 
 function withAnimationState(Component) {
-    // Unsure if we need to wrap this here with motion
     const MotionComponent = motion(Component);
 
     return function WrappedComponent({ id, initialState: initialStateFromProp, ...props }) {
         const initialState = useMemo(() => initialStateFromProp, [])
         const ref = useRef();
+        const rigidBodyRef = useRef();
         const registerComponent = useStore(state => state.registerComponent);
         const unregisterComponent = useStore(state => state.unregisterComponent);
         const animationState = useStore(state => state.getAnimationState(id) || {});
         const [simulationReady, setSimulationReady] = useState(false);
 
-        // Register and unregister component ref
+        // The MotionComponent calls this to pass the rigidBodyRef so it can be used in actions
+        const setRigidBodyRef = (refIn) => {
+            rigidBodyRef.current = refIn.current
+        };
+
         useEffect(() => {
-            // Ensure ref.current is defined before registering
             if (ref.current) {
                 registerComponent(id, ref);
             }
-            // Cleanup function for unregistration
             return () => {
                 unregisterComponent(id);
             };
         }, [id, registerComponent, unregisterComponent]);
 
-        // Impulses at the mounting of a component were missed in the Rapier engine, so this makes sure we see a frame 
         useFrame(() => {
-            if (ref.current) {
-                if (!simulationReady) {
-                    setSimulationReady(true);
-                }
+            if (ref.current && !simulationReady) {
+                setSimulationReady(true);
             }
         });
+
+        useEffect(() => {
+            if (ref.current && rigidBodyRef.current && animationState.action) {
+                const { name, params } = animationState.action;
+                if (rigidBodyRef && typeof rigidBodyRef.current[name] === 'function') {
+                    rigidBodyRef.current[name](...params);
+                }
+            }
+        }, [animationState]);
 
         return (
             <MotionComponent
@@ -45,6 +53,7 @@ function withAnimationState(Component) {
                 initialState={initialState}
                 simulationReady={simulationReady}
                 position={animationState.position || initialState.position}
+                setRigidBodyRef={setRigidBodyRef}
             />
         );
     };

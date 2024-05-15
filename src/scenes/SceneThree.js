@@ -23,6 +23,7 @@ function SceneThree() {
             [0, 'emergent2.Circle', { variant: "hidden" }],
             [0, 'emergent2.causation', { visible: false }],
         ],
+        [1, 'emergent1.Sphere1', { action: { name: 'applyImpulse', params: [{ x: 10, y: 5, z: 0 }] } }],
         [1, 'emergent1', { variant: "oneSphere-details", }],
         [1, 'entityLabel', { variant: "fadeIn", }],
         [1, 'entityLabel', { variant: "fadeOut", }],
