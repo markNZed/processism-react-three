@@ -13,10 +13,7 @@ export function AnimationController({ children, animations, useStore }) {
         const scheduleAnimations = (animations, cumulativeDelay = 0) => {
             animations.forEach(animation => {
                 if (Array.isArray(animation[0])) {
-                    // Nested parallel animations
-                    const maxDelay = Math.max(...animation.map(([delay]) => delay)) * 1000 / speed;
-                    animation.forEach(subAnimation => scheduleAnimations([subAnimation], cumulativeDelay));
-                    cumulativeDelay += maxDelay;
+                    scheduleAnimations(animation, cumulativeDelay);
                 } else {
                     // Sequential animation
                     const [delay, id, newState] = animation;

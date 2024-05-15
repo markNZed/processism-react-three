@@ -5,3 +5,6 @@ Move to using Motion for Canvas and Camera control ?
 WDS_SOCKET_PORT=0 only in CodeSpace ?
 The AnimationMixer in Three.js provides a robust and flexible way to handle animations
 Entity-Component-System (ECS) is an architectural pattern often used in game development but increasingly in other types of applications, including simulations and virtual reality.
+
+An example of calling a Physics function:
+[1, 'emergent1.Sphere1', { action: { name: 'applyImpulse', params: [{ x: 10, y: 5, z: 0 }] } }],

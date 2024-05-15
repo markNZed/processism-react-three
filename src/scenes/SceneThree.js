@@ -7,6 +7,16 @@ import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 
+/****************************
+Scene Description:
+
+Demonstrate the concepts of bottom-up causation, top-down causation, emergent entities
+
+In SceneOne there is an abstract concept of 
+
+
+ ****************************/
+
 
 function SceneThree() {
 
