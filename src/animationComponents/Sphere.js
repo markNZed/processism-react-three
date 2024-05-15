@@ -24,7 +24,6 @@ const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, o
     const rigidBodyRef = useRef();
 
     useEffect(() => {
-        console.log("props.simulationReady", props.simulationReady, simulationInit)
         if (rigidBodyRef.current && props.simulationReady && simulationInit) {
             setSimulationInit(false);
             rigidBodyRef.current.applyImpulse({ x: 3, y: 3, z: 3 }, true);
