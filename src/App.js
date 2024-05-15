@@ -4,6 +4,7 @@ import { Environment, OrbitControls } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import useStore from './useStore';
 import SceneManager from './SceneManager';
+import SceneSelector from './SceneSelector';
 
 /**
  * Handles camera adjustments on window resize for react-three-fiber.
@@ -38,6 +39,8 @@ export default function App() {
   const usePhysics = useStore(state => state.usePhysics);
 
   return (
+    <>
+    <SceneSelector />
     <Canvas orthographic>
       {/* Conditional rendering based on whether physics are enabled */}
       {usePhysics ? (
@@ -52,5 +55,6 @@ export default function App() {
       <Environment preset="sunset" />
       <CameraAdjuster />
     </Canvas>
+    </>
   );
 }
