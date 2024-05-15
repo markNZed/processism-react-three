@@ -16,10 +16,13 @@ function SceneThree() {
     const animationSequence = [
         [0, 'inter_emergent', { visible: false }],
         [0, 'emergent1', { variant: "oneSphere" }],
-        [0, 'emergent1.Circle', { variant: "hidden" }],
-        [0, 'emergent2', { visible: false }],
-        [0, 'emergent2.Circle', { variant: "hidden" }],
-        [0, 'emergent2.causation', { visible: false }],
+        // This is an example of a concurrent set of animations, we can use arrays recursively
+        [
+            [0, 'emergent1.Circle', { variant: "hidden" }],
+            [0, 'emergent2', { visible: false }],
+            [0, 'emergent2.Circle', { variant: "hidden" }],
+            [0, 'emergent2.causation', { visible: false }],
+        ],
         [1, 'emergent1', { variant: "oneSphere-details", }],
         [1, 'entityLabel', { variant: "fadeIn", }],
         [1, 'entityLabel', { variant: "fadeOut", }],

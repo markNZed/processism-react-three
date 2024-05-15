@@ -1,23 +1,31 @@
 import React, { useEffect } from 'react';
-import * as THREE from 'three';
+import { useStore } from 'zustand';
 
 export function AnimationController({ children, animations, useStore }) {
     const { updateAnimationState } = useStore(state => ({
-        updateAnimationState: state.updateAnimationState
+        updateAnimationState: state.updateAnimationState,
     }));
 
     useEffect(() => {
         const timeouts = [];
         const speed = 1; // Adjust speed for different scenes if necessary
 
-        const scheduleAnimations = (animations) => {
-            let cumulativeDelay = 0;
-            animations.forEach(([delay, id, newState]) => {
-                cumulativeDelay += delay * 1000 / speed;
-                const timeout = setTimeout(() => {
-                    updateAnimationState(id, newState);
-                }, cumulativeDelay);
-                timeouts.push(timeout);
+        const scheduleAnimations = (animations, cumulativeDelay = 0) => {
+            animations.forEach(animation => {
+                if (Array.isArray(animation[0])) {
+                    // Nested parallel animations
+                    const maxDelay = Math.max(...animation.map(([delay]) => delay)) * 1000 / speed;
+                    animation.forEach(subAnimation => scheduleAnimations([subAnimation], cumulativeDelay));
+                    cumulativeDelay += maxDelay;
+                } else {
+                    // Sequential animation
+                    const [delay, id, newState] = animation;
+                    cumulativeDelay += delay * 1000 / speed;
+                    const timeout = setTimeout(() => {
+                        updateAnimationState(id, newState);
+                    }, cumulativeDelay);
+                    timeouts.push(timeout);
+                }
             });
         };
 

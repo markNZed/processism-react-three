@@ -3,3 +3,4 @@ Use React's useMemo and useCallback to memoize complex calculations and function
 Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Move to using Motion for Canvas and Camera control ?
 WDS_SOCKET_PORT=0 only in CodeSpace ?
+The AnimationMixer in Three.js provides a robust and flexible way to handle animations
