@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
+import { Physics } from '@react-three/rapier';
 
 
 function SceneThree() {
@@ -54,62 +55,63 @@ function SceneThree() {
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Scene>
+            <Physics gravity={[0, 0, 0]}>
+                <Scene>
+                    <EmergentEntity
+                        id="emergent1"
+                        initialState={{
+                        position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
+                        radius: emergentEntityRadius,
+                        causation: "bottomup",
+                        }}
+                    />
 
-                <EmergentEntity
-                    id="emergent1"
-                    initialState={{
-                    position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
-                    radius: emergentEntityRadius,
-                    causation: "bottomup",
-                    }}
-                />
+                    <EmergentEntity
+                        id="emergent2"
+                        initialState={{
+                        position: new THREE.Vector3(emergentEntityRadius * 2, 0, 0),
+                        radius: emergentEntityRadius,
+                        causation: "topdown",
+                        }}
+                    />
 
-                <EmergentEntity
-                    id="emergent2"
-                    initialState={{
-                    position: new THREE.Vector3(emergentEntityRadius * 2, 0, 0),
-                    radius: emergentEntityRadius,
-                    causation: "topdown",
-                    }}
-                />
+                    <DynamicDoubleArrow
+                        id={"inter_emergent"}
+                        initialState={{
+                        fromId: "emergent1",
+                        toId: "emergent2",
+                        visible: false,
+                        }}
+                    />
 
-                <DynamicDoubleArrow
-                    id={"inter_emergent"}
-                    initialState={{
-                    fromId: "emergent1",
-                    toId: "emergent2",
-                    visible: false,
-                    }}
-                />
+                    <TargetText
+                        id={'entityLabel'}
+                        targetId={'emergent1.Sphere1'}
+                        initialState={{ text: "Entity 1", variant: 'hidden', scale: .5 }}
+                        offset={new THREE.Vector3(0, 1.5, 0)}
+                    />
 
-                <TargetText
-                    id={'entityLabel'}
-                    targetId={'emergent1.Sphere1'}
-                    initialState={{ text: "Entity 1", variant: 'hidden', scale: .5 }}
-                    offset={new THREE.Vector3(0, 1.5, 0)}
-                />
+                    <TargetText
+                        id={'emergent1Label'}
+                        targetId={'emergent1'}
+                        initialState={{ text: "Emergent Entity", variant: 'hidden' }}
+                        offset={new THREE.Vector3(0, 5, 0)}
+                    />
+                    <TargetText
+                        id={'emergent2Label'}
+                        targetId={'emergent2'}
+                        initialState={{ text: "Emergent Entity", variant: 'hidden' }}
+                        offset={new THREE.Vector3(0, 5, 0)}
+                    />
+                    <TargetText
+                        id={'accumulationDescription'}
+                        targetId={'emergent1.relations1'}
+                        initialState={{ text: "Accumulation", variant: 'hidden', scale: .3 }}
+                        offset={new THREE.Vector3(0, 3, -1.5)}
+                    />
 
-                <TargetText
-                    id={'emergent1Label'}
-                    targetId={'emergent1'}
-                    initialState={{ text: "Emergent Entity", variant: 'hidden' }}
-                    offset={new THREE.Vector3(0, 5, 0)}
-                />
-                <TargetText
-                    id={'emergent2Label'}
-                    targetId={'emergent2'}
-                    initialState={{ text: "Emergent Entity", variant: 'hidden' }}
-                    offset={new THREE.Vector3(0, 5, 0)}
-                />
-                <TargetText
-                    id={'accumulationDescription'}
-                    targetId={'emergent1.relations1'}
-                    initialState={{ text: "Accumulation", variant: 'hidden', scale: .3 }}
-                    offset={new THREE.Vector3(0, 3, -1.5)}
-                />
-
-            </Scene>
+                </Scene>
+            </Physics>
         </AnimationController>
 
         <Camera

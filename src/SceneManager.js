@@ -19,6 +19,8 @@ const SceneManager = () => {
   }, [reloadScene]);
 
   useEffect(() => {
+    if (!reloadScene) return;
+
     let sceneComponent;
     let isOrthographic = false;
 
@@ -39,10 +41,7 @@ const SceneManager = () => {
         setUsePhysics(true);
         break;
       default:
-        sceneComponent = <SceneOne />;
-        isOrthographic = true;
-        setUsePhysics(false);
-        break;
+        throw new Error(`Unknown Scene: ${currentScene}`);
     }
 
     setSceneInfo({ sceneComponent, isOrthographic });
