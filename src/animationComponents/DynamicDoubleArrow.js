@@ -25,7 +25,7 @@ const DynamicDoubleArrow = React.forwardRef(({ id, animationState, initialState,
     const [ends, setEnds] = useState({ from: null, to: null });
 
     const getEdgePosition = (componentRef, targetPosition) => {
-        if (componentRef.current) {
+        if (componentRef?.current) {
             if (componentRef?.current?.userData?.meshId) {
                 const meshRef = getComponentRef(componentRef.current.userData.meshId);
                 componentRef = meshRef;

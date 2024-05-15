@@ -4,6 +4,8 @@ import { devtools, subscribeWithSelector } from 'zustand/middleware';
 const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   currentScene: undefined, 
   setCurrentScene: (currentScene) => set({ currentScene }), 
+  reloadScene: false, 
+  setReloadScene: (reloadScene) => set({ reloadScene }), 
   usePhysics: false, 
   setUsePhysics: (usePhysics) => set({ usePhysics }), 
   components: {},

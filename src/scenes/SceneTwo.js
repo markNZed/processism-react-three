@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Scene from './Scene';
+import { Physics } from '@react-three/rapier';
 import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
+import { Environment, OrbitControls } from '@react-three/drei';
 
 function SceneTwo() {
 
@@ -46,6 +48,7 @@ function SceneTwo() {
   return (
     <>
         <AnimationController animations={animations} useStore={useStore}>
+        <Physics gravity={[0, 0, 0]}>
         <Scene>
 
         <EmergentEntity
@@ -78,12 +81,15 @@ function SceneTwo() {
         />
 
         </Scene>
+        </Physics>
         </AnimationController>
 
         <Camera
             id={"camera"}
             initialState={cameraInitialState}
         />
+        <Environment preset="sunset" />
+        <OrbitControls />
     </>
   );
 }

@@ -4,6 +4,7 @@ import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../anima
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
+import { Environment, OrbitControls } from '@react-three/drei';
 
 
 function SceneOne() {
@@ -117,6 +118,8 @@ function SceneOne() {
             id={"camera"}
             initialState={cameraInitialState}
         />
+        <Environment preset="sunset" />
+        <OrbitControls />
     </>
   );
 }

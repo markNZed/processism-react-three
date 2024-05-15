@@ -4,11 +4,13 @@ import useStore from './useStore'; // Make sure the path is correct
 
 const SceneSelector = () => {
   const setCurrentScene = useStore((state) => state.setCurrentScene);
+  const setReloadScene = useStore((state) => state.setReloadScene);
   const clearAllAnimationStates = useStore((state) => state.clearAllAnimationStates);
 
   const initializeScene = (sceneName) => {
     clearAllAnimationStates(); // Clear all animation states
     setCurrentScene(sceneName); // Set the current scene
+    setReloadScene(true)
   };
 
   return (
