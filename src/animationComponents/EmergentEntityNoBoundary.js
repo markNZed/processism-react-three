@@ -8,7 +8,7 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
   const { position, radius, sphereCount = 100 } = initialState;
   const sphereRefs = useRef([]);
   const reversedDirection = useRef(new Array(sphereCount).fill(false));
-  const sphereRadius = 0.1; // Radius of each sphere
+  const sphereRadius = radius / sphereCount * 10; // Radius of each sphere
   const sphereDiameter = sphereRadius * 2;
 
   const sphereData = useMemo(() => {
@@ -22,7 +22,7 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
   }, [radius, sphereCount]);
 
   useEffect(() => {
-    console.log("sphereData", sphereData);
+    console.log("sphereData", sphereData, "sphereRadius", sphereRadius, "sphereDiameter", sphereDiameter);
   }, []);
 
   useFrame(() => {
@@ -35,13 +35,14 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
         const groupCenter = new THREE.Vector3(...position);
         const localPos = posVector.clone().sub(groupCenter);
 
-        let impulseMultiplier = 0.00001;
+        let impulseMultiplier = 0.0001;
+        let repulseMultiplier = 0.001;
 
         // Check if the sphere is out of bounds and adjust direction towards the center
         if (localPos.length() > radius * 1.2) {
             const directionToCenter = groupCenter.clone().sub(posVector).normalize();
             sphereData.directions[index] = directionToCenter;
-            impulseMultiplier = impulseMultiplier * 100;
+            impulseMultiplier = impulseMultiplier * 10;
         } else if (localPos.length() > radius) {
           if (!reversedDirection.current[index]) {
             // Get the current linear velocity of the sphere
@@ -55,7 +56,7 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
 
             reversedDirection.current[index] = true; // Mark as reversed
           }
-          impulseMultiplier = impulseMultiplier * 10;
+          impulseMultiplier = impulseMultiplier * 2;
         } else {
           // Reset reversed direction state if the sphere is back within the bounds
           reversedDirection.current[index] = false;
@@ -69,14 +70,14 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
         // Apply a repulsion force to avoid clumping
         sphereRefs.current.forEach((otherSphere, otherIndex) => {
             if (otherSphere && otherIndex !== index) {
-            const otherPos = otherSphere.translation();
-            const otherPosVector = new THREE.Vector3(otherPos.x, otherPos.y, otherPos.z);
-            const distance = posVector.distanceTo(otherPosVector);
+                const otherPos = otherSphere.translation();
+                const otherPosVector = new THREE.Vector3(otherPos.x, otherPos.y, otherPos.z);
+                const distance = posVector.distanceTo(otherPosVector);
 
-            if (distance < sphereDiameter) {
-                const repulsionForce = posVector.clone().sub(otherPosVector).normalize().multiplyScalar(impulseMultiplier);
-                sphere.applyImpulse({ x: repulsionForce.x, y: repulsionForce.y, z: 0 }, true);
-            }
+                if (distance < sphereDiameter) {
+                    const repulsionForce = posVector.clone().sub(otherPosVector).normalize().multiplyScalar(repulseMultiplier);
+                    sphere.applyImpulse({ x: repulsionForce.x, y: repulsionForce.y, z: 0 }, true);
+                }
             }
         });
 
@@ -98,10 +99,10 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
             //colliders={false} this removes mass
             enabledTranslations={[true, true, false]}
             colliders="ball" // Ensure a proper collider type is set
-            linearDamping={0.9} // Add damping to smooth motion
-            angularDamping={0.9}
+            linearDamping={0.5} // Add damping to smooth motion
+            angularDamping={0.5}
           >
-            <Sphere args={[0.1, 32, 32]}>
+            <Sphere args={[sphereRadius, 32, 32]}>
               <meshStandardMaterial color="blue" />
             </Sphere>
           </RigidBody>
