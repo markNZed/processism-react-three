@@ -22,12 +22,12 @@ const SceneManager = () => {
   switch (currentScene) {
     case 'SceneOne':
       sceneComponent = <SceneOne />;
-      isOrthographic = true; // Example: SceneOne uses an orthographic camera
+      isOrthographic = true;
       setUsePhysics(false);
       break;
     case 'SceneTwo':
       sceneComponent = <SceneTwo />;
-      isOrthographic = true; // Example: SceneTwo uses a perspective camera
+      isOrthographic = true;
       setUsePhysics(true);
       break;
     default:

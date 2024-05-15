@@ -5,6 +5,5 @@ export { default as Circle } from './Circle';
 export { default as DoubleArrow } from './DoubleArrow';
 export { default as DynamicDoubleArrow } from './DynamicDoubleArrow';
 export { default as FatArrow } from './FatArrow';
-export { default as CustomText } from './CustomText';
 export { default as TargetText } from './TargetText';
 export { default as Camera } from './Camera';

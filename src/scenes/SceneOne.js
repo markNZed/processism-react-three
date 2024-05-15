@@ -11,7 +11,7 @@ function SceneOne() {
 
     const emergentEntityRadius = 3.5;
 
-    // Delay, id, animationState
+    // Delay, animationComponent id, animationState
     const animations = [
         [0, 'inter_emergent', { visible: false }],
         [0, 'emergent1', { variant: "oneSphere" }],
@@ -41,7 +41,6 @@ function SceneOne() {
         [1, 'emergent1', { variant: "moved", offset: new THREE.Vector3(5, 5, 5) }],
     ];
 
-      // Initial and animated states for the camera
   const cameraInitialState = {
     position: [0, 0, 35],
     zoom: 35,

@@ -15,6 +15,14 @@ const Circle = React.forwardRef(({id, animationState, ...props}, ref) => {
     };
     const defaultVariant = "visible";
 
+    // Component state machine using animationState.variant as the state
+    useEffect(() => {
+        switch (animationState.variant) {
+            default:
+              break;
+          }
+    }, [animationState.variant]);
+
     // Cylinder to simulate a circle with thickness
     const cylinderHeight = 0.1; // This is the "thickness" of the circle
     const radialSegments = 32; // This can be adjusted for smoother circles

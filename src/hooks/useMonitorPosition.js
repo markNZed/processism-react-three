@@ -7,12 +7,16 @@ function useMonitorPosition(objectRef, updatePositions, id, epsilon = 0.0001) {
     const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
-        objectRef?.current?.getWorldPosition(lastPosition.current);
-    }, [objectRef]);
+        if (objectRef?.current) {
+          objectRef.current.getWorldPosition(lastPosition.current);
+        }
+      }, [objectRef]);
 
     useFrame(() => {
+        if (!objectRef?.current) return;
+        
         const currentPosition = new THREE.Vector3();
-        objectRef?.current?.getWorldPosition(currentPosition);
+        objectRef.current.getWorldPosition(currentPosition);
 
         if (!initialized || !lastPosition.current.equals(currentPosition) && lastPosition.current.distanceToSquared(currentPosition) > epsilon * epsilon) {
             lastPosition.current.copy(currentPosition);

@@ -8,6 +8,21 @@ const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     const lineMesh = useRef(null);
     const coneMesh = useRef(null);
 
+    // Define animation variants
+    const variants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: animationState.opacity ?? 1.0 }
+    };
+    const defaultVariant = "visible";
+
+    // Component state machine using animationState.variant as the state
+    useEffect(() => {
+        switch (animationState.variant) {
+            default:
+                break;
+            }
+    }, [animationState.variant]);
+
     useEffect(() => {
         if (lineMesh.current && coneMesh.current) {
             //console.log("FatArrow", from, to)
@@ -37,10 +52,26 @@ const FatArrow = React.forwardRef(({ id, animationState, ...props }, ref) => {
     return (
         <group ref={ref} visible={visible}>
             <mesh ref={lineMesh}>
-                <meshBasicMaterial color={color} />
+                <meshBasicMaterial 
+                    transparent 
+                    side={THREE.DoubleSide} 
+                    initialState={defaultVariant}
+                    animate={animationState.variant || defaultVariant}
+                    variants={variants}
+                    transition={{ duration: animationState.duration || 0 }}
+                    color={color} 
+                />
             </mesh>
             <mesh ref={coneMesh}>
-                <meshBasicMaterial color={color} />
+                <meshBasicMaterial 
+                    transparent 
+                    side={THREE.DoubleSide} 
+                    initialState={defaultVariant}
+                    animate={animationState.variant || defaultVariant}
+                    variants={variants}
+                    transition={{ duration: animationState.duration || 0 }}
+                    color={color}
+                />
             </mesh>
         </group>
     );

@@ -3,39 +3,38 @@ import { useThree } from '@react-three/fiber';
 import { useSpring } from '@react-spring/three';
 import withAnimationState from '../withAnimationState'; // Ensure correct import path
 
-const Camera = React.forwardRef(({ id, animationState, initialState }, ref) => {
+const Camera = React.forwardRef(({ animationState, initialState }, ref) => {
     const { camera } = useThree();
     const [isInitialized, setIsInitialized] = useState(false);
 
     const { zoom = 1, position = [0, 0, 1], duration = 1000 } = animationState;
+    const initialZoom = initialState?.zoom || camera.zoom;
+    const initialPosition = initialState?.position || [camera.position.x, camera.position.y, camera.position.z];
 
-    // Initialize the camera position directly when component mounts
+    // Initialize the camera position and zoom directly when the component mounts
     useEffect(() => {
-        if (initialState && initialState.position) {
-            camera.position.set(initialState.position[0], initialState.position[1], initialState.position[2]);
+        if (!isInitialized) {
+            camera.position.set(initialPosition[0], initialPosition[1], initialPosition[2]);
+            camera.zoom = initialZoom;
             camera.updateProjectionMatrix();
+            setIsInitialized(true);
         }
-        if (initialState && initialState.zoom) {
-            camera.zoom = initialState.zoom;
-            camera.updateProjectionMatrix();
-        }
-        setIsInitialized(true)
-    }, [camera, initialState]);
+    }, [camera, initialZoom, initialPosition, isInitialized]);
 
     useSpring({
         from: {
-            zoom: isInitialized ? camera.zoom : initialState.zoom,
-            posX: isInitialized ? camera.position.x : initialState.position[0],
-            posY: isInitialized ? camera.position.y : initialState.position[1],
-            posZ: isInitialized ? camera.position.z : initialState.position[2]
+            zoom: isInitialized ? camera.zoom : initialZoom,
+            posX: isInitialized ? camera.position.x : initialPosition[0],
+            posY: isInitialized ? camera.position.y : initialPosition[1],
+            posZ: isInitialized ? camera.position.z : initialPosition[2]
         },
         to: {
-            zoom: zoom,
+            zoom,
             posX: position[0],
             posY: position[1],
             posZ: position[2]
         },
-        config: { duration: duration },
+        config: { duration },
         onChange: ({ value }) => {
             if (isInitialized) {
                 camera.zoom = value.zoom;

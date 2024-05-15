@@ -4,10 +4,8 @@ import { motion } from "framer-motion-3d";
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import * as THREE from 'three';
 import useStore from '../useStore';
-
 import useMonitorPosition from '../hooks/useMonitorPosition';
 import withAnimationState from '../withAnimationState';
-
 
 const MotionText = motion(DreiText);
 
@@ -15,54 +13,46 @@ const MotionText = motion(DreiText);
 
 const variants = {
     hidden: { opacity: 0 },
-    fadeIn: { opacity: 1, transition: { duration: .5 } },
-    fadeOut: { opacity: 0, transition: { duration: .5 } },
-    visible: { opacity: 1, }
+    fadeIn: { opacity: 1, transition: { duration: 0.5 } },
+    fadeOut: { opacity: 0, transition: { duration: 0.5 } },
+    visible: { opacity: 1 }
 };
 const defaultVariant = "visible";
 
-const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...props }, ref) => {
-    const { text, color = 'black', scale = 1, visible = true } = animationState;
+const TargetText = React.forwardRef(({ id, targetId, offset = new THREE.Vector3(), animationState, ...props }, ref) => {
+    const { text, color = 'black', scale = 1, visible = true, position } = animationState;
 
-    // We need textRef because we modify the ref in useFrame and cannot modify ref from parent
     const textRef = useRef();
-
-    const { camera } = useThree();  // Access the camera from the R3F context
-
-    // Define motion variants
-
+    const { camera } = useThree();
     const [positions, setPositions] = useState({});
-
+    
+    const getComponentRef = useStore((state) => state.getComponentRef);
+    const targetRef = getComponentRef(targetId);
 
     const updatePositions = (id, position) => {
-        setPositions(prev => ({ ...prev, [id]: position }));
+        setPositions((prev) => ({ ...prev, [id]: position }));
     };
 
-    const getComponentRef = useStore(state => state.getComponentRef);
-    const targetRef = getComponentRef(targetId);
-    useMonitorPosition(targetRef, updatePositions, 'target');
+    useMonitorPosition(targetRef, updatePositions, targetId);
 
     useEffect(() => {
-        if (positions.target) {
-            const newTargetPosition = positions.target.clone().add(offset);
+        if (targetId && positions[targetId]) {
+            const newTargetPosition = positions[targetId].clone().add(offset);
             textRef.current.position.copy(newTargetPosition);
         }
-    }, [positions, offset]);
+    }, [targetId, positions, offset]);
 
-    // Verify position is not undefined
-    // const isValidPosition = position && 'x' in position && 'y' in position && 'z' in position;
-
-    // Use Frame hook to update text orientation to always face the camera
-    useFrame((state) => {
+    useFrame(() => {
         if (textRef.current) {
             textRef.current.quaternion.copy(camera.quaternion);
         }
     });
 
-    // This will expose textRef as ref to the parent component
     useImperativeHandle(ref, () => textRef.current);
 
-    return text ? (
+    const isValidPosition = position && 'x' in position && 'y' in position && 'z' in position;
+
+    return ((isValidPosition || targetId) && text) ? (
         <MotionText
             {...props}
             ref={textRef}
@@ -70,16 +60,18 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
             visible={visible}
             anchorX="center"
             anchorY="middle"
+            position={isValidPosition ? position : undefined}
             scale={[scale, scale, scale]}
-            animate={animationState.variant || defaultVariant }
+            animate={animationState.variant || defaultVariant}
             variants={variants}
             transition={{ duration: animationState.duration || 0 }}
         >
             {text}
             <motion.meshBasicMaterial
-                transparent side={THREE.DoubleSide}
+                transparent
+                side={THREE.DoubleSide}
                 initialState={defaultVariant}
-                animate={animationState.variant || defaultVariant }
+                animate={animationState.variant || defaultVariant}
                 variants={variants}
                 transition={{ duration: animationState.duration || 0 }}
                 color={color}
@@ -88,5 +80,4 @@ const TargetText = React.forwardRef(({ targetId, offset, id, animationState, ...
     ) : null;
 });
 
-// Wrap CustomText with the HOC before export
 export default withAnimationState(TargetText);

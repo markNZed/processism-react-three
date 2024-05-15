@@ -50,7 +50,17 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   }),
   batchUpdateAnimationStates: (updates) => set(state => {
     const sceneUpdates = Object.fromEntries(
-      Object.entries(updates).map(([key, value]) => [`${state.currentScene}.${key}`, value])
+      Object.entries(updates).map(([key, value]) => {
+        const sceneId = `${state.currentScene}.${key}`;
+        return [
+          sceneId,
+          {
+            ...state.animationStates[sceneId], // Preserve existing state
+            ...value, // Update with new state
+            why: value.why ? sceneId + ': ' + value.why : sceneId
+          }
+        ];
+      })
     );
     const newState = { ...state.animationStates, ...sceneUpdates };
     return {
