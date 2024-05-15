@@ -1,6 +1,6 @@
 import React from 'react';
 import Scene from './Scene';
-import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../animationComponents';
+import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText, EmergentEntityNoBoundary } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
@@ -11,8 +11,12 @@ import { Physics } from '@react-three/rapier';
 Scene Description:
 
 Demonstrate the concepts of bottom-up causation, top-down causation, emergent entities
+The scene will be 2D viewed from above
+In SceneOne there is an abstract concept of an Emergent Entity that is represented by a Circle.
+In this scene we will not use an abstract circle to show the boundary of the entity. 
+The boundary of an Emergent Entity be formed by many small spheres.
 
-In SceneOne there is an abstract concept of 
+
 
 
  ****************************/
@@ -71,6 +75,16 @@ function SceneThree() {
         <AnimationController animations={animationSequence} useStore={useStore}>
             <Physics gravity={[0, 0, 0]}>
                 <Scene>
+                    
+                    <EmergentEntityNoBoundary
+                        id="emergent3"
+                        initialState={{
+                        position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
+                        radius: emergentEntityRadius,
+                        sphereCount: 100
+                        }}
+                    />
+
                     <EmergentEntity
                         id="emergent1"
                         initialState={{
@@ -133,7 +147,6 @@ function SceneThree() {
             initialState={cameraInitialState}
         />
         <Environment preset="sunset" />
-        <OrbitControls />
     </>
   );
 }

@@ -7,3 +7,4 @@ export { default as DynamicDoubleArrow } from './DynamicDoubleArrow';
 export { default as FatArrow } from './FatArrow';
 export { default as TargetText } from './TargetText';
 export { default as Camera } from './Camera';
+export { default as EmergentEntityNoBoundary } from './EmergentEntityNoBoundary';
