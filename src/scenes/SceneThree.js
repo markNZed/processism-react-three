@@ -16,7 +16,11 @@ In SceneOne there is an abstract concept of an Emergent Entity that is represent
 In this scene we will not use an abstract circle to show the boundary of the entity. 
 The boundary of an Emergent Entity be formed by many small spheres.
 
-
+Having the emergent entity with a fluid boundary is not obvious. Ideally it would require a soft body physics simulation.
+It may be possible to simulate with simple rules e.g. the ability of a particle to repel other particles could be increased closer to the center.
+The "billiard ball" effect does not look very agreeable. Particles could oscillate the level of repelling.
+Regions of the shape could oscillate. Easier to build this only in 2D.
+Better to start with circular shapes
 
 
  ****************************/
@@ -64,6 +68,44 @@ function SceneThree() {
                             radius: emergentEntityRadius,
                             sphereCount: 100,
                             withShell: false,
+                            globalImpulseDirection: new THREE.Vector3(-1, 0, 0),
+                            color: "blue",
+                        }}
+                    />
+
+                    <EmergentEntityNoBoundary
+                        id="emergent2"
+                        initialState={{
+                            position: new THREE.Vector3(+emergentEntityRadius * 6, 0, 0),
+                            radius: emergentEntityRadius,
+                            sphereCount: 100,
+                            withShell: false,
+                            globalImpulseDirection: new THREE.Vector3(1, 0, 0),
+                            color: "green",
+                        }}
+                    />
+
+                    <EmergentEntityNoBoundary
+                        id="emergent2"
+                        initialState={{
+                            position: new THREE.Vector3(+emergentEntityRadius * 4, +emergentEntityRadius * 2, 0),
+                            radius: emergentEntityRadius,
+                            sphereCount: 100,
+                            withShell: false,
+                            globalImpulseDirection: new THREE.Vector3(1, 0, 0),
+                            color: "orange",
+                        }}
+                    />
+
+                    <EmergentEntityNoBoundary
+                        id="emergent2"
+                        initialState={{
+                            position: new THREE.Vector3(+emergentEntityRadius * 4, -emergentEntityRadius * 2, 0),
+                            radius: emergentEntityRadius,
+                            sphereCount: 100,
+                            withShell: false,
+                            globalImpulseDirection: new THREE.Vector3(1, 0, 0),
+                            color: "yellow",
                         }}
                     />
 
