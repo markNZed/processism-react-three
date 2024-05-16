@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import withAnimationState from '../withAnimationState'; // Ensure correct path
+import withAnimationState from '../withAnimationState';
 import * as THREE from 'three';
 import { motion } from "framer-motion-3d"
 

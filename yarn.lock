@@ -2290,7 +2290,7 @@
     fflate "~0.8.2"
     meshoptimizer "~0.18.1"
 
-"@types/three@>=0.144.0", "@types/three@0.158.3":
+"@types/three@>= 0.125.0", "@types/three@>=0.144.0", "@types/three@0.158.3":
   version "0.158.3"
   resolved "https://registry.npmjs.org/@types/three/-/three-0.158.3.tgz"
   integrity sha512-6Qs1rUvLSbkJ4hlIe6/rdwIf61j1x2UKvGJg7s8KjswYsz1C1qDTs6voVXXB8kYaI0hgklgZgbZUupfL1l9xdA==
@@ -9404,6 +9404,11 @@ thenify-all@^1.0.0:
   dependencies:
     any-promise "^1.0.0"
 
+three-csg-ts@^3.1.14:
+  version "3.1.14"
+  resolved "https://registry.npmjs.org/three-csg-ts/-/three-csg-ts-3.1.14.tgz"
+  integrity sha512-miDfFA/bxXU5sgnePj28Nq4wcdmGkdM6dbv+lqK/vb0KbeYEDzcA9aTwMOyS1a3Fd/TDkcJ7MxHRevIGj8hMSA==
+
 three-mesh-bvh@^0.6.7:
   version "0.6.8"
   resolved "https://registry.npmjs.org/three-mesh-bvh/-/three-mesh-bvh-0.6.8.tgz"
@@ -9438,7 +9443,7 @@ three-stdlib@2.23.9:
     potpack "^1.0.1"
     zstddec "^0.0.2"
 
-three@^0.159.0, "three@>= 0.151.0", three@>=0.125.0, three@>=0.126, three@>=0.126.1, three@>=0.128.0, three@>=0.133, three@>=0.137, three@>=0.139.0, three@>=0.144.0:
+three@^0.159.0, "three@>= 0.125.0", "three@>= 0.151.0", three@>=0.125.0, three@>=0.126, three@>=0.126.1, three@>=0.128.0, three@>=0.133, three@>=0.137, three@>=0.139.0, three@>=0.144.0:
   version "0.159.0"
   resolved "https://registry.npmjs.org/three/-/three-0.159.0.tgz"
   integrity sha512-eCmhlLGbBgucuo4VEA9IO3Qpc7dh8Bd4VKzr7WfW4+8hMcIfoAVi1ev0pJYN9PTTsCslbcKgBwr2wNZ1EvLInA==

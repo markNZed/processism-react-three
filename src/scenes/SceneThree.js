@@ -53,7 +53,17 @@ function SceneThree() {
                         initialState={{
                             position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
                             radius: emergentEntityRadius,
-                            sphereCount: 1000
+                            sphereCount: 100,
+                        }}
+                    />
+
+                    <EmergentEntityNoBoundary
+                        id="emergent2"
+                        initialState={{
+                            position: new THREE.Vector3(+emergentEntityRadius * 2, 0, 0),
+                            radius: emergentEntityRadius,
+                            sphereCount: 100,
+                            withShell: false,
                         }}
                     />
 

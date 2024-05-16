@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Sphere } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { RigidBody, RigidBodyApi, vec3 } from '@react-three/rapier';
+import { RigidBody, RigidBodyApi, vec3, useRapier, MeshCollider } from '@react-three/rapier';
 import * as THREE from 'three';
+import { CSG } from 'three-csg-ts';
+import withAnimationState from '../withAnimationState';
 
-const EmergentEntityNoBoundary = ({ id, initialState }) => {
-  const { position, radius, sphereCount = 100 } = initialState;
+const EmergentEntityNoBoundary = React.forwardRef(({id, animationState, ...props}, ref) => {
+  const { position, radius, sphereCount = 100, withShell = true } = animationState;
   const sphereRefs = useRef([]);
   const reversedDirection = useRef(new Array(sphereCount).fill(false));
   const sphereRadius = radius / sphereCount * 10; // Radius of each sphere
@@ -35,31 +37,33 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
         const groupCenter = new THREE.Vector3(...position);
         const localPos = posVector.clone().sub(groupCenter);
 
-        let impulseMultiplier = 0.0001;
-        let repulseMultiplier = 0.001;
+        let impulseMultiplier = radius * radius  * 0.01; // relative to radius
+        let repulseMultiplier = radius * radius * 0.1;
 
         // Check if the sphere is out of bounds and adjust direction towards the center
-        if (localPos.length() > radius * 1.2) {
-            const directionToCenter = groupCenter.clone().sub(posVector).normalize();
-            sphereData.directions[index] = directionToCenter;
-            impulseMultiplier = impulseMultiplier * 10;
-        } else if (localPos.length() > radius) {
-          if (!reversedDirection.current[index]) {
-            // Get the current linear velocity of the sphere
-            const velocity = sphere.linvel();
+        if (!withShell) {
+          if (localPos.length() > radius * 1.2) {
+              const directionToCenter = groupCenter.clone().sub(posVector).normalize();
+              sphereData.directions[index] = directionToCenter;
+              impulseMultiplier = impulseMultiplier * 10;
+          } else if (localPos.length() > radius) {
+            if (!reversedDirection.current[index]) {
+              // Get the current linear velocity of the sphere
+              const velocity = sphere.linvel();
 
-            // Reverse the direction
-            const reversedVelocity = new THREE.Vector3(-velocity.x, -velocity.y, 0);
-            
-            // Update the direction with the reversed velocity
-            sphereData.directions[index] = reversedVelocity.normalize();
+              // Reverse the direction
+              const reversedVelocity = new THREE.Vector3(-velocity.x, -velocity.y, 0);
+              
+              // Update the direction with the reversed velocity
+              sphereData.directions[index] = reversedVelocity.normalize();
 
-            reversedDirection.current[index] = true; // Mark as reversed
+              reversedDirection.current[index] = true; // Mark as reversed
+            }
+            impulseMultiplier = impulseMultiplier * 2;
+          } else {
+            // Reset reversed direction state if the sphere is back within the bounds
+            reversedDirection.current[index] = false;
           }
-          impulseMultiplier = impulseMultiplier * 2;
-        } else {
-          // Reset reversed direction state if the sphere is back within the bounds
-          reversedDirection.current[index] = false;
         }
 
         // Apply an impulse to the sphere in the direction vector
@@ -86,6 +90,7 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
     });
   });
 
+  const shellGeometry = createShellGeometry(5, 4.9); // Slightly smaller inner sphere to ensure a thin shell
 
   return (
       <group position={position}>
@@ -94,7 +99,7 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
             key={`${id}-sphere-${index}`}
             ref={el => sphereRefs.current[index] = el}
             position={pos}
-            //linearVelocity={[sphereData.directions[index].x, sphereData.directions[index].y, 0]}
+            //linearVelocity={[sphereData.directions[index].x * 100, sphereData.directions[index].y * 100, 0]}
             type="dynamic"
             //colliders={false} this removes mass
             enabledTranslations={[true, true, false]}
@@ -102,23 +107,27 @@ const EmergentEntityNoBoundary = ({ id, initialState }) => {
             linearDamping={0.5} // Add damping to smooth motion
             angularDamping={0.5}
           >
-            <Sphere args={[sphereRadius, 32, 32]}>
+            <Sphere args={[sphereRadius, 8, 8]}>
               <meshStandardMaterial color="blue" />
             </Sphere>
           </RigidBody>
         ))}
-        {/*}
-        <RigidBody type="fixed" colliders="hull">
-          <Sphere args={[radius, 64, 64]}>
-            <meshStandardMaterial transparent={true} opacity={0} /> 
-          </Sphere>
+        
+        {withShell &&
+        <RigidBody type="fixed">
+          <MeshCollider type="trimesh">
+            <mesh geometry={shellGeometry}>
+              <meshStandardMaterial transparent={true} opacity={0.5} color="red" wireframe side={THREE.DoubleSide} />
+            </mesh>
+          </MeshCollider>
         </RigidBody>
-        */}
+        }
+
       </group>
   );
-};
+});
 
-export default EmergentEntityNoBoundary;
+export default withAnimationState(EmergentEntityNoBoundary);
 
 const generateSpherePositions = (radius, count, sphereRadius) => {
     const positions = [];
@@ -140,6 +149,11 @@ const generateSpherePositions = (radius, count, sphereRadius) => {
     }
   
     return positions;
-  };
+};
   
-
+const createShellGeometry = (outerRadius, innerRadius) => {
+  const outerSphere = new THREE.Mesh(new THREE.SphereGeometry(outerRadius, 8, 8));
+  const innerSphere = new THREE.Mesh(new THREE.SphereGeometry(innerRadius, 8, 8));
+  const csg = CSG.subtract(outerSphere, innerSphere);
+  return csg.geometry;
+};
