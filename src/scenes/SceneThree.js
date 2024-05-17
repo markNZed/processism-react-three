@@ -96,10 +96,8 @@ function SceneThree() {
 
                     <EntityScopes
                         id="EntityScopes1"
-                        initialPosition={[0, 0, 0]}
-                        radius={25}
+                        radius={10}
                         color="blue"
-                        globalImpulseMagnitude={0.1}
                     />
 
                 </Scene>

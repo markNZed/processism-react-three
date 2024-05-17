@@ -4,6 +4,7 @@ import { Sphere } from '@react-three/drei';
 import { RigidBody } from '@react-three/rapier';
 import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
+import { Circle } from './';
 
 const Particle = React.forwardRef(({ id, initialPosition, radius, color, registerRef }, ref) => {
   const internalRef = useRef();
@@ -20,8 +21,8 @@ const Particle = React.forwardRef(({ id, initialPosition, radius, color, registe
       position={initialPosition}
       type="dynamic"
       colliders="ball"
-      linearDamping={0.8}
-      angularDamping={0.8}
+      linearDamping={0.5}
+      angularDamping={0.5}
       enabledTranslations={[true, true, false]}
     >
       <Sphere args={[radius, 8, 8]}>
@@ -31,15 +32,38 @@ const Particle = React.forwardRef(({ id, initialPosition, radius, color, registe
   );
 });
 
-const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], layer, radius = 10, entityCount, Entity, color = "blue", emergentImpulseMagnitude = 0.01, registerRef }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], layer = 1, radius, entityCount, Entity, color = "blue", registerRef }, ref) => {
   const allEntityRefs = useRef(new Set());
+  const entityRadius = radius / (Math.ceil(entityCount / 3) + 1);
   const entityData = useMemo(() => {
-    const positions = generateEntityPositions(radius, entityCount, radius / (entityCount + 1));
+    const positions = generateEntityPositions(radius, entityCount, entityRadius);
     return { positions };
   }, [radius, entityCount]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
-  const maxDisplacement = radius * 1.5;
+  function calculateMaxDisplacement(radius, layer) {
+    let maxDisplacement;
+    switch (layer) {
+      case 1:
+        maxDisplacement = radius * 0.25;
+        break;
+      case 2:
+        maxDisplacement = radius * 0.5;
+        break;
+      case 3:
+        maxDisplacement = radius * 1.0;
+        break;
+      default:
+        maxDisplacement = radius; // Default to middle layer
+        break;
+    }
+    return maxDisplacement;
+  }
+  const maxDisplacement = calculateMaxDisplacement(radius, layer);
+  const prevGroupCenter = useRef();
+  const internalRef = useRef();
+
+  useImperativeHandle(ref, () => internalRef.current);
 
   const collectRef = (entityRef) => {
     if (entityRef) {
@@ -50,7 +74,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
     }
   };
 
-  const impulseScale = 0.001 / allEntityRefs.current.size;
+  const impulseScale = 0.001 / allEntityRefs.current.size / layer;
   const initialImpulseVectors = Array.from({ length: allEntityRefs.current.size }, () => new THREE.Vector3(
       (Math.random() - 0.5) * impulseScale,
       (Math.random() - 0.5) * impulseScale,
@@ -58,99 +82,118 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
   ));
 
   useEffect(() => {
-    console.log("entityData", id, "layer", layer, entityData, allEntityRefs, initialImpulseVectors);
+    console.log("entityData", id, "layer", layer, "radius", radius, "entityData", entityData, "allEntityRefs", allEntityRefs, "initialImpulseVectors", initialImpulseVectors);
   }, []);
 
-  useFrame(() => {
-    frameCount.current += 1;
-
+  const calculateGroupCenter = () => {
     const groupCenter = new THREE.Vector3();
     let activeEntities = 0;
-
-    Array.from(allEntityRefs.current).forEach((entity) => {
+    allEntityRefs.current.forEach((entity) => {
       if (entity) {
-        const pos = entity.translation ? entity.translation() : entity.position;
-        groupCenter.add(new THREE.Vector3(pos.x, pos.y, pos.z));
+        const pos = entity.translation(); // This assumes we are dealing with a RigidBody
+        const posVector = new THREE.Vector3(pos.x, pos.y, pos.z);
+        groupCenter.add(posVector);
         activeEntities++;
       }
     });
-
     if (activeEntities > 0) {
       groupCenter.divideScalar(activeEntities);
     }
+    return groupCenter;
+  };
 
-    const displacement = groupCenter.clone().sub(new THREE.Vector3(...initialPosition));
-    if (displacement.length() > maxDisplacement) {
-      displacement.setLength(maxDisplacement);
-      groupCenter.copy(new THREE.Vector3(...initialPosition).add(displacement));
-    }
-
-    const emergentImpulseDirection = displacement.clone().normalize();
-    const emergentImpulse = emergentImpulseDirection.multiplyScalar(emergentImpulseMagnitude * impulseScale);
-
-    if (initialImpulse && frameCount.current === 10) {
-      setInitialImpulse(false);
-    }
-
+  const applyImpulses = (groupCenter, emergentImpulse, frameCount) => {
     Array.from(allEntityRefs.current).forEach((entity, index) => {
       if (entity) {
-        const pos = entity.translation ? entity.translation() : entity.position;
+        const pos = entity.translation(); // This assumes we are dealing with a RigidBody
         const posVector = new THREE.Vector3(pos.x, pos.y, pos.z);
-        const localPos = posVector.clone().sub(groupCenter);
+        const displacement = posVector.sub(groupCenter);
 
-        let impulseMultiplier = radius * radius * 0.001;
-
-        if (localPos.length() > radius) {
-          const directionToCenter = groupCenter.clone().sub(posVector).normalize();
-          const impulse = directionToCenter.multiplyScalar(impulseMultiplier * 2);
+        if (displacement.length() > maxDisplacement) {
+          const directionToCenter = displacement.clone().negate().normalize();
+          //console.log("reverse directionToCenter", id, directionToCenter)
+          const impulse = directionToCenter.multiplyScalar(impulseScale * 100);
           entity.applyImpulse(impulse, true);
+        } else {
+          //console.log("emergentImpulse.length", id, emergentImpulse, displacement.length());
+          if (layer == 2) {
+            entity.applyImpulse(emergentImpulse.clone().negate().multiplyScalar(10), true);
+          } else {
+            entity.applyImpulse(emergentImpulse, true);
+          }
         }
 
-        entity.applyImpulse(emergentImpulse, true);
-
-        if (initialImpulse && frameCount.current === 10) {
-          //console.log("applyImpulse initialImpulseVectors", id, "index", index);
+        if (initialImpulse && frameCount.current === 10 && layer != 1) {
           entity.applyImpulse(initialImpulseVectors[index], true);
         }
       }
     });
+  };
+
+  useFrame(() => {
+    
+    frameCount.current += 1;
+
+    const groupCenter = (layer == 1) ? new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]) : calculateGroupCenter();
+
+    if (prevGroupCenter.current) {
+      const displacement = groupCenter.clone().sub(prevGroupCenter.current);
+      const emergentImpulseDirection = displacement.clone().normalize(); // keep moving in the direction of the impulse
+      const emergentImpulse = emergentImpulseDirection.multiplyScalar(impulseScale);
+
+      if (initialImpulse && frameCount.current === 10) {
+        setInitialImpulse(false);
+      }
+
+      applyImpulses(groupCenter, emergentImpulse, frameCount);
+    }
+
+    prevGroupCenter.current = groupCenter.clone();
+
   });
 
   return (
-    <group ref={ref} position={initialPosition}>
+    <group ref={internalRef} position={initialPosition}>
       {entityData.positions.map((pos, index) => (
         <Entity
           key={`${id}-${index}`}
           id={`${id}-${index}`}
           initialPosition={pos.toArray()}
-          radius={radius / (entityCount + 1)}
+          radius={entityRadius}
           color={color}
           layer={layer + 1}
           registerRef={collectRef}
         />
       ))}
+      <Circle 
+        id={`${id}.Circle`} 
+        initialState={{ 
+          radius: radius, 
+          color: color,
+          opacity: 0.05,
+        }}  
+      />
     </group>
   );
 });
 
 const EntityScope3 = React.forwardRef((props, ref) => (
-  <EmergentEntity {...props} ref={ref} Entity={Particle} entityCount={10} color={getRandomColor()} />
+  <EmergentEntity {...props} ref={ref} Entity={Particle} entityCount={20} color={getRandomColor()} />
 ));
 
 const EntityScope2 = React.forwardRef((props, ref) => (
-  <EmergentEntity {...props} ref={ref} Entity={EntityScope3} entityCount={5} />
+  <EmergentEntity {...props} ref={ref} Entity={EntityScope3} entityCount={10} />
 ));
 
 const EntityScopes = React.forwardRef((props, ref) => (
-  <EmergentEntity layer={1} {...props} ref={ref} Entity={EntityScope2} entityCount={4} />
+  <EmergentEntity {...props} ref={ref} Entity={EntityScope2} entityCount={10} />
 ));
 
 export default withAnimationState(EntityScopes);
 
 const generateEntityPositions = (radius, count, sphereRadius) => {
   const positions = [];
-  const diameter = radius * 2;
-  const gridSpacing = radius / Math.ceil(Math.sqrt(count));
+  const gridSpacing = (radius * 2) / Math.ceil(Math.sqrt(count));
   const tempPositions = [];
 
   for (let y = -radius; y <= radius; y += gridSpacing) {
@@ -179,3 +222,4 @@ const getRandomColor = () => {
   }
   return color;
 };
+
