@@ -1,6 +1,6 @@
 import React from 'react';
 import Scene from './Scene';
-import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText, EmergentEntityNoBoundary } from '../animationComponents';
+import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText, EmergentEntityNoBoundary, EntityScopes } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
@@ -16,12 +16,10 @@ In SceneOne there is an abstract concept of an Emergent Entity that is represent
 In this scene we will not use an abstract circle to show the boundary of the entity. 
 The boundary of an Emergent Entity be formed by many small spheres.
 
-Having the emergent entity with a fluid boundary is not obvious. Ideally it would require a soft body physics simulation.
-It may be possible to simulate with simple rules e.g. the ability of a particle to repel other particles could be increased closer to the center.
-The "billiard ball" effect does not look very agreeable. Particles could oscillate the level of repelling.
-Regions of the shape could oscillate. Easier to build this only in 2D.
-Better to start with circular shapes
+Having the emergent entity with a fluid boundary is not obvious. It could use a soft body physics simulation.
 
+Instead of top-down: outside-in
+Instead of bottom-up: inside-out
 
  ****************************/
 
@@ -32,7 +30,7 @@ function SceneThree() {
 
     // Delay, animationComponent id, animationState
     const animationSequence = [
-        [0, 'emergent1', { variant: "default" }],
+        //[0, 'emergent1', { variant: "default" }],
     ];
 
   const cameraInitialState = {
@@ -52,14 +50,7 @@ function SceneThree() {
             <Physics gravity={[0, 0, 0]}>
                 <Scene>
 
-                    <EmergentEntityNoBoundary
-                        id="emergent1"
-                        initialState={{
-                            position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
-                            radius: emergentEntityRadius,
-                            sphereCount: 100,
-                        }}
-                    />
+                    {/*
 
                     <EmergentEntityNoBoundary
                         id="emergent2"
@@ -67,8 +58,6 @@ function SceneThree() {
                             position: new THREE.Vector3(+emergentEntityRadius * 2, 0, 0),
                             radius: emergentEntityRadius,
                             sphereCount: 100,
-                            withShell: false,
-                            globalImpulseDirection: new THREE.Vector3(-1, 0, 0),
                             color: "blue",
                         }}
                     />
@@ -76,11 +65,9 @@ function SceneThree() {
                     <EmergentEntityNoBoundary
                         id="emergent2"
                         initialState={{
-                            position: new THREE.Vector3(+emergentEntityRadius * 6, 0, 0),
+                            position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
                             radius: emergentEntityRadius,
                             sphereCount: 100,
-                            withShell: false,
-                            globalImpulseDirection: new THREE.Vector3(1, 0, 0),
                             color: "green",
                         }}
                     />
@@ -88,11 +75,9 @@ function SceneThree() {
                     <EmergentEntityNoBoundary
                         id="emergent2"
                         initialState={{
-                            position: new THREE.Vector3(+emergentEntityRadius * 4, +emergentEntityRadius * 2, 0),
+                            position: new THREE.Vector3(0, +emergentEntityRadius * 2, 0),
                             radius: emergentEntityRadius,
                             sphereCount: 100,
-                            withShell: false,
-                            globalImpulseDirection: new THREE.Vector3(1, 0, 0),
                             color: "orange",
                         }}
                     />
@@ -100,13 +85,21 @@ function SceneThree() {
                     <EmergentEntityNoBoundary
                         id="emergent2"
                         initialState={{
-                            position: new THREE.Vector3(+emergentEntityRadius * 4, -emergentEntityRadius * 2, 0),
+                            position: new THREE.Vector3(0, -emergentEntityRadius * 2, 0),
                             radius: emergentEntityRadius,
                             sphereCount: 100,
-                            withShell: false,
-                            globalImpulseDirection: new THREE.Vector3(1, 0, 0),
                             color: "yellow",
                         }}
+                    />
+
+                    */}
+
+                    <EntityScopes
+                        id="EntityScopes1"
+                        initialPosition={[0, 0, 0]}
+                        radius={25}
+                        color="blue"
+                        globalImpulseMagnitude={0.1}
                     />
 
                 </Scene>

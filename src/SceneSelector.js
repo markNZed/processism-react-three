@@ -14,7 +14,7 @@ const SceneSelector = () => {
   };
 
   return (
-    <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}>
+    <div style={{ zIndex: 10 }}>
       <button onClick={() => initializeScene('SceneOne')}>Go to Scene One</button>
       <button onClick={() => initializeScene('SceneTwo')}>Go to Scene Two</button>
       <button onClick={() => initializeScene('SceneThree')}>Go to Scene Three</button>

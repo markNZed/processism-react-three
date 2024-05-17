@@ -52,7 +52,7 @@ function withAnimationState(Component) {
                 animationState={{ ...initialState, ...animationState, ...props.animationState }}
                 initialState={initialState}
                 simulationReady={simulationReady}
-                position={animationState.position || initialState.position}
+                position={animationState?.position || initialState?.position}
                 setRigidBodyRef={setRigidBodyRef}
             />
         );
