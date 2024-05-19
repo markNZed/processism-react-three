@@ -8,7 +8,14 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 
-// Use velocity instead of impulse to improve perf
+// Use velocity instead of impulse to improve perf ?
+// Add a repellant force 
+// Could break frame calculation into sequence e.g.
+//   Calculate center
+//   Calculate overshoot
+//   Apply impulse to x%
+// requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
+// This means that each frame has about 16.67 milliseconds (1000 ms / 60 FPS) available for all the rendering and updates to occur.
 
 const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) => {
   const internalRef = useRef();
@@ -111,7 +118,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
     
     frameCount.current += 1;
 
-    //if (frameCount.current % 5 !== 0) return // every X frames
+    //if (frameCount.current % 10 !== 0) return // every X frames
 
     const emergentCenter = (scope == 1) ? new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]) : calculateEmergentCenter();
     internalRef.current.setCenter(emergentCenter);
@@ -156,6 +163,8 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
 
   });
 
+  const showScopes = false;
+
   return (
     <CustomGroup ref={internalRef} position={initialPosition}>
       {entityData.positions.map((pos, index) => (
@@ -169,22 +178,26 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
           ref={entityRefs[index]}
         />
       ))}
-      <Circle 
-        id={`${id}.Circle`} 
-        initialState={{ 
-          radius: radius, 
-          color: color,
-          opacity: 0.05,
-        }}  
-      />
-      <Circle 
-        id={`${id}.CircleCenter`} 
-        initialState={{ 
-          radius: radius, 
-          color: color,
-          opacity: 0.5,
-        }}  
-      />
+      {showScopes && (
+        <>
+          <Circle 
+            id={`${id}.Circle`} 
+            initialState={{ 
+              radius: radius, 
+              color: color,
+              opacity: 0.05,
+            }}  
+          />
+          <Circle 
+            id={`${id}.CircleCenter`} 
+            initialState={{ 
+              radius: radius, 
+              color: color,
+              opacity: 0.5,
+            }}  
+          />
+        </>
+      )}
     </CustomGroup>
   );
 });
