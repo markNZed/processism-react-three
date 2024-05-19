@@ -8,6 +8,8 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 
+// Use velocity instead of impulse to improve perf
+
 const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) => {
   const internalRef = useRef();
 
@@ -36,42 +38,27 @@ const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) 
   );
 });
 
-const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], layer = 1, radius, entityCount, Entity, color = "blue" }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, color = "blue" }, ref) => {
   const getComponentRef = useStore((state) => state.getComponentRef);
   const entityRefs = Array.from({ length: entityCount }, () => React.createRef());
-  const entityRadius = radius / (Math.ceil(entityCount / 3) + 1);
+  const emergentEntityArea = areaOfCircle(radius);
+  const entityRadius = radiusFromArea(emergentEntityArea / entityCount) * 0.9;
+  const entityArea = radiusFromArea(emergentEntityArea / entityCount);
+  const emergentEntityDensity = emergentEntityArea / entityArea;
   const entityData = useMemo(() => {
     const positions = generateEntityPositions(radius, entityCount, entityRadius);
     return { positions };
   }, [radius, entityCount]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
-  function calculateMaxDisplacement(radius, layer) {
-    let maxDisplacement;
-    switch (layer) {
-      case 1:
-        maxDisplacement = radius * 0.4;
-        break;
-      case 2:
-        maxDisplacement = radius * 1.0;
-        break;
-      case 3:
-        maxDisplacement = radius * 0.5;
-        break;
-      default:
-        maxDisplacement = radius; // Default to middle layer
-        break;
-    }
-    return maxDisplacement;
-  }
-  const maxDisplacement = calculateMaxDisplacement(radius, layer);
+  const maxDisplacement = radius;
   const prevEmergentCenter = useRef();
   const internalRef = useRef();
   const zeroVector = new THREE.Vector3();
 
   useImperativeHandle(ref, () => internalRef.current);
 
-  const impulseScale = 0.001 / entityRefs.length / (layer * 1);
+  const impulseScale = 0.0001 * emergentEntityDensity;
   const initialImpulseVectors = Array.from({ length: entityRefs.length }, () => new THREE.Vector3(
           (Math.random() - 0.5) * impulseScale * 100,
           (Math.random() - 0.5) * impulseScale * 100,
@@ -79,7 +66,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
       ));
 
   useEffect(() => {
-    //console.log("entityData", id, "layer", layer, "radius", radius, "entityData", entityData, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
+    //console.log("entityData", id, "scope", scope, "radius", radius, "entityData", entityData, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
   }, []);
 
   const calculateEmergentCenter = () => {
@@ -108,14 +95,9 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
           const displacement = entityCenter.sub(emergentCenter);
 
           if (displacement.length() > maxDisplacement) {
+            const overshoot = displacement.length() - maxDisplacement;
             const directionToCenter = displacement.negate().normalize();
-            if (layer == 1) {
-              directionToCenter.multiplyScalar(impulseScale * 8);
-            } else if (layer == 2) {
-              directionToCenter.multiplyScalar(impulseScale * 2);
-            } else if (layer == 3) {
-              directionToCenter.multiplyScalar(impulseScale * 8);
-            }
+            directionToCenter.multiplyScalar(impulseScale * overshoot * 5);
             entity.current.addImpulse(directionToCenter);
           } else {
             entity.current.addImpulse(emergentImpulse);
@@ -129,11 +111,9 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
     
     frameCount.current += 1;
 
-    //if (frameCount.current < 8) return;
-
     //if (frameCount.current % 5 !== 0) return // every X frames
 
-    const emergentCenter = (layer == 1) ? new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]) : calculateEmergentCenter();
+    const emergentCenter = (scope == 1) ? new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]) : calculateEmergentCenter();
     internalRef.current.setCenter(emergentCenter);
 
     if (prevEmergentCenter.current) {
@@ -141,7 +121,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
       const emergentImpulseDirection = displacement.normalize(); // keep moving in the direction of the impulse
       const emergentImpulse = emergentImpulseDirection.multiplyScalar(impulseScale);
 
-      if (initialImpulse && layer != 1 && frameCount.current > 10) {
+      if (initialImpulse && scope != 1 && frameCount.current > 10) {
         setInitialImpulse(false);
         entityRefs.forEach((entity, index) => {
           if (entity.current) {
@@ -167,14 +147,13 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
 
     prevEmergentCenter.current = emergentCenter.clone();
 
-    /*
     const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
     if (circleCenterRef && circleCenterRef.current && internalRef.current) {
       // Convert the emergentCenter to the local space of the CustomGroup
       const localCenter = internalRef.current.worldToLocal(emergentCenter.clone());
       circleCenterRef.current.position.copy(localCenter);
     }
-    */
+
   });
 
   return (
@@ -186,11 +165,10 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
           initialPosition={pos.toArray()}
           radius={entityRadius}
           color={color}
-          layer={layer + 1}
+          scope={scope + 1}
           ref={entityRefs[index]}
         />
       ))}
-      {/*}
       <Circle 
         id={`${id}.Circle`} 
         initialState={{ 
@@ -207,7 +185,6 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], laye
           opacity: 0.5,
         }}  
       />
-      */}
     </CustomGroup>
   );
 });
@@ -228,14 +205,15 @@ export default withAnimationState(EntityScopes);
 
 const generateEntityPositions = (radius, count, sphereRadius) => {
   const positions = [];
-  const gridSpacing = (radius * 2) / (Math.ceil(Math.sqrt(count) + 1));
+  const gridSpacing = sphereRadius * 2;
   const tempPositions = [];
-  for (let y = -radius; y <= radius; y += gridSpacing) {
-    for (let x = -radius; x <= radius; x += gridSpacing) {
+  const packingRadius = radius * 1.2;
+  for (let y = -packingRadius; y <= packingRadius; y += gridSpacing) {
+    for (let x = -packingRadius; x <= packingRadius; x += gridSpacing) {
       const distanceFromCenter = Math.sqrt(x * x + y * y);
-      if (distanceFromCenter + sphereRadius <= radius) {
+      //if (distanceFromCenter + sphereRadius <= radius) {
         tempPositions.push({ position: new THREE.Vector3(x, y, 0), distance: distanceFromCenter });
-      }
+      //}
     }
   }
   tempPositions.sort((a, b) => a.distance - b.distance);
@@ -254,3 +232,16 @@ const getRandomColor = () => {
   return color;
 };
 
+const radiusFromArea = (area) => {
+  if (area <= 0) {
+    return "Area must be a positive number.";
+  }
+  return Math.sqrt(area / Math.PI);
+};
+
+const areaOfCircle = (radius) => {
+  if (radius <= 0) {
+    return "Radius must be a positive number.";
+  }
+  return Math.PI * Math.pow(radius, 2);
+};
