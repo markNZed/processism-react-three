@@ -58,18 +58,23 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
   }, [radius, entityCount]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
+  const applyCount = useRef(0);
   const maxDisplacement = radius;
   const prevEmergentCenter = useRef();
   const internalRef = useRef();
   const zeroVector = new THREE.Vector3();
+  const frameState = useRef("init");
+  const emergentCenterRef = new THREE.Vector3();
+  const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
+  const emergentImpulseRef = useRef();
 
   useImperativeHandle(ref, () => internalRef.current);
 
-  const impulseScale = 0.0001 * emergentEntityDensity;
+  const impulseScale = entityRadius * entityRadius * entityRadius * 0.2;
   const initialImpulseVectors = Array.from({ length: entityRefs.length }, () => new THREE.Vector3(
-          (Math.random() - 0.5) * impulseScale * 100,
-          (Math.random() - 0.5) * impulseScale * 100,
-          (Math.random() - 0.5) * impulseScale * 100
+          (Math.random() - 0.5) * impulseScale * 2,
+          (Math.random() - 0.5) * impulseScale * 2,
+          (Math.random() - 0.5) * impulseScale * 2
       ));
 
   useEffect(() => {
@@ -94,8 +99,9 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
     return emergentCenter;
   };
 
-  const addImpulses = (emergentCenter, emergentImpulse) => {
-    entityRefs.forEach((entity) => {
+  const addImpulses = (emergentCenter, emergentImpulse, subsetIndices) => {
+    subsetIndices.forEach((index) => {
+      const entity = entityRefs[index];
       if (entity.current) {
         const entityCenter = entity.current.getCenter();
         if (entityCenter) {
@@ -104,7 +110,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
           if (displacement.length() > maxDisplacement) {
             const overshoot = displacement.length() - maxDisplacement;
             const directionToCenter = displacement.negate().normalize();
-            directionToCenter.multiplyScalar(impulseScale * overshoot * 5);
+            directionToCenter.multiplyScalar(impulseScale * overshoot * 1);
             entity.current.addImpulse(directionToCenter);
           } else {
             entity.current.addImpulse(emergentImpulse);
@@ -115,53 +121,88 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
   };
 
   useFrame(() => {
-    
+    const startTime = performance.now(); // Start timing
+  
     frameCount.current += 1;
-
+  
     //if (frameCount.current % 10 !== 0) return // every X frames
-
-    const emergentCenter = (scope == 1) ? new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]) : calculateEmergentCenter();
-    internalRef.current.setCenter(emergentCenter);
-
-    if (prevEmergentCenter.current) {
-      const displacement = emergentCenter.clone().sub(prevEmergentCenter.current);
-      const emergentImpulseDirection = displacement.normalize(); // keep moving in the direction of the impulse
-      const emergentImpulse = emergentImpulseDirection.multiplyScalar(impulseScale);
-
-      if (initialImpulse && scope != 1 && frameCount.current > 10) {
-        setInitialImpulse(false);
+  
+    switch (frameState.current) {
+      case "init":
+        if (initialImpulse && scope != 1 && frameCount.current > 10) {
+          setInitialImpulse(false);
+          entityRefs.forEach((entity, index) => {
+            if (entity.current) {
+              // Add an impulse that is unique to each entity
+              entity.current.addImpulse(initialImpulseVectors[index]);
+            }
+          });
+          frameState.current = "findCenter";
+        }
+        break;
+      case "findCenter":
+        emergentCenterRef.current = (scope == 1) ? initialPositionVector : calculateEmergentCenter();
+        internalRef.current.setCenter(emergentCenterRef.current);
+        if (prevEmergentCenter.current) {
+          frameState.current = "calcImpulse";
+        }
+        break;
+      case "calcImpulse":
+        const displacement = emergentCenterRef.current.clone().sub(prevEmergentCenter.current);
+        const emergentImpulseDirection = displacement.normalize(); // keep moving in the direction of the impulse
+        emergentImpulseRef.current = emergentImpulseDirection.multiplyScalar(impulseScale * emergentEntityDensity);
+        frameState.current = "addImpulse";
+        break;
+      case "addImpulse":
         entityRefs.forEach((entity, index) => {
           if (entity.current) {
-            // Add an impulse that is unique to each entity
-            entity.current.addImpulse(initialImpulseVectors[index]);
+            entity.current.addImpulse(internalRef.current.getImpulse());
+          } else {
+            console.log("No entity", id, index);
           }
         });
-      }
-
-      addImpulses(emergentCenter, emergentImpulse);
-
-      entityRefs.forEach((entity, index) => {
-        if (entity.current) {
-          entity.current.addImpulse(internalRef.current.getImpulse());
-        } else {
-          console.log("No entity", id, index);
+        internalRef.current.setImpulse(zeroVector);
+        frameState.current = "entityImpulses";
+        break;
+      case "entityImpulses":
+        applyCount.current += 1;
+  
+        // Calculate 10% of entities per frame
+        const numEntitiesToUpdate = Math.ceil(entityRefs.length * 0.1);
+        const startIndex = (applyCount.current % Math.ceil(entityRefs.length / numEntitiesToUpdate)) * numEntitiesToUpdate;
+        const subsetIndices = Array.from({ length: numEntitiesToUpdate }, (_, i) => (startIndex + i) % entityRefs.length);
+  
+        //console.log("applyCount", id, startIndex)
+        addImpulses(emergentCenterRef.current, emergentImpulseRef.current, subsetIndices);
+  
+        if (startIndex + numEntitiesToUpdate >= entityRefs.length) {
+          frameState.current = "findCenter";
         }
-      })
-      
-      internalRef.current.setImpulse(zeroVector);
-
+        break;
+      default:
+        break;
     }
-
-    prevEmergentCenter.current = emergentCenter.clone();
-
+  
+    if (emergentCenterRef.current) {
+      prevEmergentCenter.current = emergentCenterRef.current.clone();
+    }
+  
+    /*
     const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
     if (circleCenterRef && circleCenterRef.current && internalRef.current) {
-      // Convert the emergentCenter to the local space of the CustomGroup
-      const localCenter = internalRef.current.worldToLocal(emergentCenter.clone());
+      // Convert the emergentCenterRef.current to the local space of the CustomGroup
+      const localCenter = internalRef.current.worldToLocal(emergentCenterRef.current.clone());
       circleCenterRef.current.position.copy(localCenter);
     }
-
+    */
+  
+    const endTime = performance.now(); // End timing
+    const frameTime = endTime - startTime;
+    if (frameTime > 16) {
+      console.log(`Frame time: ${frameTime.toFixed(3)} ms`,id, frameState.current);
+    }
   });
+  
 
   const showScopes = false;
 
