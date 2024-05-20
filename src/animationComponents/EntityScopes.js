@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Sphere } from '@react-three/drei';
+import { Sphere, Circle as CircleDrei } from '@react-three/drei';
 import RigidBody from './RigidBody';
 import CustomGroup from './CustomGroup'; 
 import * as THREE from 'three';
@@ -8,14 +8,12 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 
-// Use velocity instead of impulse to improve perf ?
 // Add a repellant force 
-// Could break frame calculation into sequence e.g.
-//   Calculate center
-//   Calculate overshoot
-//   Apply impulse to x%
 // requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
-// This means that each frame has about 16.67 milliseconds (1000 ms / 60 FPS) available for all the rendering and updates to occur.
+// This means that each frame has about 16.67 milliseconds for all the rendering and updates to occur.
+
+// Use https://github.com/pmndrs/react-three-rapier/tree/main/packages/react-three-rapier-addons#attractors
+// Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
 
 const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) => {
   const internalRef = useRef();
@@ -38,9 +36,9 @@ const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) 
       angularDamping={0.5}
       enabledTranslations={[true, true, false]}
     >
-      <Sphere args={[radius, 8, 8]}>
+      <CircleDrei args={[radius, 8, 8]}>
         <meshStandardMaterial color={color} />
-      </Sphere>
+      </CircleDrei>
     </RigidBody>
   );
 });
@@ -70,7 +68,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
 
   useImperativeHandle(ref, () => internalRef.current);
 
-  const impulseScale = entityRadius * entityRadius * entityRadius * 0.2;
+  const impulseScale = entityRadius * entityRadius * 0.2;
   const initialImpulseVectors = Array.from({ length: entityRefs.length }, () => new THREE.Vector3(
           (Math.random() - 0.5) * impulseScale * 2,
           (Math.random() - 0.5) * impulseScale * 2,
@@ -187,14 +185,12 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
       prevEmergentCenter.current = emergentCenterRef.current.clone();
     }
   
-    /*
     const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
-    if (circleCenterRef && circleCenterRef.current && internalRef.current) {
+    if (circleCenterRef && circleCenterRef.current && internalRef.current && emergentCenterRef.current) {
       // Convert the emergentCenterRef.current to the local space of the CustomGroup
       const localCenter = internalRef.current.worldToLocal(emergentCenterRef.current.clone());
       circleCenterRef.current.position.copy(localCenter);
     }
-    */
   
     const endTime = performance.now(); // End timing
     const frameTime = endTime - startTime;
@@ -204,7 +200,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
   });
   
 
-  const showScopes = false;
+  const showScopes = true;
 
   return (
     <CustomGroup ref={internalRef} position={initialPosition}>
@@ -226,7 +222,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
             initialState={{ 
               radius: radius, 
               color: color,
-              opacity: 0.05,
+              opacity: 0,
             }}  
           />
           <Circle 
@@ -234,7 +230,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
             initialState={{ 
               radius: radius, 
               color: color,
-              opacity: 0.5,
+              opacity: 0.2,
             }}  
           />
         </>
