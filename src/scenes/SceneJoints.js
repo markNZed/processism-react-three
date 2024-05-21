@@ -1,24 +1,26 @@
-import { Environment, OrbitControls, Sphere } from '@react-three/drei'
+import { Environment, OrbitControls, Circle } from '@react-three/drei'
 import { RigidBody, useSphericalJoint, Physics } from '@react-three/rapier'
 import { forwardRef, useRef, createRef } from 'react'
 import { Camera } from '../animationComponents'
+import { Color } from 'three'
 
-const RopeSegment = forwardRef(({ position, component, type }, ref) => {
+const RopeSegment = forwardRef(({ component, position }, ref) => {
   return (
-    <RigidBody colliders="ball" ref={ref} type={type} position={position}>
+    <RigidBody
+      ref={ref}
+      colliders="ball"
+      type="dynamic"
+      position={position}
+      restitution={2}
+      friction={0}
+      angularDamping={0.5}
+      linearDamping={0.5}
+      enabledTranslations={[true, true, false]}>
       {component}
     </RigidBody>
   )
 })
 
-/**
- * We can wrap our hook in a component in order to initiate
- * them conditionally and dynamically
- * a: Body A
- * b: Body B
- * c: Position-x of the joint in bodyA's local space
- * d: Position-x of the joint in bodyB's local space
- */
 const RopeJoint = ({ a, b, c, d }) => {
   useSphericalJoint(a, b, [
     [c, 0, 0],
@@ -27,41 +29,63 @@ const RopeJoint = ({ a, b, c, d }) => {
   return null
 }
 
-const Rope = (props) => {
-  const refs = useRef(Array.from({ length: props.length }).map(() => createRef()))
-  const size = 0.5
+const Rope = ({ scopeCount2, scopeCount3 }) => {
+  const entityRefs = useRef(Array.from({ length: scopeCount2 }, () => Array.from({ length: scopeCount3 }).map(() => createRef())))
+
+  const size = 0.3
 
   return (
     <group>
-      {refs.current.map((ref, i) => (
-        <RopeSegment
-          ref={ref}
-          key={i}
-          position={[i * 0.1, i * 0.1, i * 0.1]}
-          component={
-            <Sphere args={[size]}>
-              <meshStandardMaterial color={'#d9abff'} />
-            </Sphere>
-          }
-          type="dynamic"
-        />
-      ))}
+      {entityRefs.current.map((ref, i) =>
+        ref.map((ref, j) => (
+          <RopeSegment
+            key={j}
+            ref={ref}
+            position={[j * 0.1, 0, 0]}
+            component={
+              <Circle args={[size]}>
+                <meshStandardMaterial color={new Color(j, 0, 0)} />
+              </Circle>
+            }
+          />
+        ))
+      )}
 
-      {refs.current.map(
+      {entityRefs.current.map(
         (ref, i) =>
           i > 0 && (
             <>
-              <RopeJoint a={refs.current[i]} b={refs.current[i - 1]} c={-size} d={size} key={i} />
-              {/* Joining the last node with the first one to form a circle */}
-              <RopeJoint a={refs.current[refs.current.length - 1]} b={refs.current[0]} c={size} d={-size} key={i} />
+              {ref.map(
+                (_, j) =>
+                  j > 0 && (
+                    <>
+                      <RopeJoint a={ref[j]} b={ref[j - 1]} c={-size} d={size} key={j} />
+                    </>
+                  )
+              )}
+              <RopeJoint a={ref[ref.length - 1]} b={ref[0]} c={size} d={-size} />
+
+              <RopeJoint
+                a={entityRefs.current[i][0]}
+                b={entityRefs.current[i - 1][Math.round(scopeCount3 / 2)]}
+                c={-size}
+                d={size}
+                key={i}
+              />
             </>
           )
       )}
+      <RopeJoint
+        a={entityRefs.current[entityRefs.current.length - 1][Math.round(scopeCount3 / 2)]}
+        b={entityRefs.current[1][0]}
+        c={size}
+        d={-size}
+      />
     </group>
   )
 }
 
-const SceneJoints = () => {
+export const SceneJoints = () => {
   const cameraInitialState = {
     position: [0, 0, 35],
     zoom: 35,
@@ -78,7 +102,7 @@ const SceneJoints = () => {
       <Environment preset="sunset" />
       <OrbitControls />
       <Physics debug gravity={[0, 0, 0]}>
-        <Rope length={21} />
+        <Rope scopeCount2={21} scopeCount3={21} />
       </Physics>
     </>
   )
