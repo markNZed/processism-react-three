@@ -1,11 +1,19 @@
-import React from 'react';
-import Scene from './Scene';
-import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText, EmergentEntityNoBoundary, EntityScopes } from '../animationComponents';
-import * as THREE from 'three';
-import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
-import useStore from '../useStore'; // Adjust import path as necessary
-import { Environment, OrbitControls } from '@react-three/drei';
-import { Physics } from '@react-three/rapier';
+import React from 'react'
+import Scene from './Scene'
+import {
+  Camera,
+  DynamicDoubleArrow,
+  EmergentEntity,
+  TargetText,
+  EmergentEntityNoBoundary,
+  EntityScopes,
+  EntityScopesTest
+} from '../animationComponents'
+import * as THREE from 'three'
+import { AnimationController } from '../AnimationController' // Adjust import path as necessary
+import useStore from '../useStore' // Adjust import path as necessary
+import { Environment, OrbitControls } from '@react-three/drei'
+import { Physics } from '@react-three/rapier'
 
 /****************************
 Scene Description:
@@ -23,15 +31,13 @@ Instead of bottom-up: inside-out
 
  ****************************/
 
-
 function SceneThree() {
+  const emergentEntityRadius = 3.5
 
-    const emergentEntityRadius = 3.5;
-
-    // Delay, animationComponent id, animationState
-    const animationSequence = [
-        //[0, 'emergent1', { variant: "default" }],
-    ];
+  // Delay, animationComponent id, animationState
+  const animationSequence = [
+    //[0, 'emergent1', { variant: "default" }],
+  ]
 
   const cameraInitialState = {
     position: [0, 0, 35],
@@ -42,15 +48,14 @@ function SceneThree() {
     bottom: window.innerHeight / -2,
     near: 0.1,
     far: 100
-  };
+  }
 
   return (
     <>
-        <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]}>
-                <Scene>
-
-                    {/*
+      <AnimationController animations={animationSequence} useStore={useStore}>
+        <Physics gravity={[0, 0, 0]}>
+          <Scene>
+            {/*
 
                     <EmergentEntityNoBoundary
                         id="emergent2"
@@ -94,25 +99,16 @@ function SceneThree() {
 
                     */}
 
-                    <EntityScopes
-                        id="EntityScopes1"
-                        radius={10}
-                        color="blue"
-                    />
+            <EntityScopesTest id="EntityScopes1" radius={10} color="blue" />
+          </Scene>
+        </Physics>
+      </AnimationController>
 
-                </Scene>
-            </Physics>
-        </AnimationController>
-
-        <Camera
-            id={"camera"}
-            initialState={cameraInitialState}
-        />
-        <Environment preset="sunset" />
-        <OrbitControls />
+      <Camera id={'camera'} initialState={cameraInitialState} />
+      <Environment preset="sunset" />
+      <OrbitControls />
     </>
-  );
+  )
 }
 
-export default SceneThree;
-
+export default SceneThree
