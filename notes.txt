@@ -8,3 +8,7 @@ Entity-Component-System (ECS) is an architectural pattern often used in game dev
 
 An example of calling a Physics function:
 [1, 'emergent1.Sphere1', { action: { name: 'applyImpulse', params: [{ x: 10, y: 5, z: 0 }] } }],
+
+Use a shader to make the particle look like a blob. 
+
+Use a shader to allow for an a bloblike "ovverlay" of emergent entities
