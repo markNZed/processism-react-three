@@ -12,3 +12,5 @@ An example of calling a Physics function:
 Use a shader to make the particle look like a blob. 
 
 Use a shader to allow for an a bloblike "ovverlay" of emergent entities
+
+Draw realtions within emergent entity - like a radial graph
