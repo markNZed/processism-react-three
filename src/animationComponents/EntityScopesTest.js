@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react'
+import React, { useMemo, useRef, useImperativeHandle, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Circle as CircleDrei } from '@react-three/drei'
 import RigidBody from './RigidBody'
@@ -6,6 +6,7 @@ import CustomGroup from './CustomGroup'
 import * as THREE from 'three'
 import withAnimationState from '../withAnimationState'
 import { Circle } from '.'
+import { useSphericalJoint, useRapier } from '@react-three/rapier'
 
 // Add a repellant force
 // requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS).
@@ -16,7 +17,6 @@ import { Circle } from '.'
 
 const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) => {
   const internalRef = useRef()
-
   useImperativeHandle(ref, () => internalRef.current)
 
   useFrame(() => {
@@ -24,6 +24,7 @@ const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) 
       internalRef.current.applyImpulses()
     }
   })
+
 
   return (
     <>
@@ -44,37 +45,60 @@ const Particle = React.forwardRef(({ id, initialPosition, radius, color }, ref) 
   )
 })
 
+const RopeJoint = ({ a, b, c, d }) => {
+  useSphericalJoint(a, b, [
+    [c, 0, 0],
+    [d, 0, 0]
+  ])
+  
+  return null
+}
+
+
 const EmergentEntity = React.forwardRef(
   ({ id, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, color = 'blue' }, ref) => {
     const entityRefs = Array.from({ length: entityCount }, () => React.createRef())
-    const emergentEntityArea = areaOfCircle(radius)
-    const entityRadius = radiusFromArea(emergentEntityArea / entityCount) * 0.9
-
-  
+    const entityRadius = (radius * Math.PI / (entityCount + Math.PI))
     const entityData = useMemo(() => {
-      const positions = generateEntityPositions(radius, entityCount)
+      const positions = generateEntityPositions((radius - entityRadius), entityCount)
       return { positions }
     }, [radius, entityCount, entityRadius])
 
 
+    const mergedArray = entityRefs.map((ref, index) => ({
+      ref,
+      position: entityData.positions[index],
+    }));
+
+
     const internalRef = useRef()
     useImperativeHandle(ref, () => internalRef.current)
-
+  
     const showScopes = true
 
     return (
       <CustomGroup ref={internalRef} position={initialPosition}>
-        {entityData.positions.map((pos, index) => (
-          <Entity
+        {mergedArray.map((el, index) => (
+        <Entity
             key={`${id}-${index}`}
             id={`${id}-${index}`}
-            initialPosition={pos.toArray()}
+            i={index}
+            initialPosition={el.position}
             radius={entityRadius}
             color={color}
             scope={scope + 1}
-            ref={entityRefs[index]}
+            ref={el.ref}
           />
+
         ))}
+        
+        {mergedArray.map(
+          (_, i) =>
+            i > 0 && (
+              <RopeJoint a={mergedArray[i].ref} b={mergedArray[i - 1].ref} c={radius} d={radius} key={i} />
+            )
+        )}
+
         {showScopes && (
           <>
             <Circle
@@ -100,8 +124,9 @@ const EmergentEntity = React.forwardRef(
   }
 )
 
+
 const EntityScope3 = React.forwardRef((props, ref) => (
-  <EmergentEntity id={'Scope3'} {...props} ref={ref} Entity={Particle} entityCount={18} color={getRandomColor()} />
+  <EmergentEntity id={'Scope3'} {...props} ref={ref} Entity={Particle} entityCount={9} color={getRandomColor()} />
 ))
 
 const EntityScope2 = React.forwardRef((props, ref) => (
@@ -151,3 +176,4 @@ const areaOfCircle = (radius) => {
   }
   return Math.PI * Math.pow(radius, 2)
 }
+
