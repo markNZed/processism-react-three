@@ -16,6 +16,10 @@ import { useSphericalJoint } from '@react-three/rapier';
 // Use https://github.com/pmndrs/react-three-rapier/tree/main/packages/react-three-rapier-addons#attractors
 // Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
 
+// Maybe pass all the refs up and then from top level instantiate Particles and Joints
+// Pass down the register particle function
+// Pass up the registering once we receive all the lower registering
+
 const RopeJoint = ({ a, b, ax, ay, az, bx, by, bz }) => {
   const scale = 1.5;
   useSphericalJoint(a, b, [
@@ -25,7 +29,8 @@ const RopeJoint = ({ a, b, ax, ay, az, bx, by, bz }) => {
   return null
 }
 
-const Particle = React.forwardRef(({ id, i, jointPosition, initialPosition, radius, color, text="test" }, ref) => {
+const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, radius, color, parentRegisterParticle, parentParticlesRegistered }, ref) => {
+  
   const internalRef = useRef();
   const jointRadius = radius/10;
 
@@ -36,6 +41,18 @@ const Particle = React.forwardRef(({ id, i, jointPosition, initialPosition, radi
       internalRef.current.applyImpulses();
     }
   });
+
+  useEffect(() => {
+    if (parentRegisterParticle) {
+      parentRegisterParticle(internalRef);
+    }
+  }, [parentRegisterParticle]);
+
+  useEffect(() => {
+    if (parentRegisterParticle) {
+      parentParticlesRegistered(index);
+    }
+  }, [parentParticlesRegistered]);
 
   return (
     <>
@@ -60,7 +77,7 @@ const Particle = React.forwardRef(({ id, i, jointPosition, initialPosition, radi
       anchorX="center"
       anchorY="middle"
     >
-      {i}
+      {index}
     </Text>
     <CircleDrei 
       args={[jointRadius, 16]} 
@@ -71,9 +88,12 @@ const Particle = React.forwardRef(({ id, i, jointPosition, initialPosition, radi
   );
 });
 
-const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, color = "blue" }, ref) => {
+Particle.displayName = 'Particle'; // the name property won't directly give you the component's name since it uses forwardRef
+
+const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, inJointData, color = "blue", parentRegisterParticle, parentParticlesRegistered }, ref) => {
   const getComponentRef = useStore((state) => state.getComponentRef);
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
+  const particleRefs = [];
   const emergentEntityArea = areaOfCircle(radius);
   const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
   const entityArea = areaOfCircle(entityRadius);
@@ -83,8 +103,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
     return { positions };
   }, [radius, entityCount]);
   const jointData = useMemo(() => {
-    const positions = generateEntityPositions(radius - entityRadius, entityCount);
-    return calculateJointPositions(positions, entityRadius);
+    return calculateJointPositions(entityData.positions, entityRadius);
   }, [radius, entityCount]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
@@ -98,8 +117,44 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
   const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
   const emergentImpulseRef = useRef();
   const [addJoints, setAddJoints] = useState(false);
+  let outJointData = [];
+  const jointRadius = radius / 10;
+  const entitiesRegisteredRef = useRef(false);
+  const particlesRegisteredRef = useRef(false);
+  const particlesRegisterRef = useRef(Array.from({ length: entityCount }, () => false));
 
   useImperativeHandle(ref, () => internalRef.current);
+
+  const areAllEntityRefsSet = () => {
+    return entityRefs.every(ref => ref.current !== null && ref.current !== undefined);
+  };
+
+  const areAllParticlesRegistered = () => {
+    return particlesRegisterRef.current.every(ref => ref === true);
+  };
+
+  const registerParticle = (particleRef) => {
+    if (parentRegisterParticle) {
+      parentRegisterParticle(particleRef);
+    }
+    particleRefs.push(particleRef);
+    if (areAllEntityRefsSet() && !entitiesRegisteredRef.current) {
+      entitiesRegisteredRef.current = true;
+    }
+  };
+
+  const particlesRegistered = (entityIndex) => {
+    particlesRegisterRef.current[entityIndex] = true;
+    if (areAllParticlesRegistered() && !particlesRegisteredRef.current) {
+      particlesRegisteredRef.current = true;
+      if (parentParticlesRegistered) {
+        parentParticlesRegistered(index);
+      }
+      if (scope == 1) {
+        console.log("All particles registered", id, particleRefs.length, particlesRegisterRef.current);
+      }
+    }
+  };
 
   const impulseScale = entityArea * 0.05;
   const initialImpulseVectors = Array.from({ length: entityRefs.length }, () => new THREE.Vector3(
@@ -112,7 +167,52 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
     //console.log("entityData", id, "scope", scope, "radius", radius, "entityData", entityData, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
     //if (scope == 3) console.log("entityRefs[1] entityRefs[0]", entityRefs[1], entityRefs[0]);
     //console.log("jointData", jointData);
-  }, []);
+  }, [entityRefs]);
+// 
+
+  // Will need absolute positions
+  // Then find closest particles and creatr joints at scope 3
+  const updateJoints = (entityRefs, joints) => {
+    const distances = joints.map((joint, i) => {
+      let minDistanceA = Infinity;
+      let closestEntityA = null;
+      let minDistanceB = Infinity;
+      let closestEntityB = null;
+      entityRefs.forEach((entity, j) => {
+        const entityPosition = entityData.positions[j];
+        const distanceA = entityPosition.distanceTo(new THREE.Vector3(joint.ax, joint.ay, joint.az));
+        const distanceB = entityPosition.distanceTo(new THREE.Vector3(joint.bx, joint.by, joint.bz));
+        if (distanceA < minDistanceA) {
+          minDistanceA = distanceA;
+          closestEntityA = j;
+        }
+        if (distanceB < minDistanceB) {
+          minDistanceB = distanceB;
+          closestEntityB = j;
+        }
+      });
+      return {
+        ax: entityData.positions[closestEntityA].x,
+        ay: entityData.positions[closestEntityA].y,
+        az: entityData.positions[closestEntityA].z,
+        bx: entityData.positions[closestEntityB].x,
+        by: entityData.positions[closestEntityB].y,
+        bz: entityData.positions[closestEntityB].z,
+      };
+    });
+    return distances;
+  };
+
+  useEffect(() => {
+    if (entityRefs && entityRefs.length) {
+      if (inJointData && inJointData.length) {
+        outJointData = [...updateJoints(entityRefs, inJointData), ...jointData];
+      } else {
+        outJointData = [...jointData];
+      }
+      //console.log("Updated outJointData:", id, inJointData, jointData, outJointData);
+    }
+  }, [entityRefs, inJointData]);
 
   const calculateEmergentCenter = () => {
     const emergentCenter = new THREE.Vector3();
@@ -153,6 +253,14 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
     });
   };
 
+  useEffect(() => {
+    if (addJoints && Entity.displayName != "Particle") {
+      // We need to pass the joints down the stack
+      //console.log("inJointData", id, inJointData);
+      //console.log("outJointData", id, outJointData);
+    }
+  }, [addJoints]);
+
   useFrame(() => {
     const startTime = performance.now(); // Start timing
   
@@ -162,7 +270,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
   
     switch (frameState.current) {
       case "init":
-        if (initialImpulse && entityRefs[0].current) {
+        if (initialImpulse && entitiesRegisteredRef.current === true) {
           setInitialImpulse(false);
           entityRefs.forEach((entity, i) => {
             if (entity.current && scope != 1) {
@@ -172,6 +280,8 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
           });
           frameState.current = "findCenter";
           setAddJoints(true);
+          //console.log("Entity.displayName", id, Entity.displayName);
+          //console.log("inJointData", id, inJointData);
         }
         break;
       case "findCenter":
@@ -239,6 +349,7 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
   const showScopes = true;
 
   return (
+    <>
     <CustomGroup ref={internalRef} position={initialPosition}>
       {entityData.positions.map((pos, i) => (
         <Entity
@@ -248,13 +359,16 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
           radius={entityRadius}
           color={color}
           scope={scope + 1}
+          index={i}
           ref={entityRefs[i]}
-          i={i}
           jointPosition={jointData[i]}
+          inJointData={i == 0 ? outJointData : []}
+          parentRegisterParticle={registerParticle}
+          parentParticlesRegistered={particlesRegistered}
         />
       ))}
       
-      {scope == 3 && addJoints && entityRefs.map((ref, i) => (
+      {Entity.displayName == "Particle" && addJoints && entityRefs.map((ref, i) => (
         <React.Fragment key={`fragment-${i}`}>
           {i > 0 && 
             <RopeJoint 
@@ -304,6 +418,25 @@ const EmergentEntity = React.forwardRef(({ id, initialPosition = [0, 0, 0], scop
         </>
       )}
     </CustomGroup>
+      <>
+        <Text
+          position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
+          fontSize={radius / 2} // Adjust font size based on circle radius
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {index}
+        </Text>
+        {/*
+        <CircleDrei 
+          args={[jointRadius, 16]} 
+          position={[initialPosition[0] + jointPosition.ax, initialPosition[1] + jointPosition.ay, 0.2]}
+        >
+        </CircleDrei>
+        */}
+      </>
+    </>
   );
 });
 
