@@ -44,10 +44,12 @@ function SceneThree() {
     far: 100
   };
 
+  //timestep deafults to 1 / 60
+
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]}>
+            <Physics gravity={[0, 0, 0]} timestep={1/30} >
                 <Scene>
 
                     {/*
@@ -109,7 +111,7 @@ function SceneThree() {
             initialState={cameraInitialState}
         />
         <Environment preset="sunset" />
-        <OrbitControls />
+        <OrbitControls enablePan={true} />
     </>
   );
 }

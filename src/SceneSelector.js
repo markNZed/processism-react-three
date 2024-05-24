@@ -18,7 +18,6 @@ const SceneSelector = () => {
       <button onClick={() => initializeScene('SceneOne')}>Go to Scene One</button>
       <button onClick={() => initializeScene('SceneTwo')}>Go to Scene Two</button>
       <button onClick={() => initializeScene('SceneThree')}>Go to Scene Three</button>
-      <button onClick={() => initializeScene('SceneJoints')}>Go to Scene Joints</button>
     </div>
   )
 }

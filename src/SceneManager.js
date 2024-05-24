@@ -3,7 +3,6 @@ import useStore from './useStore'
 import SceneOne from './scenes/SceneOne'
 import SceneTwo from './scenes/SceneTwo'
 import SceneThree from './scenes/SceneThree'
-import SceneJoints from './scenes/SceneJoints'
 
 const SceneManager = () => {
   const currentScene = useStore((state) => state.currentScene)
@@ -38,11 +37,6 @@ const SceneManager = () => {
         break
       case 'SceneThree':
         sceneComponent = <SceneThree />
-        isOrthographic = true
-        setUsePhysics(true)
-        break
-      case 'SceneJoints':
-        sceneComponent = <SceneJoints />
         isOrthographic = true
         setUsePhysics(true)
         break
