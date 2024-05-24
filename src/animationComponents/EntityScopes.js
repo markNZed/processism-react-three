@@ -17,8 +17,8 @@ import { useSphericalJoint } from '@react-three/rapier';
 // Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
 
 // Maybe pass all the refs up and then from top level instantiate Particles and Joints
-// Pass down the register particle function
-// Pass up the registering once we receive all the lower registering
+// Pass all the Joints up
+// Create all Joints from top - or maybe at the emergent level (it should have access to all the Particles)
 
 const RopeJoint = ({ a, b, ax, ay, az, bx, by, bz }) => {
   const scale = 1.5;
