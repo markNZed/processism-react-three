@@ -33,10 +33,9 @@ const RopeJoint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
   return null
 }
 
-const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, radius, color, registerParticlesFn, debugInfo }, ref) => {
+const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, registerParticlesFn, debugInfo }, ref) => {
   
   const internalRef = useRef();
-  const jointRadius = radius/10;
 
   useImperativeHandle(ref, () => internalRef.current);
 
@@ -80,10 +79,6 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
         >
           {index}
         </Text>
-        <CircleDrei 
-          args={[jointRadius, 16]} 
-          position={[initialPosition[0] + jointPosition.ax, initialPosition[1] + jointPosition.ay, 0.2]}
-        />
       </>
     )}
   </>
@@ -116,7 +111,6 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const frameStateRef = useRef("init");
   const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
   const impulseRef = useRef();
-  const [addJoints, setAddJoints] = useState(false);
   const entitiesRegisteredRef = useRef(false);
   const entityParticlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
   const [jointParticles, setJointParticles] = useState([]);
@@ -125,6 +119,12 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const debug = debugInfo;//id == "EntityScopes1-0-8";  
 
   useImperativeHandle(ref, () => internalRef.current);
+
+  useEffect(() => {
+    //console.log("entityPositions", id, "scope", scope, "radius", radius, "entityPositions", entityPositions, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
+    //if (scope == 3) console.log("entityRefs[1] entityRefs[0]", entityRefs[1], entityRefs[0]);
+    //console.log("jointsData", id, jointsData);
+  }, [entityRefs]); // Will only update during  arender not when ref changes
 
   const areAllParticlesRegistered = () => {
     return entityParticlesRegisteredRef.current.every(ref => ref === true);
@@ -147,24 +147,13 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     }
   };
 
-  const impulseScale = entityArea * 0.01;
+  const impulseScale = entityArea * 0.03;
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
     (Math.random() - 0.5) * impulseScale * 2,
     (Math.random() - 0.5) * impulseScale * 2,
     0
   ));
 
-  useEffect(() => {
-    //console.log("entityPositions", id, "scope", scope, "radius", radius, "entityPositions", entityPositions, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
-    //if (scope == 3) console.log("entityRefs[1] entityRefs[0]", entityRefs[1], entityRefs[0]);
-    //console.log("jointsData", id, jointsData);
-  }, [entityRefs]); // Will only update during  arender not when ref changes
-
-  //  The joint positions need to be shown so we can check these
-  // Positions are relative to the radius of next level down ? Because we were allocating to particles
-  // Move to instantiating joints from the emergent entity
-  // Not taking into account the joint being between two partcles 
-  //   Map to nearest entities and push down to find nearest particles - needs a rethink 
   const allocateJointsToParticles = (particleRefs, jointsData) => {
     if (debug) console.log("allocateJointsToParticles", particleRefs, jointsData)
     // Create a new Vector3 to store the world position of this emergent entity
@@ -223,15 +212,11 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       return {
         particleRefA: particleRefs[particleAEntity].current[closestParticleAIndex],
         particlePosA: closestParticleAPosition.clone(),
-        particleAEntity: particleAEntity,
-        closestParticleAIndex: closestParticleAIndex,
         ax: offsetA.x,
         ay: offsetA.y,
         az: offsetA.z,
         particleRefB: particleRefs[particleBEntity].current[closestParticleBIndex],
         particlePosB: closestParticleBPosition.clone(),
-        particleBEntity: particleBEntity,
-        closestParticleBIndex: closestParticleBIndex,
         bx: offsetB.x,
         by: offsetB.y,
         bz: offsetB.z,
@@ -403,7 +388,6 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
           scope={scope + 1}
           index={i}
           ref={entityRefs[i]}
-          jointPosition={jointsData[i]}
           registerParticlesFn={localRegisterParticlesFn}
           debugInfo={debug}
         />
@@ -454,36 +438,6 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
                 position={localJointPosition(internalRef, particles, "B")}
                 material-color="green"
               />
-              {/*}
-              <Circle 
-                id={`${id}-${i}.jointA`}
-                //debug={true}
-                initialState={{ 
-                  radius: 0.2 / scope, 
-                  color: "red",
-                  opacity: 0.4,
-                  position: (() => {
-                    let pos = localJointPosition(internalRef, particles.particleRefA.current.translation());
-                    pos.z += 0.4;
-                    return pos;
-                  })(),
-                }}  
-              />
-              <Circle 
-                id={`${id}-${i}.jointB`} 
-                //debug={true}
-                initialState={{ 
-                  radius: 0.2 / scope, 
-                  color: "green",
-                  opacity: 0.4,
-                  position: (() => {
-                    let pos = localJointPosition(internalRef, particles.particleRefB.current.translation());
-                    pos.z += 0.4;
-                    return pos;
-                  })(),
-                }}  
-              />
-              */}
             </>
           ))}
           {jointsData.map((data, i) => (
@@ -506,13 +460,6 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         >
           {index}
         </Text>
-        {/*
-        <CircleDrei 
-          args={[jointRadius, 16]} 
-          position={[initialPosition[0] + jointPosition.ax, initialPosition[1] + jointPosition.ay, 0.2]}
-        >
-        </CircleDrei>
-        */}
       </>
     )}
     </>
