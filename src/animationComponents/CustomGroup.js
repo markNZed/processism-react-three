@@ -31,6 +31,9 @@ const CustomGroup = forwardRef(({ children, position }, ref) => {
     localToWorld: (vector) => {
       return internalRef.current.localToWorld(vector);
     },
+    getWorldPosition: (vector) => {
+      return internalRef.current.getWorldPosition(vector);
+    },    
   }), [internalRef]);
 
   return (
