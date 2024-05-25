@@ -21,7 +21,8 @@ import { useSphericalJoint } from '@react-three/rapier';
 // Create all Joints from top - or maybe at the emergent level (it should have access to all the Particles)
 
 const RopeJoint = ({ a, b, ax, ay, az, bx, by, bz }) => {
-  const scale = 1.5;
+  const scale = 1;
+  //const scale = 1 + Math.random();
   useSphericalJoint(a, b, [
     [ax * scale, ay * scale, az * scale],
     [bx * scale, by * scale, bz * scale]
@@ -29,7 +30,7 @@ const RopeJoint = ({ a, b, ax, ay, az, bx, by, bz }) => {
   return null
 }
 
-const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, radius, color, parentRegisterParticle, parentParticlesRegistered }, ref) => {
+const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, radius, color, registerParticles }, ref) => {
   
   const internalRef = useRef();
   const jointRadius = radius/10;
@@ -43,16 +44,10 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
   });
 
   useEffect(() => {
-    if (parentRegisterParticle) {
-      parentRegisterParticle(internalRef);
+    if (registerParticles) {
+      registerParticles(index, [internalRef]);
     }
-  }, [parentRegisterParticle]);
-
-  useEffect(() => {
-    if (parentRegisterParticle) {
-      parentParticlesRegistered(index);
-    }
-  }, [parentParticlesRegistered]);
+  }, [registerParticles]);
 
   return (
     <>
@@ -90,10 +85,10 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
 
 Particle.displayName = 'Particle'; // the name property won't directly give you the component's name since it uses forwardRef
 
-const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, inJointData, color = "blue", parentRegisterParticle, parentParticlesRegistered }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, inJointData, color = "blue", registerParticles }, ref) => {
   const getComponentRef = useStore((state) => state.getComponentRef);
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
-  const particleRefs = [];
+  const particleRefs = useRef([]);
   const emergentEntityArea = areaOfCircle(radius);
   const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
   const entityArea = areaOfCircle(entityRadius);
@@ -120,48 +115,34 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
   let outJointData = [];
   const jointRadius = radius / 10;
   const entitiesRegisteredRef = useRef(false);
-  const particlesRegisteredRef = useRef(false);
-  const particlesRegisterRef = useRef(Array.from({ length: entityCount }, () => false));
+  const particlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
 
   useImperativeHandle(ref, () => internalRef.current);
 
-  const areAllEntityRefsSet = () => {
-    return entityRefs.every(ref => ref.current !== null && ref.current !== undefined);
-  };
-
   const areAllParticlesRegistered = () => {
-    return particlesRegisterRef.current.every(ref => ref === true);
+    return particlesRegisteredRef.current.every(ref => ref === true);
   };
 
-  const registerParticle = (particleRef) => {
-    if (parentRegisterParticle) {
-      parentRegisterParticle(particleRef);
-    }
-    particleRefs.push(particleRef);
-    if (areAllEntityRefsSet() && !entitiesRegisteredRef.current) {
+  const localRegisterParticles = (indexToRegister, particleRefsToRegister) => {
+    particleRefs.current = [...particleRefs.current, ...particleRefsToRegister];
+    particlesRegisteredRef.current[indexToRegister] = true;
+    if (areAllParticlesRegistered() && !entitiesRegisteredRef.current) {
       entitiesRegisteredRef.current = true;
-    }
-  };
-
-  const particlesRegistered = (entityIndex) => {
-    particlesRegisterRef.current[entityIndex] = true;
-    if (areAllParticlesRegistered() && !particlesRegisteredRef.current) {
-      particlesRegisteredRef.current = true;
-      if (parentParticlesRegistered) {
-        parentParticlesRegistered(index);
+      if (registerParticles) {
+        registerParticles(index, particleRefs.current);
       }
       if (scope == 1) {
-        console.log("All particles registered", id, particleRefs.length, particlesRegisterRef.current);
+        console.log("All particles registered", id, particleRefs.current.length, particlesRegisteredRef.current);
       }
     }
   };
 
-  const impulseScale = entityArea * 0.05;
+  const impulseScale = entityArea * 0.01;
   const initialImpulseVectors = Array.from({ length: entityRefs.length }, () => new THREE.Vector3(
-          (Math.random() - 0.5) * impulseScale * 2,
-          (Math.random() - 0.5) * impulseScale * 2,
-          (Math.random() - 0.5) * impulseScale * 2
-      ));
+    (Math.random() - 0.5) * impulseScale * 2,
+    (Math.random() - 0.5) * impulseScale * 2,
+    (Math.random() - 0.5) * impulseScale * 2
+  ));
 
   useEffect(() => {
     //console.log("entityData", id, "scope", scope, "radius", radius, "entityData", entityData, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
@@ -243,7 +224,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
           if (displacement.length() > maxDisplacement) {
             const overshoot = displacement.length() - maxDisplacement;
             const directionToCenter = displacement.negate().normalize();
-            directionToCenter.multiplyScalar(impulseScale * 0.1);
+            directionToCenter.multiplyScalar(impulseScale * overshoot * 0.01);
             entity.current.addImpulse(directionToCenter);
           } else {
             entity.current.addImpulse(emergentImpulse);
@@ -346,7 +327,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
   });
   
 
-  const showScopes = true;
+  const showScopes = false;
 
   return (
     <>
@@ -363,8 +344,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
           ref={entityRefs[i]}
           jointPosition={jointData[i]}
           inJointData={i == 0 ? outJointData : []}
-          parentRegisterParticle={registerParticle}
-          parentParticlesRegistered={particlesRegistered}
+          registerParticles={localRegisterParticles}
         />
       ))}
       
@@ -441,7 +421,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
 });
 
 const EntityScope3 = React.forwardRef((props, ref) => (
-  <EmergentEntity id={"Scope3"} {...props} ref={ref} Entity={Particle} entityCount={9} />
+  <EmergentEntity id={"Scope3"} {...props} ref={ref} Entity={Particle} entityCount={21} />
 ));
 
 const EntityScope2 = React.forwardRef((props, ref) => (
