@@ -6,7 +6,7 @@ import useStore from './useStore';
 function withAnimationState(Component) {
     const MotionComponent = motion(Component);
 
-    return function WrappedComponent({ id, initialState: initialStateFromProp, ...props }) {
+    return function WrappedComponent({ id, initialState: initialStateFromProp, debug, ...props }) {
         const initialState = useMemo(() => initialStateFromProp, [])
         const ref = useRef();
         const rigidBodyRef = useRef();
@@ -19,6 +19,12 @@ function withAnimationState(Component) {
         const setRigidBodyRef = (refIn) => {
             rigidBodyRef.current = refIn.current
         };
+
+        useEffect(() => {
+            if (debug) {
+                console.log("DEBUG:", id, initialState);
+            }
+        }, [debug]);
 
         useEffect(() => {
             if (ref.current) {
@@ -54,6 +60,7 @@ function withAnimationState(Component) {
                 simulationReady={simulationReady}
                 position={animationState?.position || initialState?.position}
                 setRigidBodyRef={setRigidBodyRef}
+                debug={debug}
             />
         );
     };

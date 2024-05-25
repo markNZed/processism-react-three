@@ -32,7 +32,7 @@ const RopeJoint = ({ a, b, ax, ay, az, bx, by, bz }) => {
   return null
 }
 
-const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, radius, color, registerParticlesFn }, ref) => {
+const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, radius, color, registerParticlesFn, debugInfo }, ref) => {
   
   const internalRef = useRef();
   const jointRadius = radius/10;
@@ -52,8 +52,6 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
     }
   }, [registerParticlesFn, internalRef]);
 
-  const showScopes = false;
-
   return (
     <>
     <RigidBody
@@ -70,7 +68,7 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
         <meshStandardMaterial color={color} />
       </CircleDrei>
     </RigidBody>
-    {showScopes && (
+    {debugInfo && (
       <>
         <Text
           position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
@@ -94,7 +92,7 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
 
 Particle.displayName = 'Particle'; // the name property won't give the component's name since it uses forwardRef
 
-const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0], scope = 1, radius, entityCount, Entity, color = "blue", registerParticlesFn }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, debugInfo=true }, ref) => {
   const getComponentRef = useStore((state) => state.getComponentRef);
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
   const particleRefs = useRef([]);
@@ -169,8 +167,10 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
     const distances = jointPositions.map((joint, i) => {
       let minDistanceA = Infinity;
       let closestParticleA = null;
+      let closestParticleAPosition = new THREE.Vector3();
       let minDistanceB = Infinity;
       let closestParticleB = null;
+      let closestParticleBPosition = new THREE.Vector3();
       // Convert joint to world position
       particleRefs.current.forEach((particleRef, j) => {
         //console.log("particleRef", id, particleRef)
@@ -182,10 +182,12 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
         if (distanceA < minDistanceA) {
           minDistanceA = distanceA;
           closestParticleA = j;
+          closestParticleAPosition.copy(particleWorldPosition);
         }
         if (distanceB < minDistanceB) {
           minDistanceB = distanceB;
           closestParticleB = j;
+          closestParticleBPosition.copy(particleWorldPosition);
         }
         /*
         console.log("Allocating joints to particles with the following details:", {
@@ -199,7 +201,9 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
       });
       return {
         particleRefA: particleRefs.current[closestParticleA],
+        particlePosA: closestParticleAPosition.clone(),
         particleRefB: particleRefs.current[closestParticleB],
+        particlePosB: closestParticleBPosition.clone(),
       };
     });
     return distances;
@@ -269,7 +273,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
               entity.current.addImpulse(initialImpulseVectors[i]);
             }
           });
-          frameStateRef.current = "findCenter";
+          //frameStateRef.current = "findCenter";
           setAddJoints(true);
           //console.log("Entity.displayName", id, Entity.displayName);
         }
@@ -334,9 +338,12 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
       console.log(`Frame time: ${frameTime.toFixed(3)} ms`,id, frameStateRef.current);
     }
   });
-  
 
-  const showScopes = false;
+  const worldToLocalPosition = (groupRef, worldPosition) => {
+    const worldVector = new THREE.Vector3(worldPosition.x, worldPosition.y, worldPosition.z);
+    const localVector = groupRef.current.worldToLocal(worldVector);
+    return localVector;
+  };  
 
   return (
     <>
@@ -353,6 +360,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
           ref={entityRefs[i]}
           jointPosition={jointPositions[i]}
           registerParticlesFn={localRegisterParticlesFn}
+          debugInfo={debugInfo}
         />
       ))}
       
@@ -385,7 +393,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
         </React.Fragment>
       ))}
 
-      {jointParticles.map((particles, i) => {
+      {jointParticles.map((particles, i) => (
         <RopeJoint 
           a={particles.particleRefA.current} 
           b={particles.particleRefB.current} 
@@ -395,11 +403,11 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
           bx={0}
           by={0}
           bz={0}
-          key={`${i}-joint`} 
+          key={`${id}-${i}-emergent-joint`} 
         />
-      })}
+))}
 
-      {showScopes && (
+      {false && debugInfo && (
         <>
           <Circle 
             id={`${id}.CircleInitialPosition`} 
@@ -420,7 +428,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
         </>
       )}
     </CustomGroup>
-    {showScopes && (
+    {debugInfo && (
       <>
         <Text
           position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
@@ -431,6 +439,28 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
         >
           {index}
         </Text>
+        {jointParticles.map((particles, i) => (
+          <>
+            <Circle 
+              id={`${id}-${i}.jointA`}
+              debug={true}
+              initialState={{ 
+                radius: 0.1, 
+                color: "red",
+                position: worldToLocalPosition(internalRef, particles.particleRefA.current.translation())
+              }}  
+            />
+            <Circle 
+              id={`${id}-${i}.jointB`} 
+              debug={true}
+              initialState={{ 
+                radius: 0.1, 
+                color: "red",
+                position: worldToLocalPosition(internalRef, particles.particleRefB.current.translation())
+              }}  
+            />
+          </>
+        ))}
         {/*
         <CircleDrei 
           args={[jointRadius, 16]} 
