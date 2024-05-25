@@ -110,18 +110,19 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
   }, [radius, entityCount]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
-  const applyImpulseCount = useRef(0);
+  const applyImpulseCountRef = useRef(0);
   const maxDisplacement = radius;
-  const centerRef = new THREE.Vector3();
-  const prevEmergentCenter = useRef();
+  const centerRef = useRef(new THREE.Vector3());
+  const prevCenterRef = useRef();
   const internalRef = useRef();
-  const frameState = useRef("init");
+  const frameStateRef = useRef("init");
   const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
   const impulseRef = useRef();
   const [addJoints, setAddJoints] = useState(false);
   const jointRadius = radius / 10;
   const entitiesRegisteredRef = useRef(false);
   const entityParticlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
+  const [jointParticles, setJointParticles] = useState([]);
 
   useImperativeHandle(ref, () => internalRef.current);
 
@@ -205,10 +206,10 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
   };
 
   useEffect(() => {
-    // FOr now we add joints at the lowest emergent entity in the JSX
     if (addJoints && Entity.displayName != "Particle") {
-      const jointParticles = allocateJointsToParticles(particleRefs, jointPositions)
-      console.log("jointParticles", id, jointParticles)
+      const allocatedParticles = allocateJointsToParticles(particleRefs, jointPositions)
+      setJointParticles(allocatedParticles)
+      console.log("jointParticles", id, allocatedParticles)
     }
   }, [addJoints]);
 
@@ -258,7 +259,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
   
     //if (frameCount.current % 10 !== 0) return // every X frames
   
-    switch (frameState.current) {
+    switch (frameStateRef.current) {
       case "init":
         if (initialImpulse && entitiesRegisteredRef.current === true) {
           setInitialImpulse(false);
@@ -268,7 +269,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
               entity.current.addImpulse(initialImpulseVectors[i]);
             }
           });
-          frameState.current = "findCenter";
+          frameStateRef.current = "findCenter";
           setAddJoints(true);
           //console.log("Entity.displayName", id, Entity.displayName);
         }
@@ -276,15 +277,15 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
       case "findCenter":
         centerRef.current = (scope == 1) ? initialPositionVector : calculateCenter();
         internalRef.current.setCenter(centerRef.current);
-        if (prevEmergentCenter.current) {
-          frameState.current = "calcImpulse";
+        if (prevCenterRef.current) {
+          frameStateRef.current = "calcImpulse";
         }
         break;
       case "calcImpulse":
-        const displacement = centerRef.current.clone().sub(prevEmergentCenter.current);
+        const displacement = centerRef.current.clone().sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize(); // keep moving in the direction of the impulse
         impulseRef.current = impulseDirection.multiplyScalar(impulseScale * emergentEntityDensity);
-        frameState.current = "addImpulse";
+        frameStateRef.current = "addImpulse";
         break;
       case "addImpulse":
         entityRefs.forEach((entity, i) => {
@@ -295,21 +296,21 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
           }
         });
         internalRef.current.setImpulse(zeroVector);
-        frameState.current = "entityImpulses";
+        frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        applyImpulseCount.current += 1;
+        applyImpulseCountRef.current += 1;
   
         // Calculate 10% of entities per frame
         const numEntitiesToUpdate = Math.ceil(entityRefs.length * 0.1);
-        const startIndex = (applyImpulseCount.current % Math.ceil(entityRefs.length / numEntitiesToUpdate)) * numEntitiesToUpdate;
+        const startIndex = (applyImpulseCountRef.current % Math.ceil(entityRefs.length / numEntitiesToUpdate)) * numEntitiesToUpdate;
         const entityIndices = Array.from({ length: numEntitiesToUpdate }, (_, i) => (startIndex + i) % entityRefs.length);
   
-        //console.log("applyImpulseCount", id, startIndex)
+        //console.log("applyImpulseCountRef", id, startIndex)
         addImpulses(centerRef.current, impulseRef.current, entityIndices);
   
         if (startIndex + numEntitiesToUpdate >= entityRefs.length) {
-          frameState.current = "findCenter";
+          frameStateRef.current = "findCenter";
         }
         break;
       default:
@@ -317,7 +318,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
     }
   
     if (centerRef.current) {
-      prevEmergentCenter.current = centerRef.current.clone();
+      prevCenterRef.current = centerRef.current.clone();
     }
   
     const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
@@ -330,7 +331,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
     const endTime = performance.now(); // End timing
     const frameTime = endTime - startTime;
     if (frameTime > 16) {
-      console.log(`Frame time: ${frameTime.toFixed(3)} ms`,id, frameState.current);
+      console.log(`Frame time: ${frameTime.toFixed(3)} ms`,id, frameStateRef.current);
     }
   });
   
@@ -356,7 +357,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
       ))}
       
       {Entity.displayName == "Particle" && addJoints && entityRefs.map((ref, i) => (
-        <React.Fragment key={`fragment-${i}`}>
+        <React.Fragment key={`rope-fragment-${i}`}>
           {i > 0 && 
             <RopeJoint 
               a={entityRefs[i - 1].current} 
@@ -383,7 +384,21 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition = [0, 0, 0
             />}
         </React.Fragment>
       ))}
-      
+
+      {jointParticles.map((particles, i) => {
+        <RopeJoint 
+          a={particles.particleRefA.current} 
+          b={particles.particleRefB.current} 
+          ax={0}
+          ay={0}
+          az={0} 
+          bx={0}
+          by={0}
+          bz={0}
+          key={`${i}-joint`} 
+        />
+      })}
+
       {showScopes && (
         <>
           <Circle 
