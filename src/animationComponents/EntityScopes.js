@@ -49,7 +49,7 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
   useEffect(() => {
     if (registerParticlesFn && internalRef.current) {
       //console.log("registerParticlesFn", id, internalRef)
-      registerParticlesFn(index, [internalRef.current]);
+      registerParticlesFn(index, [internalRef.current], radius);
     }
   }, [registerParticlesFn, internalRef]);
 
@@ -92,10 +92,10 @@ const Particle = React.forwardRef(({ id, index, jointPosition, initialPosition, 
 
 Particle.displayName = 'Particle'; // the name property won't give the component's name since it uses forwardRef
 
-const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, debugInfo=true }, ref) => {
+const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, debugInfo=false }, ref) => {
   const getComponentRef = useStore((state) => state.getComponentRef);
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
-  const particleRefs = useRef([]);
+  const particleRefs = Array.from({ length: entityCount }, () => useRef([]));
   const emergentEntityArea = areaOfCircle(radius);
   const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
   const entityArea = areaOfCircle(entityRadius);
@@ -103,9 +103,9 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const entityPositions = useMemo(() => {
     return generateEntityPositions(radius - entityRadius, entityCount, entityRadius);
   }, [radius, entityRadius, entityCount]);
-  const jointPositions = useMemo(() => {
-    return generateJointPositions(entityPositions, entityRadius);
-  }, [radius, entityCount]);
+  const jointsData = useMemo(() => {
+    return generateJointsData(entityPositions);
+  }, [entityPositions]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
   const applyImpulseCountRef = useRef(0);
@@ -117,10 +117,12 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
   const impulseRef = useRef();
   const [addJoints, setAddJoints] = useState(false);
-  const jointRadius = radius / 10;
   const entitiesRegisteredRef = useRef(false);
   const entityParticlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
   const [jointParticles, setJointParticles] = useState([]);
+  const particleRadiusRef = useRef();
+
+  const debug = debugInfo;//id == "EntityScopes1-0-8";  
 
   useImperativeHandle(ref, () => internalRef.current);
 
@@ -128,17 +130,19 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     return entityParticlesRegisteredRef.current.every(ref => ref === true);
   };
 
-  const localRegisterParticlesFn = (indexToRegister, particleRefsToRegister) => {
+  const localRegisterParticlesFn = (indexToRegister, particleRefsToRegister, particleRadius) => {
     //console.log("localRegisterParticlesFn", id, indexToRegister, particleRefsToRegister)
-    particleRefs.current = [...particleRefs.current, ...particleRefsToRegister];
+    particleRefs[indexToRegister].current = [...particleRefs[indexToRegister].current, ...particleRefsToRegister];
+    particleRadiusRef.current = particleRadius;
     entityParticlesRegisteredRef.current[indexToRegister] = true;
     if (areAllParticlesRegistered() && !entitiesRegisteredRef.current) {
       entitiesRegisteredRef.current = true;
+      const flattenedParticleRefs = particleRefs.flatMap(refs => refs.current);
       if (registerParticlesFn) {
-        registerParticlesFn(index, particleRefs.current);
+        registerParticlesFn(index, flattenedParticleRefs, particleRadius);
       }
       if (scope == 1) {
-        console.log("All particles registered", id, particleRefs.current.length, entityParticlesRegisteredRef.current);
+        console.log("All particles registered", id, flattenedParticleRefs.length, jointsData);
       }
     }
   };
@@ -153,69 +157,89 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   useEffect(() => {
     //console.log("entityPositions", id, "scope", scope, "radius", radius, "entityPositions", entityPositions, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
     //if (scope == 3) console.log("entityRefs[1] entityRefs[0]", entityRefs[1], entityRefs[0]);
-    //console.log("jointPositions", jointPositions);
+    //console.log("jointsData", id, jointsData);
   }, [entityRefs]); // Will only update during  arender not when ref changes
 
   //  The joint positions need to be shown so we can check these
   // Positions are relative to the radius of next level down ? Because we were allocating to particles
   // Move to instantiating joints from the emergent entity
-  const allocateJointsToParticles = (particleRefs, jointPositions) => {
+  // Not taking into account the joint being between two partcles 
+  //   Map to nearest entities and push down to find nearest particles - needs a rethink 
+  const allocateJointsToParticles = (particleRefs, jointsData) => {
+    if (debug) console.log("allocateJointsToParticles", particleRefs, jointsData)
     // Create a new Vector3 to store the world position of this emergent entity
     const worldPosition = new THREE.Vector3();
     internalRef.current.getWorldPosition(worldPosition);
     const particleWorldPosition = new THREE.Vector3();
-    const distances = jointPositions.map((joint, i) => {
+    const allocateJoints = jointsData.map((jointData, i) => {
       let minDistanceA = Infinity;
-      let closestParticleA = null;
+      let closestParticleAIndex = null;
       let closestParticleAPosition = new THREE.Vector3();
+      let particleAEntity = null;
       let minDistanceB = Infinity;
-      let closestParticleB = null;
+      let closestParticleBIndex = null;
       let closestParticleBPosition = new THREE.Vector3();
-      // Convert joint to world position
-      particleRefs.current.forEach((particleRef, j) => {
-        //console.log("particleRef", id, particleRef)
-        // We use translation because this is a RigidBody 
-        const pos = particleRef.current.translation();
-        particleWorldPosition.set(pos.x, pos.y, pos.z);
-        const distanceA = particleWorldPosition.distanceTo(new THREE.Vector3(joint.ax + worldPosition.x, joint.ay + worldPosition.y, joint.az + worldPosition.z));
-        const distanceB = particleWorldPosition.distanceTo(new THREE.Vector3(joint.bx + worldPosition.x, joint.by + worldPosition.y, joint.bz + worldPosition.z));
-        if (distanceA < minDistanceA) {
-          minDistanceA = distanceA;
-          closestParticleA = j;
-          closestParticleAPosition.copy(particleWorldPosition);
-        }
-        if (distanceB < minDistanceB) {
-          minDistanceB = distanceB;
-          closestParticleB = j;
-          closestParticleBPosition.copy(particleWorldPosition);
-        }
-        /*
-        console.log("Allocating joints to particles with the following details:", {
-          ID: id,
-          "Position": pos,
-          "Particle World Position": particleWorldPosition,
-          "Distance A": distanceA,
-          "Distance B": distanceB
-        }); 
-        */       
+      let particleBEntity = null;
+
+      // Find the two closest particles in different entities
+      particleRefs.forEach((entityParticleRefs, entityIndex) => {
+        entityParticleRefs.current.forEach((particleRef, j) => {
+          const pos = particleRef.current.translation();
+          particleWorldPosition.set(pos.x, pos.y, pos.z);
+          const distance = particleWorldPosition.distanceTo(new THREE.Vector3(jointData.position.x + worldPosition.x, jointData.position.y + worldPosition.y, jointData.position.z + worldPosition.z));
+          if (distance < minDistanceA) {
+            minDistanceA = distance;
+            closestParticleAIndex = j; // will be 0 all the time at the lowest level (one particle per entity)
+            closestParticleAPosition.copy(particleWorldPosition);
+            particleAEntity = entityIndex;
+          }   
+        });
       });
+
+      particleRefs.forEach((entityParticleRefs, entityIndex) => {
+        if (entityIndex === particleAEntity) return;
+        entityParticleRefs.current.forEach((particleRef, j) => {
+          const pos = particleRef.current.translation();
+          particleWorldPosition.set(pos.x, pos.y, pos.z);
+          const distance = particleWorldPosition.distanceTo(new THREE.Vector3(jointData.position.x + worldPosition.x, jointData.position.y + worldPosition.y, jointData.position.z + worldPosition.z));
+          if (distance < minDistanceB) {
+            minDistanceB = distance;
+            closestParticleBIndex = j; // will be 0 all the time at the lowest level (one particle per entity)
+            closestParticleBPosition.copy(particleWorldPosition);
+            particleBEntity = entityIndex;
+          }     
+        });
+      });
+
+      // Calculate the direction vector between the two closest particles
+      const direction = new THREE.Vector3()
+        .subVectors(closestParticleBPosition, closestParticleAPosition)
+        .normalize();
+
+      // Calculate the offsets
+      const offsetA = direction.clone().multiplyScalar(particleRadiusRef.current);
+      const offsetB = direction.clone().multiplyScalar(-particleRadiusRef.current);
+
       return {
-        particleRefA: particleRefs.current[closestParticleA],
+        particleRefA: particleRefs[particleAEntity].current[closestParticleAIndex],
         particlePosA: closestParticleAPosition.clone(),
-        particleRefB: particleRefs.current[closestParticleB],
+        particleAEntity: particleAEntity,
+        closestParticleAIndex: closestParticleAIndex,
+        ax: offsetA.x,
+        ay: offsetA.y,
+        az: offsetA.z,
+        particleRefB: particleRefs[particleBEntity].current[closestParticleBIndex],
         particlePosB: closestParticleBPosition.clone(),
+        particleBEntity: particleBEntity,
+        closestParticleBIndex: closestParticleBIndex,
+        bx: offsetB.x,
+        by: offsetB.y,
+        bz: offsetB.z,
       };
     });
-    return distances;
-  };
+    return allocateJoints;
+};
 
-  useEffect(() => {
-    if (addJoints && Entity.displayName != "Particle") {
-      const allocatedParticles = allocateJointsToParticles(particleRefs, jointPositions)
-      setJointParticles(allocatedParticles)
-      console.log("jointParticles", id, allocatedParticles)
-    }
-  }, [addJoints]);
 
   const calculateCenter = () => {
     const center = new THREE.Vector3();
@@ -273,8 +297,10 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
               entity.current.addImpulse(initialImpulseVectors[i]);
             }
           });
-          //frameStateRef.current = "findCenter";
-          setAddJoints(true);
+          frameStateRef.current = "findCenter";
+          const allocatedJoints = allocateJointsToParticles(particleRefs, jointsData)
+          setJointParticles(allocatedJoints)
+          //console.log("allocatedJoints", id, allocatedJoints)
           //console.log("Entity.displayName", id, Entity.displayName);
         }
         break;
@@ -339,10 +365,29 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     }
   });
 
-  const worldToLocalPosition = (groupRef, worldPosition) => {
+  const localJointPosition = (groupRef, particles, side) => {
+    let worldPosition;
+    let xOffset;
+    let yOffset;
+    let zOffset;
+    if (side == "A") {
+      worldPosition = particles.particleRefA.current.translation();
+      xOffset = particles.ax;
+      yOffset = particles.ay;
+      zOffset = 0.4;
+    } else {
+      worldPosition = particles.particleRefB.current.translation();
+      xOffset = particles.bx;
+      yOffset = particles.by;
+      zOffset = 0.5;
+    }
     const worldVector = new THREE.Vector3(worldPosition.x, worldPosition.y, worldPosition.z);
     const localVector = groupRef.current.worldToLocal(worldVector);
-    return localVector;
+    localVector.x += xOffset;
+    localVector.y += yOffset;
+    localVector.z += zOffset;
+    const result = [localVector.x, localVector.y, localVector.z];
+    return result
   };  
 
   return (
@@ -358,59 +403,28 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
           scope={scope + 1}
           index={i}
           ref={entityRefs[i]}
-          jointPosition={jointPositions[i]}
+          jointPosition={jointsData[i]}
           registerParticlesFn={localRegisterParticlesFn}
-          debugInfo={debugInfo}
+          debugInfo={debug}
         />
-      ))}
-      
-      {false && Entity.displayName == "Particle" && addJoints && entityRefs.map((ref, i) => (
-        <React.Fragment key={`rope-fragment-${i}`}>
-          {i > 0 && 
-            <RopeJoint 
-              a={entityRefs[i - 1].current} 
-              b={ref.current} 
-              ax={jointPositions[i-1].ax} 
-              ay={jointPositions[i-1].ay} 
-              az={jointPositions[i-1].az} 
-              bx={jointPositions[i].bx} 
-              by={jointPositions[i].by} 
-              bz={jointPositions[i].bz} 
-              id={`${id}-${i}-rope`}
-              key={`${id}-${i}-rope`} 
-            />}
-          {i === entityRefs.length - 1 && 
-            <RopeJoint 
-              a={ref.current} 
-              b={entityRefs[0].current}
-              ax={jointPositions[entityRefs.length - 1].ax} 
-              ay={jointPositions[entityRefs.length - 1].ay} 
-              az={jointPositions[entityRefs.length - 1].az} 
-              bx={jointPositions[0].bx} 
-              by={jointPositions[0].by} 
-              bz={jointPositions[0].bz} 
-              id={`${id}-${i}-last-to-first-rope`}
-              key={`${id}-${i}-last-to-first-rope`} 
-            />}
-        </React.Fragment>
       ))}
 
       {jointParticles.map((particles, i) => (
         <RopeJoint 
           a={particles.particleRefA} 
           b={particles.particleRefB} 
-          ax={0}
-          ay={0}
-          az={0} 
-          bx={0}
-          by={0}
-          bz={0}
+          ax={particles.ax}
+          ay={particles.ay}
+          az={particles.az} 
+          bx={particles.bx}
+          by={particles.by}
+          bz={particles.bz}
           key={`${id}-${i}-emergent-joint`}
           id={`${id}-${i}-emergent-joint`}
         />
       ))}
 
-      {debugInfo && (
+      {debug && Entity.displayName == "Particle" && (
         <>
           <Circle 
             id={`${id}.CircleInitialPosition`} 
@@ -430,13 +444,29 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
           />
           {jointParticles.map((particles, i) => (
             <>
+              <CircleDrei
+                args={[0.1, 8]} 
+                position={localJointPosition(internalRef, particles, "A")}
+                material-color="red"
+              />
+              <CircleDrei
+                args={[0.1, 8]} 
+                position={localJointPosition(internalRef, particles, "B")}
+                material-color="green"
+              />
+              {/*}
               <Circle 
                 id={`${id}-${i}.jointA`}
                 //debug={true}
                 initialState={{ 
                   radius: 0.2 / scope, 
                   color: "red",
-                  position: worldToLocalPosition(internalRef, particles.particleRefA.current.translation())
+                  opacity: 0.4,
+                  position: (() => {
+                    let pos = localJointPosition(internalRef, particles.particleRefA.current.translation());
+                    pos.z += 0.4;
+                    return pos;
+                  })(),
                 }}  
               />
               <Circle 
@@ -444,22 +474,28 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
                 //debug={true}
                 initialState={{ 
                   radius: 0.2 / scope, 
-                  color: "red",
-                  position: worldToLocalPosition(internalRef, particles.particleRefB.current.translation())
+                  color: "green",
+                  opacity: 0.4,
+                  position: (() => {
+                    let pos = localJointPosition(internalRef, particles.particleRefB.current.translation());
+                    pos.z += 0.4;
+                    return pos;
+                  })(),
                 }}  
               />
+              */}
             </>
           ))}
-          {jointPositions.map((jointPosition, i) => (
+          {jointsData.map((data, i) => (
             <CircleDrei
               args={[0.1, 16]} 
-              position={[jointPosition.ax, jointPosition.ay, 0.3]}
+              position={[data.position.x, data.position.y, 0.3]}
             />
           ))}
         </>
       )}
     </CustomGroup>
-    {debugInfo && (
+    {debug && (
       <>
         <Text
           position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
@@ -525,17 +561,38 @@ const areaOfCircle = (radius) => {
   return Math.PI * Math.pow(radius, 2);
 };
 
-const generateJointPositions = (positions, entityRadius) => {
-  const jointPositions = positions.map((pos, i) => {
-    const nextPos = positions[(i + 1) % positions.length];
+const generateJointsData = (positions) => {
+  const jointsData = positions.map((pos, i) => {
+    let nextPos;
+    if (i == positions.length - 1) {
+      nextPos = positions[0];
+    } else {
+      nextPos = positions[i + 1];
+    }
+    
+    // Calculate midpoint
+    const midX = (pos.x + nextPos.x) / 2;
+    const midY = (pos.y + nextPos.y) / 2;
+    const midZ = (pos.z + nextPos.z) / 2;
+    
+    // Calculate direction vector
+    const dirX = nextPos.x - pos.x;
+    const dirY = nextPos.y - pos.y;
+    const dirZ = nextPos.z - pos.z;
+    
     return {
-      ax: entityRadius * Math.cos(Math.atan2(nextPos.y - pos.y, nextPos.x - pos.x)),
-      ay: entityRadius * Math.sin(Math.atan2(nextPos.y - pos.y, nextPos.x - pos.x)),
-      az: 0,
-      bx: -entityRadius * Math.cos(Math.atan2(nextPos.y - pos.y, nextPos.x - pos.x)),
-      by: -entityRadius * Math.sin(Math.atan2(nextPos.y - pos.y, nextPos.x - pos.x)),
-      bz: 0,
+      position: {
+        x: midX,
+        y: midY,
+        z: midZ,
+      },
+      direction: {
+        x: dirX,
+        y: dirY,
+        z: dirZ,
+      },
     };
   });
-  return jointPositions;
+  return jointsData;
 };
+
