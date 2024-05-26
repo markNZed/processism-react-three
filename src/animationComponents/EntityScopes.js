@@ -127,12 +127,12 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   // Constants impacting particle behavior
   ////////////////////////////////////////
   const impulsePerParticle = 0.01;
-  const overshootScaling = impulsePerParticle / 2;
+  const overshootScaling = impulsePerParticle;
   const maxDisplacement = radius;
   
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
-    (Math.random() - 0.5) * impulsePerParticle * 2,
-    (Math.random() - 0.5) * impulsePerParticle * 2,
+    (Math.random() - 0.5) * impulsePerParticle,
+    (Math.random() - 0.5) * impulsePerParticle,
     0
   ));
 
