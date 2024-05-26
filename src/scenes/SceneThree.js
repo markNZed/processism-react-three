@@ -6,6 +6,7 @@ import { AnimationController } from '../AnimationController'; // Adjust import p
 import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
 import { Physics, useRapier } from '@react-three/rapier';
+import { Perf } from 'r3f-perf'
 
 /****************************
 Scene Description:
@@ -53,6 +54,7 @@ function SceneThree() {
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
             <Physics gravity={[0, 0, 0]} timestep={fixedDelta} paused={true} >
+                <Perf />
                 <Scene>
 
                     {/*
