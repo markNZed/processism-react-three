@@ -47,11 +47,12 @@ function SceneThree() {
   };
 
   //timestep defaults to 1 / 60
+  // Physics allowSleep={true} ?
 
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]} timestep={fixedDelta} paused={true}>
+            <Physics gravity={[0, 0, 0]} timestep={fixedDelta} paused={true} >
                 <Scene>
 
                     {/*

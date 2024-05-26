@@ -25,3 +25,6 @@ config = {
 Pass down a ref to runtimeConfig ?
 
 https://github.com/utsuboco/r3f-perf
+https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance
+https://rapier.rs/docs/user_guides/rust/common_mistakes/
+https://www.dhiwise.com/post/The%20Role%20of%20React%20Three%20Fiber%20in%20the%20Evolution%20of%20User%20Interface%20Design

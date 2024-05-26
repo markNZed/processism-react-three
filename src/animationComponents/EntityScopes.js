@@ -38,19 +38,10 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
 
-  // Unsure if this is really having much effect, it should, but maybe setting FPS is enough
-  // I guess there are still a lot of calculations to do with or without the impulses
-  const FRAMES_PER_IMPULSE = 1;
-  const frameCount = useRef(0);
-  const initialFrame = Math.floor(Math.random() * FRAMES_PER_IMPULSE);
-
   useFrame(() => {
-    if (frameCount.current >= initialFrame && (frameCount.current - initialFrame) % FRAMES_PER_IMPULSE === 0) {
-      if (internalRef.current.applyImpulses) {
-        internalRef.current.applyImpulses();
-      }
+    if (internalRef.current.applyImpulses) {
+      internalRef.current.applyImpulses();
     }
-    frameCount.current += 1;
   });
 
   useEffect(() => {
@@ -129,16 +120,19 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const entityParticlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
   const [joints, setJoints] = useState([]);
   const particleRadiusRef = useRef(); 
+  const particleCountRef = useRef();
+  const particleAreaRef = useRef();
 
   ////////////////////////////////////////
   // Constants impacting particle behavior
   ////////////////////////////////////////
-  const impulseScale = entityArea * entityArea * 0.02;
-  const overshootScaling = 0.01;
+  const impulsePerParticle = 0.01;
+  const overshootScaling = impulsePerParticle / 2;
   const maxDisplacement = radius;
+  
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
-    (Math.random() - 0.5) * impulseScale * 2,
-    (Math.random() - 0.5) * impulseScale * 2,
+    (Math.random() - 0.5) * impulsePerParticle * 2,
+    (Math.random() - 0.5) * impulsePerParticle * 2,
     0
   ));
 
@@ -165,6 +159,8 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       if (registerParticlesFn) {
         registerParticlesFn(index, flattenedParticleRefs, particleRadius);
       }
+      particleCountRef.current = flattenedParticleRefs.length;
+      particleAreaRef.current = calculateCircleArea(particleRadius);
       if (scope == 1) {
         console.log("All particles registered", id, flattenedParticleRefs.length, jointsData);
       }
@@ -275,10 +271,10 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
           if (displacement.length() > maxDisplacement) {
             const overshoot = displacement.length() - maxDisplacement;
             const directionToCenter = displacement.negate().normalize();
-            directionToCenter.multiplyScalar(impulseScale * overshoot * overshootScaling);
+            directionToCenter.multiplyScalar(impulse * overshoot * overshootScaling / entityRefs.length);
             entity.current.addImpulse(directionToCenter);
           } else {
-            entity.current.addImpulse(impulse);
+            entity.current.addImpulse(impulse / entityRefs.length);
           }
         }
       }
@@ -318,7 +314,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         // Could calculate velocity and direction here
         const displacement = centerRef.current.clone().sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize(); // keep moving in the direction of the displacement
-        impulseRef.current = impulseDirection.multiplyScalar(impulseScale * density);
+        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current);
         frameStateRef.current = "addImpulse";
         break;
       case "addImpulse":
@@ -486,23 +482,26 @@ const Scope3 = React.forwardRef((props, ref) => (
 ));
 
 const Scope2 = React.forwardRef((props, ref) => (
-  <CompoundEntity id={"Scope2"} {...props} ref={ref} Entity={Scope3} entityCount={9} color={getRandomColor()} />
+  <CompoundEntity id={"Scope2"} {...props} ref={ref} Entity={Scope3} entityCount={16} color={getRandomColor()} />
 ));
 
 const EntityScopes = React.forwardRef((props, ref) => {
-
   const { step } = useRapier();
-  const fixedDelta = 1 / 30; // FPS
+  const framesPerStep = 4; // Update every framesPerStep frames
+  const fixedDelta = 1 / 30; // Fixed time step for physics
+  const frameCount = useRef(0);
 
   useFrame(() => {
-    // Manually step the physics world
-    step(fixedDelta);
+    frameCount.current++;
+    if (frameCount.current >= framesPerStep) {
+      step(fixedDelta);
+      frameCount.current = 0; // Reset the frame count
+    }
   });
 
   return (
     <CompoundEntity id={"Scope1"} {...props} ref={ref} Entity={Scope2} entityCount={9} />
   );
-
 });
 
 export default withAnimationState(EntityScopes);
