@@ -16,3 +16,10 @@ Use a shader to make the particle look like a blob.
 Use a shader to allow for an a bloblike "ovverlay" of emergent entities
 
 Draw realtions within emergent entity - like a radial graph
+
+Pass config into emergent entity e.g.
+config = {
+  entityCounts: [9,9,21],
+  radius: 10
+}
+Pass down a ref to runtimeConfig ?
