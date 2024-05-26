@@ -49,7 +49,7 @@ function SceneThree() {
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]} timestep={1/10} >
+            <Physics gravity={[0, 0, 0]} timestep={1/30} >
                 <Scene>
 
                     {/*
