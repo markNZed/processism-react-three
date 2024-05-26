@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Circle as CircleDrei, Text } from '@react-three/drei';
-import MyRigidBody from './MyRigidBody';
+import ParticleRigidBody from './ParticleRigidBody';
 import CustomGroup from './CustomGroup'; 
 import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
@@ -32,7 +32,7 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
   return null
 }
 
-// The Particle uses MyRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
+// The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, registerParticlesFn, parentDebug }, ref) => {
   
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
@@ -52,7 +52,7 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
 
   return (
     <>
-    <MyRigidBody
+    <ParticleRigidBody
       ref={internalRef}
       position={initialPosition}
       type="dynamic"
@@ -66,7 +66,7 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
       <CircleDrei args={[radius, 16]}>
         <meshStandardMaterial color={color} />
       </CircleDrei>
-    </MyRigidBody>
+    </ParticleRigidBody>
     {parentDebug && (
       <>
         <Text
@@ -126,7 +126,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   ////////////////////////////////////////
   // Constants impacting particle behavior
   ////////////////////////////////////////
-  const impulsePerParticle = 0.01;
+  const impulsePerParticle = 0.02;
   const overshootScaling = impulsePerParticle;
   const maxDisplacement = radius;
   
@@ -292,7 +292,8 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         if (applyInitialImpulse && entitiesRegisteredRef.current === true) {
           setApplyInitialImpulse(false);
           entityRefs.forEach((entity, i) => {
-            if (entity.current && scope != 1) {
+            // Don't apply impulses to Particles to improve performance
+            if (entity.current && Entity.displayName != "Particle") {
               // Add an impulse that is unique to each entity
               entity.current.addImpulse(initialImpulseVectors[i]);
             }

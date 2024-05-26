@@ -2,7 +2,7 @@ import React, { forwardRef, useRef, useImperativeHandle, useEffect } from 'react
 import { RigidBody as RapierRigidBody } from '@react-three/rapier';
 import * as THREE from 'three';
 
-const MyRigidBody = forwardRef((props, ref) => {
+const ParticleRigidBody = forwardRef((props, ref) => {
   const internalRef = useRef();
   const impulseRef = useRef(new THREE.Vector3());
 
@@ -51,4 +51,4 @@ const MyRigidBody = forwardRef((props, ref) => {
   );
 });
 
-export default MyRigidBody;
+export default ParticleRigidBody;
