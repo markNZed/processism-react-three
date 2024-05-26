@@ -306,7 +306,10 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        entityImpulses(centerRef.current, impulseRef.current);
+        // Don't apply impulses to particles to improve performance
+        if (Entity.displayName != "Particle") {
+          entityImpulses(centerRef.current, impulseRef.current);
+        }
         frameStateRef.current = "findCenter";
         break;
       default:
@@ -386,7 +389,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         />
       ))}
 
-      {debug && Entity.displayName == "Particle" && (
+      {debug && (
         <>
           <Circle 
             id={`${id}.CircleInitialPosition`} 
