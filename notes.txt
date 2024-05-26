@@ -15,7 +15,7 @@ Use a shader to make the particle look like a blob.
 
 Use a shader to allow for an a bloblike "ovverlay" of emergent entities
 
-Draw realtions within emergent entity - like a radial graph
+Draw relations within emergent entity - like a radial graph
 
 Pass config into emergent entity e.g.
 config = {
@@ -23,3 +23,5 @@ config = {
   radius: 10
 }
 Pass down a ref to runtimeConfig ?
+
+https://github.com/utsuboco/r3f-perf

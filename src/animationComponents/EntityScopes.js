@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
-import { useSphericalJoint } from '@react-three/rapier';
+import { useSphericalJoint, useRapier } from '@react-three/rapier';
 
 // Add a repellant force 
 // requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
@@ -38,7 +38,9 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
 
-  const FRAMES_PER_IMPULSE = 10;
+  // Unsure if this is really having much effect, it should, but maybe setting FPS is enough
+  // I guess there are still a lot of calculations to do with or without the impulses
+  const FRAMES_PER_IMPULSE = 1;
   const frameCount = useRef(0);
   const initialFrame = Math.floor(Math.random() * FRAMES_PER_IMPULSE);
 
@@ -68,6 +70,7 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
       angularDamping={0.5}
       enabledTranslations={[true, true, false]}
       enabledRotations={[false, false, true]}
+      restitution={1}
     >
       <CircleDrei args={[radius, 16]}>
         <meshStandardMaterial color={color} />
@@ -127,17 +130,20 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const [joints, setJoints] = useState([]);
   const particleRadiusRef = useRef(); 
 
+  ////////////////////////////////////////
   // Constants impacting particle behavior
-  const impulseScale = entityArea * 0.03;
+  ////////////////////////////////////////
+  const impulseScale = entityArea * entityArea * 0.02;
+  const overshootScaling = 0.01;
+  const maxDisplacement = radius;
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
     (Math.random() - 0.5) * impulseScale * 2,
     (Math.random() - 0.5) * impulseScale * 2,
     0
   ));
-  const maxDisplacement = radius;
-  const overshootScaling = 0.01;
 
   useEffect(() => {
+    //console.log("entityArea", id, entityArea)
     if (isDebug) {
       //console.log("jointsData", id, jointsData);
     }
@@ -469,17 +475,35 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
 // Instead of using an explicit instantiation of the scopes refactor to use a config and a single instantiation of CompoundEntity
 // Could also introduce a runtimeConfig that all CompoundEntity can update
 
-const EntityScope3 = React.forwardRef((props, ref) => (
+/*
+const Scope4 = React.forwardRef((props, ref) => (
+  <CompoundEntity id={"Scope4"} {...props} ref={ref} Entity={Particle} entityCount={21} />
+));
+*/
+
+const Scope3 = React.forwardRef((props, ref) => (
   <CompoundEntity id={"Scope3"} {...props} ref={ref} Entity={Particle} entityCount={21} />
 ));
 
-const EntityScope2 = React.forwardRef((props, ref) => (
-  <CompoundEntity id={"Scope2"} {...props} ref={ref} Entity={EntityScope3} entityCount={9} color={getRandomColor()} />
+const Scope2 = React.forwardRef((props, ref) => (
+  <CompoundEntity id={"Scope2"} {...props} ref={ref} Entity={Scope3} entityCount={9} color={getRandomColor()} />
 ));
 
-const EntityScopes = React.forwardRef((props, ref) => (
-  <CompoundEntity id={"Scope1"} {...props} ref={ref} Entity={EntityScope2} entityCount={9} />
-));
+const EntityScopes = React.forwardRef((props, ref) => {
+
+  const { step } = useRapier();
+  const fixedDelta = 1 / 30; // FPS
+
+  useFrame(() => {
+    // Manually step the physics world
+    step(fixedDelta);
+  });
+
+  return (
+    <CompoundEntity id={"Scope1"} {...props} ref={ref} Entity={Scope2} entityCount={9} />
+  );
+
+});
 
 export default withAnimationState(EntityScopes);
 

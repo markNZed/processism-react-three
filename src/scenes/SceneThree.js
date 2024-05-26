@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
-import { Physics } from '@react-three/rapier';
+import { Physics, useRapier } from '@react-three/rapier';
 
 /****************************
 Scene Description:
@@ -33,6 +33,8 @@ function SceneThree() {
         //[0, 'emergent1', { variant: "default" }],
     ];
 
+    const fixedDelta = 1 / 30; // 30 FPS
+
   const cameraInitialState = {
     position: [0, 0, 35],
     zoom: 35,
@@ -49,7 +51,7 @@ function SceneThree() {
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]} timestep={1/30} >
+            <Physics gravity={[0, 0, 0]} timestep={fixedDelta} paused={true}>
                 <Scene>
 
                     {/*
