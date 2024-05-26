@@ -20,9 +20,11 @@ import { useSphericalJoint } from '@react-three/rapier';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
-const RopeJoint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
+// Joints connect Particles and when the joints form a loop the boundary will behave like a softbody
+const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
+  // Scaling the joint can create space between the particles
   const scale = 1;
-  //const scale = 1 + Math.random();
+  //const scale = 1 + Math.random(); // A more organic form
   useSphericalJoint(a, b, [
     [ax * scale, ay * scale, az * scale],
     [bx * scale, by * scale, bz * scale]
@@ -30,14 +32,15 @@ const RopeJoint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
   return null
 }
 
+// The Particle uses MyRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, registerParticlesFn, parentDebug }, ref) => {
   
-  const internalRef = useRef();
+  const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
+  useImperativeHandle(ref, () => internalRef.current);
+
   const FRAMES_PER_IMPULSE = 10;
   const frameCount = useRef(0);
   const initialFrame = Math.floor(Math.random() * FRAMES_PER_IMPULSE);
-
-  useImperativeHandle(ref, () => internalRef.current);
 
   useFrame(() => {
     if (frameCount.current >= initialFrame && (frameCount.current - initialFrame) % FRAMES_PER_IMPULSE === 0) {
@@ -89,11 +92,12 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
 
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
-const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, parentDebug=false }, ref) => {
+// 
+const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, parentDebug=false }, ref) => {
 
   const isDebug = parentDebug;//id == "EntityScopes1-0-8";
   
-  // Using forwardRef but need to access the ref from inside this component too
+  // Using forwardRef and need to access the ref from inside this component too
   const internalRef = useRef();
   useImperativeHandle(ref, () => internalRef.current);
 
@@ -106,7 +110,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const entityArea = calculateCircleArea(entityRadius);
   const density = area / (entityArea * entityCount)
   const entityPositions = useMemo(() => {
-    return generateEntityPositions(radius - entityRadius, entityCount, entityRadius);
+    return generateEntityPositions(radius - entityRadius, entityCount);
   }, [radius, entityRadius, entityCount]);
   const jointsData = useMemo(() => {
     return generateJointsData(entityPositions);
@@ -123,6 +127,16 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const [joints, setJoints] = useState([]);
   const particleRadiusRef = useRef(); 
 
+  // Constants impacting particle behavior
+  const impulseScale = entityArea * 0.03;
+  const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
+    (Math.random() - 0.5) * impulseScale * 2,
+    (Math.random() - 0.5) * impulseScale * 2,
+    0
+  ));
+  const maxDisplacement = radius;
+  const overshootScaling = 0.01;
+
   useEffect(() => {
     if (isDebug) {
       //console.log("jointsData", id, jointsData);
@@ -134,7 +148,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   };
 
   // Pass up the Particle refs so we can find Particles for joints at the scope of this entity
-  // The particle radius gets passed up using registerParticlesFn to calculate joint offsets
+  // The particle radius gets passed up to calculate joint offsets
   const localRegisterParticlesFn = (entityIndex, particleRefs, particleRadius) => {
     entityParticlesRefs[entityIndex].current = [...entityParticlesRefs[entityIndex].current, ...particleRefs];
     particleRadiusRef.current = particleRadius;
@@ -150,16 +164,6 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       }
     }
   };
-
-  // Constants impacting particle behavior
-  const impulseScale = entityArea * 0.03;
-  const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
-    (Math.random() - 0.5) * impulseScale * 2,
-    (Math.random() - 0.5) * impulseScale * 2,
-    0
-  ));
-  const maxDisplacement = radius;
-  const overshootScaling = 0.01;
 
   const allocateJointsToParticles = (entityParticlesRefs, jointsData) => {
     if (isDebug) console.log("allocateJointsToParticles", entityParticlesRefs, jointsData)
@@ -235,8 +239,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       };
     });
     return allocateJoints;
-};
-
+  };
 
   const calculateCenter = () => {
     const center = new THREE.Vector3();
@@ -283,6 +286,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     // A state machine allows for computation to be distributed across frames, reducng load on the physics engine
     switch (frameStateRef.current) {
       case "init":
+        // Initial random impulse to get more interesting behavior
         if (applyInitialImpulse && entitiesRegisteredRef.current === true) {
           setApplyInitialImpulse(false);
           entityRefs.forEach((entity, i) => {
@@ -299,6 +303,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       case "findCenter":
         centerRef.current = (scope == 1) ? initialPositionVector : calculateCenter();
         internalRef.current.setCenter(centerRef.current);
+        // Wait until prevCenterRef is set so we can assume it is there in later states
         if (prevCenterRef.current) {
           frameStateRef.current = "calcImpulse";
         }
@@ -311,14 +316,14 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         frameStateRef.current = "addImpulse";
         break;
       case "addImpulse":
-        entityRefs.forEach((entity, i) => {
+        entityRefs.forEach((entity) => {
             entity.current.addImpulse(internalRef.current.getImpulse());
         });
         internalRef.current.setImpulse(ZERO_VECTOR);
         frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        // Don't apply impulses to particles to improve performance
+        // Don't apply impulses to Particles to improve performance
         if (Entity.displayName != "Particle") {
           entityImpulses(centerRef.current, impulseRef.current);
         }
@@ -328,7 +333,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         break;
     }
   
-    // For tracking the movement and calculating displacement
+    // For tracking movement and calculating displacement
     if (centerRef.current) {
       prevCenterRef.current = centerRef.current.clone();
     }
@@ -344,7 +349,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   
   });
 
-  // This is used for isDebug
+  // This is used only for debug
   const localJointPosition = (groupRef, particles, side) => {
     let worldPosition;
     let xOffset;
@@ -389,7 +394,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       ))}
 
       {joints.map((particles, i) => (
-        <RopeJoint 
+        <Joint 
           a={particles.particleRefA} 
           b={particles.particleRefB} 
           ax={particles.ax}
@@ -461,19 +466,19 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   );
 });
 
-// Instead of using an explicit instantiation of the scopes refactor to use a config and a single instantiation of EmergentEntity
-// Could also introduce a runtimeConfig that all EmergentEntity can update
+// Instead of using an explicit instantiation of the scopes refactor to use a config and a single instantiation of CompoundEntity
+// Could also introduce a runtimeConfig that all CompoundEntity can update
 
 const EntityScope3 = React.forwardRef((props, ref) => (
-  <EmergentEntity id={"Scope3"} {...props} ref={ref} Entity={Particle} entityCount={21} />
+  <CompoundEntity id={"Scope3"} {...props} ref={ref} Entity={Particle} entityCount={21} />
 ));
 
 const EntityScope2 = React.forwardRef((props, ref) => (
-  <EmergentEntity id={"Scope2"} {...props} ref={ref} Entity={EntityScope3} entityCount={9} color={getRandomColor()} />
+  <CompoundEntity id={"Scope2"} {...props} ref={ref} Entity={EntityScope3} entityCount={9} color={getRandomColor()} />
 ));
 
 const EntityScopes = React.forwardRef((props, ref) => (
-  <EmergentEntity id={"Scope1"} {...props} ref={ref} Entity={EntityScope2} entityCount={9} />
+  <CompoundEntity id={"Scope1"} {...props} ref={ref} Entity={EntityScope2} entityCount={9} />
 ));
 
 export default withAnimationState(EntityScopes);
