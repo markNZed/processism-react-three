@@ -26,7 +26,7 @@ Instead of bottom-up: inside-out
 
 function SceneThree() {
 
-    const emergentEntityRadius = 3.5;
+    const emergentEntityRadius = 10;
 
     // Delay, animationComponent id, animationState
     const animationSequence = [
@@ -44,12 +44,12 @@ function SceneThree() {
     far: 100
   };
 
-  //timestep deafults to 1 / 60
+  //timestep defaults to 1 / 60
 
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]} timestep={1/30} >
+            <Physics gravity={[0, 0, 0]} timestep={1/10} >
                 <Scene>
 
                     {/*
@@ -98,7 +98,7 @@ function SceneThree() {
 
                     <EntityScopes
                         id="EntityScopes1"
-                        radius={10}
+                        radius={emergentEntityRadius}
                         color="blue"
                     />
 

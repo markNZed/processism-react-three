@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Circle as CircleDrei, Text } from '@react-three/drei';
-import RigidBody from './RigidBody';
+import MyRigidBody from './MyRigidBody';
 import CustomGroup from './CustomGroup'; 
 import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
@@ -11,19 +11,16 @@ import { useSphericalJoint } from '@react-three/rapier';
 
 // Add a repellant force 
 // requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
-// This means that each frame has about 16.67 milliseconds for all the rendering and updates to occur.
+// Each frame has 16.67 milliseconds for all the rendering and updates to occur.
 
 // Use https://github.com/pmndrs/react-three-rapier/tree/main/packages/react-three-rapier-addons#attractors
 // Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
 
 // Maybe pass all the refs up and then from top level instantiate Particles and Joints
-// Pass all the Joints up
-// Create all Joints from top - or maybe at the emergent level (it should have access to all the Particles)
 
 const zeroVector = new THREE.Vector3();
 
 const RopeJoint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
-  //console.log("RopeJoint", id, a, b);
   const scale = 1;
   //const scale = 1 + Math.random();
   useSphericalJoint(a, b, [
@@ -36,25 +33,30 @@ const RopeJoint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, registerParticlesFn, debugInfo }, ref) => {
   
   const internalRef = useRef();
+  const framesPerImpulse = 10;
+  const frameCount = useRef(0);
+  const startFrame = Math.floor(Math.random() * framesPerImpulse);
 
   useImperativeHandle(ref, () => internalRef.current);
 
   useFrame(() => {
-    if (internalRef.current.applyImpulses) {
-      internalRef.current.applyImpulses();
+    if (frameCount.current >= startFrame && (frameCount.current - startFrame) % framesPerImpulse === 0) {
+      if (internalRef.current.applyImpulses) {
+        internalRef.current.applyImpulses();
+      }
     }
+    frameCount.current += 1;
   });
 
   useEffect(() => {
     if (registerParticlesFn && internalRef.current) {
-      //console.log("registerParticlesFn", id, internalRef)
       registerParticlesFn(index, [internalRef.current], radius);
     }
   }, [registerParticlesFn, internalRef]);
 
   return (
     <>
-    <RigidBody
+    <MyRigidBody
       ref={internalRef}
       position={initialPosition}
       type="dynamic"
@@ -67,7 +69,7 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
       <CircleDrei args={[radius, 16]}>
         <meshStandardMaterial color={color} />
       </CircleDrei>
-    </RigidBody>
+    </MyRigidBody>
     {debugInfo && (
       <>
         <Text
@@ -85,7 +87,7 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
   );
 });
 
-Particle.displayName = 'Particle'; // the name property won't give the component's name since it uses forwardRef
+Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, debugInfo=false }, ref) => {
   const getComponentRef = useStore((state) => state.getComponentRef);
@@ -103,7 +105,6 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   }, [entityPositions]);
   const [initialImpulse, setInitialImpulse] = useState(true);
   const frameCount = useRef(0);
-  const applyImpulseCountRef = useRef(0);
   const maxDisplacement = radius;
   const centerRef = useRef(new THREE.Vector3());
   const prevCenterRef = useRef();
@@ -121,17 +122,16 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   useImperativeHandle(ref, () => internalRef.current);
 
   useEffect(() => {
-    //console.log("entityPositions", id, "scope", scope, "radius", radius, "entityPositions", entityPositions, "entityRefs", entityRefs, "initialImpulseVectors", initialImpulseVectors);
-    //if (scope == 3) console.log("entityRefs[1] entityRefs[0]", entityRefs[1], entityRefs[0]);
-    //console.log("jointsData", id, jointsData);
-  }, [entityRefs]); // Will only update during  arender not when ref changes
+    if (debug) {
+      //console.log("jointsData", id, jointsData);
+    }
+  }, [entityRefs]); // Will only run during a render after ref has changed
 
   const areAllParticlesRegistered = () => {
     return entityParticlesRegisteredRef.current.every(ref => ref === true);
   };
 
   const localRegisterParticlesFn = (indexToRegister, particleRefsToRegister, particleRadius) => {
-    //console.log("localRegisterParticlesFn", id, indexToRegister, particleRefsToRegister)
     particleRefs[indexToRegister].current = [...particleRefs[indexToRegister].current, ...particleRefsToRegister];
     particleRadiusRef.current = particleRadius;
     entityParticlesRegisteredRef.current[indexToRegister] = true;
@@ -156,7 +156,7 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
 
   const allocateJointsToParticles = (particleRefs, jointsData) => {
     if (debug) console.log("allocateJointsToParticles", particleRefs, jointsData)
-    // Create a new Vector3 to store the world position of this emergent entity
+    // Create a new Vector3 to store the world position of this entity
     const worldPosition = new THREE.Vector3();
     internalRef.current.getWorldPosition(worldPosition);
     const particleWorldPosition = new THREE.Vector3();
@@ -244,9 +244,8 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     return center;
   };
 
-  const addImpulses = (center, impulse, entityIndices) => {
-    entityIndices.forEach((i) => {
-      const entity = entityRefs[i];
+  const entityImpulses = (center, impulse) => {
+    entityRefs.forEach((entity, i) => {
       if (entity.current) {
         const entityCenter = entity.current.getCenter();
         if (entityCenter) {
@@ -266,12 +265,10 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   };
 
   useFrame(() => {
-    const startTime = performance.now(); // Start timing
   
     frameCount.current += 1;
   
-    //if (frameCount.current % 10 !== 0) return // every X frames
-  
+    // A state machine allows for computation to be distributed across frames, reducng load on the physics engine
     switch (frameStateRef.current) {
       case "init":
         if (initialImpulse && entitiesRegisteredRef.current === true) {
@@ -282,11 +279,10 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
               entity.current.addImpulse(initialImpulseVectors[i]);
             }
           });
-          frameStateRef.current = "findCenter";
           const allocatedJoints = allocateJointsToParticles(particleRefs, jointsData)
           setJointParticles(allocatedJoints)
           //console.log("allocatedJoints", id, allocatedJoints)
-          //console.log("Entity.displayName", id, Entity.displayName);
+          frameStateRef.current = "findCenter";
         }
         break;
       case "findCenter":
@@ -304,29 +300,14 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         break;
       case "addImpulse":
         entityRefs.forEach((entity, i) => {
-          if (entity.current) {
             entity.current.addImpulse(internalRef.current.getImpulse());
-          } else {
-            console.log("No entity", id, i);
-          }
         });
         internalRef.current.setImpulse(zeroVector);
         frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        applyImpulseCountRef.current += 1;
-  
-        // Calculate 10% of entities per frame
-        const numEntitiesToUpdate = Math.ceil(entityRefs.length * 0.1);
-        const startIndex = (applyImpulseCountRef.current % Math.ceil(entityRefs.length / numEntitiesToUpdate)) * numEntitiesToUpdate;
-        const entityIndices = Array.from({ length: numEntitiesToUpdate }, (_, i) => (startIndex + i) % entityRefs.length);
-  
-        //console.log("applyImpulseCountRef", id, startIndex)
-        addImpulses(centerRef.current, impulseRef.current, entityIndices);
-  
-        if (startIndex + numEntitiesToUpdate >= entityRefs.length) {
-          frameStateRef.current = "findCenter";
-        }
+        entityImpulses(centerRef.current, impulseRef.current);
+        frameStateRef.current = "findCenter";
         break;
       default:
         break;
@@ -335,19 +316,16 @@ const EmergentEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     if (centerRef.current) {
       prevCenterRef.current = centerRef.current.clone();
     }
-  
-    const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
-    if (circleCenterRef && circleCenterRef.current && internalRef.current && centerRef.current) {
-      // Convert the centerRef.current to the local space of the CustomGroup
-      const localCenter = internalRef.current.worldToLocal(centerRef.current.clone());
-      circleCenterRef.current.position.copy(localCenter);
+
+    if (debug) {
+      const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
+      if (circleCenterRef && circleCenterRef.current && internalRef.current && centerRef.current) {
+        // Convert the centerRef.current to the local space of the entity
+        const localCenter = internalRef.current.worldToLocal(centerRef.current.clone());
+        circleCenterRef.current.position.copy(localCenter);
+      }
     }
   
-    const endTime = performance.now(); // End timing
-    const frameTime = endTime - startTime;
-    if (frameTime > 16) {
-      console.log(`Frame time: ${frameTime.toFixed(3)} ms`,id, frameStateRef.current);
-    }
   });
 
   const localJointPosition = (groupRef, particles, side) => {
