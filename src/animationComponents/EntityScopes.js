@@ -100,29 +100,42 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
 
   const entityCount = config.entityCounts[scope];
   const color = getColor(config, scope, parentColor || "blue");
+  // At the deepest scope we will instantiate Particles instead of CompoundEntity
   const Entity = scope == config.entityCounts.length - 1 ? Particle : CompoundEntity;
-  const getComponentRef = useStore((state) => state.getComponentRef); // used for Circle during isDebug
+  // Used for Circle animation when isDebug, the position is managed by r3f not rapier
+  const getComponentRef = useStore((state) => state.getComponentRef); 
+  // Array of refs to entities (either CompoundEntity or Particles)
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
   // An array of entityCount length that stores the particle refs associated with each entity
   const entityParticlesRefs = Array.from({ length: entityCount }, () => useRef([]));
-  // The entity radius fills the boundary with a margin to avoid overl
+  // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
   const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
+  // Layout to avoid Particle overlap
   const entityPositions = useMemo(() => {
     return generateEntityPositions(radius - entityRadius, entityCount);
   }, [radius, entityRadius, entityCount]);
+  // Joints aligned based on entityPositions
   const jointsData = useMemo(() => {
     return generateJointsData(entityPositions);
   }, [entityPositions]);
+  // An impulse to get some random behavior at the beginning
   const [applyInitialImpulse, setApplyInitialImpulse] = useState(true);
   const frameCount = useRef(0);
+  // Track the center of this CompoundEntity
   const centerRef = useRef(new THREE.Vector3());
   const prevCenterRef = useRef();
+  // State machine that distributes computation across frames
   const frameStateRef = useRef("init");
   const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
+  // Impulse that will be applied to Particles in this CompoundEntity
   const impulseRef = useRef();
+  // All true when all entities have registered a ref
   const entitiesRegisteredRef = useRef(false);
+  // All true when all Particles have registered a ref for all entities
   const entityParticlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
+  // Joints alow for soft body like behavior and create the structure at each scope (joining entities)
   const [joints, setJoints] = useState([]);
+  // Info about Particle at the deepest scope
   const particleRadiusRef = useRef(); 
   const particleCountRef = useRef();
   const particleAreaRef = useRef();
@@ -140,18 +153,19 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     0
   ));
 
+  // Initialization logging/debug
   useEffect(() => {
     //console.log("entityArea", id, entityArea)
     if (isDebug) {
       //console.log("jointsData", id, jointsData);
     }
-  }, [entityRefs]); // Will only run during a render after ref has changed
+  }, []);
 
   const areAllParticlesRegistered = () => {
     return entityParticlesRegisteredRef.current.every(ref => ref === true);
   };
 
-  // Pass up the Particle refs so we can find Particles for joints at the scope of this entity
+  // Pass up the Particle refs from lower scope so we can find Particles for joints at the scope of this entity
   // The particle radius gets passed up to calculate joint offsets
   const localRegisterParticlesFn = (entityIndex, particleRefs, particleRadius) => {
     entityParticlesRefs[entityIndex].current = [...entityParticlesRefs[entityIndex].current, ...particleRefs];
@@ -171,6 +185,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     }
   };
 
+  // Map the joints to the Particles and align teh joint with the initial Particle layout
   const allocateJointsToParticles = (entityParticlesRefs, jointsData) => {
     if (isDebug) console.log("allocateJointsToParticles", entityParticlesRefs, jointsData)
     // Create a new Vector3 to store the world position of this entity
@@ -247,6 +262,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     return allocateJoints;
   };
 
+  // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
   const calculateCenter = () => {
     const center = new THREE.Vector3();
     let activeEntities = 0;
@@ -265,6 +281,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
     return center;
   };
 
+  // Distribute impulses to each entity
   const entityImpulses = (center, impulse) => {
     entityRefs.forEach((entity, i) => {
       if (entity.current) {
@@ -289,7 +306,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   
     frameCount.current += 1;
   
-    // A state machine allows for computation to be distributed across frames, reducng load on the physics engine
+    // This state machine allows for computation to be distributed across frames, reducing load on the physics engine
     switch (frameStateRef.current) {
       case "init":
         // Initial random impulse to get more interesting behavior
@@ -356,7 +373,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   
   });
 
-  // This is used only for debug
+  // This is only used in debug
   const localJointPosition = (groupRef, particles, side) => {
     let worldPosition;
     let xOffset;
@@ -481,7 +498,9 @@ const EntityScopes = React.forwardRef((props, ref) => {
   const framesPerStep = 4; // Update every framesPerStep frames
   const fixedDelta = 1 / 30; // Fixed time step for physics
   const framesPerStepCount = useRef(0);
+  // The global configuration 
   const scopesConfig = {
+    // Number of entities at each scope
     entityCounts: [9, 16, 21],
     // Can pass a function as a color, null will inherit parent color or default
     colors: [props.color || null, getRandomColor, null],
@@ -491,6 +510,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
     overshootScaling: 0.02,
   };
 
+  // Manually stepping Rapier seemed to improve performance significantly
   useFrame(() => {
     framesPerStepCount.current++;
     if (framesPerStepCount.current >= framesPerStep) {
@@ -501,12 +521,13 @@ const EntityScopes = React.forwardRef((props, ref) => {
 
   return (
     // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
-    <CompoundEntity id={"Scope1"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
+    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
   );
 });
 
 export default withAnimationState(EntityScopes);
 
+// Distribute evenly around the perimeter
 const generateEntityPositions = (radius, count) => {
   const positions = []
   const angleStep = (2 * Math.PI) / count
@@ -519,6 +540,7 @@ const generateEntityPositions = (radius, count) => {
   return positions
 }
 
+// Return the center point of all the joints
 const generateJointsData = (positions) => {
   const jointsData = positions.map((pos, i) => {
     let nextPos;
@@ -560,6 +582,7 @@ const calculateCircleArea = (radius) => {
   return Math.PI * Math.pow(radius, 2);
 };
 
+// Utility to allow passing in color string or function
 const getColor = (config, scope, defaultValue) => {
   const colorConfig = config.colors[scope];
   if (colorConfig === null || colorConfig === undefined) {
