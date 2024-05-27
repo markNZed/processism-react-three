@@ -28,7 +28,7 @@ To start the development server, run:
 npm start
 ```
 
-This will start the development server at `http://localhost:3000`.
+This will start the development server at [http://localhost:3000](http://localhost:3000).
 
 ## Deployment
 
@@ -38,7 +38,7 @@ To deploy the project to GitHub Pages, use the following command:
 npm run deploy
 ```
 
-You can then view your deployed site at `https://markNZed.github.io/react-three`.
+You can then view your deployed site at [https://markNZed.github.io/react-three](https://markNZed.github.io/react-three).
 
 ## Development Guidelines
 
