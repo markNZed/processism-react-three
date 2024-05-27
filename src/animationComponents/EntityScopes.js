@@ -103,6 +103,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   const Entity = scope == config.entityCounts.length - 1 ? Particle : CompoundEntity;
   const getComponentRef = useStore((state) => state.getComponentRef); // used for Circle during isDebug
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
+  // An array of entityCount length that stores the particle refs associated with each entity
   const entityParticlesRefs = Array.from({ length: entityCount }, () => useRef([]));
   // The entity radius fills the boundary with a margin to avoid overl
   const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
