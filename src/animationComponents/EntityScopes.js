@@ -9,16 +9,62 @@ import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier } from '@react-three/rapier';
 
-// Add a repellant force 
-// requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
-// Each frame has 16.67 milliseconds for all the rendering and updates to occur.
+/* Notes:
 
-// Use https://github.com/pmndrs/react-three-rapier/tree/main/packages/react-three-rapier-addons#attractors
-// Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
+ Add a repellant force 
+ requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
+ Each frame has 16.67 milliseconds for all the rendering and updates to occur.
 
-// Maybe pass all the refs up and then from top level instantiate Particles and Joints
+ Use https://github.com/pmndrs/react-three-rapier/tree/main/packages/react-three-rapier-addons#attractors
+ Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
+
+ Maybe pass all the refs up and then from top level instantiate Particles and Joints
+ Could introduce a runtimeConfig that all CompoundEntity can update
+
+*/
 
 const ZERO_VECTOR = new THREE.Vector3();
+
+// A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
+// This shows the concept of emergent entities 
+// Each CompoundEntity has joints that connect CompoundEntity/Particle as a "soft body"
+
+// This is the Component that gets exported and is instantiated in the scene
+// There is a recursive structure under EntityScopes where
+// a CompoundEntity will instantiate multiple CompoundEntity to a certain depth (length of scopesConfig.entityCounts array)
+// the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
+const EntityScopes = React.forwardRef((props, ref) => {
+  const { step } = useRapier();
+  const framesPerStep = 4; // Update every framesPerStep frames
+  const fixedDelta = 1 / 30; // Fixed time step for physics
+  const framesPerStepCount = useRef(0);
+  
+  // The global configuration 
+  const scopesConfig = {
+    // Number of entities at each scope
+    entityCounts: [9, 16, 21],
+    // Can pass a function as a color, null will inherit parent color or default
+    colors: [props.color || null, getRandomColor, null],
+    debug: false,
+    radius: props.radius || 10, // Radius of the first CompoundEntity
+    impulsePerParticle:  0.02,
+    overshootScaling: 0.02,
+  };
+
+  // Manually stepping Rapier seemed to improve performance significantly
+  useFrame(() => {
+    framesPerStepCount.current++;
+    if (framesPerStepCount.current >= framesPerStep) {
+      step(fixedDelta);
+      framesPerStepCount.current = 0; // Reset the frame count
+    }
+  });
+
+  return (
+    // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
+    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
+  );
+});
 
 // Joints connect Particles and when the joints form a loop the boundary will behave like a softbody
 const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
@@ -488,40 +534,6 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       </>
     )}
     </>
-  );
-});
-
-// Could introduce a runtimeConfig that all CompoundEntity can update
-
-const EntityScopes = React.forwardRef((props, ref) => {
-  const { step } = useRapier();
-  const framesPerStep = 4; // Update every framesPerStep frames
-  const fixedDelta = 1 / 30; // Fixed time step for physics
-  const framesPerStepCount = useRef(0);
-  // The global configuration 
-  const scopesConfig = {
-    // Number of entities at each scope
-    entityCounts: [9, 16, 21],
-    // Can pass a function as a color, null will inherit parent color or default
-    colors: [props.color || null, getRandomColor, null],
-    debug: false,
-    radius: props.radius || 10, // Radius of the first CompoundEntity
-    impulsePerParticle:  0.02,
-    overshootScaling: 0.02,
-  };
-
-  // Manually stepping Rapier seemed to improve performance significantly
-  useFrame(() => {
-    framesPerStepCount.current++;
-    if (framesPerStepCount.current >= framesPerStep) {
-      step(fixedDelta);
-      framesPerStepCount.current = 0; // Reset the frame count
-    }
-  });
-
-  return (
-    // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
-    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
   );
 });
 
