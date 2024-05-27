@@ -17,14 +17,11 @@ Use a shader to allow for an a bloblike "ovverlay" of emergent entities
 
 Draw relations within emergent entity - like a radial graph
 
-Pass config into emergent entity e.g.
-config = {
-  entityCounts: [9,9,21],
-  radius: 10
-}
 Pass down a ref to runtimeConfig ?
 
-https://github.com/utsuboco/r3f-perf
+We have the Particle refs at the top level CompoundEntity so we could create mesh instances there ?
+Can use Merged from @react-three/drei ?
+
 https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance
 https://rapier.rs/docs/user_guides/rust/common_mistakes/
 https://www.dhiwise.com/post/The%20Role%20of%20React%20Three%20Fiber%20in%20the%20Evolution%20of%20User%20Interface%20Design

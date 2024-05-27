@@ -103,7 +103,7 @@ function SceneThree() {
 
                     <EntityScopes
                         id="EntityScopes1"
-                        radius={emergentEntityRadius}
+                        //radius={emergentEntityRadius}
                         color="blue"
                     />
 

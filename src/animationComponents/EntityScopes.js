@@ -33,10 +33,13 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 }
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, registerParticlesFn, parentDebug }, ref) => {
+const Particle = React.forwardRef(({ id, index, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
   
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
+
+  const isDebug = config.debug;
+  const color = getColor(config, scope, parentColor || "blue");
 
   useFrame(() => {
     if (internalRef.current.applyImpulses) {
@@ -67,7 +70,7 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
         <meshStandardMaterial color={color} />
       </CircleDrei>
     </ParticleRigidBody>
-    {parentDebug && (
+    {isDebug && (
       <>
         <Text
           position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
@@ -87,22 +90,22 @@ const Particle = React.forwardRef(({ id, index, initialPosition, radius, color, 
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=1, radius, entityCount, Entity, color = "blue", registerParticlesFn, parentDebug=false }, ref) => {
+const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
 
-  const isDebug = parentDebug;//id == "EntityScopes1-0-8";
+  const isDebug = config.debug;
   
   // Using forwardRef and need to access the ref from inside this component too
   const internalRef = useRef();
   useImperativeHandle(ref, () => internalRef.current);
 
+  const entityCount = config.entityCounts[scope];
+  const color = getColor(config, scope, parentColor || "blue");
+  const Entity = scope == config.entityCounts.length - 1 ? Particle : CompoundEntity;
   const getComponentRef = useStore((state) => state.getComponentRef); // used for Circle during isDebug
   const entityRefs = Array.from({ length: entityCount }, () => useRef());
   const entityParticlesRefs = Array.from({ length: entityCount }, () => useRef([]));
-  const area = calculateCircleArea(radius);
   // The entity radius fills the boundary with a margin to avoid overl
   const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
-  const entityArea = calculateCircleArea(entityRadius);
-  const density = area / (entityArea * entityCount)
   const entityPositions = useMemo(() => {
     return generateEntityPositions(radius - entityRadius, entityCount);
   }, [radius, entityRadius, entityCount]);
@@ -126,9 +129,9 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   ////////////////////////////////////////
   // Constants impacting particle behavior
   ////////////////////////////////////////
-  const impulsePerParticle = 0.02;
-  const overshootScaling = impulsePerParticle;
-  const maxDisplacement = radius;
+  const impulsePerParticle = config.impulsePerParticle || 0.02;
+  const overshootScaling = config.overshootScaling || impulsePerParticle;
+  const maxDisplacement = radius; // can't use config because radius is not known in advance (could use a function in config?)
   
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
     (Math.random() - 0.5) * impulsePerParticle,
@@ -161,7 +164,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       }
       particleCountRef.current = flattenedParticleRefs.length;
       particleAreaRef.current = calculateCircleArea(particleRadius);
-      if (scope == 1) {
+      if (scope == 0) {
         console.log("All particles registered", id, flattenedParticleRefs.length, jointsData);
       }
     }
@@ -304,7 +307,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
         }
         break;
       case "findCenter":
-        centerRef.current = (scope == 1) ? initialPositionVector : calculateCenter();
+        centerRef.current = (scope == 0) ? initialPositionVector : calculateCenter();
         internalRef.current.setCenter(centerRef.current);
         // Wait until prevCenterRef is set so we can assume it is there in later states
         if (prevCenterRef.current) {
@@ -387,12 +390,13 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
           id={`${id}-${i}`}
           initialPosition={entityPositions[i].toArray()}
           radius={entityRadius}
-          color={color}
+          parentColor={color}
           scope={scope + 1}
           index={i}
           ref={entityRef}
           registerParticlesFn={localRegisterParticlesFn}
           parentDebug={isDebug}
+          config={config}
         />
       ))}
 
@@ -469,39 +473,34 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
   );
 });
 
-// Instead of using an explicit instantiation of the scopes refactor to use a config and a single instantiation of CompoundEntity
-// Could also introduce a runtimeConfig that all CompoundEntity can update
-
-/*
-const Scope4 = React.forwardRef((props, ref) => (
-  <CompoundEntity id={"Scope4"} {...props} ref={ref} Entity={Particle} entityCount={21} />
-));
-*/
-
-const Scope3 = React.forwardRef((props, ref) => (
-  <CompoundEntity id={"Scope3"} {...props} ref={ref} Entity={Particle} entityCount={21} />
-));
-
-const Scope2 = React.forwardRef((props, ref) => (
-  <CompoundEntity id={"Scope2"} {...props} ref={ref} Entity={Scope3} entityCount={16} color={getRandomColor()} />
-));
+// Could introduce a runtimeConfig that all CompoundEntity can update
 
 const EntityScopes = React.forwardRef((props, ref) => {
   const { step } = useRapier();
   const framesPerStep = 4; // Update every framesPerStep frames
   const fixedDelta = 1 / 30; // Fixed time step for physics
-  const frameCount = useRef(0);
+  const framesPerStepCount = useRef(0);
+  const scopesConfig = {
+    entityCounts: [9, 16, 21],
+    // Can pass a function as a color, null will inherit parent color or default
+    colors: [props.color || null, getRandomColor, null],
+    debug: false,
+    radius: props.radius || 10, // Radius of the first CompoundEntity
+    impulsePerParticle:  0.02,
+    overshootScaling: 0.02,
+  };
 
   useFrame(() => {
-    frameCount.current++;
-    if (frameCount.current >= framesPerStep) {
+    framesPerStepCount.current++;
+    if (framesPerStepCount.current >= framesPerStep) {
       step(fixedDelta);
-      frameCount.current = 0; // Reset the frame count
+      framesPerStepCount.current = 0; // Reset the frame count
     }
   });
 
   return (
-    <CompoundEntity id={"Scope1"} {...props} ref={ref} Entity={Scope2} entityCount={9} />
+    // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
+    <CompoundEntity id={"Scope1"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
   );
 });
 
@@ -558,4 +557,15 @@ const calculateCircleArea = (radius) => {
     return "Radius must be a positive number.";
   }
   return Math.PI * Math.pow(radius, 2);
+};
+
+const getColor = (config, scope, defaultValue) => {
+  const colorConfig = config.colors[scope];
+  if (colorConfig === null || colorConfig === undefined) {
+    return defaultValue;
+  }
+  if (typeof colorConfig === 'function') {
+    return colorConfig();
+  }
+  return colorConfig;
 };
