@@ -49,6 +49,7 @@ function SceneThree() {
 
   //timestep defaults to 1 / 60
   // Physics allowSleep={true} ?
+  // Physics is paused so we can manually control the step from EntityScopes
 
   return (
     <>

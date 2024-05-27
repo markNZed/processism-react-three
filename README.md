@@ -84,10 +84,6 @@ To work with this project on a remote server (assuming the server has SSH, Docke
    - `git config --global user.email "your_email@example.com"`
    - `git config --global user.name "your_name"`
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Additional Notes
 
 - Created with CodeSandbox
