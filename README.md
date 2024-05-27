@@ -91,6 +91,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Additional Notes
 
 - Created with CodeSandbox
-- View/edit the project on CodeSandbox: [CodeSandbox Link](https://codesandbox.io/p/github/markNZed/react-three)
+- View/edit the project on CodeSandbox: ([https://codesandbox.io/p/github/markNZed/react-three](https://codesandbox.io/p/devbox/github/markNZed/react-three))
 - Configured to run as a GitHub Codespace
 - For recording video of an animation, consider using [use-capture](https://github.com/gsimone/use-capture)
