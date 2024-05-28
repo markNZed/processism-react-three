@@ -40,6 +40,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
   const framesPerStepCount = useRef(0);
   const startTimeRef = useRef(0);
   const durations = useRef([]); // Store the last 100 durations
+  const stepCount = useRef(0); // Counter to track the number of steps
   
   // The global configuration 
   const scopesConfig = {
@@ -73,8 +74,14 @@ const EntityScopes = React.forwardRef((props, ref) => {
     if (durations.current.length > 100) {
       durations.current.shift(); // Keep only the last 100 entries
     }
-    const averageDuration = durations.current.reduce((a, b) => a + b, 0) / durations.current.length;
-    console.log(`Step duration: ${duration.toFixed(2)} ms, Average over last 100 steps: ${averageDuration.toFixed(2)} ms`);
+    
+    stepCount.current++;
+    
+    if (stepCount.current >= 100) {
+      const averageDuration = durations.current.reduce((a, b) => a + b, 0) / durations.current.length;
+      console.log(`Average step duration over last 100 steps: ${averageDuration.toFixed(2)} ms`);
+      stepCount.current = 0; // Reset the step count
+    }
   });
 
   return (
