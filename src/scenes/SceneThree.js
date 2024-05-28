@@ -47,14 +47,15 @@ function SceneThree() {
     far: 100
   };
 
-  //timestep defaults to 1 / 60
+  //timestep defaults to 1 / 60 timeStep={"vary"} 
   // Physics allowSleep={true} ?
   // Physics is paused so we can manually control the step from EntityScopes
+  // numSolverIterations={4} numAdditionalFrictionIterations={4} erp={1} allowedLinearError={0.1}
 
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics gravity={[0, 0, 0]} timestep={fixedDelta} paused={true} >
+            <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} >
                 <Perf />
                 <Scene>
 

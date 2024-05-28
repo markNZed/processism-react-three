@@ -36,30 +36,31 @@ const ZERO_VECTOR = new THREE.Vector3();
 const EntityScopes = React.forwardRef((props, ref) => {
   const { step } = useRapier();
   const framesPerStep = 4; // Update every framesPerStep frames
-  const fixedDelta = 1 / 30; // Fixed time step for physics
+  const fixedDelta = 1 / 30; //fps
   const framesPerStepCount = useRef(0);
   const startTimeRef = useRef(0);
   const durations = useRef([]); // Store the last 100 durations
   const stepCount = useRef(0); // Counter to track the number of steps
+  const lastStepEnd = useRef(0);
   
   // The global configuration 
+  const impulse = 0.002;
   const scopesConfig = {
     // Number of entities at each scope
-    entityCounts: [9, 21, 21],
+    entityCounts: [16, 21, 21],
     // Can pass a function as a color, null will inherit parent color or default
     colors: [props.color || null, getRandomColor, null],
     debug: false,
     radius: props.radius || 10, // Radius of the first CompoundEntity
-    impulsePerParticle:  0.02,
-    overshootScaling: 0.02,
+    impulsePerParticle: impulse,
+    overshootScaling: impulse,
   };
 
-  // Manually stepping Rapier seemed to improve performance significantly
   useFrame(() => {
     framesPerStepCount.current++;
-    if (framesPerStepCount.current >= framesPerStep) {
+    if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
+    if (framesPerStepCount.current == 0) {
       step(fixedDelta);
-      framesPerStepCount.current = 0; // Reset the frame count
     }
   });
 
@@ -76,12 +77,15 @@ const EntityScopes = React.forwardRef((props, ref) => {
     }
     
     stepCount.current++;
+    console.log(`useAfterPhysicsStep: ${stepCount.current} ${framesPerStepCount.current} ${duration}`);
     
     if (stepCount.current >= 100) {
       const averageDuration = durations.current.reduce((a, b) => a + b, 0) / durations.current.length;
       console.log(`Average step duration over last 100 steps: ${averageDuration.toFixed(2)} ms`);
       stepCount.current = 0; // Reset the step count
     }
+
+    lastStepEnd.current = endTime;
   });
 
   return (
