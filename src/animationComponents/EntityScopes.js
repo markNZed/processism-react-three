@@ -36,7 +36,7 @@ const ZERO_VECTOR = new THREE.Vector3();
 const EntityScopes = React.forwardRef((props, ref) => {
   const { step } = useRapier();
   const framesPerStep = 4; // Update every framesPerStep frames
-  const fixedDelta = 1 / 30; //fps
+  const fixedDelta = framesPerStep / 60; //fps
   const framesPerStepCount = useRef(0);
   const startTimeRef = useRef(0);
   const durations = useRef([]); // Store the last 100 durations
@@ -77,7 +77,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
     }
     
     stepCount.current++;
-    console.log(`useAfterPhysicsStep: ${stepCount.current} ${framesPerStepCount.current} ${duration}`);
+    //console.log(`useAfterPhysicsStep: ${stepCount.current} ${framesPerStepCount.current} ${duration}`);
     
     if (stepCount.current >= 100) {
       const averageDuration = durations.current.reduce((a, b) => a + b, 0) / durations.current.length;
