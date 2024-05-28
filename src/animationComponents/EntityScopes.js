@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
-import { useSphericalJoint, useRapier } from '@react-three/rapier';
+import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from '@react-three/rapier';
 
 /* Notes:
 
@@ -38,11 +38,13 @@ const EntityScopes = React.forwardRef((props, ref) => {
   const framesPerStep = 4; // Update every framesPerStep frames
   const fixedDelta = 1 / 30; // Fixed time step for physics
   const framesPerStepCount = useRef(0);
+  const startTimeRef = useRef(0);
+  const durations = useRef([]); // Store the last 100 durations
   
   // The global configuration 
   const scopesConfig = {
     // Number of entities at each scope
-    entityCounts: [9, 16, 21],
+    entityCounts: [9, 21, 21],
     // Can pass a function as a color, null will inherit parent color or default
     colors: [props.color || null, getRandomColor, null],
     debug: false,
@@ -58,6 +60,21 @@ const EntityScopes = React.forwardRef((props, ref) => {
       step(fixedDelta);
       framesPerStepCount.current = 0; // Reset the frame count
     }
+  });
+
+  useBeforePhysicsStep(() => {
+    startTimeRef.current = performance.now();
+  });
+
+  useAfterPhysicsStep(() => {
+    const endTime = performance.now();
+    const duration = endTime - startTimeRef.current;
+    durations.current.push(duration); // Store the duration
+    if (durations.current.length > 100) {
+      durations.current.shift(); // Keep only the last 100 entries
+    }
+    const averageDuration = durations.current.reduce((a, b) => a + b, 0) / durations.current.length;
+    console.log(`Step duration: ${duration.toFixed(2)} ms, Average over last 100 steps: ${averageDuration.toFixed(2)} ms`);
   });
 
   return (
