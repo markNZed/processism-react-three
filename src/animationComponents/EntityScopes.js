@@ -107,13 +107,30 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 }
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.forwardRef(({ id, index, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
+const Particle = React.forwardRef(({ id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
   
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
 
   const isDebug = config.debug;
   const color = getColor(config, scope, parentColor || "blue");
+
+  // Calculate the unique global index for the Particle
+  const calculateUniqueIndex = (indexArray, entityCounts) => {
+    let multiplier = 1;
+    let uniqueIndex = 0;
+    for (let i = indexArray.length - 1; i >= 0; i--) {
+      uniqueIndex += indexArray[i] * multiplier;
+      multiplier *= entityCounts[i];
+    }
+    return uniqueIndex;
+  };
+
+  const uniqueIndex = useMemo(() => calculateUniqueIndex(indexArray, config.entityCounts), [indexArray, config.entityCounts]);
+
+  useEffect(() => {
+    //console.log("Particle uniqueIndex", id, uniqueIndex)
+  }, []);
 
   useFrame(() => {
     if (internalRef.current.applyImpulses) {
@@ -164,7 +181,7 @@ const Particle = React.forwardRef(({ id, index, scope, initialPosition, radius, 
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
+const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
 
   const isDebug = config.debug;
   
@@ -485,6 +502,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
           parentColor={color}
           scope={scope + 1}
           index={i}
+          indexArray={[...indexArray, i]}
           ref={entityRef}
           registerParticlesFn={localRegisterParticlesFn}
           parentDebug={isDebug}

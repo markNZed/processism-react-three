@@ -28,3 +28,4 @@ https://www.dhiwise.com/post/The%20Role%20of%20React%20Three%20Fiber%20in%20the%
 
 Below a certain scale joints could become fixed and merge into a single collider (capsule) the intermediate joints can be ignored
 Why can joints have large gaps appear due to forces
+
