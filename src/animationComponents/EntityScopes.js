@@ -27,7 +27,7 @@ const ZERO_VECTOR = new THREE.Vector3();
 
 // A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
 // This shows the concept of emergent entities 
-// Each CompoundEntity has joints that connect CompoundEntity/Particle as a "soft body"
+// Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
 
 // This is the Component that gets exported and is instantiated in the scene
 // There is a recursive structure under EntityScopes where
@@ -254,7 +254,7 @@ const CompoundEntity = React.forwardRef(({ id, index, initialPosition=[0, 0, 0],
       particleCountRef.current = flattenedParticleRefs.length;
       particleAreaRef.current = calculateCircleArea(particleRadius);
       if (scope == 0) {
-        console.log("All particles registered", id, flattenedParticleRefs.length, jointsData);
+        console.log(`All particles (radius: ${particleRadiusRef.current}m) are registered`, id, flattenedParticleRefs.length, jointsData);
       }
     }
   };

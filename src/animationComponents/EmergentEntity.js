@@ -108,7 +108,7 @@ const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) 
   );
 
   return (
-    // We set a mesh for this object so we can get a ref for DynamicDoubleArrow above this component
+    // We set a mesh for this group so we can get a ref for DynamicDoubleArrow when connecting to this component
     <group ref={ref} position={position} visible={visible} userData={{ meshId: `${id}.Circle` }} >
       <Circle id={`${id}.Circle`} initialState={{ radius: radius }} />
       <Sphere id={`${id}.Sphere1`} initialState={{ position: spherePosition1, radius: sphereRadius }} />

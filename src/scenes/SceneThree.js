@@ -50,7 +50,7 @@ function SceneThree() {
   //timestep defaults to 1 / 60 timeStep={"vary"} 
   // Physics allowSleep={true} ?
   // Physics is paused so we can manually control the step from EntityScopes
-  // numSolverIterations={4} numAdditionalFrictionIterations={4} erp={1} allowedLinearError={0.1}
+  // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
 
   return (
     <>
@@ -58,50 +58,6 @@ function SceneThree() {
             <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} >
                 <Perf />
                 <Scene>
-
-                    {/*
-
-                    <EmergentEntityNoBoundary
-                        id="emergent2"
-                        initialState={{
-                            position: new THREE.Vector3(+emergentEntityRadius * 2, 0, 0),
-                            radius: emergentEntityRadius,
-                            sphereCount: 100,
-                            color: "blue",
-                        }}
-                    />
-
-                    <EmergentEntityNoBoundary
-                        id="emergent2"
-                        initialState={{
-                            position: new THREE.Vector3(-emergentEntityRadius * 2, 0, 0),
-                            radius: emergentEntityRadius,
-                            sphereCount: 100,
-                            color: "green",
-                        }}
-                    />
-
-                    <EmergentEntityNoBoundary
-                        id="emergent2"
-                        initialState={{
-                            position: new THREE.Vector3(0, +emergentEntityRadius * 2, 0),
-                            radius: emergentEntityRadius,
-                            sphereCount: 100,
-                            color: "orange",
-                        }}
-                    />
-
-                    <EmergentEntityNoBoundary
-                        id="emergent2"
-                        initialState={{
-                            position: new THREE.Vector3(0, -emergentEntityRadius * 2, 0),
-                            radius: emergentEntityRadius,
-                            sphereCount: 100,
-                            color: "yellow",
-                        }}
-                    />
-
-                    */}
 
                     <EntityScopes
                         id="EntityScopes1"

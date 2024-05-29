@@ -6,6 +6,18 @@ import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 import withAnimationState from '../withAnimationState';
 
+/*
+<EmergentEntityNoBoundary
+    id="emergent2"
+    initialState={{
+        position: new THREE.Vector3(+emergentEntityRadius * 2, 0, 0),
+        radius: emergentEntityRadius,
+        sphereCount: 100,
+        color: "blue",
+    }}
+/>
+*/
+
 const EmergentEntityNoBoundary = React.forwardRef(({ id, animationState, ...props }, ref) => {
   const { 
     position, 
