@@ -34,7 +34,11 @@ const ParticleRigidBody = forwardRef((props, ref) => {
         }
     }, 
     translation: () => {
-        return internalRef.current.translation();
+        if (internalRef.current) {
+          return internalRef.current.translation();
+        } else {
+          return null;
+        }
     }, 
   }));
 
