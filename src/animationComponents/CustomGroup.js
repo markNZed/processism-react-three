@@ -20,7 +20,8 @@ const CustomGroup = forwardRef(({ children, position }, ref) => {
       impulseRef.current.add(newImpulse);
     },
     getCenter: () => {
-        return centerRef.current.clone();
+        const result = centerRef.current.clone();
+        return result
     }, 
     setCenter: (center) => {
         return centerRef.current.copy(center);

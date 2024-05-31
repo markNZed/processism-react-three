@@ -27,7 +27,7 @@ const ParticleRigidBody = forwardRef((props, ref) => {
     },
     getCenter: () => {
         if (internalRef?.current?.translation) {
-            const pos = internalRef.current.translation();
+            const pos = internalRef.current.translation(); // world position
             return new THREE.Vector3(pos.x, pos.y, pos.z);
         } else {
             return null;

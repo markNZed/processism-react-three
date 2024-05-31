@@ -34,18 +34,17 @@ const ZERO_VECTOR = new THREE.Vector3();
 const EntityScopes = React.forwardRef((props, ref) => {
 
   // The global configuration 
-  const impulse = 0.02;
   const scopesConfig = {
+    debug: false,
     // Number of entities at each scope
     entityCounts: [9, 9, 21],
     // Can pass a function as a color, null will inherit parent color or default
     colors: [props.color || null, getRandomColorFn, null],
-    debug: false,
     radius: props.radius || 10, // Radius of the first CompoundEntity
-    impulsePerParticle: impulse,
+    impulsePerParticle: 0.01,
     overshootScaling: 2,
-    attractorStrength: -10,
-    maxDisplacementScaling: 1.0,
+    attractorScaling: -0.2,
+    maxDisplacementScaling: 0.5,
     particleRestitution: 0,
   };
   const { step } = useRapier();
@@ -196,7 +195,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   // An array of entityCount length that stores the particle refs associated with each entity
   const entityParticlesRefs = Array.from({ length: entityCount }, () => useRef([]));
   // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
-  const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.925;
+  const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.95;
   // Layout to avoid Particle overlap
   const entityPositions = useMemo(() => {
     return generateEntityPositions(radius - entityRadius, entityCount);
@@ -232,14 +231,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   ////////////////////////////////////////
   // Constants impacting particle behavior
   ////////////////////////////////////////
-  const impulsePerParticle = config.impulsePerParticle || 0.02;
+  const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
   const overshootScaling = config.overshootScaling || 1;
   const maxDisplacement = (config.maxDisplacementScaling || 1) * radius;
-  const attractorStrength = config.attractorStrength;
+  const attractorScaling = config.attractorScaling;
   
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
-    (Math.random() - 0.5) * impulsePerParticle / (scope + 1),
-    (Math.random() - 0.5) * impulsePerParticle / (scope + 1),
+    (Math.random() - 0.5) * impulsePerParticle,
+    (Math.random() - 0.5) * impulsePerParticle,
     0
   ));
 
@@ -369,26 +368,33 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   };
 
   // Distribute impulses to each entity
-  const entityImpulses = (center, impulse) => {
+  const entityImpulses = (center, impulseIn) => {
+    const impulse = impulseIn.clone();
+    impulse.multiplyScalar(1 /  entityRefs.length);
     entityRefs.forEach((entity, i) => {
       if (entity.current) {
         const entityCenter = entity.current.getCenter();
         if (entityCenter) {
-          const displacement = entityCenter.sub(center);
-          // If the entity gets too far from the center then pull it back toward the center
-          if (displacement.length() > maxDisplacement) {
-            const overshoot = displacement.length() - maxDisplacement;
-            const directionToCenter = displacement.negate().normalize();
-            directionToCenter.multiplyScalar(impulse / entityRefs.length * overshoot * overshootScaling);
-            entity.current.addImpulse(directionToCenter);
-          } else {
-            // Continue moving in the current direction
-            entity.current.addImpulse(impulse / entityRefs.length);
+          const displacement = entityCenter.clone()
+          displacement.sub(center);
+          const directionToCenter = displacement.clone();
+          directionToCenter.negate().normalize();
+          if (impulse.length() == 0) {
+            //impulse.copy(directionToCenter);
+            //impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current  / entityRefs.length);
           }
+          // If the entity gets too far from the center then pull it back toward the center
+          const overshoot = displacement.length() - maxDisplacement;
+          if (overshoot > 0) {
+            impulse.copy(directionToCenter);
+            impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current  / entityRefs.length);
+            impulse.multiplyScalar(overshoot * overshootScaling);
+          }
+          entity.current.addImpulse(impulse);
           // Model attractor
-          if (attractorStrength) {
-            const directionToCenter = attractorStrength > 0 ? displacement.negate().normalize() : displacement.normalize();
-            directionToCenter.multiplyScalar(impulse / entityRefs.length *  Math.abs(attractorStrength));
+          if (attractorScaling) {
+            const directionToCenter = attractorScaling > 0 ? displacement.negate().normalize() : displacement.normalize();
+            directionToCenter.multiplyScalar(impulse.length() * Math.abs(attractorScaling));
             entity.current.addImpulse(directionToCenter);
           }
         }
@@ -397,13 +403,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   };
 
   useFrame(() => {
-    // Transfer the impulse to entities on each frame
+    // Transfer the impulse to entities
     if (entitiesRegisteredRef.current === true) {
-      const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1/entityRefs.length);
-      entityRefs.forEach((entity) => {
-          entity.current.addImpulse(perEntityImpulse);
-      });
-      internalRef.current.setImpulse(ZERO_VECTOR);
+      const impulse = internalRef.current.getImpulse();
+      if (impulse.length() > 0) {
+        const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1/entityRefs.length);
+        entityRefs.forEach((entity) => {
+            entity.current.addImpulse(perEntityImpulse);
+        });
+        internalRef.current.setImpulse(ZERO_VECTOR);
+      }
     }
   });
 
@@ -430,36 +439,35 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         }
         break;
       case "findCenter":
+        prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
         centerRef.current = calculateCenter();
+        if (scope == 0) {
+          //console.log("centerRef.current", id, centerRef.current)
+        }
         internalRef.current.setCenter(centerRef.current);
-        // Wait until prevCenterRef is set so we can assume it is there in later states
-        if (prevCenterRef.current) {
-          frameStateRef.current = "calcEntitiesImpulse";
+        if (centerRef.current && prevCenterRef.current) {
+          frameStateRef.current = "calcEntityImpulses";
         }
         break;
-      case "calcEntitiesImpulse":
+      case "calcEntityImpulses":
         // Could calculate velocity and direction here
-        const displacement = centerRef.current.clone().sub(prevCenterRef.current);
+        const displacement = centerRef.current.clone();
+        displacement.sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize(); // keep moving in the direction of the displacement
         impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current);
+        if (scope == 0) {
+          //console.log("impulseRef.current", id, impulseRef.current, impulseRef.current.length())
+        }
         frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        entityImpulses(centerRef.current, impulseRef.current);
+        //if (scope != 0) {
+          entityImpulses(prevCenterRef.current, impulseRef.current);
+        //}
         frameStateRef.current = "findCenter";
         break;
       default:
         break;
-    }
-  
-    // For tracking movement and calculating displacement
-    if (centerRef.current) {
-      // Leave the center of scope 0 at initial position so it stays in the center of the screen
-      if (scope == 0) {
-        prevCenterRef.current = prevCenterRef.current || centerRef.current.clone();
-      } else {
-        prevCenterRef.current = centerRef.current.clone();
-      }
     }
 
     if (isDebug) {
@@ -490,7 +498,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         const currentPos = new THREE.Vector3();
         dummy.matrix.decompose(currentPos, new THREE.Quaternion(), new THREE.Vector3());
   
-        // Get the position of the rigid body
+        // Get the position of the rigid body, tis is world position
         const pos = flattenedParticleRefs.current[i].current.translation();
         dummy.position.set(pos.x, pos.y, pos.z);
   
