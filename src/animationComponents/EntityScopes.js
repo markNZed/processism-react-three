@@ -41,14 +41,15 @@ const EntityScopes = React.forwardRef((props, ref) => {
     // Can pass a function as a color, null will inherit parent color or default
     colors: [props.color || null, getRandomColorFn, null],
     radius: props.radius || 10, // Radius of the first CompoundEntity
-    impulsePerParticle: 0.01,
-    overshootScaling: 2,
-    attractorScaling: -0.2,
-    maxDisplacementScaling: 0.5,
+    impulsePerParticle: 0.005,
+    overshootScaling: 1,
+    attractorScaling: [0, -0.8, -0.1],
+    maxDisplacementScaling: 0.75,
     particleRestitution: 0,
+    ccd: false,
   };
   const { step } = useRapier();
-  const framesPerStep = 3; // Update every framesPerStep frames
+  const framesPerStep = 1; // Update every framesPerStep frames
   const fixedDelta = framesPerStep / 60; //fps
   const framesPerStepCount = useRef(0);
   const startTimeRef = useRef(0);
@@ -153,6 +154,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, in
       enabledRotations={[false, false, true]}
       restitution={config.particleRestitution}
       userData={{color: color}}
+      ccd={config.ccd}
     >
       <BallCollider args={[radius]} />
     </ParticleRigidBody>
@@ -234,7 +236,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
   const overshootScaling = config.overshootScaling || 1;
   const maxDisplacement = (config.maxDisplacementScaling || 1) * radius;
-  const attractorScaling = config.attractorScaling;
+  const attractorScaling = config.attractorScaling[scope];
   
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
     (Math.random() - 0.5) * impulsePerParticle,
@@ -380,8 +382,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           const directionToCenter = displacement.clone();
           directionToCenter.negate().normalize();
           if (impulse.length() == 0) {
-            //impulse.copy(directionToCenter);
-            //impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current  / entityRefs.length);
+            impulse.copy(directionToCenter);
+            impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current  / entityRefs.length);
           }
           // If the entity gets too far from the center then pull it back toward the center
           const overshoot = displacement.length() - maxDisplacement;
@@ -390,13 +392,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
             impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current  / entityRefs.length);
             impulse.multiplyScalar(overshoot * overshootScaling);
           }
-          entity.current.addImpulse(impulse);
           // Model attractor
           if (attractorScaling) {
             const directionToCenter = attractorScaling > 0 ? displacement.negate().normalize() : displacement.normalize();
             directionToCenter.multiplyScalar(impulse.length() * Math.abs(attractorScaling));
-            entity.current.addImpulse(directionToCenter);
+            impulse.add(directionToCenter);
           }
+          entity.current.addImpulse(impulse);
         }
       }
     });
@@ -455,15 +457,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         displacement.sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize(); // keep moving in the direction of the displacement
         impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current);
-        if (scope == 0) {
-          //console.log("impulseRef.current", id, impulseRef.current, impulseRef.current.length())
-        }
         frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        //if (scope != 0) {
-          entityImpulses(prevCenterRef.current, impulseRef.current);
-        //}
+        entityImpulses(prevCenterRef.current, impulseRef.current);
         frameStateRef.current = "findCenter";
         break;
       default:

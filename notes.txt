@@ -1,30 +1,16 @@
 Maybe manage RigidBodyRef in HOC and provide a position function that tries rigid then mesh
 Use React's useMemo and useCallback to memoize complex calculations and functions that don't need to be re-created on every render.
-Bottom down and top up should be connected on id using DynamicDoubleArrow with offset
 Move to using Motion for Canvas and Camera control ?
 WDS_SOCKET_PORT=0 only in CodeSpace ?
 The AnimationMixer in Three.js provides a robust and flexible way to handle animations
-Entity-Component-System (ECS) is an architectural pattern often used in game development but increasingly in other types of applications, including simulations and virtual reality.
+Entity-Component-System (ECS) is an architectural pattern often used in game development. Entity: A unique identifier representing an object. Component: Holds data attributes for an entity (e.g., position, velocity). System: Contains logic to process entities with specific components (e.g., movement, rendering).
 
 We are likely to hit performance issues so moving to 2D may be better e.g. pixi.js with planck-js This leaves an issue regarding how to have intersecting planes. plank-js seemed to run into issues with 1000s of objects. https://github.com/liabru/matter-js might be better ? https://github.com/liabru/matter-attractors
 
-An example of calling a Physics function:
+Calling a Physics function through animation controller:
 [1, 'emergent1.Sphere1', { action: { name: 'applyImpulse', params: [{ x: 10, y: 5, z: 0 }] } }],
 
-Use a shader to make the particle look like a blob. 
-
-Use a shader to allow for an a blob=like "overlay" of emergent entities
-
-Draw relations within emergent entity - like a radial graph
-
 Pass down a ref to runtimeConfig ?
-
-We have the Particle refs at the top level CompoundEntity so we could create mesh instances there ?
-Can use Merged from @react-three/drei ?
-
-https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance
-https://rapier.rs/docs/user_guides/rust/common_mistakes/
-https://www.dhiwise.com/post/The%20Role%20of%20React%20Three%20Fiber%20in%20the%20Evolution%20of%20User%20Interface%20Design
 
 Below a certain scale joints could become fixed and merge into a single collider (capsule) the intermediate joints can be ignored
 Why can joints have large gaps appear due to forces
