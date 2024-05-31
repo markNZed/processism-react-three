@@ -9,31 +9,45 @@ import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
 
-/* Notes:
+/* Overview:
+ A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
+ This shows the concept of emergent entities 
+ Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
 
- Add a repellant force 
  requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
  Each frame has 16.67 milliseconds for all the rendering and updates to occur.
+*/
 
- Use https://github.com/pmndrs/react-three-rapier/tree/main/packages/react-three-rapier-addons#attractors
- Use https://github.com/pmndrs/react-three-rapier?tab=readme-ov-file#instanced-meshes
-
- Maybe pass all the refs up and then from top level instantiate Particles and Joints
+/* Ideas:
  Could introduce a runtimeConfig that all CompoundEntity can update
-
+ The Attractor does not support ref for updating position - this causes re-rendering
 */
 
 const ZERO_VECTOR = new THREE.Vector3();
 
-// A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
-// This shows the concept of emergent entities 
-// Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
-
-// This is the Component that gets exported and is instantiated in the scene
-// There is a recursive structure under EntityScopes where
-// a CompoundEntity will instantiate multiple CompoundEntity to a certain depth (length of scopesConfig.entityCounts array)
-// the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
+/*
+ This is the Component that gets exported and is instantiated in the scene
+ There is a recursive structure under EntityScopes where
+ a CompoundEntity will instantiate multiple CompoundEntity to a certain depth (length of scopesConfig.entityCounts array)
+ the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
+*/
 const EntityScopes = React.forwardRef((props, ref) => {
+
+  // The global configuration 
+  const impulse = 0.02;
+  const scopesConfig = {
+    // Number of entities at each scope
+    entityCounts: [9, 9, 21],
+    // Can pass a function as a color, null will inherit parent color or default
+    colors: [props.color || null, getRandomColorFn, null],
+    debug: false,
+    radius: props.radius || 10, // Radius of the first CompoundEntity
+    impulsePerParticle: impulse,
+    overshootScaling: 2,
+    attractorStrength: -10,
+    maxDisplacementScaling: 1.0,
+    particleRestitution: 0,
+  };
   const { step } = useRapier();
   const framesPerStep = 3; // Update every framesPerStep frames
   const fixedDelta = framesPerStep / 60; //fps
@@ -42,19 +56,6 @@ const EntityScopes = React.forwardRef((props, ref) => {
   const durations = useRef([]); // Store the last 100 durations
   const stepCount = useRef(0); // Counter to track the number of steps
   const lastStepEnd = useRef(0);
-  
-  // The global configuration 
-  const impulse = 0.1;
-  const scopesConfig = {
-    // Number of entities at each scope
-    entityCounts: [9, 9, 21],
-    // Can pass a function as a color, null will inherit parent color or default
-    colors: [props.color || null, getRandomColor, null],
-    debug: false,
-    radius: props.radius || 10, // Radius of the first CompoundEntity
-    impulsePerParticle: impulse,
-    overshootScaling: impulse * 4,
-  };
 
   useFrame(() => {
     framesPerStepCount.current++;
@@ -107,7 +108,7 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 }
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.forwardRef(({ id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
   
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
@@ -151,7 +152,7 @@ const Particle = React.forwardRef(({ id, index, indexArray, scope, initialPositi
       angularDamping={0.5}
       enabledTranslations={[true, true, false]}
       enabledRotations={[false, false, true]}
-      //restitution={1}
+      restitution={config.particleRestitution}
       userData={{color: color}}
     >
       <BallCollider args={[radius]} />
@@ -171,12 +172,12 @@ const Particle = React.forwardRef(({ id, index, indexArray, scope, initialPositi
     )}
   </>
   );
-});
+}));
 
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
 
   const isDebug = config.debug;
   
@@ -185,7 +186,7 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
   useImperativeHandle(ref, () => internalRef.current);
 
   const entityCount = config.entityCounts[scope];
-  const color = getColor(config, scope, parentColor || "blue");
+  const [color, setColor] = useState(getColor(config, scope, parentColor || "blue"));
   // At the deepest scope we will instantiate Particles instead of CompoundEntity
   const Entity = scope == config.entityCounts.length - 1 ? Particle : CompoundEntity;
   // Used for Circle animation when isDebug, the position is managed by r3f not rapier
@@ -195,7 +196,7 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
   // An array of entityCount length that stores the particle refs associated with each entity
   const entityParticlesRefs = Array.from({ length: entityCount }, () => useRef([]));
   // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
-  const entityRadius = (radius * Math.PI / (entityCount + Math.PI)) * 0.95;
+  const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.925;
   // Layout to avoid Particle overlap
   const entityPositions = useMemo(() => {
     return generateEntityPositions(radius - entityRadius, entityCount);
@@ -232,8 +233,9 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
   // Constants impacting particle behavior
   ////////////////////////////////////////
   const impulsePerParticle = config.impulsePerParticle || 0.02;
-  const overshootScaling = config.overshootScaling || impulsePerParticle;
-  const maxDisplacement = radius; // can't use config because radius is not known in advance (could use a function in config?)
+  const overshootScaling = config.overshootScaling || 1;
+  const maxDisplacement = (config.maxDisplacementScaling || 1) * radius;
+  const attractorStrength = config.attractorStrength;
   
   const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
     (Math.random() - 0.5) * impulsePerParticle / (scope + 1),
@@ -377,15 +379,33 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
           if (displacement.length() > maxDisplacement) {
             const overshoot = displacement.length() - maxDisplacement;
             const directionToCenter = displacement.negate().normalize();
-            directionToCenter.multiplyScalar(impulse * overshoot * overshootScaling / entityRefs.length);
+            directionToCenter.multiplyScalar(impulse / entityRefs.length * overshoot * overshootScaling);
             entity.current.addImpulse(directionToCenter);
           } else {
+            // Continue moving in the current direction
             entity.current.addImpulse(impulse / entityRefs.length);
+          }
+          // Model attractor
+          if (attractorStrength) {
+            const directionToCenter = attractorStrength > 0 ? displacement.negate().normalize() : displacement.normalize();
+            directionToCenter.multiplyScalar(impulse / entityRefs.length *  Math.abs(attractorStrength));
+            entity.current.addImpulse(directionToCenter);
           }
         }
       }
     });
   };
+
+  useFrame(() => {
+    // Transfer the impulse to entities on each frame
+    if (entitiesRegisteredRef.current === true) {
+      const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1/entityRefs.length);
+      entityRefs.forEach((entity) => {
+          entity.current.addImpulse(perEntityImpulse);
+      });
+      internalRef.current.setImpulse(ZERO_VECTOR);
+    }
+  });
 
   useFrame(() => {
   
@@ -396,46 +416,36 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
       case "init":
         // Initial random impulse to get more interesting behavior
         if (applyInitialImpulse && entitiesRegisteredRef.current === true) {
-          setApplyInitialImpulse(false);
-          entityRefs.forEach((entity, i) => {
-            // Don't apply impulses to Particles to improve performance
-            if (entity.current && Entity.displayName != "Particle") {
-              // Add an impulse that is unique to each entity
-              entity.current.addImpulse(initialImpulseVectors[i]);
-            }
-          });
           const allocatedJoints = allocateJointsToParticles(entityParticlesRefs, jointsData);
           setJoints(allocatedJoints);
+          setApplyInitialImpulse(false);
+          entityRefs.forEach((entity, i) => {
+            if (entity.current) {
+              // Add an impulse that is unique to each entity
+              const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefs[i].current.length);
+              entity.current.addImpulse(perEntityImpulse);
+            }
+          });
           frameStateRef.current = "findCenter";
         }
         break;
       case "findCenter":
-        centerRef.current = (scope == 0) ? initialPositionVector : calculateCenter();
+        centerRef.current = calculateCenter();
         internalRef.current.setCenter(centerRef.current);
         // Wait until prevCenterRef is set so we can assume it is there in later states
         if (prevCenterRef.current) {
-          frameStateRef.current = "addImpulse";
+          frameStateRef.current = "calcEntitiesImpulse";
         }
         break;
-      case "addImpulse":
-        entityRefs.forEach((entity) => {
-            entity.current.addImpulse(internalRef.current.getImpulse());
-        });
-        internalRef.current.setImpulse(ZERO_VECTOR);
-        frameStateRef.current = "calcImpulse";
-        break;
-      case "calcImpulse":
+      case "calcEntitiesImpulse":
         // Could calculate velocity and direction here
         const displacement = centerRef.current.clone().sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize(); // keep moving in the direction of the displacement
-        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current / (scope + 1));
+        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current);
         frameStateRef.current = "entityImpulses";
         break;
       case "entityImpulses":
-        // Don't apply impulses to Particles to improve performance
-        if (Entity.displayName != "Particle") {
-          entityImpulses(centerRef.current, impulseRef.current);
-        }
+        entityImpulses(centerRef.current, impulseRef.current);
         frameStateRef.current = "findCenter";
         break;
       default:
@@ -444,7 +454,12 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
   
     // For tracking movement and calculating displacement
     if (centerRef.current) {
-      prevCenterRef.current = centerRef.current.clone();
+      // Leave the center of scope 0 at initial position so it stays in the center of the screen
+      if (scope == 0) {
+        prevCenterRef.current = prevCenterRef.current || centerRef.current.clone();
+      } else {
+        prevCenterRef.current = centerRef.current.clone();
+      }
     }
 
     if (isDebug) {
@@ -457,32 +472,6 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
     }
   
   });
-
-  // This is only used in debug
-  const localJointPosition = (groupRef, particles, side) => {
-    let worldPosition;
-    let xOffset;
-    let yOffset;
-    let zOffset;
-    if (side == "A") {
-      worldPosition = particles.particleRefA.current.translation();
-      xOffset = particles.ax;
-      yOffset = particles.ay;
-      zOffset = 0.4;
-    } else {
-      worldPosition = particles.particleRefB.current.translation();
-      xOffset = particles.bx;
-      yOffset = particles.by;
-      zOffset = 0.5;
-    }
-    const worldVector = new THREE.Vector3(worldPosition.x, worldPosition.y, worldPosition.z);
-    const localVector = groupRef.current.worldToLocal(worldVector);
-    localVector.x += xOffset;
-    localVector.y += yOffset;
-    localVector.z += zOffset;
-    const result = [localVector.x, localVector.y, localVector.z];
-    return result
-  };
 
   // Because we are using instanced meshes of the particles to improve performance they are instantiated at scope 0
   // Then the Particle contains the associated rigid body with the physics information whcih is copied here to update
@@ -546,6 +535,31 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
     }
   });
   
+  // This is only used in debug
+  const localJointPosition = (groupRef, particles, side) => {
+    let worldPosition;
+    let xOffset;
+    let yOffset;
+    let zOffset;
+    if (side == "A") {
+      worldPosition = particles.particleRefA.current.translation();
+      xOffset = particles.ax;
+      yOffset = particles.ay;
+      zOffset = 0.4;
+    } else {
+      worldPosition = particles.particleRefB.current.translation();
+      xOffset = particles.bx;
+      yOffset = particles.by;
+      zOffset = 0.5;
+    }
+    const worldVector = new THREE.Vector3(worldPosition.x, worldPosition.y, worldPosition.z);
+    const localVector = groupRef.current.worldToLocal(worldVector);
+    localVector.x += xOffset;
+    localVector.y += yOffset;
+    localVector.z += zOffset;
+    const result = [localVector.x, localVector.y, localVector.z];
+    return result
+  };
 
   return (
     <>
@@ -646,7 +660,7 @@ const CompoundEntity = React.forwardRef(({ id, index, indexArray=[], initialPosi
     )}
     </>
   );
-});
+}));
 
 export default withAnimationState(EntityScopes);
 
@@ -689,7 +703,7 @@ const generateJointsData = (positions) => {
   return jointsData;
 };
 
-const getRandomColor = () => {
+const getRandomColorFn = () => {
   const letters = '0123456789ABCDEF';
   let color = '#';
   for (let i = 0; i < 6; i++) {

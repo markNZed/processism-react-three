@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Scene from './Scene';
 import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText, EmergentEntityNoBoundary, EntityScopes } from '../animationComponents';
 import * as THREE from 'three';
@@ -27,57 +27,54 @@ Instead of bottom-up: inside-out
 
 function SceneThree() {
 
-    const emergentEntityRadius = 10;
-
     // Delay, animationComponent id, animationState
     const animationSequence = [
         //[0, 'emergent1', { variant: "default" }],
     ];
 
-    const fixedDelta = 1 / 30; // 30 FPS
+    const cameraInitialState = {
+        position: [0, 0, 35],
+        zoom: 35,
+        left: window.innerWidth / -2,
+        right: window.innerWidth / 2,
+        top: window.innerHeight / 2,
+        bottom: window.innerHeight / -2,
+        near: 0.1,
+        far: 100
+    };
 
-  const cameraInitialState = {
-    position: [0, 0, 35],
-    zoom: 35,
-    left: window.innerWidth / -2,
-    right: window.innerWidth / 2,
-    top: window.innerHeight / 2,
-    bottom: window.innerHeight / -2,
-    near: 0.1,
-    far: 100
-  };
+    //timestep defaults to 1 / 60 timeStep={"vary"} 
+    // Physics allowSleep={true} ?
+    // Physics is paused so we can manually control the step from EntityScopes
+    // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
+    // numSolverIterations={2} numAdditionalFrictionIterations={2}
 
-  //timestep defaults to 1 / 60 timeStep={"vary"} 
-  // Physics allowSleep={true} ?
-  // Physics is paused so we can manually control the step from EntityScopes
-  // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
-  // numSolverIterations={2} numAdditionalFrictionIterations={2}
+    return (
+        <>
+            <AnimationController animations={animationSequence} useStore={useStore}>
+                <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={false} >
+                    <Perf />
+                    <Scene>
 
-  return (
-    <>
-        <AnimationController animations={animationSequence} useStore={useStore}>
-            <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} numSolverIterations={3} numAdditionalFrictionIterations={3} >
-                <Perf />
-                <Scene>
+                        <EntityScopes
+                            id="EntityScopes1"
+                            //radius={emergentEntityRadius}
+                            color="blue"
+                        />
 
-                    <EntityScopes
-                        id="EntityScopes1"
-                        //radius={emergentEntityRadius}
-                        color="blue"
-                    />
+                    </Scene>
+                </Physics>
+            </AnimationController>
 
-                </Scene>
-            </Physics>
-        </AnimationController>
+            <Camera
+                id={"camera"}
+                initialState={cameraInitialState}
+            />
+            <Environment preset="sunset" />
+            <OrbitControls enablePan={true} />
+        </>
+    );
 
-        <Camera
-            id={"camera"}
-            initialState={cameraInitialState}
-        />
-        <Environment preset="sunset" />
-        <OrbitControls enablePan={true} />
-    </>
-  );
 }
 
 export default SceneThree;
