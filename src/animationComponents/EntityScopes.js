@@ -8,6 +8,7 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
+import convex_hull from './convex_hull';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -229,6 +230,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   const particleAreaRef = useRef();
   const instancedMeshRef = useRef();
   const flattenedParticleRefs = useRef();
+  const convex_mesh_ref = useRef();
 
   ////////////////////////////////////////
   // Constants impacting particle behavior
@@ -489,6 +491,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       let colorChanged = false; // Track if any color has changed
       let positionChanged = false; // Track if any position has changed
   
+      // array to hold all positions jsg
+      const all_positions =[]
+
       for (let i = 0; i < particleCountRef.current; i++) {
         // Get the current position of the instance
         mesh.getMatrixAt(i, dummy.matrix);
@@ -498,6 +503,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         // Get the position of the rigid body, tis is world position
         const pos = flattenedParticleRefs.current[i].current.translation();
         dummy.position.set(pos.x, pos.y, pos.z);
+
+        all_positions.push( new THREE.Vector3( pos.x, pos.y, pos.z ))
   
         // Compare with the current position
         if (!currentPos.equals(dummy.position)) {
@@ -527,6 +534,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           colorChanged = true;
         }
       }
+
+      // create the blob from all_positions jsg
+      if( convex_mesh_ref.current ){
+        const hull                       = convex_hull( all_positions )
+        const shape                      = new THREE.Shape();
+        for( const [ index, point ] of hull.entries()){
+          if( index == 0 ) shape.moveTo( point.x, point.y )
+          else             shape.lineTo( point.x, point.y )
+          //else             shape.bezierCurveTo( point.x, point.y )
+        }
+        const geometry                   = new THREE.ShapeGeometry( shape );		
+        convex_mesh_ref.current.geometry = geometry
+      }      
   
       // Update the instance matrix to reflect changes only if positions changed
       if (positionChanged) {
@@ -601,6 +621,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           id={`${id}-${i}-joint`}
         />
       ))}
+
+      <mesh ref = { convex_mesh_ref }>
+        <meshStandardMaterial color="#ff0000" />
+      </mesh>      
 
       {scope == 0 && particleCountRef.current && (
         <instancedMesh ref={instancedMeshRef} args={[null, null, particleCountRef.current]}>
