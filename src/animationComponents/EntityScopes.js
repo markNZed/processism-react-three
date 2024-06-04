@@ -591,12 +591,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 
 		  { // hide all meshes
 			  hull_ref.current.visible                                        = false
-			  for( const key in compilation ) compilation[ key ].mesh.visible = false
 			  instancedMeshRef.current.visible                                = false
+			  for( const key in compilation ) compilation[ key ].mesh.visible = false
 		  }
 		  switch( global_scope ){
 			  case 0:{
-				let all_hulls =[]
+				let all_hulls                             =[]
 				for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
 				const hull                                = convex_hull( all_hulls )
 				const geometry                            = points_to_geometry( hull )
@@ -627,15 +627,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 			  case 3:{
 				instancedMeshRef.current.visible = true
 			  } break
-		  }
-		  
-		  if( global_scope == 0 ){
-            let  compiled_hulls =[]
-
-		  } else {
-			hull_ref.current.visible = false
-			  
-			for( const key in compilation ) compilation[ key ].mesh.visible = true
 		  }
 	  }
    
@@ -719,7 +710,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 
       <group ref = { convex_group_ref }/>
 	  
-	  <mesh ref = { hull_ref } onClick={()=> ++global_scope}>
+	  <mesh ref = { hull_ref } onClick = { event =>{
+		  if( ++global_scope > 3 ) global_scope = 0
+		}}>	 
 	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
 	  </mesh>
 
