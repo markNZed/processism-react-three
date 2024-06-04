@@ -501,7 +501,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 	  { // setup the compilation object so that no objects need to be created later
 		  const n = particleCountRef.current
 		  for( let i = 0; i < n ; ++i ) {
-			  const parent_serial                  = flattenedParticleRefs.current[i].current.userData.parent_serial
+			  const parent_serial             = flattenedParticleRefs.current[i].current.userData.parent_serial
 			  
 			  if( ! compilation ) compilation ={}
 			  
@@ -511,11 +511,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 					compilation                       ={}
 					convex_group_ref.current.children =[]
 				  }
+				  const color = flattenedParticleRefs.current[ i ].current.userData.color
 				  compilation[ parent_serial ] = {
 					  positions      : [],
 					  position_index : 0,
 					  hull           : [],
-					  mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color : flattenedParticleRefs.current[i].current.userData.color })),
+					  color,
+					  mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color })),
 				  }
 				  convex_group_ref.current.add( compilation[ parent_serial ].mesh )
 				  
@@ -542,7 +544,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
         dummy.position.set(pos.x, pos.y, pos.z);
 		
 		{ // acumulate positions by CompoundEntity index jsg
-			const parent_serial                            = flattenedParticleRefs.current[i].current.userData.parent_serial
+			const parent_serial = flattenedParticleRefs.current[i].current.userData.parent_serial
 			compilation[ parent_serial ].positions[ compilation[ parent_serial ].position_index++ ].set(pos.x, pos.y, pos.z);
 			//compilation[ parent_serial ].positions.push( new THREE.Vector3( pos.x, pos.y, pos.z ))
 		}
@@ -587,26 +589,53 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 			return      new THREE.ShapeGeometry( shape )
 		  }
 
-		  let  compiled_hulls               =[]
-		  for( const key in compilation ){
-			//const key = Object.keys( compilation )[ 0 ]
-			compilation[ key ].hull          = convex_hull( compilation[ key ].positions )
-			compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull  )			
-			compiled_hulls                   = compiled_hulls.concat( compilation[ key ].hull )
+		  { // hide all meshes
+			  hull_ref.current.visible                                        = false
+			  for( const key in compilation ) compilation[ key ].mesh.visible = false
+			  instancedMeshRef.current.visible                                = false
 		  }
+		  switch( global_scope ){
+			  case 0:{
+				let all_hulls =[]
+				for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
+				const hull                                = convex_hull( all_hulls )
+				const geometry                            = points_to_geometry( hull )
+				hull_ref.current.geometry                 = geometry
+				hull_ref.current.visible                  = true
+			  } break
+			  case 1:{
+				  const hull_and_meshes_by_color =[]
+				  for( const key in compilation ){
+					  compilation[ key ].hull                                                       = convex_hull( compilation[ key ].positions )
+					  const color                                                                   = compilation[ key ].color
+					  if( !( color in hull_and_meshes_by_color )) hull_and_meshes_by_color[ color ] = { hull :[], mesh : compilation[ key ].mesh }
+					  hull_and_meshes_by_color[ color ].hull                                        = hull_and_meshes_by_color[ color ].hull.concat( compilation[ key ].hull )
+				  }
+				  for( const key in hull_and_meshes_by_color ){
+					  const mesh    = hull_and_meshes_by_color[ key ].mesh
+					  mesh.geometry = points_to_geometry( hull_and_meshes_by_color[ key ].hull )
+					  mesh.visible  = true
+				  }
+			  } break
+			  case 2:{		  
+				for( const key in compilation ){
+					compilation[ key ].hull          = convex_hull( compilation[ key ].positions )
+					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
+					compilation[ key ].mesh.visible  = true
+				}
+			  } break
+			  case 3:{
+				instancedMeshRef.current.visible = true
+			  } break
+		  }
+		  
 		  if( global_scope == 0 ){
-			  const hull                = convex_hull( compiled_hulls )
-			  const geometry            = points_to_geometry( hull )
-			  hull_ref.current.geometry = geometry
-			  hull_ref.current.visible  = true
-			  
-			  for( const key in compilation )
-				compilation[ key ].mesh.visible = false
+            let  compiled_hulls =[]
+
 		  } else {
-			  hull_ref.current.visible = false
+			hull_ref.current.visible = false
 			  
-			for( const key in compilation )
-				compilation[ key ].mesh.visible = true
+			for( const key in compilation ) compilation[ key ].mesh.visible = true
 		  }
 	  }
    
@@ -690,7 +719,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 
       <group ref = { convex_group_ref }/>
 	  
-	  <mesh ref = { hull_ref } onClick={() => ++global_scope}>
+	  <mesh ref = { hull_ref } onClick={()=> ++global_scope}>
 	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
 	  </mesh>
 
