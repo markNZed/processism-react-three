@@ -589,29 +589,34 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 
 			shape.moveTo( points[ 0 ].x, points[ 0 ].y )
 			for( let i = 1; i < points.length; ++i ){
+				/*
 				shape.bezierCurveTo( control_points[ i * 2 - 1 ].x,
 				                     control_points[ i * 2 - 1 ].y,
 				                     control_points[ i * 2     ].x,
 				                     control_points[ i * 2     ].y,
 				                     points        [ i         ].x,
 				                     points        [ i         ].y )
-									 
+				*/
+				shape.lineTo( points[ i ].x, points[ i ].y )		 
   		    }
+			/*
 			shape.bezierCurveTo( control_points[ control_points.length - 1 ].x,
 								 control_points[ control_points.length - 1 ].y,
 								 control_points[ 0                         ].x,
 								 control_points[ 0                         ].y,
 								 points        [ 0                         ].x,
 								 points        [ 0                         ].y )
-
+			*/
+			
 			return      new THREE.ShapeGeometry( shape )
 		  }
 		  
-		let all_hulls                             =[]
-		for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
-		const hull                                = convex_hull( all_hulls )
-		const geometry                            = points_to_geometry( hull )
-		hull_ref.current.geometry                 = geometry		  
+		  let all_hulls                             =[]
+		  for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
+		  const hull                                = convex_hull( all_hulls )
+		  const geometry                            = points_to_geometry( hull )
+		  hull_ref.current.geometry.dispose()
+		  hull_ref.current.geometry                 = geometry
 
 		  { // hide all meshes
 			  hull_ref.current.visible                                        = false
@@ -619,7 +624,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 			  for( const key in compilation ) compilation[ key ].mesh.visible = false
 		  }
 		  switch( global_scope ){
-			  case 0:{
+			  case 0:{			  
 				hull_ref.current.visible                  = true				
 			  } break
 			  case 1:{
@@ -632,6 +637,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 				  }
 				  for( const key in hull_and_meshes_by_color ){
 					  const mesh    = hull_and_meshes_by_color[ key ].mesh
+					  mesh.geometry.dispose()
 					  mesh.geometry = points_to_geometry( hull_and_meshes_by_color[ key ].hull )
 					  mesh.visible  = true
 				  }
@@ -639,6 +645,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 			  case 2:{		  
 				for( const key in compilation ){
 					compilation[ key ].hull          = convex_hull( compilation[ key ].positions )
+					compilation[ key ].mesh.geometry.dispose()
 					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
 					compilation[ key ].mesh.visible  = true
 				}
