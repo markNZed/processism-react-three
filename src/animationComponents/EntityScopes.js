@@ -8,6 +8,7 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
+import convex_hull from './convex_hull';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -24,6 +25,11 @@ import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep
 */
 
 const ZERO_VECTOR = new THREE.Vector3();
+
+let global_scope     = 0
+let next_serial      = 0
+let compilation      = null
+let compilation_done = false
 
 /*
  This is the Component that gets exported and is instantiated in the scene
@@ -46,7 +52,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
     attractorScaling: [0, -0.8, -0.1],
     maxDisplacementScaling: 0.75,
     particleRestitution: 0,
-    ccd: false,
+	ccd: false,
   };
   const { step } = useRapier();
   const framesPerStep = 1; // Update every framesPerStep frames
@@ -91,7 +97,8 @@ const EntityScopes = React.forwardRef((props, ref) => {
 
   return (
     // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
-    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
+    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}
+		serial = { next_serial++ } /> // jsg/>
   );
 });
 
@@ -108,7 +115,7 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 }
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
+const Particle = React.memo(React.forwardRef(({ serial, parent_serial, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
   
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
@@ -153,8 +160,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, in
       enabledTranslations={[true, true, false]}
       enabledRotations={[false, false, true]}
       restitution={config.particleRestitution}
-      userData={{color: color}}
-      ccd={config.ccd}
+      userData={{color: color, parent_serial }}
+	  ccd={config.ccd}
     >
       <BallCollider args={[radius]} />
     </ParticleRigidBody>
@@ -178,7 +185,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, in
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
 
   const isDebug = config.debug;
   
@@ -229,7 +236,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   const particleAreaRef = useRef();
   const instancedMeshRef = useRef();
   const flattenedParticleRefs = useRef();
-
+  
+  // jsg
+  const convex_group_ref      = useRef()
+  const hull_ref              = useRef()
+  
   ////////////////////////////////////////
   // Constants impacting particle behavior
   ////////////////////////////////////////
@@ -489,6 +500,41 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       let colorChanged = false; // Track if any color has changed
       let positionChanged = false; // Track if any position has changed
   
+	  { // setup the compilation object so that no objects need to be created later jsg
+		  const n = particleCountRef.current
+		  for( let i = 0; i < n ; ++i ) {
+			  const parent_serial             = flattenedParticleRefs.current[i].current.userData.parent_serial
+			  
+			  if( ! compilation ) compilation ={}
+			  
+			  if( ! ( parent_serial in compilation )){
+				  if( compilation_done ){
+					compilation_done                  = false
+					compilation                       ={}
+					convex_group_ref.current.children =[]
+				  }
+				  const color = flattenedParticleRefs.current[ i ].current.userData.color
+				  compilation[ parent_serial ] = {
+					  positions      : [],
+					  position_index : 0,
+					  hull           : [],
+					  color,
+					  mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color })),
+				  }
+				  convex_group_ref.current.add( compilation[ parent_serial ].mesh )
+				  
+				  for( let j = 0; j < n; ++j ){
+				    if( parent_serial == flattenedParticleRefs.current[ j ].current.userData.parent_serial )
+						compilation[ parent_serial ].positions.push( new THREE.Vector3())
+				  }
+			  }
+			  
+			  //compilation[ parent_serial ].positions = []
+			  compilation[ parent_serial ].position_index = 0
+		  }
+		  compilation_done = true
+	  }
+       
       for (let i = 0; i < particleCountRef.current; i++) {
         // Get the current position of the instance
         mesh.getMatrixAt(i, dummy.matrix);
@@ -498,6 +544,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         // Get the position of the rigid body, tis is world position
         const pos = flattenedParticleRefs.current[i].current.translation();
         dummy.position.set(pos.x, pos.y, pos.z);
+  
+		{ // acumulate positions by CompoundEntity index jsg
+			const parent_serial = flattenedParticleRefs.current[i].current.userData.parent_serial
+			compilation[ parent_serial ].positions[ compilation[ parent_serial ].position_index++ ].set(pos.x, pos.y, pos.z);
+			//compilation[ parent_serial ].positions.push( new THREE.Vector3( pos.x, pos.y, pos.z ))
+		}
   
         // Compare with the current position
         if (!currentPos.equals(dummy.position)) {
@@ -528,6 +580,71 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         }
       }
   
+	  { // create the blobs from positions_by_entity jsg
+		  const points_to_geometry = points =>{
+			const shape = new THREE.Shape()
+			for( const [ index, point ] of points.entries()){
+			  if( index == 0 ) shape.moveTo( point.x, point.y )
+			  else             shape.lineTo( point.x, point.y )
+			  //else             shape.bezierCurveTo( point.x, point.y )
+			}
+			return      new THREE.ShapeGeometry( shape )
+		  }
+
+		  { // hide all meshes
+			  hull_ref.current.visible                                        = false
+			  instancedMeshRef.current.visible                                = false
+			  for( const key in compilation ) compilation[ key ].mesh.visible = false
+		  }
+		  switch( global_scope ){
+			  case 0:{
+				let all_hulls                             =[]
+				for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
+				const hull                                = convex_hull( all_hulls )
+				const geometry                            = points_to_geometry( hull )
+				hull_ref.current.geometry                 = geometry
+				hull_ref.current.visible                  = true
+			  } break
+			  case 1:{
+				  const hull_and_meshes_by_color =[]
+				  for( const key in compilation ){
+					  compilation[ key ].hull                                                       = convex_hull( compilation[ key ].positions )
+					  const color                                                                   = compilation[ key ].color
+					  if( !( color in hull_and_meshes_by_color )) hull_and_meshes_by_color[ color ] = { hull :[], mesh : compilation[ key ].mesh }
+					  hull_and_meshes_by_color[ color ].hull                                        = hull_and_meshes_by_color[ color ].hull.concat( compilation[ key ].hull )
+				  }
+				  for( const key in hull_and_meshes_by_color ){
+					  const mesh    = hull_and_meshes_by_color[ key ].mesh
+					  mesh.geometry = points_to_geometry( hull_and_meshes_by_color[ key ].hull )
+					  mesh.visible  = true
+				  }
+				  /*
+				  const positions_and_meshes_by_color =[]
+				  for( const key in compilation ){
+					  const color                                                                             = compilation[ key ].color
+					  if( !( color in positions_and_meshes_by_color )) positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
+					  positions_and_meshes_by_color[ color ].positions                                        = positions_and_meshes_by_color[ color ].positions.concat( compilation[ key ].positions )
+				  }
+				  for( const key in positions_and_meshes_by_color ){
+					  const mesh    = positions_and_meshes_by_color[ key ].mesh
+					  mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
+					  mesh.visible  = true
+				  }		
+				  */
+			  } break
+			  case 2:{		  
+				for( const key in compilation ){
+					compilation[ key ].hull          = convex_hull( compilation[ key ].positions )
+					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
+					compilation[ key ].mesh.visible  = true
+				}
+			  } break
+			  case 3:{
+				instancedMeshRef.current.visible = true
+			  } break
+		  }
+	  }
+   
       // Update the instance matrix to reflect changes only if positions changed
       if (positionChanged) {
         mesh.instanceMatrix.needsUpdate = true;
@@ -584,6 +701,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           parentDebug={isDebug}
           config={config}
           userData={{ color }}
+		  
+		  // jsg 
+		  serial        = { next_serial++ }
+		  parent_serial = { serial }		  
         />
       ))}
 
@@ -602,6 +723,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         />
       ))}
 
+	  // jsg
+      <group ref = { convex_group_ref }/>
+	  
+	  <mesh ref = { hull_ref } 
+		onClick       = { event =>{ if( ++global_scope > 3 ) global_scope = 0 }}
+		onContextMenu = { event =>{ if( --global_scope < 0 ) global_scope = 3 }}>	 
+	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
+	  </mesh>
+	  
       {scope == 0 && particleCountRef.current && (
         <instancedMesh ref={instancedMeshRef} args={[null, null, particleCountRef.current]}>
           <circleGeometry args={[particleRadiusRef.current, 16]} /> 
