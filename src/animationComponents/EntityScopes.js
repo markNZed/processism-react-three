@@ -8,7 +8,8 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
-import convex_hull from './convex_hull';
+import convex_hull from './convex_hull'
+import build_curve from './curve'
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -505,7 +506,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 		  for( let i = 0; i < n ; ++i ) {
 			  const parent_serial             = flattenedParticleRefs.current[i].current.userData.parent_serial
 			  
-			  if( ! compilation ) compilation ={}
+			  if( ! compilation ){ 
+				compilation ={}
+				convex_group_ref.current.children =[]
+			  }
 			  
 			  if( ! ( parent_serial in compilation )){
 				  if( compilation_done ){
@@ -528,8 +532,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 						compilation[ parent_serial ].positions.push( new THREE.Vector3())
 				  }
 			  }
-			  
-			  //compilation[ parent_serial ].positions = []
 			  compilation[ parent_serial ].position_index = 0
 		  }
 		  compilation_done = true
@@ -548,7 +550,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 		{ // acumulate positions by CompoundEntity index jsg
 			const parent_serial = flattenedParticleRefs.current[i].current.userData.parent_serial
 			compilation[ parent_serial ].positions[ compilation[ parent_serial ].position_index++ ].set(pos.x, pos.y, pos.z);
-			//compilation[ parent_serial ].positions.push( new THREE.Vector3( pos.x, pos.y, pos.z ))
 		}
   
         // Compare with the current position
@@ -580,16 +581,37 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
         }
       }
   
-	  { // create the blobs from positions_by_entity jsg
+	  { // create the blobs from positions_by_entity jsg	  
 		  const points_to_geometry = points =>{
 			const shape = new THREE.Shape()
-			for( const [ index, point ] of points.entries()){
-			  if( index == 0 ) shape.moveTo( point.x, point.y )
-			  else             shape.lineTo( point.x, point.y )
-			  //else             shape.bezierCurveTo( point.x, point.y )
-			}
+
+		    const control_points = build_curve({ points : points, closed : true })
+
+			shape.moveTo( points[ 0 ].x, points[ 0 ].y )
+			for( let i = 1; i < points.length; ++i ){
+				shape.bezierCurveTo( control_points[ i * 2 - 1 ].x,
+				                     control_points[ i * 2 - 1 ].y,
+				                     control_points[ i * 2     ].x,
+				                     control_points[ i * 2     ].y,
+				                     points        [ i         ].x,
+				                     points        [ i         ].y )
+									 
+  		    }
+			shape.bezierCurveTo( control_points[ control_points.length - 1 ].x,
+								 control_points[ control_points.length - 1 ].y,
+								 control_points[ 0                         ].x,
+								 control_points[ 0                         ].y,
+								 points        [ 0                         ].x,
+								 points        [ 0                         ].y )
+
 			return      new THREE.ShapeGeometry( shape )
 		  }
+		  
+		let all_hulls                             =[]
+		for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
+		const hull                                = convex_hull( all_hulls )
+		const geometry                            = points_to_geometry( hull )
+		hull_ref.current.geometry                 = geometry		  
 
 		  { // hide all meshes
 			  hull_ref.current.visible                                        = false
@@ -598,12 +620,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 		  }
 		  switch( global_scope ){
 			  case 0:{
-				let all_hulls                             =[]
-				for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
-				const hull                                = convex_hull( all_hulls )
-				const geometry                            = points_to_geometry( hull )
-				hull_ref.current.geometry                 = geometry
-				hull_ref.current.visible                  = true
+				hull_ref.current.visible                  = true				
 			  } break
 			  case 1:{
 				  const hull_and_meshes_by_color =[]
@@ -618,19 +635,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 					  mesh.geometry = points_to_geometry( hull_and_meshes_by_color[ key ].hull )
 					  mesh.visible  = true
 				  }
-				  /*
-				  const positions_and_meshes_by_color =[]
-				  for( const key in compilation ){
-					  const color                                                                             = compilation[ key ].color
-					  if( !( color in positions_and_meshes_by_color )) positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
-					  positions_and_meshes_by_color[ color ].positions                                        = positions_and_meshes_by_color[ color ].positions.concat( compilation[ key ].positions )
-				  }
-				  for( const key in positions_and_meshes_by_color ){
-					  const mesh    = positions_and_meshes_by_color[ key ].mesh
-					  mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-					  mesh.visible  = true
-				  }		
-				  */
 			  } break
 			  case 2:{		  
 				for( const key in compilation ){
