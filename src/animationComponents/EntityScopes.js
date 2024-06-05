@@ -28,6 +28,7 @@ import build_curve from './curve'
 const ZERO_VECTOR = new THREE.Vector3();
 
 let global_scope     = 0
+let max_global_scope = 0
 let compilation      = null
 let compilation_done = false
 
@@ -116,6 +117,9 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
   
+  // keep track of how deep it goes jsg
+  if( scope > max_global_scope ) max_global_scope = scope
+  
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
 
@@ -186,6 +190,9 @@ Particle.displayName = 'Particle'; // the name property doesn't exist because it
 // 
 const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
 
+  // keep track of how deep it goes jsg
+  if( scope > max_global_scope ) max_global_scope = scope
+  
   const isDebug = config.debug;
   
   // Using forwardRef and need to access the ref from inside this component too
@@ -718,8 +725,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       <group ref = { convex_group_ref }/>
 	  
 	  <mesh ref = { hull_ref } 
-		onClick       = { event =>{ if( ++global_scope > 3 ) global_scope = 0 }}
-		onContextMenu = { event =>{ if( --global_scope < 0 ) global_scope = 3 }}>	 
+		onClick       = { event =>{ if( ++global_scope > max_global_scope ) global_scope = 0 }}
+		onContextMenu = { event =>{ if( --global_scope < 0 ) global_scope = max_global_scope }}>	 
 	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
 	  </mesh>
 	  
