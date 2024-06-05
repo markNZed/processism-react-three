@@ -28,7 +28,6 @@ import build_curve from './curve'
 const ZERO_VECTOR = new THREE.Vector3();
 
 let global_scope     = 0
-let next_serial      = 0
 let compilation      = null
 let compilation_done = false
 
@@ -98,8 +97,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
 
   return (
     // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
-    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}
-		serial = { next_serial++ } /> // jsg/>
+    <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
   );
 });
 
@@ -116,7 +114,7 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 }
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ serial, parent_serial, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
+const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
   
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
@@ -161,7 +159,7 @@ const Particle = React.memo(React.forwardRef(({ serial, parent_serial, id, index
       enabledTranslations={[true, true, false]}
       enabledRotations={[false, false, true]}
       restitution={config.particleRestitution}
-      userData={{color: color, parent_serial }}
+      userData={{color: color, parent_id }}
 	  ccd={config.ccd}
     >
       <BallCollider args={[radius]} />
@@ -186,7 +184,7 @@ const Particle = React.memo(React.forwardRef(({ serial, parent_serial, id, index
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
 
   const isDebug = config.debug;
   
@@ -504,35 +502,35 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 	  { // setup the compilation object so that no objects need to be created later jsg
 		  const n = particleCountRef.current
 		  for( let i = 0; i < n ; ++i ) {
-			  const parent_serial             = flattenedParticleRefs.current[i].current.userData.parent_serial
+			  const parent_id = flattenedParticleRefs.current[i].current.userData.parent_id
 			  
 			  if( ! compilation ){ 
 				compilation ={}
 				convex_group_ref.current.children =[]
 			  }
 			  
-			  if( ! ( parent_serial in compilation )){
+			  if( ! ( parent_id in compilation )){
 				  if( compilation_done ){
 					compilation_done                  = false
 					compilation                       ={}
 					convex_group_ref.current.children =[]
 				  }
 				  const color = flattenedParticleRefs.current[ i ].current.userData.color
-				  compilation[ parent_serial ] = {
+				  compilation[ parent_id ] = {
 					  positions      : [],
 					  position_index : 0,
 					  hull           : [],
 					  color,
 					  mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color })),
 				  }
-				  convex_group_ref.current.add( compilation[ parent_serial ].mesh )
+				  convex_group_ref.current.add( compilation[ parent_id ].mesh )
 				  
 				  for( let j = 0; j < n; ++j ){
-				    if( parent_serial == flattenedParticleRefs.current[ j ].current.userData.parent_serial )
-						compilation[ parent_serial ].positions.push( new THREE.Vector3())
+				    if( parent_id == flattenedParticleRefs.current[ j ].current.userData.parent_id )
+						compilation[ parent_id ].positions.push( new THREE.Vector3())
 				  }
 			  }
-			  compilation[ parent_serial ].position_index = 0
+			  compilation[ parent_id ].position_index = 0
 		  }
 		  compilation_done = true
 	  }
@@ -548,8 +546,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
         dummy.position.set(pos.x, pos.y, pos.z);
   
 		{ // acumulate positions by CompoundEntity index jsg
-			const parent_serial = flattenedParticleRefs.current[i].current.userData.parent_serial
-			compilation[ parent_serial ].positions[ compilation[ parent_serial ].position_index++ ].set(pos.x, pos.y, pos.z);
+			const parent_id = flattenedParticleRefs.current[i].current.userData.parent_id
+			compilation[ parent_id ].positions[ compilation[ parent_id ].position_index++ ].set(pos.x, pos.y, pos.z);
 		}
   
         // Compare with the current position
@@ -584,33 +582,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
 	  { // create the blobs from positions_by_entity jsg	  
 		  const points_to_geometry = points =>{
 			const shape = new THREE.Shape()
-
-		    const control_points = build_curve({ points : points, closed : true })
-
-			shape.moveTo( points[ 0 ].x, points[ 0 ].y )
+		    shape.moveTo( points[ 0 ].x, points[ 0 ].y )
 			for( let i = 1; i < points.length; ++i ){
-				/*
-				shape.bezierCurveTo( control_points[ i * 2 - 1 ].x,
-				                     control_points[ i * 2 - 1 ].y,
-				                     control_points[ i * 2     ].x,
-				                     control_points[ i * 2     ].y,
-				                     points        [ i         ].x,
-				                     points        [ i         ].y )
-				*/
 				shape.lineTo( points[ i ].x, points[ i ].y )		 
   		    }
-			/*
-			shape.bezierCurveTo( control_points[ control_points.length - 1 ].x,
-								 control_points[ control_points.length - 1 ].y,
-								 control_points[ 0                         ].x,
-								 control_points[ 0                         ].y,
-								 points        [ 0                         ].x,
-								 points        [ 0                         ].y )
-			*/
-			
-			return      new THREE.ShapeGeometry( shape )
+			const shape_geometry = new THREE.ShapeGeometry( shape )
+			//shape.dispose()
+			return shape_geometry
 		  }
 		  
+		  // update the hidden blob so that it can be correctly clicked
 		  let all_hulls                             =[]
 		  for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
 		  const hull                                = convex_hull( all_hulls )
@@ -714,8 +695,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ serial, parent_serial, id,
           userData={{ color }}
 		  
 		  // jsg 
-		  serial        = { next_serial++ }
-		  parent_serial = { serial }		  
+		  parent_id = { id }		  
         />
       ))}
 
