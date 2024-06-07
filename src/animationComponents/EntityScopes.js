@@ -9,7 +9,6 @@ import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
 import convex_hull from './convex_hull'
-import build_curve from './curve'
 import { ConvexHull } from 'three/addons/math/ConvexHull.js';
 
 /* Overview:
@@ -600,10 +599,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 		  }
 		  		  
 		  { // update the hidden blob so that it can be correctly clicked
-			  let all_hulls                             =[]
-			  for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
-			  //for( const key in compilation ) all_hulls = all_hulls.concat( compilation[ key ].positions )
-			  const hull                                = convex_hull( all_hulls )
+			  let all_positions                             =[]
+			  for( const key in compilation ) all_positions = all_positions.concat( compilation[ key ].positions )
+			  const hull                                = convex_hull({ points : all_positions })
 			  const geometry                            = points_to_geometry( hull )
 			  hull_ref.current.geometry.dispose()
 			  hull_ref.current.geometry                 = geometry
@@ -622,7 +620,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			  case 1:{
 				  const hull_and_meshes_by_color =[]
 				  for( const key in compilation ){
-					  compilation[ key ].hull                                                       = convex_hull( compilation[ key ].positions )
+					  compilation[ key ].hull                                                       = convex_hull({ points : compilation[ key ].positions, epsilon : -1 })
 					  const color                                                                   = compilation[ key ].color
 					  if( !( color in hull_and_meshes_by_color )) hull_and_meshes_by_color[ color ] = { hull :[], mesh : compilation[ key ].mesh }
 					  hull_and_meshes_by_color[ color ].hull                                        = hull_and_meshes_by_color[ color ].hull.concat( compilation[ key ].hull )
@@ -636,7 +634,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			  } break
 			  case 2:{		  
 				for( const key in compilation ){
-					compilation[ key ].hull          = convex_hull( compilation[ key ].positions )
+					compilation[ key ].hull          = convex_hull({ points : compilation[ key ].positions })
 					compilation[ key ].mesh.geometry.dispose()
 					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
 					compilation[ key ].mesh.visible  = true
