@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
-import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
+import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider, vec3 } from '@react-three/rapier';
 import convex_hull from './convex_hull'
 
 /* Overview:
@@ -115,7 +115,7 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
-  
+
   // keep track of how deep it goes jsg
   if( scope > max_global_scope ) max_global_scope = scope
   
@@ -262,6 +262,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
   // Initialization logging/debug
   useEffect(() => {
+    console.log("Mounting", id);
     //console.log("entityArea", id, entityArea)
     if (isDebug) {
       //console.log("jointsData", id, jointsData);
@@ -444,6 +445,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         // Initial random impulse to get more interesting behavior
         if (applyInitialImpulse && entitiesRegisteredRef.current === true) {
           const allocatedJoints = allocateJointsToParticles(entityParticlesRefs, jointsData);
+          centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
+          // Get distance from center ot first joint
+          const firstJointData = jointsData[0];
+          const firstJointPosition = new THREE.Vector3(firstJointData.position.x, firstJointData.position.y, firstJointData.position.z);
+          const distanceToFirstJoint = centerRef.current.distanceTo(internalRef.current.localToWorld(firstJointPosition));
+          // foreach particle set a userData entry userData.scopeInner[scope] = true if the particle is closer to the center than the joint
+          flattenedParticleRefs.current.forEach(particleRef => {
+            const particlePosition = particleRef.current.translation();
+            const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
+            const distanceToCenter = centerRef.current.distanceTo(particleVector);
+            if (!particleRef.current.userData.scopeInner) {
+              particleRef.current.userData.scopeInner = {};
+            }
+            const inner = distanceToCenter < distanceToFirstJoint;
+            particleRef.current.userData.scopeInner[scope] = inner;
+          });
           setJoints(allocatedJoints);
           setApplyInitialImpulse(false);
           entityRefs.forEach((entity, i) => {
@@ -721,7 +738,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         />
       ))}
 
-	  // jsg
+	  {/*// jsg*/}
       <group ref = { convex_group_ref }/>
 	  
 	  <mesh ref = { hull_ref } 
