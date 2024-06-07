@@ -9,7 +9,6 @@ import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
 import convex_hull from './convex_hull'
-import { ConvexHull } from 'three/addons/math/ConvexHull.js';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -588,9 +587,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   
 	  { // create the blobs from positions_by_entity jsg	  
 		  const points_to_geometry = points =>{
-			
-			const curve           = new THREE.CatmullRomCurve3( points, true, 'centripetal' )
-			const ten_fold_points = curve.getPoints( points.length * 10 )
+			const curve           = new THREE.CatmullRomCurve3( points, true )
+			const ten_fold_points = curve.getPoints( points.length * 2 )
 			//curve.dispose         ()
 			const shape           = new THREE.Shape( ten_fold_points )
 			const shape_geometry  = new THREE.ShapeGeometry( shape )
@@ -618,17 +616,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				hull_ref.current.visible                  = true				
 			  } break
 			  case 1:{
-				  const hull_and_meshes_by_color =[]
+				  const positions_and_meshes_by_color =[]
 				  for( const key in compilation ){
-					  compilation[ key ].hull                                                       = convex_hull({ points : compilation[ key ].positions, epsilon : -1 })
-					  const color                                                                   = compilation[ key ].color
-					  if( !( color in hull_and_meshes_by_color )) hull_and_meshes_by_color[ color ] = { hull :[], mesh : compilation[ key ].mesh }
-					  hull_and_meshes_by_color[ color ].hull                                        = hull_and_meshes_by_color[ color ].hull.concat( compilation[ key ].hull )
+					  const color                                                                             = compilation[ key ].color
+					  if( !( color in positions_and_meshes_by_color )) positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
+					  positions_and_meshes_by_color[ color ].positions                                        = positions_and_meshes_by_color[ color ].positions.concat( compilation[ key ].positions )
 				  }
-				  for( const key in hull_and_meshes_by_color ){
-					  const mesh    = hull_and_meshes_by_color[ key ].mesh
+				  
+				  for( const key in positions_and_meshes_by_color ){
+					  const mesh    = positions_and_meshes_by_color[ key ].mesh
 					  mesh.geometry.dispose()
-					  mesh.geometry = points_to_geometry( hull_and_meshes_by_color[ key ].hull )
+					  mesh.geometry = points_to_geometry( convex_hull({ points : positions_and_meshes_by_color[ key ].positions }))
 					  mesh.visible  = true
 				  }
 			  } break

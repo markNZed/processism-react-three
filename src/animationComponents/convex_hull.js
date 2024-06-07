@@ -147,10 +147,25 @@ function dist(p1, p2){
 // 1 --> Clockwise
 // 2 --> Counterclockwise
 function orientation(p, q, r){
-	let val = ( q.y - p.y ) * ( r.x - q.x ) - ( q.x - p.x ) * ( r.y - q.y )
+	//let val = ( q.y - p.y ) * ( r.x - q.x ) - ( q.x - p.x ) * ( r.y - q.y )
+	
+	    let val = ((q.y - p.y) * (r.x - q.x)
+               - (q.x - p.x) * (r.y - q.y));
 
 	if (val == 0) return 0 // collinear
 	return (val > 0)? 1: 2 // clockwise or counterclock wise
+}
+
+function orientation2(p, q, r)
+{
+    let val = ((q.y - p.y) * (r.x - q.x)
+               - (q.x - p.x) * (r.y - q.y));
+    if (val == 0)
+        return 0; // collinear
+    else if (val > 0)
+        return 1; // clock wise
+    else
+        return 2; // counterclock wise
 }
 
 // A function used by library function qsort() to sort
@@ -232,11 +247,8 @@ export default function convex_hull( args ){
         // points next-to-top, top, and points[i] makes
         // a non-left turn
         while (true) {
-            if (S.length < 2)
-                break;
-            if (orientation(nextToTop(S), S[S.length - 1], args.points[i])
-                >= 2)
-                break;
+            if (S.length < 2) break;
+            if (orientation(nextToTop(S), S[S.length - 1], args.points[i]) >= 2) break;
             S.pop();
         }
  
