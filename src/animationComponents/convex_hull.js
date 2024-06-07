@@ -62,6 +62,61 @@ export default function convex_hull( points ){
 		
 		} while (p != l); // While we don't come to first point
 		
-		return hull
+		const Distance                  = ( p1 , p2 )                 => {
+			var x = p1 . x - p2 . x
+			var y = p1 . y - p2 . y
+
+			return Math . sqrt ( x * x + y * y )
+		}				
+		const RDP                       = ( points , epsilon )        => {
+			if ( points . length < 3 ) return points . slice ()
+
+			var firstPoint = points [ 0 ]
+			var lastPoint  = points [ points . length - 1 ]
+
+			var index = - 1
+			var dist  = 0
+			var cDist = 0
+
+			for ( var i = 1 ; i < points . length - 1 ; i ++ ) {
+				var point = points [ i ]
+
+				if ( firstPoint . x == lastPoint . x ) cDist = Math . abs ( point . x - firstPoint . x ) ;
+				else {
+					var slope    = ( lastPoint . y - firstPoint . y ) / ( lastPoint . x - firstPoint . x ) ;
+					var intercept = firstPoint . y - (  slope * firstPoint . x ) ;
+					cDist = Math . abs ( slope * point . x - point . y + intercept ) / Math . sqrt ( Math . pow ( slope , 2 ) + 1 ) ;
+				}
+
+				if ( cDist > dist ) {
+					dist  = cDist ;
+					index = i ;
+				}
+			}
+
+			if ( dist > epsilon ) {
+				var l1 = points . slice ( 0 , index + 1 ) ;
+				var l2 = points . slice ( index ) ;
+				var r1 = RDP ( l1 , epsilon ) ;
+				var r2 = RDP ( l2 , epsilon ) ;
+				r1 . pop ;
+				r1 = r1 . concat ( r2 ) ;
+
+				var r3 = []
+				for ( var i = 0 ; i < r1 . length ; i ++ ) {
+					if ( i == 0 ) r3 . push ( r1 [ 0 ] )
+					else {
+						var pi = r1 [ i ]
+						var pi1 = r1 [ i - 1 ]
+						if ( pi . x != pi1 . x || pi . y != pi1 . y ) r3 . push ( pi )
+					}
+				}
+
+				return r3
+			}
+			return [ firstPoint , lastPoint ]
+		}
+				
+		return RDP( hull, 0 )
 }
 

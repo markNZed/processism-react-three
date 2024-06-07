@@ -10,6 +10,7 @@ import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider } from '@react-three/rapier';
 import convex_hull from './convex_hull'
 import build_curve from './curve'
+import { ConvexHull } from 'three/addons/math/ConvexHull.js';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -588,29 +589,32 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   
 	  { // create the blobs from positions_by_entity jsg	  
 		  const points_to_geometry = points =>{
-			const shape = new THREE.Shape()
-		    shape.moveTo( points[ 0 ].x, points[ 0 ].y )
-			for( let i = 1; i < points.length; ++i ){
-				shape.lineTo( points[ i ].x, points[ i ].y )		 
-  		    }
-			const shape_geometry = new THREE.ShapeGeometry( shape )
-			//shape.dispose()
-			return shape_geometry
+			
+			const curve           = new THREE.CatmullRomCurve3( points, true, 'centripetal' )
+			const ten_fold_points = curve.getPoints( points.length * 10 )
+			//curve.dispose         ()
+			const shape           = new THREE.Shape( ten_fold_points )
+			const shape_geometry  = new THREE.ShapeGeometry( shape )
+			//shape.dispose         ()
+			return                shape_geometry
 		  }
-		  
-		  // update the hidden blob so that it can be correctly clicked
-		  let all_hulls                             =[]
-		  for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
-		  const hull                                = convex_hull( all_hulls )
-		  const geometry                            = points_to_geometry( hull )
-		  hull_ref.current.geometry.dispose()
-		  hull_ref.current.geometry                 = geometry
+		  		  
+		  { // update the hidden blob so that it can be correctly clicked
+			  let all_hulls                             =[]
+			  for( const key in compilation ) all_hulls = all_hulls.concat( convex_hull( compilation[ key ].positions ))
+			  //for( const key in compilation ) all_hulls = all_hulls.concat( compilation[ key ].positions )
+			  const hull                                = convex_hull( all_hulls )
+			  const geometry                            = points_to_geometry( hull )
+			  hull_ref.current.geometry.dispose()
+			  hull_ref.current.geometry                 = geometry
+		  }
 
 		  { // hide all meshes
 			  hull_ref.current.visible                                        = false
 			  instancedMeshRef.current.visible                                = false
 			  for( const key in compilation ) compilation[ key ].mesh.visible = false
 		  }
+
 		  switch( global_scope ){
 			  case 0:{			  
 				hull_ref.current.visible                  = true				

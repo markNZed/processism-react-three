@@ -29,7 +29,7 @@ export default function build_curve( args ){
 			p2      : curve_points[ i + 2 ] , 
 			tension : 0 })
 			
-		control_points.push( cpoints[ 0 ], cpoints[ 1 ])
+		control_points.push( cpoints[ 0 ], cpoints[ 1 ], 0 )
 	}
 	return                   control_points
 }
