@@ -263,7 +263,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
   // Initialization logging/debug
   useEffect(() => {
-    console.log("Mounting", id);
     //console.log("entityArea", id, entityArea)
     if (isDebug) {
       //console.log("jointsData", id, jointsData);
@@ -542,6 +541,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				  const color = flattenedParticleRefs.current[ i ].current.userData.color
 				  compilation[ parent_id ] = {
 					  positions      : [],
+            scopeInners      : [],
 					  position_index : 0,
 					  hull           : [],
 					  color,
@@ -552,6 +552,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				  for( let j = 0; j < n; ++j ){
 				    if( parent_id == flattenedParticleRefs.current[ j ].current.userData.parent_id )
 						compilation[ parent_id ].positions.push( new THREE.Vector3())
+            compilation[ parent_id ].scopeInners.push(flattenedParticleRefs.current[j].current.userData.scopeInner)
 				  }
 			  }
 			  compilation[ parent_id ].position_index = 0
@@ -637,7 +638,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			  case 1:{
 				  const hull_and_meshes_by_color =[]
 				  for( const key in compilation ){
-					  compilation[ key ].hull                                                       = convex_hull({ points : compilation[ key ].positions, epsilon : -1 })
+            const positions = [];
+            compilation[ key ].positions.forEach((position, i) => {
+               if (!compilation[key].scopeInners[i][1]) {
+                positions.push(position);
+              }
+            });
+					  compilation[ key ].hull                                                       = convex_hull({ points : positions, epsilon : -1 })
 					  const color                                                                   = compilation[ key ].color
 					  if( !( color in hull_and_meshes_by_color )) hull_and_meshes_by_color[ color ] = { hull :[], mesh : compilation[ key ].mesh }
 					  hull_and_meshes_by_color[ color ].hull                                        = hull_and_meshes_by_color[ color ].hull.concat( compilation[ key ].hull )
@@ -651,7 +658,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			  } break
 			  case 2:{		  
 				for( const key in compilation ){
-					compilation[ key ].hull          = convex_hull({ points : compilation[ key ].positions })
+          const positions = [];
+          compilation[ key ].positions.forEach((position, i) => {
+            if (!compilation[key].scopeInners[i][0]) {
+              positions.push(position);
+            } else {
+              console.group("ignoring", i)
+            }
+          });
+          
+					compilation[ key ].hull          = convex_hull({ points : positions })
 					compilation[ key ].mesh.geometry.dispose()
 					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
 					compilation[ key ].mesh.visible  = true
