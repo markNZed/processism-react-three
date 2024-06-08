@@ -123,7 +123,7 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
   useImperativeHandle(ref, () => internalRef.current);
 
   const isDebug = config.debug;
-  const color = getColor(config, scope, parentColor || "blue");
+  const color = internalRef?.current?.current?.userData?.color || getColor(config, scope, parentColor || "blue");
 
   // Calculate the unique global index for the Particle
   const calculateUniqueIndex = (indexArray, entityCounts) => {
@@ -162,7 +162,7 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
       enabledTranslations={[true, true, false]}
       enabledRotations={[false, false, true]}
       restitution={config.particleRestitution}
-      userData={{color: color, parent_id }}
+      userData={{color: color, parent_id, uniqueIndex }}
 	  ccd={config.ccd}
     >
       <BallCollider args={[radius]} />
@@ -176,7 +176,7 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
           anchorX="center"
           anchorY="middle"
         >
-          {index}
+          {uniqueIndex}
         </Text>
       </>
     )}
@@ -187,7 +187,7 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config, ...props }, ref) => {
 
   // keep track of how deep it goes jsg
   if( scope > max_global_scope ) max_global_scope = scope
@@ -241,6 +241,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   const particleAreaRef = useRef();
   const instancedMeshRef = useRef();
   const flattenedParticleRefs = useRef();
+  const chainRef = props.chainRef || useRef({});
   
   // jsg
   const convex_group_ref      = useRef()
@@ -350,6 +351,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       const offsetA = direction.clone().multiplyScalar(particleRadiusRef.current);
       const offsetB = direction.clone().multiplyScalar(-particleRadiusRef.current);
 
+      const refA = entityParticlesRefs[particleAEntityIndex].current[closestParticleAIndex];
+      const refB = entityParticlesRefs[particleBEntityIndex].current[closestParticleBIndex];
+      const uniqueIndexA = refA.current.userData.uniqueIndex
+      const uniqueIndexB = refB.current.userData.uniqueIndex
+
+      if (chainRef.current[uniqueIndexA]) {
+        chainRef.current[uniqueIndexA].push(uniqueIndexB)
+      } else {
+        chainRef.current[uniqueIndexA] = [uniqueIndexB]
+      }
+      if (chainRef.current[uniqueIndexB]) {
+        chainRef.current[uniqueIndexB].push(uniqueIndexA)
+      } else {
+        chainRef.current[uniqueIndexB] = [uniqueIndexA]
+      }
+
       return {
         particleRefA: entityParticlesRefs[particleAEntityIndex].current[closestParticleAIndex],
         particlePosA: closestParticleAPosition.clone(),
@@ -457,11 +474,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
             if (!particleRef.current.userData.scopeInner) {
               particleRef.current.userData.scopeInner = {};
             }
-            const inner = distanceToCenter < distanceToFirstJoint;
-            particleRef.current.userData.scopeInner[scope] = inner;
+            let inner = distanceToCenter <= (distanceToFirstJoint - 0.15); // Why 0.15 ???
+            const scopeInner = particleRef.current.userData.scopeInner;
+            if (inner) {
+              for( let i = 0; i <= scope ; ++i ) {
+                scopeInner[i] = true;
+              }
+            }
+            //if (scopeInner[0] && scope == 0) particleRef.current.userData.color = "black";
           });
-          setJoints(allocatedJoints);
           setApplyInitialImpulse(false);
+          setJoints(allocatedJoints);
           entityRefs.forEach((entity, i) => {
             if (entity.current) {
               // Add an impulse that is unique to each entity
@@ -540,7 +563,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
             const color = flattenedParticleRefs.current[ i ].current.userData.color
             compilation[ parent_id ] = {
               positions      : [],
-              scopeInners      : [],
+              scopeInners    : [],
+              uniqueIndexes  : [],
               position_index : 0,
               hull           : [],
               color,
@@ -552,6 +576,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
               if( parent_id == flattenedParticleRefs.current[ j ].current.userData.parent_id ) {
                 compilation[ parent_id ].positions.push( new THREE.Vector3())
                 compilation[ parent_id ].scopeInners.push(flattenedParticleRefs.current[j].current.userData.scopeInner)
+                compilation[ parent_id ].uniqueIndexes.push(flattenedParticleRefs.current[j].current.userData.uniqueIndex)
               }
             }
           }
@@ -605,76 +630,129 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       }
   
 	  { // create the blobs from positions_by_entity jsg	  
-		  const points_to_geometry = points =>{
-			//const curve           = new THREE.CatmullRomCurve3( points, true )
-			//const ten_fold_points = curve.getPoints( points.length * 2 )
-			//curve.dispose         ()
-			//const shape           = new THREE.Shape( ten_fold_points )
-			const shape           = new THREE.Shape( points )
-			const shape_geometry  = new THREE.ShapeGeometry( shape )
-			//shape.dispose         ()
-			return                shape_geometry
+		  const points_to_geometry = pointsIn =>{
+        const points          = smoothPoints(pointsIn, 0.9, 10);
+        const curve           = new THREE.CatmullRomCurve3( points, true )
+        const ten_fold_points = curve.getPoints( points.length * 10 )
+        const smoothedPoints  = smoothPoints(ten_fold_points, 0.9, 50);
+        const shape           = new THREE.Shape( smoothedPoints )
+        const shape_geometry  = new THREE.ShapeGeometry( shape )
+        return                shape_geometry
+		  }
+
+      const points_to_geometry2 = pointsIn => {
+        const curve           = new THREE.CatmullRomCurve3( pointsIn )
+        const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
+        return                geometry
+		  }
+
+      const old_points_to_geometry = points =>{
+        const curve           = new THREE.CatmullRomCurve3( points, true )
+        const ten_fold_points = curve.getPoints( points.length * 2 )
+        //curve.dispose         ()
+        const shape           = new THREE.Shape( ten_fold_points )
+        const shape_geometry  = new THREE.ShapeGeometry( shape )
+        //shape.dispose         ()
+        return                shape_geometry
 		  }
 		  		  
 		  { // update the hidden blob so that it can be correctly clicked
 			  let all_positions                             =[]
 			  for( const key in compilation ) {
-				  const positions = [];
-				  compilation[ key ].positions.forEach((position, i) => {
-					if (!compilation[key].scopeInners[i][0]) {
-					  positions.push(position);
-					}
-				  });
-				  all_positions = all_positions.concat( positions )
-			  }
-			  all_positions                             =[]
-			  for( const key in compilation ){
-				  all_positions = all_positions.concat( compilation[ key ].positions )
-			  }
-			  const hull                                = convex_hull( all_positions, 10 )
-			  const geometry                            = points_to_geometry( all_positions )
+          for (let i = 0; i < compilation[key].positions.length; i++) {
+            const position = compilation[key].positions[i];
+            position.z = 0.5;
+            if (!compilation[key].scopeInners[i][0]) {
+              all_positions.push({
+                  position: position,
+                  uniqueIndex: compilation[key].uniqueIndexes[i]
+              });
+            }
+          }
+        }
+
+        // We need to order all_positions
+        // For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
+        // Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
+        // Until we reach the original element we started with
+        const ordered_all_positions = [];
+        const visited = new Set();
+
+        // Helper function to recursively build the ordered list
+        function buildOrderedPositions(uniqueIndex) {
+            // Prevent infinite loops
+            if (visited.has(uniqueIndex)) return;
+            visited.add(uniqueIndex);
+
+            // Find the position with the current uniqueIndex
+            const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
+            if (positionObj) {
+              ordered_all_positions.push(positionObj.position);
+            } else {
+              return;
+            }
+
+            const connectedIndexes = chainRef.current[uniqueIndex];
+            for (let i = 0; i < connectedIndexes.length; i++) {
+              const checkId = connectedIndexes[i];
+              buildOrderedPositions(checkId)
+            }
+        }
+
+        // Start building the ordered list from each uniqueIndex in all_positions
+        const firstIndex = all_positions[0].uniqueIndex;
+        buildOrderedPositions(firstIndex);
+        
+			  const geometry                            = points_to_geometry( ordered_all_positions )
 			  hull_ref.current.geometry.dispose()
 			  hull_ref.current.geometry                 = geometry
+        
 		  }
 
 		  { // hide all meshes
-			  hull_ref.current.visible                                        = false
-			  instancedMeshRef.current.visible                                = false
-			  for( const key in compilation ) compilation[ key ].mesh.visible = false
+			  hull_ref.current.visible = false
+			  instancedMeshRef.current.visible = false
+			  for( const key in compilation ) {
+          compilation[ key ].mesh.visible = false
+        }
 		  }
 
 		  switch( global_scope ){
 			  case 0:{			  
-				hull_ref.current.visible                  = true				
+				  hull_ref.current.visible                  = true				
 			  } break
 			  case 1:{
 				  const positions_and_meshes_by_color =[]
 				  for( const key in compilation ){
             const positions = [];
-            compilation[ key ].positions.forEach((position, i) => {
-               if (!compilation[key].scopeInners[i][1]) {
+            for (let i = 0; i < compilation[key].positions.length; i++) {
+              const position = compilation[key].positions[i];
+              if (!compilation[key].scopeInners[i][1]) {
                 positions.push(position);
+                break;
               }
-            });
-					  const color                                                                             = compilation[ key ].color
-					  if( !( color in positions_and_meshes_by_color )) positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
-					  positions_and_meshes_by_color[ color ].positions                                        = positions_and_meshes_by_color[ color ].positions.concat( positions )
+            }
+					  const color = compilation[ key ].color
+					  if( !( color in positions_and_meshes_by_color )) {
+              positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
+            }
+					  positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( positions )
 				  }
 				  
 				  for( const key in positions_and_meshes_by_color ){
 					  const mesh    = positions_and_meshes_by_color[ key ].mesh
 					  mesh.geometry.dispose()
-					  mesh.geometry = points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 10 ))
+					  mesh.geometry = old_points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 100 ))
 					  mesh.visible  = true
 				  }
 			  } break
 			  case 2:{		  
-				for( const key in compilation ){          
-					compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 10 )
-					compilation[ key ].mesh.geometry.dispose()
-					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
-					compilation[ key ].mesh.visible  = true
-				}
+          for( const key in compilation ){          
+            compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 15 )
+            compilation[ key ].mesh.geometry.dispose()
+            compilation[ key ].mesh.geometry = old_points_to_geometry( compilation[ key ].hull )
+            compilation[ key ].mesh.visible  = true
+          }
 			  } break
 			  case 3:{
 				instancedMeshRef.current.visible = true
@@ -740,7 +818,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           userData={{ color }}
 		  
 		  // jsg 
-		  parent_id = { id }		  
+		  parent_id = { id }	
+      chainRef = {chainRef}	  
         />
       ))}
 
@@ -762,9 +841,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 	  {/*// jsg*/}
       <group ref = { convex_group_ref }/>
 	  
-	  <mesh ref = { hull_ref } 
-		onClick       = { event =>{ if( ++global_scope > max_global_scope ) global_scope = 0 }}
-		onContextMenu = { event =>{ if( --global_scope < 0 ) global_scope = max_global_scope }}>	 
+	  <mesh 
+      ref = { hull_ref } 
+		  onClick       = { event =>{ if( ++global_scope > max_global_scope ) global_scope = 0 }}
+		  onContextMenu = { event =>{ if( --global_scope < 0 ) global_scope = max_global_scope }}
+    >	 
 	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
 	  </mesh>
 	  
@@ -901,4 +982,40 @@ const getColor = (config, scope, defaultValue) => {
     return colorConfig();
   }
   return colorConfig;
+};
+
+// Function to smooth points using averaging filter with adjustable window size
+function smoothPoints(points, smoothingFactor = 0.5, windowSize = 3) {
+  const smoothedPoints = [];
+  const len = points.length;
+
+  for (let i = 0; i < len; i++) {
+    let sumX = 0;
+    let sumY = 0;
+    let count = 0;
+
+    // Sum up the points within the window size
+    for (let j = -windowSize; j <= windowSize; j++) {
+      const index = (i + j + len) % len;
+      sumX += points[index].x;
+      sumY += points[index].y;
+      count++;
+    }
+
+    const avgX = sumX / count;
+    const avgY = sumY / count;
+
+    const currPoint = points[i];
+    const smoothX = currPoint.x + (avgX - currPoint.x) * smoothingFactor;
+    const smoothY = currPoint.y + (avgY - currPoint.y) * smoothingFactor;
+
+    smoothedPoints.push(new THREE.Vector2(smoothX, smoothY));
+  }
+
+  return smoothedPoints;
+}
+
+// Function to convert array of Vector3 to array of points
+const convertVector3ToPoints = (vectorArray) => {
+  return vectorArray.map(vector => [vector.x, vector.y, vector.z]);
 };
