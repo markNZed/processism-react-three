@@ -606,28 +606,33 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   
 	  { // create the blobs from positions_by_entity jsg	  
 		  const points_to_geometry = points =>{
-        const curve           = new THREE.CatmullRomCurve3( points, true )
-        const ten_fold_points = curve.getPoints( points.length * 2 )
-        //curve.dispose         ()
-        const shape           = new THREE.Shape( ten_fold_points )
-        const shape_geometry  = new THREE.ShapeGeometry( shape )
-        //shape.dispose         ()
-        return                shape_geometry
+			//const curve           = new THREE.CatmullRomCurve3( points, true )
+			//const ten_fold_points = curve.getPoints( points.length * 2 )
+			//curve.dispose         ()
+			//const shape           = new THREE.Shape( ten_fold_points )
+			const shape           = new THREE.Shape( points )
+			const shape_geometry  = new THREE.ShapeGeometry( shape )
+			//shape.dispose         ()
+			return                shape_geometry
 		  }
 		  		  
 		  { // update the hidden blob so that it can be correctly clicked
 			  let all_positions                             =[]
 			  for( const key in compilation ) {
-          const positions = [];
-          compilation[ key ].positions.forEach((position, i) => {
-            if (!compilation[key].scopeInners[i][0]) {
-              positions.push(position);
-            }
-          });
-          all_positions = all_positions.concat( positions )
-        }
-			  const hull                                = convex_hull({ points : all_positions })
-			  const geometry                            = points_to_geometry( hull )
+				  const positions = [];
+				  compilation[ key ].positions.forEach((position, i) => {
+					if (!compilation[key].scopeInners[i][0]) {
+					  positions.push(position);
+					}
+				  });
+				  all_positions = all_positions.concat( positions )
+			  }
+			  all_positions                             =[]
+			  for( const key in compilation ){
+				  all_positions = all_positions.concat( compilation[ key ].positions )
+			  }
+			  const hull                                = convex_hull( all_positions, 10 )
+			  const geometry                            = points_to_geometry( all_positions )
 			  hull_ref.current.geometry.dispose()
 			  hull_ref.current.geometry                 = geometry
 		  }
@@ -659,13 +664,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				  for( const key in positions_and_meshes_by_color ){
 					  const mesh    = positions_and_meshes_by_color[ key ].mesh
 					  mesh.geometry.dispose()
-					  mesh.geometry = points_to_geometry( convex_hull({ points : positions_and_meshes_by_color[ key ].positions }))
+					  mesh.geometry = points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 10 ))
 					  mesh.visible  = true
 				  }
 			  } break
 			  case 2:{		  
 				for( const key in compilation ){          
-					compilation[ key ].hull          = convex_hull({ points : compilation[ key ].positions })
+					compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 10 )
 					compilation[ key ].mesh.geometry.dispose()
 					compilation[ key ].mesh.geometry = points_to_geometry( compilation[ key ].hull )
 					compilation[ key ].mesh.visible  = true
