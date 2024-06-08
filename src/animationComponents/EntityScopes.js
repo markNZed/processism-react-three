@@ -556,9 +556,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           
           if( ! ( parent_id in compilation )){
             if( compilation_done ){
-            compilation_done                  = false
-            compilation                       ={}
-            convex_group_ref.current.children =[]
+				compilation_done                  = false
+				compilation                       ={}
+				convex_group_ref.current.children =[]
             }
             const color = flattenedParticleRefs.current[ i ].current.userData.color
             compilation[ parent_id ] = {
@@ -629,92 +629,94 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         }
       }
   
-	  { // create the blobs from positions_by_entity jsg	  
+	  { // create the blobs from positions_by_entity jsg
+		  // Helper function to recursively build the ordered list
+		  let all_positions = [];
+		  let ordered_all_positions = [];
+		  let visited = new Set();
+
+		  function buildOrderedPositions(uniqueIndex) {
+			// Prevent infinite loops
+			if (visited.has(uniqueIndex)) return;
+			  visited.add(uniqueIndex);
+
+			  // Find the position with the current uniqueIndex
+			  const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
+			  if (positionObj) {
+				ordered_all_positions.push(positionObj.position);
+			  } else {
+				return;
+			  }
+
+			  const connectedIndexes = chainRef.current[uniqueIndex];
+				for (let i = 0; i < connectedIndexes.length; i++) {
+				  const checkId = connectedIndexes[i];
+				  buildOrderedPositions(checkId)
+				}
+			}
+
+				  
 		  const points_to_geometry = pointsIn =>{
-        const points          = smoothPoints(pointsIn, 0.9, 10);
-        const curve           = new THREE.CatmullRomCurve3( points, true )
-        const ten_fold_points = curve.getPoints( points.length * 10 )
-        const smoothedPoints  = smoothPoints(ten_fold_points, 0.9, 50);
-        const shape           = new THREE.Shape( smoothedPoints )
-        const shape_geometry  = new THREE.ShapeGeometry( shape )
-        return                shape_geometry
+			const points          = smoothPoints(pointsIn, 0.9, 10);
+			const curve           = new THREE.CatmullRomCurve3( points, true )
+			const ten_fold_points = curve.getPoints( points.length * 10 )
+			const smoothedPoints  = smoothPoints(ten_fold_points, 0.9, 50);
+			const shape           = new THREE.Shape( smoothedPoints )
+			const shape_geometry  = new THREE.ShapeGeometry( shape )
+			return                shape_geometry
 		  }
 
-      const points_to_geometry2 = pointsIn => {
-        const curve           = new THREE.CatmullRomCurve3( pointsIn )
-        const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
-        return                geometry
+		  const points_to_geometry2 = pointsIn => {
+			const curve           = new THREE.CatmullRomCurve3( pointsIn )
+			const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
+			return                geometry
 		  }
 
-      const old_points_to_geometry = points =>{
-        const curve           = new THREE.CatmullRomCurve3( points, true )
-        const ten_fold_points = curve.getPoints( points.length * 2 )
-        //curve.dispose         ()
-        const shape           = new THREE.Shape( ten_fold_points )
-        const shape_geometry  = new THREE.ShapeGeometry( shape )
-        //shape.dispose         ()
-        return                shape_geometry
+		  const old_points_to_geometry = points =>{
+			const curve           = new THREE.CatmullRomCurve3( points, true )
+			const ten_fold_points = curve.getPoints( points.length * 2 )
+			//curve.dispose         ()
+			const shape           = new THREE.Shape( ten_fold_points )
+			const shape_geometry  = new THREE.ShapeGeometry( shape )
+			//shape.dispose         ()
+			return                shape_geometry
 		  }
 		  		  
 		  { // update the hidden blob so that it can be correctly clicked
-			  let all_positions                             =[]
-			  for( const key in compilation ) {
-          for (let i = 0; i < compilation[key].positions.length; i++) {
-            const position = compilation[key].positions[i];
-            position.z = 0.5;
-            if (!compilation[key].scopeInners[i][0]) {
-              all_positions.push({
-                  position: position,
-                  uniqueIndex: compilation[key].uniqueIndexes[i]
-              });
-            }
-          }
-        }
+			all_positions =[]
+			for( const key in compilation ){
+				for (let i = 0; i < compilation[key].positions.length; i++) {
+					const position = compilation[key].positions[i];
+					position.z = 0.5;
+					if ( !compilation[key].scopeInners[i][0]) {
+						all_positions.push({
+							position: position,
+							uniqueIndex: compilation[key].uniqueIndexes[i]
+						});
+					}
+				}
+			}
 
-        // We need to order all_positions
-        // For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
-        // Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
-        // Until we reach the original element we started with
-        const ordered_all_positions = [];
-        const visited = new Set();
+			// We need to order all_positions
+			// For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
+			// Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
+			// Until we reach the original element we started with
 
-        // Helper function to recursively build the ordered list
-        function buildOrderedPositions(uniqueIndex) {
-            // Prevent infinite loops
-            if (visited.has(uniqueIndex)) return;
-            visited.add(uniqueIndex);
+			// Start building the ordered list from each uniqueIndex in all_positions
+			const firstIndex = all_positions[0].uniqueIndex;
+			buildOrderedPositions(firstIndex);
 
-            // Find the position with the current uniqueIndex
-            const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
-            if (positionObj) {
-              ordered_all_positions.push(positionObj.position);
-            } else {
-              return;
-            }
-
-            const connectedIndexes = chainRef.current[uniqueIndex];
-            for (let i = 0; i < connectedIndexes.length; i++) {
-              const checkId = connectedIndexes[i];
-              buildOrderedPositions(checkId)
-            }
-        }
-
-        // Start building the ordered list from each uniqueIndex in all_positions
-        const firstIndex = all_positions[0].uniqueIndex;
-        buildOrderedPositions(firstIndex);
-        
-			  const geometry                            = points_to_geometry( ordered_all_positions )
-			  hull_ref.current.geometry.dispose()
-			  hull_ref.current.geometry                 = geometry
-        
+			const geometry                            = points_to_geometry( ordered_all_positions )
+			hull_ref.current.geometry.dispose()
+			hull_ref.current.geometry                 = geometry
 		  }
 
 		  { // hide all meshes
 			  hull_ref.current.visible = false
 			  instancedMeshRef.current.visible = false
 			  for( const key in compilation ) {
-          compilation[ key ].mesh.visible = false
-        }
+				compilation[ key ].mesh.visible = false
+			  }
 		  }
 
 		  switch( global_scope ){
@@ -722,37 +724,47 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				  hull_ref.current.visible                  = true				
 			  } break
 			  case 1:{
-				  const positions_and_meshes_by_color =[]
-				  for( const key in compilation ){
-            const positions = [];
-            for (let i = 0; i < compilation[key].positions.length; i++) {
-              const position = compilation[key].positions[i];
-              if (!compilation[key].scopeInners[i][1]) {
-                positions.push(position);
-                break;
-              }
-            }
-					  const color = compilation[ key ].color
-					  if( !( color in positions_and_meshes_by_color )) {
-              positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
-            }
-					  positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( positions )
-				  }
-				  
-				  for( const key in positions_and_meshes_by_color ){
-					  const mesh    = positions_and_meshes_by_color[ key ].mesh
-					  mesh.geometry.dispose()
-					  mesh.geometry = old_points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 100 ))
-					  mesh.visible  = true
-				  }
+				const positions_and_meshes_by_color =[]
+				for( const key in compilation ){
+					all_positions = [];
+					for (let i = 0; i < compilation[key].positions.length; i++) {
+						const position = compilation[key].positions[i];
+						//if (!compilation[key].scopeInners[i][1]) {
+							all_positions.push({
+								position: position,
+								uniqueIndex: compilation[key].uniqueIndexes[i]
+							});
+							//break;
+						//}
+					}
+					ordered_all_positions =[]
+					visited = new Set();					
+					const firstIndex = all_positions[0].uniqueIndex;
+					buildOrderedPositions(firstIndex);
+					
+					const color = compilation[ key ].color
+					if( !( color in positions_and_meshes_by_color )) {
+						positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
+					}
+					positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( ordered_all_positions )
+				}
+
+				for( const key in positions_and_meshes_by_color ){
+					const mesh    = positions_and_meshes_by_color[ key ].mesh
+					mesh.geometry.dispose()
+					//visited = new Set();
+					mesh.geometry                            = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
+					//mesh.geometry = old_points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 100 ))
+					mesh.visible  = true
+				}
 			  } break
 			  case 2:{		  
-          for( const key in compilation ){          
-            compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 15 )
-            compilation[ key ].mesh.geometry.dispose()
-            compilation[ key ].mesh.geometry = old_points_to_geometry( compilation[ key ].hull )
-            compilation[ key ].mesh.visible  = true
-          }
+				  for( const key in compilation ){          
+					compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 15 )
+					compilation[ key ].mesh.geometry.dispose()
+					compilation[ key ].mesh.geometry = old_points_to_geometry( compilation[ key ].hull )
+					compilation[ key ].mesh.visible  = true
+				  }
 			  } break
 			  case 3:{
 				instancedMeshRef.current.visible = true
