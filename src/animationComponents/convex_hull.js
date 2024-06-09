@@ -263,7 +263,51 @@ export default function convex_hull( args ){
 */
 
 // Convex Hull algorithm (Gift Wrapping/Jarvis March)
-export default function convex_hull( points, percentage ) {
+export default function convex_hull( points, percentage ){
+	function orientation(p, q, r) {
+	const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+	if (val === 0) return 0; // collinear
+	return val > 0 ? 1 : 2; // clockwise or counterclockwise
+	}
+	
+	// Function to adjust points to be within a certain percentage of the hull's width
+	function adjustPointsToHull(points, hull, percentage) {
+	const hullWidth =
+		Math.max(...hull.map((p) => p.x)) - Math.min(...hull.map((p) => p.x));
+	const maxDistance = (hullWidth * percentage) / 100;
+	
+	return points.map((p) => {
+		let closestHullPoint = hull[0];
+		let minDistance = distance(p, hull[0]);
+	
+		hull.forEach((hullPoint) => {
+		const dist = distance(p, hullPoint);
+		if (dist < minDistance) {
+			minDistance = dist;
+			closestHullPoint = hullPoint;
+		}
+		});
+	
+		if (minDistance > maxDistance) {
+		const angle = Math.atan2(
+			p.y - closestHullPoint.y,
+			p.x - closestHullPoint.x
+		);
+		return { //new THREE.Vector2(
+			x : closestHullPoint.x + Math.cos(angle) * maxDistance,
+			y : closestHullPoint.y + Math.sin(angle) * maxDistance,
+		//);
+		}
+		} else {
+		return p;
+		}
+	});
+	}
+	
+	function distance(p1, p2) {
+	return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+	}
+	
   if (points.length < 3) return points;
 
   const hull = [];
@@ -286,52 +330,9 @@ export default function convex_hull( points, percentage ) {
     p = q;
   } while (p !== leftmost);
   
-  if( percentage >= 0 ){
+  /*if( percentage >= 0 ){
 	  adjustPointsToHull( points, hull, percentage )
 	  return points;
-  } else return hull
+  } else*/ return hull
 }
 
-function orientation(p, q, r) {
-  const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-  if (val === 0) return 0; // collinear
-  return val > 0 ? 1 : 2; // clockwise or counterclockwise
-}
-
-// Function to adjust points to be within a certain percentage of the hull's width
-function adjustPointsToHull(points, hull, percentage) {
-  const hullWidth =
-    Math.max(...hull.map((p) => p.x)) - Math.min(...hull.map((p) => p.x));
-  const maxDistance = (hullWidth * percentage) / 100;
-
-  return points.map((p) => {
-    let closestHullPoint = hull[0];
-    let minDistance = distance(p, hull[0]);
-
-    hull.forEach((hullPoint) => {
-      const dist = distance(p, hullPoint);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestHullPoint = hullPoint;
-      }
-    });
-
-    if (minDistance > maxDistance) {
-      const angle = Math.atan2(
-        p.y - closestHullPoint.y,
-        p.x - closestHullPoint.x
-      );
-      return { //new THREE.Vector2(
-        x : closestHullPoint.x + Math.cos(angle) * maxDistance,
-        y : closestHullPoint.y + Math.sin(angle) * maxDistance,
-      //);
-	  }
-    } else {
-      return p;
-    }
-  });
-}
-
-function distance(p1, p2) {
-  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-}

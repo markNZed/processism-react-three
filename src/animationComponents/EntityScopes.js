@@ -688,6 +688,23 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				return                shape_geometry
 			}
 		  		  
+		  // remove the gap between blobs
+		  const remove_gap = ( positions, gap ) =>{
+			// compute the center
+			const center = new THREE.Vector3()
+			for( const position of positions )
+				center.add( position )
+			center.divideScalar( positions.length )
+			
+			// move the points outward from the center
+			const direction = new THREE.Vector3()
+			for( const position of positions ){
+				direction.subVectors( position, center )
+				direction.normalize()
+				position.add( direction.multiplyScalar( gap ))
+			}			  
+		  }
+		  
 		  { // update the hidden blob so that it can be correctly clicked
 			all_positions =[]
 			for( const key in compilation ){
@@ -768,17 +785,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				}
 
 				for( const key in positions_and_meshes_by_color ){
+					//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
+					
 					const mesh    = positions_and_meshes_by_color[ key ].mesh
 					mesh.geometry.dispose()
-					//visited = new Set();
-					mesh.geometry                            = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-					//mesh.geometry = old_points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 100 ))
+					mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
 					mesh.visible  = true
 				}
+				
 			  } break
 			  case 2:{		  
 				  for( const key in compilation ){          
 					compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 15 )
+					remove_gap                       ( compilation[ key ].hull, .075 )
 					compilation[ key ].mesh.geometry.dispose()
 					compilation[ key ].mesh.geometry = old_points_to_geometry( compilation[ key ].hull )
 					compilation[ key ].mesh.visible  = true
