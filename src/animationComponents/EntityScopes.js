@@ -740,18 +740,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				  hull_ref.current.visible                  = true				
 			  } break
 			  case 1:{
+				 /*
 				const positions_and_meshes_by_color =[]
 				for( const key in compilation ){
 					all_positions = [];
 					for (let i = 0; i < compilation[key].positions.length; i++) {
 						const position = compilation[key].positions[i];
-						//if (!compilation[key].scopeInners[i][1]) {
+						if (!compilation[key].scopeInners[i][1]) {
 							all_positions.push({
 								position: position,
 								uniqueIndex: compilation[key].uniqueIndexes[i]
 							});
 							//break;
-						//}
+						}
 					}
 					ordered_all_positions =[]
 					visited = new Set();					
@@ -766,20 +767,53 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				}
 
 				for( const key in positions_and_meshes_by_color ){
-					remove_gap( positions_and_meshes_by_color[ key ].positions, 1 )
+					//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
 					
 					const mesh    = positions_and_meshes_by_color[ key ].mesh
 					mesh.geometry.dispose()
-					//visited = new Set();
-					mesh.geometry                            = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-					//mesh.geometry = old_points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions, 100 ))
+					mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
 					mesh.visible  = true
 				}
+				*/
+				/*
+				const positions_and_meshes_by_color =[]
+				for( const key in compilation ){
+					const color = compilation[ key ].color
+					if( !( color in positions_and_meshes_by_color )) {
+						positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
+					}
+					positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( compilation[ key ].positions )
+				}
+
+				for( const key in positions_and_meshes_by_color ){
+					//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
+					
+					const mesh    = positions_and_meshes_by_color[ key ].mesh
+					mesh.geometry.dispose()
+					mesh.geometry = points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions ))
+					mesh.visible  = true
+				}				
+				*/
+				
+				  const positions_and_meshes_by_color =[]
+				  for( const key in compilation ){
+					  const color                                                                             = compilation[ key ].color
+					  if( !( color in positions_and_meshes_by_color )) positions_and_meshes_by_color[ color ] = { positions :[], mesh : compilation[ key ].mesh }
+					  positions_and_meshes_by_color[ color ].positions                                        = positions_and_meshes_by_color[ color ].positions.concat( compilation[ key ].positions )
+				  }
+				  
+				  for( const key in positions_and_meshes_by_color ){
+					  const mesh    = positions_and_meshes_by_color[ key ].mesh
+					  mesh.geometry.dispose()
+					  mesh.geometry = old_points_to_geometry( convex_hull( positions_and_meshes_by_color[ key ].positions ))
+					  mesh.visible  = true
+				  }				
+				
 			  } break
 			  case 2:{		  
 				  for( const key in compilation ){          
 					compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 15 )
-					remove_gap( compilation[ key ].hull, .15 )
+					remove_gap                       ( compilation[ key ].hull, .075 )
 					compilation[ key ].mesh.geometry.dispose()
 					compilation[ key ].mesh.geometry = old_points_to_geometry( compilation[ key ].hull )
 					compilation[ key ].mesh.visible  = true

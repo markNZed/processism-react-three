@@ -330,9 +330,9 @@ export default function convex_hull( points, percentage ){
     p = q;
   } while (p !== leftmost);
   
-  if( percentage >= 0 ){
+  /*if( percentage >= 0 ){
 	  adjustPointsToHull( points, hull, percentage )
 	  return points;
-  } else return hull
+  } else*/ return hull
 }
 
