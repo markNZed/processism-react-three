@@ -295,7 +295,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
   // Map the joints to the Particles and align teh joint with the initial Particle layout
   const allocateJointsToParticles = (entityParticlesRefs, jointsData) => {
-    if (isDebug) console.log("allocateJointsToParticles", entityParticlesRefs, jointsData)
     // Create a new Vector3 to store the world position of this entity
     const worldPosition = new THREE.Vector3();
     internalRef.current.getWorldPosition(worldPosition);
@@ -466,22 +465,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           const firstJointData = jointsData[0];
           const firstJointPosition = new THREE.Vector3(firstJointData.position.x, firstJointData.position.y, firstJointData.position.z);
           const distanceToFirstJoint = centerRef.current.distanceTo(internalRef.current.localToWorld(firstJointPosition));
-          // foreach particle set a userData entry userData.scopeInner[scope] = true if the particle is closer to the center than the joint
+          // foreach particle set a userData entry userData.scopeOuter[scope] = true if the particle is closer to the center than the joint
           flattenedParticleRefs.current.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);
-            if (!particleRef.current.userData.scopeInner) {
-              particleRef.current.userData.scopeInner = {};
+            if (!particleRef.current.userData.scopeOuter) {
+              particleRef.current.userData.scopeOuter = {};
             }
-            let inner = distanceToCenter <= (distanceToFirstJoint - 0.15); // Why 0.15 ???
-            const scopeInner = particleRef.current.userData.scopeInner;
-            if (inner) {
-              for( let i = 0; i <= scope ; ++i ) {
-                scopeInner[i] = true;
-              }
-            }
-            //if (scopeInner[0] && scope == 0) particleRef.current.userData.color = "black";
+						const offset = [-0.15, -0.2, 0]; // Why 0.15 ???
+            let outer = distanceToCenter >= (distanceToFirstJoint + offset[scope]); 
+            const scopeOuter = particleRef.current.userData.scopeOuter;
+						scopeOuter[scope] = outer;
+            //if (scopeOuter[1] && index == 0) particleRef.current.userData.color = "black";
           });
           setApplyInitialImpulse(false);
           setJoints(allocatedJoints);
@@ -563,7 +559,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
             const color = flattenedParticleRefs.current[ i ].current.userData.color
             compilation[ parent_id ] = {
               positions      : [],
-              scopeInners    : [],
+              scopeOuters    : [],
               uniqueIndexes  : [],
               position_index : 0,
               hull           : [],
@@ -575,7 +571,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
             for( let j = 0; j < n; ++j ){
               if( parent_id == flattenedParticleRefs.current[ j ].current.userData.parent_id ) {
                 compilation[ parent_id ].positions.push( new THREE.Vector3())
-                compilation[ parent_id ].scopeInners.push(flattenedParticleRefs.current[j].current.userData.scopeInner)
+                compilation[ parent_id ].scopeOuters.push(flattenedParticleRefs.current[j].current.userData.scopeOuter)
                 compilation[ parent_id ].uniqueIndexes.push(flattenedParticleRefs.current[j].current.userData.uniqueIndex)
               }
             }
@@ -633,54 +629,64 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 		  // Helper function to recursively build the ordered list
 		  let all_positions = [];
 		  let ordered_all_positions = [];
+			let ordered_uniqueIndexes = [];
 		  let visited = new Set();
 
-		  function buildOrderedPositions(uniqueIndex) {
-			// Prevent infinite loops
-			if (visited.has(uniqueIndex)) return;
-			  visited.add(uniqueIndex);
+			function buildOrderedPositions(uniqueIndex) {
+				// Prevent infinite loops
+				if (visited.has(uniqueIndex)) return;
+				visited.add(uniqueIndex);
 
-			  // Find the position with the current uniqueIndex
-			  const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
-			  if (positionObj) {
-				ordered_all_positions.push(positionObj.position);
-			  } else {
-				return;
-			  }
+				// Find the position with the current uniqueIndex
+				const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
+				if (positionObj) {
+					ordered_all_positions.push(positionObj.position);
+					ordered_uniqueIndexes.push(uniqueIndex)
+				} else {
+					return;
+				}
 
-			  const connectedIndexes = chainRef.current[uniqueIndex];
+				const connectedIndexes = chainRef.current[uniqueIndex];
 				for (let i = 0; i < connectedIndexes.length; i++) {
-				  const checkId = connectedIndexes[i];
-				  buildOrderedPositions(checkId)
+					buildOrderedPositions(connectedIndexes[i])
 				}
 			}
 
+			function filterMultipleJoints(indexes) {
+				return indexes.filter(idx => chainRef.current[idx].length > 2);
+			}		
+
+			function getPositions(indexes) {
+				return indexes.map(idx => {
+						const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
+						return positionObj.position;
+				});
+		}		
 				  
 		  const points_to_geometry = pointsIn =>{
-			const points          = smoothPoints(pointsIn, 0.9, 10);
-			const curve           = new THREE.CatmullRomCurve3( points, true )
-			const ten_fold_points = curve.getPoints( points.length * 10 )
-			const smoothedPoints  = smoothPoints(ten_fold_points, 0.9, 50);
-			const shape           = new THREE.Shape( smoothedPoints )
-			const shape_geometry  = new THREE.ShapeGeometry( shape )
-			return                shape_geometry
+			  const points          = smoothPoints(pointsIn);
+			  const curve           = new THREE.CatmullRomCurve3( points, true )
+			  const ten_fold_points = curve.getPoints( points.length * 10 )
+			  const shape           = new THREE.Shape( ten_fold_points )
+			  const shape_geometry  = new THREE.ShapeGeometry( shape )
+			  return                shape_geometry
 		  }
 
 		  const points_to_geometry2 = pointsIn => {
-			const curve           = new THREE.CatmullRomCurve3( pointsIn )
-			const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
-			return                geometry
+				const curve           = new THREE.CatmullRomCurve3( pointsIn )
+				const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
+				return                geometry
 		  }
 
 		  const old_points_to_geometry = points =>{
-			const curve           = new THREE.CatmullRomCurve3( points, true )
-			const ten_fold_points = curve.getPoints( points.length * 2 )
-			//curve.dispose         ()
-			const shape           = new THREE.Shape( ten_fold_points )
-			const shape_geometry  = new THREE.ShapeGeometry( shape )
-			//shape.dispose         ()
-			return                shape_geometry
-		  }
+				const curve           = new THREE.CatmullRomCurve3( points, true )
+				const ten_fold_points = curve.getPoints( points.length * 2 )
+				//curve.dispose         ()
+				const shape           = new THREE.Shape( ten_fold_points )
+				const shape_geometry  = new THREE.ShapeGeometry( shape )
+				//shape.dispose         ()
+				return                shape_geometry
+			}
 		  		  
 		  { // update the hidden blob so that it can be correctly clicked
 			all_positions =[]
@@ -688,7 +694,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				for (let i = 0; i < compilation[key].positions.length; i++) {
 					const position = compilation[key].positions[i];
 					position.z = 0.5;
-					if ( !compilation[key].scopeInners[i][0]) {
+					if ( compilation[key].scopeOuters[i][0] ) {
 						all_positions.push({
 							position: position,
 							uniqueIndex: compilation[key].uniqueIndexes[i]
@@ -706,7 +712,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			const firstIndex = all_positions[0].uniqueIndex;
 			buildOrderedPositions(firstIndex);
 
-			const geometry                            = points_to_geometry( ordered_all_positions )
+			const orderedJoint = filterMultipleJoints(ordered_uniqueIndexes);
+			const jointPositions = getPositions(orderedJoint)
+
+			const geometry                            = points_to_geometry( jointPositions )
 			hull_ref.current.geometry.dispose()
 			hull_ref.current.geometry                 = geometry
 		  }
@@ -725,28 +734,37 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			  } break
 			  case 1:{
 				const positions_and_meshes_by_color =[]
+				// key is the lowest level
 				for( const key in compilation ){
 					all_positions = [];
 					for (let i = 0; i < compilation[key].positions.length; i++) {
 						const position = compilation[key].positions[i];
-						//if (!compilation[key].scopeInners[i][1]) {
+						if ( compilation[key].scopeOuters[i][1] ) {
 							all_positions.push({
 								position: position,
 								uniqueIndex: compilation[key].uniqueIndexes[i]
 							});
-							//break;
-						//}
+						}
 					}
-					ordered_all_positions =[]
-					visited = new Set();					
-					const firstIndex = all_positions[0].uniqueIndex;
-					buildOrderedPositions(firstIndex);
-					
 					const color = compilation[ key ].color
 					if( !( color in positions_and_meshes_by_color )) {
 						positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
 					}
-					positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( ordered_all_positions )
+					//console.log("color", color, firstIndex)
+					positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
+				}
+				for( const color in positions_and_meshes_by_color ){
+					all_positions = positions_and_meshes_by_color[ color ].positions;
+					ordered_all_positions = []
+					ordered_uniqueIndexes = [];
+					visited = new Set();					
+					const firstIndex = all_positions[0].uniqueIndex;
+					buildOrderedPositions(firstIndex);
+
+					const orderedJoint = filterMultipleJoints(ordered_uniqueIndexes);
+					const jointPositions = getPositions(orderedJoint)
+
+					positions_and_meshes_by_color[ color ].positions = jointPositions;
 				}
 
 				for( const key in positions_and_meshes_by_color ){
@@ -997,7 +1015,7 @@ const getColor = (config, scope, defaultValue) => {
 };
 
 // Function to smooth points using averaging filter with adjustable window size
-function smoothPoints(points, smoothingFactor = 0.5, windowSize = 3) {
+function smoothPoints(points, smoothingFactor = 0.5, windowSize = 1) {
   const smoothedPoints = [];
   const len = points.length;
 
