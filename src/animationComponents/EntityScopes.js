@@ -30,9 +30,12 @@ let global_scope     = true
 let max_global_scope = 0
 let compilation      = null
 let compilation_done = false
+let ignore_click     = false
 
 const Handle_click = event =>{
-	console.log('Handle_click')
+	if( ignore_click ) return
+	
+	console.log('Handle_click')	
 	
 	const mesh                        = event.object
 	const key                         = mesh.userData.key
@@ -973,7 +976,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
 	  {/*// jsg*/}
       <group ref = { convex_group_ref }
-		onClick = { event =>{ Handle_click( event )}}/>
+		onClick = { event =>{ 	
+			Handle_click( event )
+			ignore_click = true
+			setTimeout( event => ignore_click = false , 1000 )
+		}}/>
 	  
 	  <mesh 
       ref = { hull_ref } 
