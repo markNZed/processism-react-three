@@ -26,10 +26,17 @@ import convex_hull from './convex_hull'
 
 const ZERO_VECTOR = new THREE.Vector3();
 
-let global_scope     = 0
+let global_scope     = true
 let max_global_scope = 0
 let compilation      = null
 let compilation_done = false
+
+const Handle_click = event =>{
+	const mesh                        = event.object
+	const key                         = mesh.userData.key
+	const entity_compound_compilation = compilation[ key ]
+	++                                entity_compound_compilation.scope
+}
 
 /*
  This is the Component that gets exported and is instantiated in the scene
@@ -565,8 +572,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
               hull           : [],
               color,
               mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color })),
+              instanced_mesh : null,
+			  scope          : 0,			  
             }
-            convex_group_ref.current.add( compilation[ parent_id ].mesh )
             
             for( let j = 0; j < n; ++j ){
               if( parent_id == flattenedParticleRefs.current[ j ].current.userData.parent_id ) {
@@ -575,7 +583,18 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
                 compilation[ parent_id ].uniqueIndexes.push(flattenedParticleRefs.current[j].current.userData.uniqueIndex)
               }
             }
-          }
+
+			compilation[ parent_id ].instanced_mesh = new THREE.InstancedMesh(
+				new THREE.CircleGeometry( particleRadiusRef.current, 16 ), 
+				new THREE.MeshStandardMaterial({ color }),
+				compilation[ parent_id ].positions.length )
+				
+			compilation[ parent_id ].mesh.userData           = { key : parent_id }
+			convex_group_ref.current.add                     ( compilation[ parent_id ].mesh )
+			
+			compilation[ parent_id ].instanced_mesh.userData = { key : parent_id }
+			convex_group_ref.current.add                     ( compilation[ parent_id ].instanced_mesh )
+		  }
           compilation[ parent_id ].position_index = 0
         }
         compilation_done = true
@@ -592,8 +611,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         dummy.position.set(pos.x, pos.y, pos.z);
   
 		{ // acumulate positions by CompoundEntity index jsg
-			const parent_id = flattenedParticleRefs.current[i].current.userData.parent_id
-			compilation[ parent_id ].positions[ compilation[ parent_id ].position_index++ ].set(pos.x, pos.y, pos.z);
+			const parent_id                                                                  = flattenedParticleRefs.current[i].current.userData.parent_id
+			compilation[ parent_id ].positions[ compilation[ parent_id ].position_index ].set(pos.x, pos.y, pos.z)
+			compilation[ parent_id ].instanced_mesh.setMatrixAt                              ( compilation[ parent_id ].position_index++, dummy.matrix)
+			compilation[ parent_id ].instanced_mesh.instanceMatrix.needsUpdate               = true
 		}
   
         // Compare with the current position
@@ -629,7 +650,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 		  // Helper function to recursively build the ordered list
 		  let all_positions = [];
 		  let ordered_all_positions = [];
-			let ordered_uniqueIndexes = [];
+		  let ordered_uniqueIndexes = [];
 		  let visited = new Set();
 
 			function buildOrderedPositions(uniqueIndex) {
@@ -741,10 +762,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 			  hull_ref.current.visible = false
 			  instancedMeshRef.current.visible = false
 			  for( const key in compilation ) {
-				compilation[ key ].mesh.visible = false
+				compilation[ key ].mesh.visible           = false
+				compilation[ key ].instanced_mesh.visible = false
 			  }
 		  }
 
+		  /*
 		  switch( global_scope ){
 			  case 0:{			  
 				  hull_ref.current.visible                  = true				
@@ -806,6 +829,68 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 					instancedMeshRef.current.visible = true
 			  } break
 		  }
+		  */
+		if( global_scope ) {
+			hull_ref.current.visible = true
+		} else {
+			for( const key in compilation ){
+				const compound_entity_compilation = compilation[ key ]
+				switch( compound_entity_compilation.scope ){
+					case 2 :{ // show blob
+						const positions_and_meshes_by_color =[]
+						// key is the lowest level
+						all_positions = [];
+						for (let i = 0; i < compound_entity_compilation.positions.length; i++) {
+							const position = compound_entity_compilation.positions[i];
+							if ( compound_entity_compilation.scopeOuters[i][1] ) {
+									all_positions.push({
+									position: position,
+									uniqueIndex: compound_entity_compilation.uniqueIndexes[i]
+								});
+							}
+						}
+						
+						const color = compound_entity_compilation.color
+						if( !( color in positions_and_meshes_by_color )) {
+							positions_and_meshes_by_color[ color ] = { positions : [], mesh : compound_entity_compilation.mesh }
+						}
+						positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
+
+						for( const color in positions_and_meshes_by_color ){
+							all_positions = positions_and_meshes_by_color[ color ].positions;
+							ordered_uniqueIndexes = [];
+							visited = new Set();					
+							const firstIndex = all_positions[0].uniqueIndex;
+							buildOrderedPositions(firstIndex);
+
+							const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes)
+							const jointPositions = getPositions(orderedJoint)
+
+							positions_and_meshes_by_color[ color ].positions = jointPositions;
+						}
+
+						for( const key in positions_and_meshes_by_color ){
+							//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
+
+							const mesh           = positions_and_meshes_by_color[ key ].mesh
+							mesh.geometry.dispose()
+							mesh.geometry        = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
+							mesh.visible         = true
+						}				
+					} break
+					case 0 :{ // show blobs
+						compound_entity_compilation.hull                 = convex_hull( compilation[ key ].positions )
+						remove_gap                                       ( compilation[ key ].hull, .075 )
+						compound_entity_compilation.mesh.geometry.dispose()
+						compound_entity_compilation.mesh.geometry        = points_to_geometry( compilation[ key ].hull )
+						compound_entity_compilation.mesh.visible         = true
+					} break
+					case 1 :{
+					  compound_entity_compilation.instanced_mesh.visible = true
+					}
+				}
+			}
+		}
 	  }
    
       // Update the instance matrix to reflect changes only if positions changed
@@ -887,13 +972,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       ))}
 
 	  {/*// jsg*/}
-      <group ref = { convex_group_ref }/>
+      <group ref = { convex_group_ref }
+		onClick = { event =>{ Handle_click( event )}}/>
 	  
 	  <mesh 
       ref = { hull_ref } 
-		  onClick       = { event =>{ if( ++global_scope > max_global_scope ) global_scope = 0 }}
-		  onContextMenu = { event =>{ if( --global_scope < 0 ) global_scope = max_global_scope }}
-    >	 
+		  onClick       = { event => global_scope = false }
+		  onContextMenu = { event => global_scope = true  }>	 
 	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
 	  </mesh>
 	  
