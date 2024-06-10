@@ -35,8 +35,6 @@ let ignore_click     = false
 const Handle_click = event =>{
 	if( ignore_click ) return
 	
-	console.log('Handle_click')	
-	
 	const mesh  = event.object
 	const key   = mesh.userData.key
 	const scope = compilation[ key ].scope    
@@ -56,7 +54,7 @@ const Handle_click = event =>{
 			}		
 		} break
 		case 2:{
-			const color = compilation[ key ].color
+      const color = compilation[ key ].color
 			for( const key in compilation ){
 				if( color == compilation[ key ].color ) 
 					compilation[ key ].scope = 0
@@ -752,12 +750,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         }
 
         const old_points_to_geometry = points =>{
-          const curve           = new THREE.CatmullRomCurve3( points, true )
-          const ten_fold_points = curve.getPoints( points.length * 2 )
-          //curve.dispose         ()
-          const shape           = new THREE.Shape( ten_fold_points )
+          const shape           = new THREE.Shape( points ) 
           const shape_geometry  = new THREE.ShapeGeometry( shape )
-          //shape.dispose         ()
           return                shape_geometry
         }
               
@@ -832,7 +826,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
                   if( color == compilation[ key ].color )
                     positions = positions.concat( compilation[ key ].positions )
                 }
-                //remove_gap                              ( compilation[ key ].hull, .075 )
+                remove_gap                              ( compilation[ key ].hull, 1 )
                 compilation[ key ].mesh.geometry.dispose()
                 compilation[ key ].mesh.geometry        = old_points_to_geometry( positions )
                 compilation[ key ].mesh.visible         = true			
