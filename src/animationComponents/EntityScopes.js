@@ -32,10 +32,27 @@ let compilation      = null
 let compilation_done = false
 
 const Handle_click = event =>{
+	console.log('Handle_click')
+	
 	const mesh                        = event.object
 	const key                         = mesh.userData.key
-	const entity_compound_compilation = compilation[ key ]
-	++                                entity_compound_compilation.scope
+	const scope                       = compilation[ key ].scope    
+	switch( scope ){
+		case 0:{
+			const color = compilation[ key ].color
+			for( const key in compilation ){
+				if( color == compilation[ key ].color ) 
+					++compilation[ key ].scope
+			}
+		} break
+		case 1:{
+			const color = compilation[ key ].color
+			for( const key in compilation ){
+				if( color == compilation[ key ].color ) 
+					++compilation[ key ].scope
+			}		
+		} break
+	}
 }
 
 /*
@@ -673,6 +690,31 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 				}
 			}
 
+			function filterMiddleIndexes(chainRef, indexes) {
+        const jointIndexes = [];
+        // First, find all valid indexes from the provided list where the condition is true
+        for (let i = 0; i < indexes.length; i++) {
+            const idx = indexes[i];
+            //Find joints
+            //console.log("chainRef.current[idx].length", idx, i, chainRef.current[idx].length)
+            if (chainRef.current[idx].length > 2) {
+                jointIndexes.push(i);
+            }
+        }
+        const middleIndexes = [];
+        //console.log("jointIndexes", jointIndexes)
+        // Now, find indexes that are exactly in the middle between joints
+        for (let i = 1; i < jointIndexes.length; i++) {
+            // Calculate the middle index
+            const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
+            // Avoid adding joints
+            if (!jointIndexes.includes(midIndex)) {
+              middleIndexes.push(indexes[midIndex]);
+            }
+        }
+        return middleIndexes;
+      }
+ 
 			function filterMultipleJoints(indexes) {
 				return indexes.filter(idx => chainRef.current[idx].length > 2);
 			}		
@@ -759,103 +801,56 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 		  }
 
 		  { // hide all meshes
-			  hull_ref.current.visible = false
+			  hull_ref.current.visible         = false
 			  instancedMeshRef.current.visible = false
-			  for( const key in compilation ) {
+			  for( const key in compilation ){
 				compilation[ key ].mesh.visible           = false
 				compilation[ key ].instanced_mesh.visible = false
 			  }
 		  }
 
-		  /*
-		  switch( global_scope ){
-			  case 0:{			  
-				  hull_ref.current.visible                  = true				
-			  } break
-			  case 1:{
-					const positions_and_meshes_by_color =[]
-					// key is the lowest level
-					for( const key in compilation ){
-						all_positions = [];
-						for (let i = 0; i < compilation[key].positions.length; i++) {
-							const position = compilation[key].positions[i];
-							if ( compilation[key].scopeOuters[i][1] ) {
-								all_positions.push({
-									position: position,
-									uniqueIndex: compilation[key].uniqueIndexes[i]
-								});
-							}
-						}
-						const color = compilation[ key ].color
-						if( !( color in positions_and_meshes_by_color )) {
-							positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
-						}
-						positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
-					}
-					for( const color in positions_and_meshes_by_color ){
-						all_positions = positions_and_meshes_by_color[ color ].positions;
-						ordered_all_positions = []
-						ordered_uniqueIndexes = [];
-						visited = new Set();					
-						const firstIndex = all_positions[0].uniqueIndex;
-						buildOrderedPositions(firstIndex);
-
-						const orderedJoint = filterMultipleJoints(ordered_uniqueIndexes);
-						const jointPositions = getPositions(orderedJoint)
-
-						positions_and_meshes_by_color[ color ].positions = jointPositions;
-					}
-
-					for( const key in positions_and_meshes_by_color ){
-						//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
-						
-						const mesh    = positions_and_meshes_by_color[ key ].mesh
-						mesh.geometry.dispose()
-						mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-						mesh.visible  = true
-					}
-				
-			  } break
-			  case 2:{		  
-				  for( const key in compilation ){          
-					compilation[ key ].hull          = convex_hull( compilation[ key ].positions, 15 )
-					remove_gap                       ( compilation[ key ].hull, .075 )
-					compilation[ key ].mesh.geometry.dispose()
-					compilation[ key ].mesh.geometry = old_points_to_geometry( compilation[ key ].hull )
-					compilation[ key ].mesh.visible  = true
-				  }
-			  } break
-			  case 3:{
-					instancedMeshRef.current.visible = true
-			  } break
-		  }
-		  */
 		if( global_scope ) {
 			hull_ref.current.visible = true
 		} else {
+			const colors_handled =[]
+			let   done           = false
 			for( const key in compilation ){
-				const compound_entity_compilation = compilation[ key ]
-				switch( compound_entity_compilation.scope ){
-					case 2 :{ // show blob
+				const color = compilation[ key ].color
+				if( done ) break
+				switch( compilation[ key ].scope ){
+				    case 0:{
+						let positions = []
+						for( const key in compilation ){
+							if( color == compilation[ key ].color )
+								positions = positions.concat( compilation[ key ].positions )
+						}
+						//remove_gap                              ( compilation[ key ].hull, .075 )
+						compilation[ key ].mesh.geometry.dispose()
+						compilation[ key ].mesh.geometry        = old_points_to_geometry( convex_hull( positions ) )
+						compilation[ key ].mesh.visible         = true						
+						
+						/*
 						const positions_and_meshes_by_color =[]
 						// key is the lowest level
-						all_positions = [];
-						for (let i = 0; i < compound_entity_compilation.positions.length; i++) {
-							const position = compound_entity_compilation.positions[i];
-							if ( compound_entity_compilation.scopeOuters[i][1] ) {
-									all_positions.push({
-									position: position,
-									uniqueIndex: compound_entity_compilation.uniqueIndexes[i]
-								});
+						for( const key in compilation ){
+							if( colors_handled.indexOf( compilation[ key ].color ) == -1 ){
+								all_positions = [];
+								for (let i = 0; i < compilation[key].positions.length; i++) {
+									const position = compilation[key].positions[i];
+									if ( compilation[key].scopeOuters[i][1] ) {
+										all_positions.push({
+											position: position,
+											uniqueIndex: compilation[key].uniqueIndexes[i]
+										});
+									}
+								}
+								const color = compilation[ key ].color
+								if( !( color in positions_and_meshes_by_color )) {
+									positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
+								}
+								positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
 							}
 						}
-						
-						const color = compound_entity_compilation.color
-						if( !( color in positions_and_meshes_by_color )) {
-							positions_and_meshes_by_color[ color ] = { positions : [], mesh : compound_entity_compilation.mesh }
-						}
-						positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
-
 						for( const color in positions_and_meshes_by_color ){
 							all_positions = positions_and_meshes_by_color[ color ].positions;
 							ordered_uniqueIndexes = [];
@@ -871,23 +866,28 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
 						for( const key in positions_and_meshes_by_color ){
 							//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
-
-							const mesh           = positions_and_meshes_by_color[ key ].mesh
+							
+							const mesh    = positions_and_meshes_by_color[ key ].mesh
 							mesh.geometry.dispose()
-							mesh.geometry        = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-							mesh.visible         = true
-						}				
+							mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
+							mesh.visible  = true
+						}
+						//colors_handled.push( compilation[ key ].color )
+						*/
+				  } break
+					case 1 :{ // show blobs
+						compilation[ key ].hull                 = convex_hull( compilation[ key ].positions )
+						remove_gap                              ( compilation[ key ].hull, .075 )
+						compilation[ key ].mesh.geometry.dispose()
+						compilation[ key ].mesh.geometry        = points_to_geometry( compilation[ key ].hull )
+						compilation[ key ].mesh.visible         = true
+						
+						//if( colors_handled.indexOf( compilation[ key ].color ) != -1 )
+							colors_handled.push( compilation[ key ].color )						
 					} break
-					case 0 :{ // show blobs
-						compound_entity_compilation.hull                 = convex_hull( compilation[ key ].positions )
-						remove_gap                                       ( compilation[ key ].hull, .075 )
-						compound_entity_compilation.mesh.geometry.dispose()
-						compound_entity_compilation.mesh.geometry        = points_to_geometry( compilation[ key ].hull )
-						compound_entity_compilation.mesh.visible         = true
+					case 2 :{
+						compilation[ key ].instanced_mesh.visible = true
 					} break
-					case 1 :{
-					  compound_entity_compilation.instanced_mesh.visible = true
-					}
 				}
 			}
 		}
