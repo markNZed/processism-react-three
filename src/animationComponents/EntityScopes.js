@@ -37,9 +37,9 @@ const Handle_click = event =>{
 	
 	console.log('Handle_click')	
 	
-	const mesh                        = event.object
-	const key                         = mesh.userData.key
-	const scope                       = compilation[ key ].scope    
+	const mesh  = event.object
+	const key   = mesh.userData.key
+	const scope = compilation[ key ].scope    
 	switch( scope ){
 		case 0:{
 			const color = compilation[ key ].color
@@ -53,6 +53,13 @@ const Handle_click = event =>{
 			for( const key in compilation ){
 				if( color == compilation[ key ].color ) 
 					++compilation[ key ].scope
+			}		
+		} break
+		case 2:{
+			const color = compilation[ key ].color
+			for( const key in compilation ){
+				if( color == compilation[ key ].color ) 
+					compilation[ key ].scope = 0
 			}		
 		} break
 	}
@@ -567,21 +574,21 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       let colorChanged = false; // Track if any color has changed
       let positionChanged = false; // Track if any position has changed
   
-	  { // setup the compilation object so that no objects need to be created later jsg
+      { // setup the compilation object so that no objects need to be created later jsg
         const n = particleCountRef.current
         for( let i = 0; i < n ; ++i ) {
           const parent_id = flattenedParticleRefs.current[i].current.userData.parent_id
           
           if( ! compilation ){ 
-          compilation ={}
-          convex_group_ref.current.children =[]
+            compilation ={}
+            convex_group_ref.current.children =[]
           }
           
           if( ! ( parent_id in compilation )){
             if( compilation_done ){
-				compilation_done                  = false
-				compilation                       ={}
-				convex_group_ref.current.children =[]
+              compilation_done                  = false
+              compilation                       ={}
+              convex_group_ref.current.children =[]
             }
             const color = flattenedParticleRefs.current[ i ].current.userData.color
             compilation[ parent_id ] = {
@@ -593,7 +600,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
               color,
               mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color })),
               instanced_mesh : null,
-			  scope          : 0,			  
+              scope          : 0,			  
             }
             
             for( let j = 0; j < n; ++j ){
@@ -604,21 +611,21 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
               }
             }
 
-			compilation[ parent_id ].instanced_mesh = new THREE.InstancedMesh(
-				new THREE.CircleGeometry( particleRadiusRef.current, 16 ), 
-				new THREE.MeshStandardMaterial({ color }),
-				compilation[ parent_id ].positions.length )
-				
-			compilation[ parent_id ].mesh.userData           = { key : parent_id }
-			convex_group_ref.current.add                     ( compilation[ parent_id ].mesh )
-			
-			compilation[ parent_id ].instanced_mesh.userData = { key : parent_id }
-			convex_group_ref.current.add                     ( compilation[ parent_id ].instanced_mesh )
-		  }
+            compilation[ parent_id ].instanced_mesh = new THREE.InstancedMesh(
+              new THREE.CircleGeometry( particleRadiusRef.current, 16 ), 
+              new THREE.MeshStandardMaterial({ color }),
+              compilation[ parent_id ].positions.length )
+              
+            compilation[ parent_id ].mesh.userData           = { key : parent_id }
+            convex_group_ref.current.add                     ( compilation[ parent_id ].mesh )
+            
+            compilation[ parent_id ].instanced_mesh.userData = { key : parent_id }
+            convex_group_ref.current.add                     ( compilation[ parent_id ].instanced_mesh )
+          }
           compilation[ parent_id ].position_index = 0
         }
         compilation_done = true
-	  }
+      }
        
       for (let i = 0; i < particleCountRef.current; i++) {
         // Get the current position of the instance
@@ -630,12 +637,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         const pos = flattenedParticleRefs.current[i].current.translation();
         dummy.position.set(pos.x, pos.y, pos.z);
   
-		{ // acumulate positions by CompoundEntity index jsg
-			const parent_id                                                                  = flattenedParticleRefs.current[i].current.userData.parent_id
-			compilation[ parent_id ].positions[ compilation[ parent_id ].position_index ].set(pos.x, pos.y, pos.z)
-			compilation[ parent_id ].instanced_mesh.setMatrixAt                              ( compilation[ parent_id ].position_index++, dummy.matrix)
-			compilation[ parent_id ].instanced_mesh.instanceMatrix.needsUpdate               = true
-		}
+        { // acumulate positions by CompoundEntity index jsg
+          const parent_id                                                                  = flattenedParticleRefs.current[i].current.userData.parent_id
+          compilation[ parent_id ].positions[ compilation[ parent_id ].position_index ].set(pos.x, pos.y, pos.z)
+          compilation[ parent_id ].instanced_mesh.setMatrixAt                              ( compilation[ parent_id ].position_index++, dummy.matrix)
+          compilation[ parent_id ].instanced_mesh.instanceMatrix.needsUpdate               = true
+        }
   
         // Compare with the current position
         if (!currentPos.equals(dummy.position)) {
@@ -666,235 +673,230 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         }
       }
   
-	  { // create the blobs from positions_by_entity jsg
-		  // Helper function to recursively build the ordered list
-		  let all_positions = [];
-		  let ordered_all_positions = [];
-		  let ordered_uniqueIndexes = [];
-		  let visited = new Set();
+      { // create the blobs from positions_by_entity jsg
+        // Helper function to recursively build the ordered list
+        let all_positions         = [];
+        let ordered_all_positions = [];
+        let ordered_uniqueIndexes = [];
+        let visited               = new Set();
 
-			function buildOrderedPositions(uniqueIndex) {
-				// Prevent infinite loops
-				if (visited.has(uniqueIndex)) return;
-				visited.add(uniqueIndex);
+        function buildOrderedPositions(uniqueIndex) {
+          // Prevent infinite loops
+          if (visited.has(uniqueIndex)) return;
+          visited.add(uniqueIndex);
 
-				// Find the position with the current uniqueIndex
-				const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
-				if (positionObj) {
-					ordered_all_positions.push(positionObj.position);
-					ordered_uniqueIndexes.push(uniqueIndex)
-				} else {
-					return;
-				}
+          // Find the position with the current uniqueIndex
+          const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
+          if (positionObj) {
+            ordered_all_positions.push(positionObj.position);
+            ordered_uniqueIndexes.push(uniqueIndex)
+          } else {
+            return;
+          }
 
-				const connectedIndexes = chainRef.current[uniqueIndex];
-				for (let i = 0; i < connectedIndexes.length; i++) {
-					buildOrderedPositions(connectedIndexes[i])
-				}
-			}
-
-			function filterMiddleIndexes(chainRef, indexes) {
-        const jointIndexes = [];
-        // First, find all valid indexes from the provided list where the condition is true
-        for (let i = 0; i < indexes.length; i++) {
-            const idx = indexes[i];
-            //Find joints
-            //console.log("chainRef.current[idx].length", idx, i, chainRef.current[idx].length)
-            if (chainRef.current[idx].length > 2) {
-                jointIndexes.push(i);
-            }
+          const connectedIndexes = chainRef.current[uniqueIndex];
+          for (let i = 0; i < connectedIndexes.length; i++) {
+            buildOrderedPositions(connectedIndexes[i])
+          }
         }
-        const middleIndexes = [];
-        //console.log("jointIndexes", jointIndexes)
-        // Now, find indexes that are exactly in the middle between joints
-        for (let i = 1; i < jointIndexes.length; i++) {
-            // Calculate the middle index
-            const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
-            // Avoid adding joints
-            if (!jointIndexes.includes(midIndex)) {
-              middleIndexes.push(indexes[midIndex]);
-            }
+
+        function filterMiddleIndexes(chainRef, indexes) {
+          const jointIndexes = [];
+          // First, find all valid indexes from the provided list where the condition is true
+          for (let i = 0; i < indexes.length; i++) {
+              const idx = indexes[i];
+              //Find joints
+              //console.log("chainRef.current[idx].length", idx, i, chainRef.current[idx].length)
+              if (chainRef.current[idx].length > 2) {
+                  jointIndexes.push(i);
+              }
+          }
+          const middleIndexes = [];
+          //console.log("jointIndexes", jointIndexes)
+          // Now, find indexes that are exactly in the middle between joints
+          for (let i = 1; i < jointIndexes.length; i++) {
+              // Calculate the middle index
+              const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
+              // Avoid adding joints
+              if (!jointIndexes.includes(midIndex)) {
+                middleIndexes.push(indexes[midIndex]);
+              }
+          }
+          return middleIndexes;
         }
-        return middleIndexes;
+  
+        function filterMultipleJoints(indexes) {
+          return indexes.filter(idx => chainRef.current[idx].length > 2);
+        }		
+
+        function getPositions(indexes) {
+          return indexes.map(idx => {
+              const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
+              return positionObj.position;
+          });
+        }		
+            
+        const points_to_geometry = pointsIn =>{
+          const points          = smoothPoints(pointsIn);
+          const curve           = new THREE.CatmullRomCurve3( points, true )
+          const ten_fold_points = curve.getPoints( points.length * 10 )
+          const shape           = new THREE.Shape( ten_fold_points )
+          const shape_geometry  = new THREE.ShapeGeometry( shape )
+          return                shape_geometry
+        }
+
+        const points_to_geometry2 = pointsIn => {
+          const curve           = new THREE.CatmullRomCurve3( pointsIn )
+          const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
+          return                geometry
+        }
+
+        const old_points_to_geometry = points =>{
+          const curve           = new THREE.CatmullRomCurve3( points, true )
+          const ten_fold_points = curve.getPoints( points.length * 2 )
+          //curve.dispose         ()
+          const shape           = new THREE.Shape( ten_fold_points )
+          const shape_geometry  = new THREE.ShapeGeometry( shape )
+          //shape.dispose         ()
+          return                shape_geometry
+        }
+              
+        // remove the gap between blobs
+        const remove_gap = ( positions, gap ) =>{
+          // compute the center
+          const center = new THREE.Vector3()
+          for( const position of positions )
+            center.add( position )
+          center.divideScalar( positions.length )
+
+          // move the points outward from the center
+          const direction = new THREE.Vector3()
+          for( const position of positions ){
+            direction.subVectors( position, center )
+            direction.normalize()
+            position.add( direction.multiplyScalar( gap ))
+          }			  
+        }
+        
+        { // update the hidden blob so that it can be correctly clicked
+        all_positions =[]
+        for( const key in compilation ){
+          for (let i = 0; i < compilation[key].positions.length; i++) {
+            const position = compilation[key].positions[i];
+            position.z = 0.5;
+            if ( compilation[key].scopeOuters[i][0] ) {
+              all_positions.push({
+                position: position,
+                uniqueIndex: compilation[key].uniqueIndexes[i]
+              });
+            }
+          }
+        }
+
+        // We need to order all_positions
+        // For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
+        // Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
+        // Until we reach the original element we started with
+
+        // Start building the ordered list from each uniqueIndex in all_positions
+        const firstIndex = all_positions[0].uniqueIndex;
+        buildOrderedPositions(firstIndex);
+
+        const orderedJoint = filterMultipleJoints(ordered_uniqueIndexes);
+        const jointPositions = getPositions(orderedJoint)
+
+        const geometry                            = points_to_geometry( jointPositions )
+        hull_ref.current.geometry.dispose()
+        hull_ref.current.geometry                 = geometry
+        }
+
+        { // hide all meshes
+          hull_ref.current.visible         = false
+          instancedMeshRef.current.visible = false
+          for( const key in compilation ){
+          compilation[ key ].mesh.visible           = false
+          compilation[ key ].instanced_mesh.visible = false
+          }
+        }
+
+        if( global_scope ) {
+          hull_ref.current.visible = true
+        } else {
+          const colors_handled =[]
+          for( const key in compilation ){
+            const color = compilation[ key ].color
+            switch( compilation[ key ].scope ){
+              case 0:{
+                let positions = []
+                for( const key in compilation ){
+                  if( color == compilation[ key ].color )
+                    positions = positions.concat( compilation[ key ].positions )
+                }
+                //remove_gap                              ( compilation[ key ].hull, .075 )
+                compilation[ key ].mesh.geometry.dispose()
+                compilation[ key ].mesh.geometry        = old_points_to_geometry( convex_hull( positions ) )
+                compilation[ key ].mesh.visible         = true						
+                
+                /*
+                const positions_and_meshes_by_color =[]
+                // key is the lowest level
+                for( const key in compilation ){
+                  if( colors_handled.indexOf( compilation[ key ].color ) == -1 ){
+                    all_positions = [];
+                    for (let i = 0; i < compilation[key].positions.length; i++) {
+                      const position = compilation[key].positions[i];
+                      if ( compilation[key].scopeOuters[i][1] ) {
+                        all_positions.push({
+                          position: position,
+                          uniqueIndex: compilation[key].uniqueIndexes[i]
+                        });
+                      }
+                    }
+                    const color = compilation[ key ].color
+                    if( !( color in positions_and_meshes_by_color )) {
+                      positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
+                    }
+                    positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
+                  }
+                }
+                for( const color in positions_and_meshes_by_color ){
+                  all_positions = positions_and_meshes_by_color[ color ].positions;
+                  ordered_uniqueIndexes = [];
+                  visited = new Set();					
+                  const firstIndex = all_positions[0].uniqueIndex;
+                  buildOrderedPositions(firstIndex);
+
+                  const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes)
+                  const jointPositions = getPositions(orderedJoint)
+
+                  positions_and_meshes_by_color[ color ].positions = jointPositions;
+                }
+
+                for( const key in positions_and_meshes_by_color ){
+                  //remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
+                  
+                  const mesh    = positions_and_meshes_by_color[ key ].mesh
+                  mesh.geometry.dispose()
+                  mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
+                  mesh.visible  = true
+                }
+                //colors_handled.push( compilation[ key ].color )
+                */
+              } break
+              case 1 :{ // show blobs
+                compilation[ key ].hull                 = convex_hull( compilation[ key ].positions )
+                remove_gap                              ( compilation[ key ].hull, .075 )
+                compilation[ key ].mesh.geometry.dispose()
+                compilation[ key ].mesh.geometry        = points_to_geometry( compilation[ key ].hull )
+                compilation[ key ].mesh.visible         = true
+              } break
+              case 2 :{
+                compilation[ key ].instanced_mesh.visible = true
+              } break
+            }
+          }
+        }
       }
- 
-			function filterMultipleJoints(indexes) {
-				return indexes.filter(idx => chainRef.current[idx].length > 2);
-			}		
-
-			function getPositions(indexes) {
-				return indexes.map(idx => {
-						const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
-						return positionObj.position;
-				});
-		}		
-				  
-		  const points_to_geometry = pointsIn =>{
-			  const points          = smoothPoints(pointsIn);
-			  const curve           = new THREE.CatmullRomCurve3( points, true )
-			  const ten_fold_points = curve.getPoints( points.length * 10 )
-			  const shape           = new THREE.Shape( ten_fold_points )
-			  const shape_geometry  = new THREE.ShapeGeometry( shape )
-			  return                shape_geometry
-		  }
-
-		  const points_to_geometry2 = pointsIn => {
-				const curve           = new THREE.CatmullRomCurve3( pointsIn )
-				const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
-				return                geometry
-		  }
-
-		  const old_points_to_geometry = points =>{
-				const curve           = new THREE.CatmullRomCurve3( points, true )
-				const ten_fold_points = curve.getPoints( points.length * 2 )
-				//curve.dispose         ()
-				const shape           = new THREE.Shape( ten_fold_points )
-				const shape_geometry  = new THREE.ShapeGeometry( shape )
-				//shape.dispose         ()
-				return                shape_geometry
-			}
-		  		  
-		  // remove the gap between blobs
-		  const remove_gap = ( positions, gap ) =>{
-			// compute the center
-			const center = new THREE.Vector3()
-			for( const position of positions )
-				center.add( position )
-			center.divideScalar( positions.length )
-			
-			// move the points outward from the center
-			const direction = new THREE.Vector3()
-			for( const position of positions ){
-				direction.subVectors( position, center )
-				direction.normalize()
-				position.add( direction.multiplyScalar( gap ))
-			}			  
-		  }
-		  
-		  { // update the hidden blob so that it can be correctly clicked
-			all_positions =[]
-			for( const key in compilation ){
-				for (let i = 0; i < compilation[key].positions.length; i++) {
-					const position = compilation[key].positions[i];
-					position.z = 0.5;
-					if ( compilation[key].scopeOuters[i][0] ) {
-						all_positions.push({
-							position: position,
-							uniqueIndex: compilation[key].uniqueIndexes[i]
-						});
-					}
-				}
-			}
-
-			// We need to order all_positions
-			// For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
-			// Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
-			// Until we reach the original element we started with
-
-			// Start building the ordered list from each uniqueIndex in all_positions
-			const firstIndex = all_positions[0].uniqueIndex;
-			buildOrderedPositions(firstIndex);
-
-			const orderedJoint = filterMultipleJoints(ordered_uniqueIndexes);
-			const jointPositions = getPositions(orderedJoint)
-
-			const geometry                            = points_to_geometry( jointPositions )
-			hull_ref.current.geometry.dispose()
-			hull_ref.current.geometry                 = geometry
-		  }
-
-		  { // hide all meshes
-			  hull_ref.current.visible         = false
-			  instancedMeshRef.current.visible = false
-			  for( const key in compilation ){
-				compilation[ key ].mesh.visible           = false
-				compilation[ key ].instanced_mesh.visible = false
-			  }
-		  }
-
-		if( global_scope ) {
-			hull_ref.current.visible = true
-		} else {
-			const colors_handled =[]
-			let   done           = false
-			for( const key in compilation ){
-				const color = compilation[ key ].color
-				if( done ) break
-				switch( compilation[ key ].scope ){
-				    case 0:{
-						let positions = []
-						for( const key in compilation ){
-							if( color == compilation[ key ].color )
-								positions = positions.concat( compilation[ key ].positions )
-						}
-						//remove_gap                              ( compilation[ key ].hull, .075 )
-						compilation[ key ].mesh.geometry.dispose()
-						compilation[ key ].mesh.geometry        = old_points_to_geometry( convex_hull( positions ) )
-						compilation[ key ].mesh.visible         = true						
-						
-						/*
-						const positions_and_meshes_by_color =[]
-						// key is the lowest level
-						for( const key in compilation ){
-							if( colors_handled.indexOf( compilation[ key ].color ) == -1 ){
-								all_positions = [];
-								for (let i = 0; i < compilation[key].positions.length; i++) {
-									const position = compilation[key].positions[i];
-									if ( compilation[key].scopeOuters[i][1] ) {
-										all_positions.push({
-											position: position,
-											uniqueIndex: compilation[key].uniqueIndexes[i]
-										});
-									}
-								}
-								const color = compilation[ key ].color
-								if( !( color in positions_and_meshes_by_color )) {
-									positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
-								}
-								positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
-							}
-						}
-						for( const color in positions_and_meshes_by_color ){
-							all_positions = positions_and_meshes_by_color[ color ].positions;
-							ordered_uniqueIndexes = [];
-							visited = new Set();					
-							const firstIndex = all_positions[0].uniqueIndex;
-							buildOrderedPositions(firstIndex);
-
-							const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes)
-							const jointPositions = getPositions(orderedJoint)
-
-							positions_and_meshes_by_color[ color ].positions = jointPositions;
-						}
-
-						for( const key in positions_and_meshes_by_color ){
-							//remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
-							
-							const mesh    = positions_and_meshes_by_color[ key ].mesh
-							mesh.geometry.dispose()
-							mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-							mesh.visible  = true
-						}
-						//colors_handled.push( compilation[ key ].color )
-						*/
-				  } break
-					case 1 :{ // show blobs
-						compilation[ key ].hull                 = convex_hull( compilation[ key ].positions )
-						remove_gap                              ( compilation[ key ].hull, .075 )
-						compilation[ key ].mesh.geometry.dispose()
-						compilation[ key ].mesh.geometry        = points_to_geometry( compilation[ key ].hull )
-						compilation[ key ].mesh.visible         = true
-						
-						//if( colors_handled.indexOf( compilation[ key ].color ) != -1 )
-							colors_handled.push( compilation[ key ].color )						
-					} break
-					case 2 :{
-						compilation[ key ].instanced_mesh.visible = true
-					} break
-				}
-			}
-		}
-	  }
    
       // Update the instance matrix to reflect changes only if positions changed
       if (positionChanged) {
