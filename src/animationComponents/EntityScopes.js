@@ -826,7 +826,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           for( const key in compilation ){
             const color = compilation[ key ].color
             switch( compilation[ key ].scope ){
-              case 0:{
+              case 0 :{   
                 let positions = []
                 for( const key in compilation ){
                   if( color == compilation[ key ].color )
@@ -834,53 +834,42 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
                 }
                 //remove_gap                              ( compilation[ key ].hull, .075 )
                 compilation[ key ].mesh.geometry.dispose()
-                compilation[ key ].mesh.geometry        = old_points_to_geometry( convex_hull( positions ) )
-                compilation[ key ].mesh.visible         = true						
+                compilation[ key ].mesh.geometry        = old_points_to_geometry( positions )
+                compilation[ key ].mesh.visible         = true			
                 
                 /*
-                const positions_and_meshes_by_color =[]
                 // key is the lowest level
-                for( const key in compilation ){
-                  if( colors_handled.indexOf( compilation[ key ].color ) == -1 ){
-                    all_positions = [];
+                const all_positions = [];
+                //for( const key in compilation ){
+                  if( colors_handled.indexOf( color ) == -1 ){
+                    colors_handled.push( color )
                     for (let i = 0; i < compilation[key].positions.length; i++) {
                       const position = compilation[key].positions[i];
                       if ( compilation[key].scopeOuters[i][1] ) {
                         all_positions.push({
-                          position: position,
-                          uniqueIndex: compilation[key].uniqueIndexes[i]
+                          position    : position,
+                          uniqueIndex : compilation[key].uniqueIndexes[i]
                         });
                       }
                     }
-                    const color = compilation[ key ].color
-                    if( !( color in positions_and_meshes_by_color )) {
-                      positions_and_meshes_by_color[ color ] = { positions : [], mesh : compilation[ key ].mesh }
-                    }
-                    positions_and_meshes_by_color[ color ].positions = positions_and_meshes_by_color[ color ].positions.concat( all_positions )
                   }
-                }
-                for( const color in positions_and_meshes_by_color ){
-                  all_positions = positions_and_meshes_by_color[ color ].positions;
+                //}
+                if( all_positions.length > 0 ){
                   ordered_uniqueIndexes = [];
-                  visited = new Set();					
-                  const firstIndex = all_positions[0].uniqueIndex;
-                  buildOrderedPositions(firstIndex);
+                  visited               = new Set();					
+                  const firstIndex      = all_positions[0].uniqueIndex;
+                  buildOrderedPositions (firstIndex);
 
                   const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes)
                   const jointPositions = getPositions(orderedJoint)
 
-                  positions_and_meshes_by_color[ color ].positions = jointPositions;
-                }
-
-                for( const key in positions_and_meshes_by_color ){
                   //remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
                   
-                  const mesh    = positions_and_meshes_by_color[ key ].mesh
+                  const mesh           = compilation[ key ].mesh
                   mesh.geometry.dispose()
-                  mesh.geometry = points_to_geometry( positions_and_meshes_by_color[ key ].positions )
-                  mesh.visible  = true
+                  mesh.geometry        = points_to_geometry( jointPositions )
+                  mesh.visible         = true
                 }
-                //colors_handled.push( compilation[ key ].color )
                 */
               } break
               case 1 :{ // show blobs
