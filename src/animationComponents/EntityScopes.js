@@ -26,42 +26,7 @@ import convex_hull from './convex_hull'
 
 const ZERO_VECTOR = new THREE.Vector3();
 
-let global_scope     = true
-let max_global_scope = 0
-let compilation      = null
-let compilation_done = false
-let ignore_click     = false
-
-const Handle_click = event =>{
-	if( ignore_click ) return
-	
-	const mesh  = event.object
-	const key   = mesh.userData.key
-	const scope = compilation[ key ].scope    
-	switch( scope ){
-		case 0:{
-			const color = compilation[ key ].color
-			for( const key in compilation ){
-				if( color == compilation[ key ].color ) 
-					++compilation[ key ].scope
-			}
-		} break
-		case 1:{
-			const color = compilation[ key ].color
-			for( const key in compilation ){
-				if( color == compilation[ key ].color ) 
-					++compilation[ key ].scope
-			}		
-		} break
-		case 2:{
-      const color = compilation[ key ].color
-			for( const key in compilation ){
-				if( color == compilation[ key ].color ) 
-					compilation[ key ].scope = 0
-			}		
-		} break
-	}
-}
+let global_scope     = 0
 
 /*
  This is the Component that gets exported and is instantiated in the scene
@@ -148,9 +113,6 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
 
-  // keep track of how deep it goes jsg
-  if( scope > max_global_scope ) max_global_scope = scope
-  
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
 
@@ -220,9 +182,6 @@ Particle.displayName = 'Particle'; // the name property doesn't exist because it
 
 // 
 const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config, ...props }, ref) => {
-
-  // keep track of how deep it goes jsg
-  if( scope > max_global_scope ) max_global_scope = scope
   
   const isDebug = config.debug;
   
@@ -276,8 +235,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   const chainRef = props.chainRef || useRef({});
   
   // jsg
-  const convex_group_ref      = useRef()
   const hull_ref              = useRef()
+  let compilation             = useRef()
+  let compilation_done        = useRef(false);
   
   ////////////////////////////////////////
   // Constants impacting particle behavior
@@ -571,76 +531,29 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       const colorDummy = new THREE.Color();
       let colorChanged = false; // Track if any color has changed
       let positionChanged = false; // Track if any position has changed
-  
-      { // setup the compilation object so that no objects need to be created later jsg
-        const n = particleCountRef.current
-        for( let i = 0; i < n ; ++i ) {
-          const parent_id = flattenedParticleRefs.current[i].current.userData.parent_id
-          
-          if( ! compilation ){ 
-            compilation ={}
-            convex_group_ref.current.children =[]
-          }
-          
-          if( ! ( parent_id in compilation )){
-            if( compilation_done ){
-              compilation_done                  = false
-              compilation                       ={}
-              convex_group_ref.current.children =[]
-            }
-            const color = flattenedParticleRefs.current[ i ].current.userData.color
-            compilation[ parent_id ] = {
-              positions      : [],
-              scopeOuters    : [],
-              uniqueIndexes  : [],
-              position_index : 0,
-              hull           : [],
-              color,
-              mesh           : new THREE.Mesh( new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color })),
-              instanced_mesh : null,
-              scope          : 0,			  
-            }
-            
-            for( let j = 0; j < n; ++j ){
-              if( parent_id == flattenedParticleRefs.current[ j ].current.userData.parent_id ) {
-                compilation[ parent_id ].positions.push( new THREE.Vector3())
-                compilation[ parent_id ].scopeOuters.push(flattenedParticleRefs.current[j].current.userData.scopeOuter)
-                compilation[ parent_id ].uniqueIndexes.push(flattenedParticleRefs.current[j].current.userData.uniqueIndex)
-              }
-            }
-
-            compilation[ parent_id ].instanced_mesh = new THREE.InstancedMesh(
-              new THREE.CircleGeometry( particleRadiusRef.current, 16 ), 
-              new THREE.MeshStandardMaterial({ color }),
-              compilation[ parent_id ].positions.length )
-              
-            compilation[ parent_id ].mesh.userData           = { key : parent_id }
-            convex_group_ref.current.add                     ( compilation[ parent_id ].mesh )
-            
-            compilation[ parent_id ].instanced_mesh.userData = { key : parent_id }
-            convex_group_ref.current.add                     ( compilation[ parent_id ].instanced_mesh )
-          }
-          compilation[ parent_id ].position_index = 0
-        }
-        compilation_done = true
-      }
        
       for (let i = 0; i < particleCountRef.current; i++) {
         // Get the current position of the instance
         mesh.getMatrixAt(i, dummy.matrix);
         const currentPos = new THREE.Vector3();
         dummy.matrix.decompose(currentPos, new THREE.Quaternion(), new THREE.Vector3());
+
+        // Get the visibility from userData
+        const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
+        if (visible) {
+          //console.log("visible", id, i, visible)
+          dummy.scale.set(1, 1, 1); // Set scale to show
+          mesh.setMatrixAt(i, dummy.matrix);
+          positionChanged = true;
+        } else {
+          dummy.scale.set(0, 0, 0); // Set scale to 0 to hide
+          mesh.setMatrixAt(i, dummy.matrix);
+          positionChanged = true;
+        }
   
         // Get the position of the rigid body, tis is world position
         const pos = flattenedParticleRefs.current[i].current.translation();
         dummy.position.set(pos.x, pos.y, pos.z);
-  
-        { // acumulate positions by CompoundEntity index jsg
-          const parent_id                                                                  = flattenedParticleRefs.current[i].current.userData.parent_id
-          compilation[ parent_id ].positions[ compilation[ parent_id ].position_index ].set(pos.x, pos.y, pos.z)
-          compilation[ parent_id ].instanced_mesh.setMatrixAt                              ( compilation[ parent_id ].position_index++, dummy.matrix)
-          compilation[ parent_id ].instanced_mesh.instanceMatrix.needsUpdate               = true
-        }
   
         // Compare with the current position
         if (!currentPos.equals(dummy.position)) {
@@ -670,216 +583,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           colorChanged = true;
         }
       }
-  
-      { // create the blobs from positions_by_entity jsg
-        // Helper function to recursively build the ordered list
-        let all_positions         = [];
-        let ordered_all_positions = [];
-        let ordered_uniqueIndexes = [];
-        let visited               = new Set();
-
-        function buildOrderedPositions(uniqueIndex) {
-          // Prevent infinite loops
-          if (visited.has(uniqueIndex)) return;
-          visited.add(uniqueIndex);
-
-          // Find the position with the current uniqueIndex
-          const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
-          if (positionObj) {
-            ordered_all_positions.push(positionObj.position);
-            ordered_uniqueIndexes.push(uniqueIndex)
-          } else {
-            return;
-          }
-
-          const connectedIndexes = chainRef.current[uniqueIndex];
-          for (let i = 0; i < connectedIndexes.length; i++) {
-            buildOrderedPositions(connectedIndexes[i])
-          }
-        }
-
-        function filterMiddleIndexes(chainRef, indexes) {
-          const jointIndexes = [];
-          // First, find all valid indexes from the provided list where the condition is true
-          for (let i = 0; i < indexes.length; i++) {
-              const idx = indexes[i];
-              //Find joints
-              //console.log("chainRef.current[idx].length", idx, i, chainRef.current[idx].length)
-              if (chainRef.current[idx].length > 2) {
-                  jointIndexes.push(i);
-              }
-          }
-          const middleIndexes = [];
-          //console.log("jointIndexes", jointIndexes)
-          // Now, find indexes that are exactly in the middle between joints
-          for (let i = 1; i < jointIndexes.length; i++) {
-              // Calculate the middle index
-              const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
-              // Avoid adding joints
-              if (!jointIndexes.includes(midIndex)) {
-                middleIndexes.push(indexes[midIndex]);
-              }
-          }
-          return middleIndexes;
-        }
-  
-        function filterMultipleJoints(indexes) {
-          return indexes.filter(idx => chainRef.current[idx].length > 2);
-        }		
-
-        function getPositions(indexes) {
-          return indexes.map(idx => {
-              const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
-              return positionObj.position;
-          });
-        }		
-            
-        const points_to_geometry = pointsIn =>{
-          const points          = smoothPoints(pointsIn);
-          const curve           = new THREE.CatmullRomCurve3( points, true )
-          const ten_fold_points = curve.getPoints( points.length * 10 )
-          const shape           = new THREE.Shape( ten_fold_points )
-          const shape_geometry  = new THREE.ShapeGeometry( shape )
-          return                shape_geometry
-        }
-
-        const points_to_geometry2 = pointsIn => {
-          const curve           = new THREE.CatmullRomCurve3( pointsIn )
-          const geometry        = new THREE.BufferGeometry().setFromPoints( curve.getPoints( pointsIn.length ));
-          return                geometry
-        }
-
-        const old_points_to_geometry = points =>{
-          const shape           = new THREE.Shape( points ) 
-          const shape_geometry  = new THREE.ShapeGeometry( shape )
-          return                shape_geometry
-        }
-              
-        // remove the gap between blobs
-        const remove_gap = ( positions, gap ) =>{
-          // compute the center
-          const center = new THREE.Vector3()
-          for( const position of positions )
-            center.add( position )
-          center.divideScalar( positions.length )
-
-          // move the points outward from the center
-          const direction = new THREE.Vector3()
-          for( const position of positions ){
-            direction.subVectors( position, center )
-            direction.normalize()
-            position.add( direction.multiplyScalar( gap ))
-          }			  
-        }
-        
-        { // update the hidden blob so that it can be correctly clicked
-        all_positions =[]
-        for( const key in compilation ){
-          for (let i = 0; i < compilation[key].positions.length; i++) {
-            const position = compilation[key].positions[i];
-            position.z = 0.5;
-            if ( compilation[key].scopeOuters[i][0] ) {
-              all_positions.push({
-                position: position,
-                uniqueIndex: compilation[key].uniqueIndexes[i]
-              });
-            }
-          }
-        }
-
-        // We need to order all_positions
-        // For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
-        // Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
-        // Until we reach the original element we started with
-
-        // Start building the ordered list from each uniqueIndex in all_positions
-        const firstIndex = all_positions[0].uniqueIndex;
-        buildOrderedPositions(firstIndex);
-
-        const orderedJoint = filterMultipleJoints(ordered_uniqueIndexes);
-        const jointPositions = getPositions(orderedJoint)
-
-        const geometry                            = points_to_geometry( jointPositions )
-        hull_ref.current.geometry.dispose()
-        hull_ref.current.geometry                 = geometry
-        }
-
-        { // hide all meshes
-          hull_ref.current.visible         = false
-          instancedMeshRef.current.visible = false
-          for( const key in compilation ){
-          compilation[ key ].mesh.visible           = false
-          compilation[ key ].instanced_mesh.visible = false
-          }
-        }
-
-        if( global_scope ) {
-          hull_ref.current.visible = true
-        } else {
-          const colors_handled =[]
-          for( const key in compilation ){
-            const color = compilation[ key ].color
-            switch( compilation[ key ].scope ){
-              case 0 :{   
-                let positions = []
-                for( const key in compilation ){
-                  if( color == compilation[ key ].color )
-                    positions = positions.concat( compilation[ key ].positions )
-                }
-                remove_gap                              ( compilation[ key ].hull, 1 )
-                compilation[ key ].mesh.geometry.dispose()
-                compilation[ key ].mesh.geometry        = old_points_to_geometry( positions )
-                compilation[ key ].mesh.visible         = true			
-                
-                /*
-                // key is the lowest level
-                const all_positions = [];
-                //for( const key in compilation ){
-                  if( colors_handled.indexOf( color ) == -1 ){
-                    colors_handled.push( color )
-                    for (let i = 0; i < compilation[key].positions.length; i++) {
-                      const position = compilation[key].positions[i];
-                      if ( compilation[key].scopeOuters[i][1] ) {
-                        all_positions.push({
-                          position    : position,
-                          uniqueIndex : compilation[key].uniqueIndexes[i]
-                        });
-                      }
-                    }
-                  }
-                //}
-                if( all_positions.length > 0 ){
-                  ordered_uniqueIndexes = [];
-                  visited               = new Set();					
-                  const firstIndex      = all_positions[0].uniqueIndex;
-                  buildOrderedPositions (firstIndex);
-
-                  const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes)
-                  const jointPositions = getPositions(orderedJoint)
-
-                  //remove_gap( positions_and_meshes_by_color[ key ].positions, 1	)
-                  
-                  const mesh           = compilation[ key ].mesh
-                  mesh.geometry.dispose()
-                  mesh.geometry        = points_to_geometry( jointPositions )
-                  mesh.visible         = true
-                }
-                */
-              } break
-              case 1 :{ // show blobs
-                compilation[ key ].hull                 = convex_hull( compilation[ key ].positions )
-                remove_gap                              ( compilation[ key ].hull, .075 )
-                compilation[ key ].mesh.geometry.dispose()
-                compilation[ key ].mesh.geometry        = points_to_geometry( compilation[ key ].hull )
-                compilation[ key ].mesh.visible         = true
-              } break
-              case 2 :{
-                compilation[ key ].instanced_mesh.visible = true
-              } break
-            }
-          }
-        }
-      }
    
       // Update the instance matrix to reflect changes only if positions changed
       if (positionChanged) {
@@ -892,6 +595,238 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       }
     }
   });
+
+  useFrame(() => {
+    if (frameStateRef.current === "init") return;
+  
+    if( ! compilation.current) {
+
+      compilation.current = {
+        positions      : [],
+        scopeOuters    : [],
+        uniqueIndexes  : [],
+        position_index : 0,
+        hull           : [],
+        scope          : 0,			  
+      }
+
+      const n = particleCountRef.current;
+      for( let i = 0; i < n ; ++i ) {
+        compilation.current.positions.push( new THREE.Vector3())
+        compilation.current.scopeOuters.push(flattenedParticleRefs.current[i].current.userData.scopeOuter)
+        compilation.current.uniqueIndexes.push(flattenedParticleRefs.current[i].current.userData.uniqueIndex)
+      }
+
+      // Helper function to recursively build the ordered list
+      let all_positions         = [];
+      let ordered_all_positions = [];
+      let ordered_uniqueIndexes = [];
+      let visited               = new Set();
+
+      function buildOrderedPositions(uniqueIndex) {
+				// Prevent infinite loops
+				if (visited.has(uniqueIndex)) return false;
+				visited.add(uniqueIndex);
+				// Find the positionObj with the current uniqueIndex
+				const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
+				if (positionObj) {
+					ordered_uniqueIndexes.push(uniqueIndex)
+				} else {
+					return false;
+				}
+				const connectedIndexes = chainRef.current[uniqueIndex];
+        let foundJoint = false
+        if (connectedIndexes.length > 2) {
+          for (let i = 0; i < connectedIndexes.length; i++) {
+            if (chainRef.current[connectedIndexes[i]].length > 2) {
+              if (buildOrderedPositions(connectedIndexes[i])) {
+                //console.log("Found joint", uniqueIndex, connectedIndexes[i])
+                foundJoint = true;
+              }
+            } 
+          }
+        }
+        if (!foundJoint) {
+          for (let i = 0; i < connectedIndexes.length; i++) {
+            buildOrderedPositions(connectedIndexes[i])
+          }
+        }
+        return true;
+			}
+
+      function filterMiddleIndexes(chainRef, indexes) {
+        const jointIndexes = [];
+        // First, find all valid indexes from the provided list where the condition is true
+        for (let i = 0; i < indexes.length; i++) {
+          const idx = indexes[i];
+          //Find joints
+          //console.log("chainRef.current[idx].length", idx, i, chainRef.current[idx].length)
+          if (chainRef.current[idx].length > 2) {
+              jointIndexes.push(i);
+          }
+        }
+        const middleIndexes = [];
+        //console.log("jointIndexes", jointIndexes)
+        // Now, find indexes that are exactly in the middle between joints
+        for (let i = 1; i < jointIndexes.length; i++) {
+          // Calculate the middle index
+          const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
+          // Avoid adding joints
+          if (!jointIndexes.includes(midIndex)) {
+            middleIndexes.push(indexes[midIndex]);
+          }
+        }
+        return middleIndexes;
+      }
+      
+      // update the hidden blob so that it can be correctly clicked
+      all_positions =[]
+      for (let i = 0; i < compilation.current.positions.length; i++) {
+        const position = compilation.current.positions[i];
+        if ( compilation.current.scopeOuters[i][scope] ) {
+          all_positions.push({
+            position: position,
+            uniqueIndex: compilation.current.uniqueIndexes[i]
+          });
+        }
+      }
+
+      // We need to order all_positions
+      // For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
+      // Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
+      // Until we reach the original element we started with
+
+      // Start building the ordered list from each uniqueIndex in all_positions
+      const firstIndex = all_positions[0].uniqueIndex;
+      buildOrderedPositions(firstIndex);
+
+      const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes);
+
+      compilation.current.orderedJoint = orderedJoint;
+
+      //console.log("compilation", id, compilation);
+            
+    }
+
+    compilation_done.current = true;
+
+    function getPositions(indexes) {
+      return indexes.map(idx => {
+          const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
+          return positionObj.position;
+      });
+    }
+        
+    const points_to_geometry = points =>{
+      const curve           = new THREE.CatmullRomCurve3( points, true )
+      const ten_fold_points = curve.getPoints( points.length * 10 )
+      const shape           = new THREE.Shape( ten_fold_points )
+      const shape_geometry  = new THREE.ShapeGeometry( shape )
+      return                shape_geometry
+    }
+    
+    const worldVector = new THREE.Vector3();
+
+    for (let i = 0; i < particleCountRef.current; i++) {
+      // Get the position of the rigid body, this is world position
+      const pos = flattenedParticleRefs.current[i].current.translation();
+      worldVector.set(pos.x, pos.y, pos.z);
+      // acumulate positions by CompoundEntity index jsg
+      compilation.current.positions[i].copy(internalRef.current.worldToLocal(worldVector))
+    }
+
+    let jointPositions = []
+
+    // update the hidden blob so that it can be correctly clicked
+    const all_positions =[]
+    
+
+    if (scope == config.entityCounts.length - 1) {
+      for (let i = 0; i < particleCountRef.current; i++) {
+        const position = compilation.current.positions[i];
+        jointPositions.push(position);
+      }
+    } else {
+      for (let i = 0; i < compilation.current.positions.length; i++) {
+        const position = compilation.current.positions[i];
+        position.set(position.x, position.y, 2);
+        if ( compilation.current.scopeOuters[i][scope] ) {
+          all_positions.push({
+            position: position,
+            uniqueIndex: compilation.current.uniqueIndexes[i]
+          });
+        }
+      }
+      jointPositions = getPositions(compilation.current.orderedJoint);
+    }
+
+    //if (scope == 0) console.log("jointPositions", jointPositions)
+    const geometry = points_to_geometry( jointPositions )
+    hull_ref.current.geometry.dispose()
+    hull_ref.current.geometry = geometry
+
+    const show_or_hide_particles = show_or_hide =>{
+      if( scope != config.entityCounts.length - 1 ) return
+
+      for ( let i = 0; i < flattenedParticleRefs.current.length; ++i ) {
+        flattenedParticleRefs.current[i].current.userData.visible = show_or_hide
+      }
+    }
+
+    hull_ref.current.visible = false
+    switch( global_scope ){
+      case 0 :{
+        // only show scope 0 blob
+        hull_ref.current.visible = scope == 0
+        show_or_hide_particles   ( false )
+      } break
+      case 1 :{
+        if( ! hull_ref.current.userData.visible ){
+          // show scope 1 for the first time ?
+          if( ! hull_ref.current.userData.clicks ){
+            hull_ref.current.visible = scope == 1
+            show_or_hide_particles   ( false )
+          }
+        } else {
+          hull_ref.current.visible = scope != 0
+          show_or_hide_particles   ( false )
+          //hull_ref.current.visible = scope != 0                              &&   hull_ref.current.userData.visible
+          //show_or_hide_particles   ( scope == config.entityCounts.length - 1 && ! hull_ref.current.visible )  
+        }
+      }
+    }
+  });
+
+  const Handle_click = ( event ) => {
+
+    console.log("Handle_click", id, event)
+
+    if( ! hull_ref.current.visible ) return
+
+    switch( global_scope ){
+      case 0 :{
+        global_scope = 1
+      } break
+      case 1 :{
+        hull_ref.current.userData.visible = false
+        hull_ref.current.userData.clicks++
+        
+        entityRefs.forEach( entity => {
+          if (entity.current) {
+            if (entity.current.current) {
+              if( 'children' in entity.current.current ){
+                entity.current.current.children.forEach( child =>{
+                  child.userData.visible = true
+                })
+              } else {
+                entity.current.current.userData.visible = true
+              }
+            }
+          }          
+        })
+      } break
+    } 
+  }
   
   // This is only used in debug
   const localJointPosition = (groupRef, particles, side) => {
@@ -936,11 +871,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           registerParticlesFn={localRegisterParticlesFn}
           parentDebug={isDebug}
           config={config}
-          userData={{ color }}
+          userData={{ color, visible : false }}
 		  
-		  // jsg 
-		  parent_id = { id }	
-      chainRef = {chainRef}	  
+          // jsg 
+          parent_id = { id }	
+          chainRef = {chainRef}	  
         />
       ))}
 
@@ -960,17 +895,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       ))}
 
 	  {/*// jsg*/}
-      <group ref = { convex_group_ref }
-		onClick = { event =>{ 	
-			Handle_click( event )
-			ignore_click = true
-			setTimeout( event => ignore_click = false , 1000 )
-		}}/>
 	  
 	  <mesh 
       ref = { hull_ref } 
-		  onClick       = { event => global_scope = false }
-		  onContextMenu = { event => global_scope = true  }>	 
+      userData = {{ visible : false, clicks : 0 }}
+		  onContextMenu = { event => global_scope = 0  }	 
+      onClick = { event => { 	
+        Handle_click( event )
+      }}
+      >
 	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
 	  </mesh>
 	  
@@ -1107,40 +1040,4 @@ const getColor = (config, scope, defaultValue) => {
     return colorConfig();
   }
   return colorConfig;
-};
-
-// Function to smooth points using averaging filter with adjustable window size
-function smoothPoints(points, smoothingFactor = 0.5, windowSize = 1) {
-  const smoothedPoints = [];
-  const len = points.length;
-
-  for (let i = 0; i < len; i++) {
-    let sumX = 0;
-    let sumY = 0;
-    let count = 0;
-
-    // Sum up the points within the window size
-    for (let j = -windowSize; j <= windowSize; j++) {
-      const index = (i + j + len) % len;
-      sumX += points[index].x;
-      sumY += points[index].y;
-      count++;
-    }
-
-    const avgX = sumX / count;
-    const avgY = sumY / count;
-
-    const currPoint = points[i];
-    const smoothX = currPoint.x + (avgX - currPoint.x) * smoothingFactor;
-    const smoothY = currPoint.y + (avgY - currPoint.y) * smoothingFactor;
-
-    smoothedPoints.push(new THREE.Vector2(smoothX, smoothY));
-  }
-
-  return smoothedPoints;
-}
-
-// Function to convert array of Vector3 to array of points
-const convertVector3ToPoints = (vectorArray) => {
-  return vectorArray.map(vector => [vector.x, vector.y, vector.z]);
 };
