@@ -8,7 +8,6 @@ import withAnimationState from '../withAnimationState';
 import { Circle } from './';
 import useStore from '../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider, vec3 } from '@react-three/rapier';
-import convex_hull from './convex_hull'
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -26,7 +25,7 @@ import convex_hull from './convex_hull'
 
 const ZERO_VECTOR = new THREE.Vector3();
 
-let global_scope     = 0
+let global_scope = 0
 
 /*
  This is the Component that gets exported and is instantiated in the scene
@@ -92,6 +91,8 @@ const EntityScopes = React.forwardRef((props, ref) => {
     lastStepEnd.current = endTime;
   });
 
+  console.log("config", scopesConfig);
+
   return (
     // Pass in radius so we can calcualte new radius for next scope an pass in same way to CompoundEntity
     <CompoundEntity id={"Scope0"} {...props} ref={ref} config={scopesConfig} radius={scopesConfig.radius}/>
@@ -111,21 +112,22 @@ const Joint = ({ id, a, b, ax, ay, az, bx, by, bz }) => {
 }
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray, scope, initialPosition, radius, parentColor, registerParticlesFn, config }, ref) => {
-
+const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, initialPosition, radius, registerParticlesFn, config, ...props }, ref) => {
+  
   const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
   useImperativeHandle(ref, () => internalRef.current);
 
   const isDebug = config.debug;
-  const color = internalRef?.current?.current?.userData?.color || getColor(config, scope, parentColor || "blue");
+  const color = useMemo(() => getColor(config, scope, props.color || "blue"));
+  const [initialize, setInitialize] = useState(true);
 
   // Calculate the unique global index for the Particle
   const calculateUniqueIndex = (indexArray, entityCounts) => {
     let multiplier = 1;
     let uniqueIndex = 0;
-    for (let i = indexArray.length - 1; i >= 0; i--) {
+    for (let i = indexArray.length - 1; i > 0; i--) {
       uniqueIndex += indexArray[i] * multiplier;
-      multiplier *= entityCounts[i];
+      multiplier *= entityCounts[i-1];
     }
     return uniqueIndex;
   };
@@ -144,6 +146,14 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
     }
   }, [registerParticlesFn, internalRef]);
 
+  // Set the initial userData, don't do this in JSX (it would overwrite on renders)
+  useEffect(() => {
+    if (initialize && internalRef.current) {
+      internalRef.current.setUserData({color: color, uniqueIndex: uniqueIndex});
+      setInitialize(false);
+    }
+  }, [internalRef]);
+
   return (
     <>
     <ParticleRigidBody
@@ -156,8 +166,7 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
       enabledTranslations={[true, true, false]}
       enabledRotations={[false, false, true]}
       restitution={config.particleRestitution}
-      userData={{color: color, parent_id, uniqueIndex }}
-	  ccd={config.ccd}
+	    ccd={config.ccd}
     >
       <BallCollider args={[radius]} />
     </ParticleRigidBody>
@@ -181,7 +190,7 @@ const Particle = React.memo(React.forwardRef(({ parent_id, id, index, indexArray
 Particle.displayName = 'Particle'; // the name property doesn't exist because it uses forwardRef
 
 // 
-const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, indexArray=[], initialPosition=[0, 0, 0], scope=0, radius, parentColor, registerParticlesFn, config, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[0], initialPosition=[0, 0, 0], scope=0, radius, registerParticlesFn, config, ...props }, ref) => {
   
   const isDebug = config.debug;
   
@@ -190,7 +199,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   useImperativeHandle(ref, () => internalRef.current);
 
   const entityCount = config.entityCounts[scope];
-  const [color, setColor] = useState(getColor(config, scope, parentColor || "blue"));
+  const [color, setColor] = useState(getColor(config, scope, props.color || "blue"));
   // At the deepest scope we will instantiate Particles instead of CompoundEntity
   const Entity = scope == config.entityCounts.length - 1 ? Particle : CompoundEntity;
   // Used for Circle animation when isDebug, the position is managed by r3f not rapier
@@ -235,9 +244,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   const chainRef = props.chainRef || useRef({});
   
   // jsg
-  const hull_ref              = useRef()
-  let compilation             = useRef()
-  let compilation_done        = useRef(false);
+  const hull_ref               = useRef()
+  let   compilation            = useRef()
+  let   compilation_done       = useRef(false);
+  const blobVisibleRef         = props.blobVisibleRef || useRef({0: true});
+  const indexArrayStr          = indexArray.join('');
+  const prevAncestorVisibleRef = useRef(true);
   
   ////////////////////////////////////////
   // Constants impacting particle behavior
@@ -468,8 +480,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 						const offset = [-0.15, -0.2, 0]; // Why 0.15 ???
             let outer = distanceToCenter >= (distanceToFirstJoint + offset[scope]); 
             const scopeOuter = particleRef.current.userData.scopeOuter;
+            if (scopeOuter[scope + 1] === false) {
+              outer = false;
+            }
 						scopeOuter[scope] = outer;
-            //if (scopeOuter[1] && index == 0) particleRef.current.userData.color = "black";
+            //if (outer && scope == 1) particleRef.current.userData.color = "black";
           });
           setApplyInitialImpulse(false);
           setJoints(allocatedJoints);
@@ -525,10 +540,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
   // Then the Particle contains the associated rigid body with the physics information whcih is copied here to update
   // all the instances at once.
   useFrame(() => {
-    if (scope === 0 && instancedMeshRef.current) {
+    if (scope === 0 && instancedMeshRef.current && frameStateRef.current !== "init") {
       const mesh = instancedMeshRef.current;
       const dummy = new THREE.Object3D();
-      const colorDummy = new THREE.Color();
+      const userColor = new THREE.Color();
+      const colorTolerance = 0.01; // Define a tolerance for color comparison
       let colorChanged = false; // Track if any color has changed
       let positionChanged = false; // Track if any position has changed
        
@@ -541,7 +557,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         // Get the visibility from userData
         const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
         if (visible) {
-          //console.log("visible", id, i, visible)
           dummy.scale.set(1, 1, 1); // Set scale to show
           mesh.setMatrixAt(i, dummy.matrix);
           positionChanged = true;
@@ -561,25 +576,27 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           mesh.setMatrixAt(i, dummy.matrix);
           positionChanged = true;
         }
-  
+
         // Get the color from userData
         const color = flattenedParticleRefs.current[i].current.userData.color || 'red';
-        colorDummy.set(color);
+        userColor.set(color);
   
-        // Check if the color attribute is set
+        // Update the color only if it has changed beyond the tolerance threshold
         if (mesh.instanceColor) {
-          // Get the current color of the instance
           const currentColor = new THREE.Color();
           mesh.getColorAt(i, currentColor);
-  
-          // Update the color only if it has changed
-          if (!currentColor.equals(colorDummy)) {
-            mesh.setColorAt(i, colorDummy);
-            colorChanged = true; // Mark that a color has changed
+
+          if (
+            Math.abs(currentColor.r - userColor.r) > colorTolerance ||
+            Math.abs(currentColor.g - userColor.g) > colorTolerance ||
+            Math.abs(currentColor.b - userColor.b) > colorTolerance
+          ) {
+            mesh.setColorAt(i, userColor);
+            colorChanged = true;
           }
         } else {
           // If instanceColor is not set, set it now
-          mesh.setColorAt(i, colorDummy);
+          mesh.setColorAt(i, userColor);
           colorChanged = true;
         }
       }
@@ -619,7 +636,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
       // Helper function to recursively build the ordered list
       let all_positions         = [];
-      let ordered_all_positions = [];
       let ordered_uniqueIndexes = [];
       let visited               = new Set();
 
@@ -680,7 +696,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       }
       
       // update the hidden blob so that it can be correctly clicked
-      all_positions =[]
       for (let i = 0; i < compilation.current.positions.length; i++) {
         const position = compilation.current.positions[i];
         if ( compilation.current.scopeOuters[i][scope] ) {
@@ -704,18 +719,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 
       compilation.current.orderedJoint = orderedJoint;
 
-      //console.log("compilation", id, compilation);
+      if (scope != 0) {
+        blobVisibleRef.current[indexArrayStr] = false;
+      }
+      if (scope == config.entityCounts.length - 1) {
+        blobVisibleRef.current[indexArrayStr + '0'] = false;
+      }
             
     }
 
     compilation_done.current = true;
-
-    function getPositions(indexes) {
-      return indexes.map(idx => {
-          const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
-          return positionObj.position;
-      });
-    }
         
     const points_to_geometry = points =>{
       const curve           = new THREE.CatmullRomCurve3( points, true )
@@ -724,47 +737,79 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
       const shape_geometry  = new THREE.ShapeGeometry( shape )
       return                shape_geometry
     }
-    
-    const worldVector = new THREE.Vector3();
 
-    for (let i = 0; i < particleCountRef.current; i++) {
-      // Get the position of the rigid body, this is world position
-      const pos = flattenedParticleRefs.current[i].current.translation();
-      worldVector.set(pos.x, pos.y, pos.z);
-      // acumulate positions by CompoundEntity index jsg
-      compilation.current.positions[i].copy(internalRef.current.worldToLocal(worldVector))
+    let ancestorVisible = false;
+    for (let i = indexArrayStr.length - 1; i >= 0; i--) {
+      const ancestor = indexArrayStr.slice(0, i);
+      if (blobVisibleRef.current[ancestor]) {
+        blobVisibleRef.current[indexArrayStr] = false;
+        if (scope == config.entityCounts.length - 1) blobVisibleRef.current[indexArrayStr + '0'] = false;
+        ancestorVisible = true;
+        break;
+      }
     }
 
-    let jointPositions = []
+    if (!ancestorVisible && prevAncestorVisibleRef.current) {
+      blobVisibleRef.current[indexArrayStr] = true;
+    }
 
-    // update the hidden blob so that it can be correctly clicked
-    const all_positions =[]
-    
+    prevAncestorVisibleRef.current = ancestorVisible;
 
+    hull_ref.current.visible = blobVisibleRef.current[indexArrayStr];
+
+    /*
     if (scope == config.entityCounts.length - 1) {
-      for (let i = 0; i < particleCountRef.current; i++) {
-        const position = compilation.current.positions[i];
-        jointPositions.push(position);
+      for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
+        flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayStr + '0'];
       }
-    } else {
-      for (let i = 0; i < compilation.current.positions.length; i++) {
-        const position = compilation.current.positions[i];
-        position.set(position.x, position.y, 2);
-        if ( compilation.current.scopeOuters[i][scope] ) {
-          all_positions.push({
-            position: position,
-            uniqueIndex: compilation.current.uniqueIndexes[i]
-          });
-        }
-      }
-      jointPositions = getPositions(compilation.current.orderedJoint);
     }
+    */
+    //if (!ancestorVisible) {
+    
+      const worldVector = new THREE.Vector3();
 
-    //if (scope == 0) console.log("jointPositions", jointPositions)
-    const geometry = points_to_geometry( jointPositions )
-    hull_ref.current.geometry.dispose()
-    hull_ref.current.geometry = geometry
+      for (let i = 0; i < particleCountRef.current; i++) {
+        // Get the position of the rigid body, this is world position
+        const pos = flattenedParticleRefs.current[i].current.translation();
+        worldVector.set(pos.x, pos.y, pos.z);
+        compilation.current.positions[i].copy(internalRef.current.worldToLocal(worldVector))
+      }
 
+      let jointPositions = []
+      const all_positions =[]
+
+      function getPositions(indexes) {
+        return indexes.map(idx => {
+            const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
+            return positionObj.position;
+        });
+      }
+
+      if (scope == config.entityCounts.length - 1) {
+        for (let i = 0; i < particleCountRef.current; i++) {
+          const position = compilation.current.positions[i];
+          jointPositions.push(position);
+        }
+      } else {
+        for (let i = 0; i < compilation.current.positions.length; i++) {
+          const position = compilation.current.positions[i];
+          position.set(position.x, position.y, 2);
+          if ( compilation.current.scopeOuters[i][scope] ) {
+            all_positions.push({
+              position: position,
+              uniqueIndex: compilation.current.uniqueIndexes[i]
+            });
+          }
+        }
+        jointPositions = getPositions(compilation.current.orderedJoint);
+      }
+
+      const geometry = points_to_geometry( jointPositions )
+      hull_ref.current.geometry.dispose()
+      hull_ref.current.geometry = geometry
+    //}
+
+    // hide / show blobs
     const show_or_hide_particles = show_or_hide =>{
       if( scope != config.entityCounts.length - 1 ) return
 
@@ -772,7 +817,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         flattenedParticleRefs.current[i].current.userData.visible = show_or_hide
       }
     }
-
     hull_ref.current.visible = false
     switch( global_scope ){
       case 0 :{
@@ -790,17 +834,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         } else {
           hull_ref.current.visible = scope != 0
           show_or_hide_particles   ( false )
-          //hull_ref.current.visible = scope != 0                              &&   hull_ref.current.userData.visible
-          //show_or_hide_particles   ( scope == config.entityCounts.length - 1 && ! hull_ref.current.visible )  
         }
       }
     }
   });
 
-  const Handle_click = ( event ) => {
-
+  const Handle_click = ( event, blobVisibleRef, scope, config ) => { 
     console.log("Handle_click", id, event)
 
+    // avoid processing hidden blobs
     if( ! hull_ref.current.visible ) return
 
     switch( global_scope ){
@@ -808,9 +850,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
         global_scope = 1
       } break
       case 1 :{
+        // hide the clicked blob
         hull_ref.current.userData.visible = false
         hull_ref.current.userData.clicks++
         
+        // show all the children
         entityRefs.forEach( entity => {
           if (entity.current) {
             if (entity.current.current) {
@@ -863,7 +907,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           id={`${id}-${i}`}
           initialPosition={entityPositions[i].toArray()}
           radius={entityRadius}
-          parentColor={color}
+          color={color}
           scope={scope + 1}
           index={i}
           indexArray={[...indexArray, i]}
@@ -871,11 +915,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
           registerParticlesFn={localRegisterParticlesFn}
           parentDebug={isDebug}
           config={config}
-          userData={{ color, visible : false }}
+          userData={{ color }}
+          blobVisibleRef={blobVisibleRef}
 		  
-          // jsg 
-          parent_id = { id }	
-          chainRef = {chainRef}	  
+		  // jsg 
+      chainRef = {chainRef}	  
         />
       ))}
 
@@ -897,14 +941,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ parent_id, id, index, inde
 	  {/*// jsg*/}
 	  
 	  <mesh 
-      ref = { hull_ref } 
-      userData = {{ visible : false, clicks : 0 }}
+      ref           = { hull_ref } 
+      userData      = {{ visible : false, clicks : 0 }}
 		  onContextMenu = { event => global_scope = 0  }	 
-      onClick = { event => { 	
-        Handle_click( event )
-      }}
-      >
-	    <meshBasicMaterial color = {[ 1, 0, 0 ]}/>
+      onClick       = { event => { 	
+        Handle_click( event, blobVisibleRef, scope, config )
+      }}>
+	    <meshBasicMaterial color = {color}/>
 	  </mesh>
 	  
       {scope == 0 && particleCountRef.current && (

@@ -40,6 +40,16 @@ const ParticleRigidBody = forwardRef((props, ref) => {
           return null;
         }
     }, 
+    getUserData: () => {
+      if (internalRef.current) {
+        return structuredClone(internalRef.current.userData);
+      } else {
+        return null;
+      }
+    },
+    setUserData: (userData) => {
+      internalRef.current.userData = userData;
+    },
   }));
 
   useEffect(() => {
