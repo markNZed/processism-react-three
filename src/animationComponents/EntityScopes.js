@@ -306,14 +306,6 @@ const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, in
     }
   }, [internalRef]);
 
-  // Set the initial userData, don't do this in JSX (it would overwrite on renders)
-  useEffect(() => {
-    if (initialize && internalRef.current) {
-      internalRef.current.setUserData({color: color, uniqueIndex: uniqueIndex});
-      setInitialize(false);
-    }
-  }, [internalRef]);
-
   return (
     <>
     <ParticleRigidBody
@@ -1109,6 +1101,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     }
   });
 
+  // Blob rendering
   useFrame(() => {
     if (frameStateRef.current === "init") return;
   
@@ -1328,17 +1321,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     for (let i = scope - 1; i >= 0; i--) {
       const key = indexArray.slice(0, i).join(); // create a string for the key
       if (blobVisibleRef.current[key]) {
-        console.log("Handle_click higher blob visible", id,  key);
         return
       }
     }
     // Alternate visibility
-    console.log("Handle_click alternate visibility", id, indexArray.join());
     blobVisibleRef.current[indexArray.join()] = !blobVisibleRef.current[indexArray.join()];
     //Special case for Particles
     if (scope == config.entityCounts.length - 1) {
       blobVisibleRef.current[indexArray.join() + ',0'] = !blobVisibleRef.current[indexArray.join()];
-      console.log("Handle_click alternate visibility blobVisibleRef.current[indexArray.join() + ',0']", id, blobVisibleRef.current[indexArray.join() + ',0']);
     }
   }
   
@@ -1511,10 +1501,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           jointRefsRef={jointRefsRef}
           getEntityRefFn={getEntityRefFn}
           registerGetEntityRefFn={registerGetEntityRefFn}
-		  
-		  // jsg 
-      chainRef = {chainRef}	  
-          
+          chainRef = {chainRef}	  
         />
       ))}
 
@@ -1526,18 +1513,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           jointRefsRef={jointRefsRef}
         />
       ))}
-
-	  {/*// jsg*/}
-	  
-	  <mesh 
-      ref           = { hull_ref } 
-      userData      = {{ visible : false, clicks : 0 }}
-		  onContextMenu = { event => global_scope = 0  }	 
-      onClick       = { event => { 	
-        Handle_click( event, blobVisibleRef, scope, config );
-      }}>
-	    <meshBasicMaterial color = {color}/>
-	  </mesh>
+      
+      <mesh 
+        ref           = { hull_ref } 
+        userData      = {{ visible : false, clicks : 0 }}
+        onContextMenu = { event => global_scope = 0  }	 
+        onClick       = { event => { 	
+          Handle_click( event, blobVisibleRef, scope, config );
+        }}>
+        <meshBasicMaterial color = {color}/>
+      </mesh>
 	  
       {scope == 0 && particleCountRef.current && (
         <instancedMesh 
