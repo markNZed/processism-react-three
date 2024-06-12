@@ -28,8 +28,6 @@ import _ from 'lodash';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
-let global_scope = 0
-
 /*
  This is the Component that gets exported and is instantiated in the scene
  There is a recursive structure under EntityScopes where
@@ -1035,7 +1033,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       const currentPos = new THREE.Vector3();
       const currentScale = new THREE.Vector3();
       const currentQuaternion = new THREE.Quaternion();
-      const invisibleScale = new THREE.Vector3(0, 0, 0);
+      const invisibleScale = new THREE.Vector3(0.1, 0.1, 0.1); // Why does this work with 0.1 ?
   
       for (let i = 0; i < particleCountRef.current; i++) {
         const instanceMatrix = new THREE.Matrix4(); // a new instance to avoid transfer between iterations
@@ -1224,7 +1222,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
 
       compilation.current.orderedJoint = orderedJoint;
 
-      if (scope != 0) {
+      if (scope == 0) {
+        blobVisibleRef.current[indexArray.join()] = true;
+      } else {
         blobVisibleRef.current[indexArray.join()] = false;
       }
       if (scope == config.entityCounts.length - 1) {
@@ -1244,8 +1244,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     }
 
     let ancestorVisible = false;
-    for (let i = scope; i > 0; i--) {
+    for (let i = scope - 1; i >= 0; i--) {
       const key = indexArray.slice(0, i).join(); // create a string for the key
+      //if (id === "Scope-3") console.log("key", id, i, indexArray, key, blobVisibleRef.current[key])
       if (blobVisibleRef.current[key]) {
         blobVisibleRef.current[indexArray.join()] = false;
         if (scope == config.entityCounts.length - 1) blobVisibleRef.current[indexArray.join() + ',0'] = false;
@@ -1253,6 +1254,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         break;
       }
     }
+
+    //if (id === "Scope-3") console.log("ancestorVisible", id, ancestorVisible, blobVisibleRef.current[indexArray.join()])
 
     if (!ancestorVisible && prevAncestorVisibleRef.current) {
       blobVisibleRef.current[indexArray.join()] = true;
@@ -1262,14 +1265,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
 
     hull_ref.current.visible = blobVisibleRef.current[indexArray.join()];
 
-    /*
     if (scope == config.entityCounts.length - 1) {
       for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
+        //console.log("here", blobVisibleRef.current[indexArray.join() + ',0'])
+        if (blobVisibleRef.current[indexArray.join() + ',0']) {
+        }
         flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArray.join() + ',0'];
       }
     }
-    */
-    //if (!ancestorVisible) {
+
+    if (!ancestorVisible) {
     
       const worldVector = new THREE.Vector3();
 
@@ -1311,72 +1316,32 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       const geometry = points_to_geometry( jointPositions )
       hull_ref.current.geometry.dispose()
       hull_ref.current.geometry = geometry
-    //}
-
-    // hide / show blobs
-    const show_or_hide_particles = show_or_hide =>{
-      if( scope != config.entityCounts.length - 1 ) return
-
-      for ( let i = 0; i < flattenedParticleRefs.current.length; ++i ) {
-        flattenedParticleRefs.current[i].current.userData.visible = show_or_hide
-      }
     }
-    hull_ref.current.visible = false
-    switch( global_scope ){
-      case 0 :{
-        // only show scope 0 blob
-        hull_ref.current.visible = scope == 0
-        show_or_hide_particles   ( false )
-      } break
-      case 1 :{
-        if( ! hull_ref.current.userData.visible ){
-          // show scope 1 for the first time ?
-          if( ! hull_ref.current.userData.clicks ){
-            hull_ref.current.visible = scope == 1
-            show_or_hide_particles   ( false )
-          }
-        } else {
-          hull_ref.current.visible = scope != 0
-          show_or_hide_particles   ( false )
-        }
-      }
-    }
+
   });
 
   const Handle_click = ( event, blobVisibleRef, scope, config ) => { 
-    console.log("Handle_click", id, event)
-
-    // avoid processing hidden blobs
-    if( ! hull_ref.current.visible ) return
-
-    switch( global_scope ){
-      case 0 :{
-        global_scope = 1
-      } break
-      case 1 :{
-        // hide the clicked blob
-        hull_ref.current.userData.visible = false
-        hull_ref.current.userData.clicks++
-        
-        // show all the children
-        entityRefs.forEach( entity => {
-          if (entity.current) {
-            if (entity.current.current) {
-              if( 'children' in entity.current.current ){
-                entity.current.current.children.forEach( child =>{
-                  child.userData.visible = true
-                })
-              } else {
-                entity.current.current.userData.visible = true
-              }
-            }
-          }          
-        })
-      } break
-    } 
+    // Stop the event from bubbling up
+    event.stopPropagation();
+    console.log("Handle_click", id, "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope, "config:", config)
+    // If a higher blob is visible then ignore
+    for (let i = scope - 1; i >= 0; i--) {
+      const key = indexArray.slice(0, i).join(); // create a string for the key
+      if (blobVisibleRef.current[key]) {
+        console.log("Handle_click higher blob visible", id,  key);
+        return
+      }
+    }
+    // Alternate visibility
+    console.log("Handle_click alternate visibility", id, indexArray.join());
+    blobVisibleRef.current[indexArray.join()] = !blobVisibleRef.current[indexArray.join()];
+    //Special case for Particles
+    if (scope == config.entityCounts.length - 1) {
+      blobVisibleRef.current[indexArray.join() + ',0'] = !blobVisibleRef.current[indexArray.join()];
+      console.log("Handle_click alternate visibility blobVisibleRef.current[indexArray.join() + ',0']", id, blobVisibleRef.current[indexArray.join() + ',0']);
+    }
   }
   
-
   function Relations({ internalRef, relationsRef, linesRef, newLinesRef }) {
     
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
@@ -1569,7 +1534,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       userData      = {{ visible : false, clicks : 0 }}
 		  onContextMenu = { event => global_scope = 0  }	 
       onClick       = { event => { 	
-        Handle_click( event, blobVisibleRef, scope, config )
+        Handle_click( event, blobVisibleRef, scope, config );
       }}>
 	    <meshBasicMaterial color = {color}/>
 	  </mesh>
