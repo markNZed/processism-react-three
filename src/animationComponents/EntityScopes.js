@@ -352,8 +352,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   const entityCount = config.entityCounts[scope];
   // Store the color in a a state so it si consistent across renders, setColor is not used
   const [color, setColor] = useState(getColor(config, scope, props.color || "blue"));
+  const lastCompoundEntity = (scope == config.entityCounts.length - 1);
   // At the deepest scope we will instantiate Particles instead of CompoundEntity
-  const Entity = scope == config.entityCounts.length - 1 ? Particle : CompoundEntity;
+  const Entity = lastCompoundEntity ? Particle : CompoundEntity;
   // Used for Circle animation when isDebug, the position is managed by r3f not rapier
   const getComponentRef = useStore((state) => state.getComponentRef); 
   // Array of refs to entities (either CompoundEntity or Particles)
@@ -399,11 +400,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   const chainRef = props.chainRef || useRef({});
   
   // jsg
-  const hull_ref               = useRef()
+  const blobRef               = useRef()
   let   compilation            = useRef()
   let   compilation_done       = useRef(false);
   const blobVisibleRef         = props.blobVisibleRef || useRef({0: true});
   const prevAncestorVisibleRef = useRef(true);
+  const indexArrayKey = indexArray.join()
+
   
   // Key is the uniqueIndex of a particle. Value is an array of joint ids
   // Any change to particleJointsRef needs to be made to jointRefsRef also
@@ -1078,7 +1081,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
             Math.abs(currentColor.g - userColor.g) > colorTolerance ||
             Math.abs(currentColor.b - userColor.b) > colorTolerance
           ) {
-            console.log("Color change", i, userColor)
+            //console.log("Color change", i, userColor)
             mesh.setColorAt(i, userColor);
             colorChanged = true;
           }
@@ -1111,6 +1114,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         positions      : [],
         scopeOuters    : [],
         uniqueIndexes  : [],
+        uniqueIndexesToPosition : [],
         position_index : 0,
         hull           : [],
         scope          : 0,			  
@@ -1120,58 +1124,57 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       for( let i = 0; i < n ; ++i ) {
         compilation.current.positions.push( new THREE.Vector3())
         compilation.current.scopeOuters.push(flattenedParticleRefs.current[i].current.userData.scopeOuter)
-        compilation.current.uniqueIndexes.push(flattenedParticleRefs.current[i].current.userData.uniqueIndex)
+        const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
+        compilation.current.uniqueIndexes.push(uniqueIndex)
+        compilation.current.uniqueIndexesToPosition[uniqueIndex] = i;
       }
 
       // Helper function to recursively build the ordered list
-      let all_positions         = [];
-      let ordered_uniqueIndexes = [];
-      let visited               = new Set();
-
-      function buildOrderedPositions(uniqueIndex) {
+      // Using chainRef and blobIndexes which are not passed in as aargs
+      function buildOrderedIndexes(uniqueIndex, visited = new Set()) {
+        const result = [];
 				// Prevent infinite loops
-				if (visited.has(uniqueIndex)) return false;
+				if (visited.has(uniqueIndex)) return null;
 				visited.add(uniqueIndex);
-				// Find the positionObj with the current uniqueIndex
-				const positionObj = all_positions.find(posObj => posObj.uniqueIndex === uniqueIndex);
-				if (positionObj) {
-					ordered_uniqueIndexes.push(uniqueIndex)
+				if (blobIndexes.includes(uniqueIndex)) {
+					result.push(uniqueIndex)
 				} else {
-					return false;
+					return null;
 				}
 				const connectedIndexes = chainRef.current[uniqueIndex];
         let foundJoint = false
         if (connectedIndexes.length > 2) {
           for (let i = 0; i < connectedIndexes.length; i++) {
             if (chainRef.current[connectedIndexes[i]].length > 2) {
-              if (buildOrderedPositions(connectedIndexes[i])) {
-                //console.log("Found joint", uniqueIndex, connectedIndexes[i])
+              const recursiveResult = buildOrderedIndexes(connectedIndexes[i], visited);
+              if (recursiveResult) {
                 foundJoint = true;
+                result.push(...recursiveResult);
               }
             } 
           }
         }
         if (!foundJoint) {
           for (let i = 0; i < connectedIndexes.length; i++) {
-            buildOrderedPositions(connectedIndexes[i])
+            const recursiveResult = buildOrderedIndexes(connectedIndexes[i], visited)
+            if (recursiveResult) {
+              result.push(...recursiveResult);
+            }
           }
         }
-        return true;
+        return result;
 			}
 
       function filterMiddleIndexes(chainRef, indexes) {
         const jointIndexes = [];
-        // First, find all valid indexes from the provided list where the condition is true
+        // Find all indexes from the provided list that are joints i.e. more than 2 links
         for (let i = 0; i < indexes.length; i++) {
           const idx = indexes[i];
-          //Find joints
-          //console.log("chainRef.current[idx].length", idx, i, chainRef.current[idx].length)
           if (chainRef.current[idx].length > 2) {
               jointIndexes.push(i);
           }
         }
         const middleIndexes = [];
-        //console.log("jointIndexes", jointIndexes)
         // Now, find indexes that are exactly in the middle between joints
         for (let i = 1; i < jointIndexes.length; i++) {
           // Calculate the middle index
@@ -1191,37 +1194,26 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         return middleIndexes;
       }
       
-      // update the hidden blob so that it can be correctly clicked
+      let blobIndexes = [];
       for (let i = 0; i < compilation.current.positions.length; i++) {
-        const position = compilation.current.positions[i];
         if ( compilation.current.scopeOuters[i][scope] ) {
-          all_positions.push({
-            position: position,
-            uniqueIndex: compilation.current.uniqueIndexes[i]
-          });
+          blobIndexes.push(compilation.current.uniqueIndexes[i]);
         }
       }
 
-      // We need to order all_positions
-      // For each uniqueIndex get the array of connected uniqueIndexes from chainRef.current[uniqueIndex] 
-      // Find the relevant uniqueIndex from all_positions and contineu to build an ordred list of positions
-      // Until we reach the original element we started with
-
-      // Start building the ordered list from each uniqueIndex in all_positions
-      const firstIndex = all_positions[0].uniqueIndex;
-      buildOrderedPositions(firstIndex);
-
-      const orderedJoint = filterMiddleIndexes(chainRef, ordered_uniqueIndexes);
-
-      compilation.current.orderedJoint = orderedJoint;
-
-      if (scope == 0) {
-        blobVisibleRef.current[indexArray.join()] = true;
+      if (lastCompoundEntity) {
+        compilation.current.orderedIndexes = blobIndexes;
       } else {
-        blobVisibleRef.current[indexArray.join()] = false;
+        const firstIndex = blobIndexes[0];
+        const orderedIndexes = buildOrderedIndexes(firstIndex);
+        const midJointIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
+        compilation.current.orderedIndexes = midJointIndexes;
       }
-      if (scope == config.entityCounts.length - 1) {
-        blobVisibleRef.current[indexArray.join() + ',0'] = false;
+
+      blobVisibleRef.current[indexArrayKey] = (scope == 0);
+      
+      if (lastCompoundEntity) {
+        blobVisibleRef.current[indexArrayKey + ',0'] = false;
       }
             
     }
@@ -1239,76 +1231,45 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     let ancestorVisible = false;
     for (let i = scope - 1; i >= 0; i--) {
       const key = indexArray.slice(0, i).join(); // create a string for the key
-      //if (id === "Scope-3") console.log("key", id, i, indexArray, key, blobVisibleRef.current[key])
       if (blobVisibleRef.current[key]) {
-        blobVisibleRef.current[indexArray.join()] = false;
-        if (scope == config.entityCounts.length - 1) blobVisibleRef.current[indexArray.join() + ',0'] = false;
+        blobVisibleRef.current[indexArrayKey] = false;
+        if (lastCompoundEntity) blobVisibleRef.current[indexArrayKey + ',0'] = false;
         ancestorVisible = true;
         break;
       }
     }
 
-    //if (id === "Scope-3") console.log("ancestorVisible", id, ancestorVisible, blobVisibleRef.current[indexArray.join()])
+    const ancestorVanished = !ancestorVisible && prevAncestorVisibleRef.current;
 
-    if (!ancestorVisible && prevAncestorVisibleRef.current) {
-      blobVisibleRef.current[indexArray.join()] = true;
+    if (ancestorVanished) {
+      blobVisibleRef.current[indexArrayKey] = true;
     }
 
     prevAncestorVisibleRef.current = ancestorVisible;
 
-    hull_ref.current.visible = blobVisibleRef.current[indexArray.join()];
+    blobRef.current.visible = blobVisibleRef.current[indexArrayKey];
 
-    if (scope == config.entityCounts.length - 1) {
+    if (lastCompoundEntity) {
       for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
-        //console.log("here", blobVisibleRef.current[indexArray.join() + ',0'])
-        if (blobVisibleRef.current[indexArray.join() + ',0']) {
-        }
-        flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArray.join() + ',0'];
+        flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayKey + ',0'];
       }
     }
 
-    if (!ancestorVisible) {
+    if (!ancestorVisible && blobRef.current.visible) {
     
       const worldVector = new THREE.Vector3();
 
-      for (let i = 0; i < particleCountRef.current; i++) {
-        // Get the position of the rigid body, this is world position
-        const pos = flattenedParticleRefs.current[i].current.translation();
-        worldVector.set(pos.x, pos.y, pos.z);
-        compilation.current.positions[i].copy(internalRef.current.worldToLocal(worldVector))
-      }
+      const blobPoints = compilation.current.orderedIndexes.map((idx) => {
+        const positionIdx = compilation.current.uniqueIndexesToPosition[idx];
+        const pos = flattenedParticleRefs.current[positionIdx].current.translation();
+        worldVector.set(pos.x, pos.y, pos.z); 
+        compilation.current.positions[positionIdx].copy(internalRef.current.worldToLocal(worldVector))
+        return compilation.current.positions[positionIdx];
+      });
 
-      let jointPositions = []
-      const all_positions =[]
-
-      function getPositions(indexes) {
-        return indexes.map(idx => {
-            const positionObj = all_positions.find(posObj => posObj.uniqueIndex === idx);
-            return positionObj.position;
-        });
-      }
-
-      if (scope == config.entityCounts.length - 1) {
-        for (let i = 0; i < particleCountRef.current; i++) {
-          const position = compilation.current.positions[i];
-          jointPositions.push(position);
-        }
-      } else {
-        for (let i = 0; i < compilation.current.positions.length; i++) {
-          const position = compilation.current.positions[i];
-          if ( compilation.current.scopeOuters[i][scope] ) {
-            all_positions.push({
-              position: position,
-              uniqueIndex: compilation.current.uniqueIndexes[i]
-            });
-          }
-        }
-        jointPositions = getPositions(compilation.current.orderedJoint);
-      }
-
-      const geometry = points_to_geometry( jointPositions )
-      hull_ref.current.geometry.dispose()
-      hull_ref.current.geometry = geometry
+      const geometry = points_to_geometry(blobPoints);
+      blobRef.current.geometry.dispose();
+      blobRef.current.geometry = geometry;
     }
 
   });
@@ -1325,11 +1286,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       }
     }
     // Alternate visibility
-    blobVisibleRef.current[indexArray.join()] = !blobVisibleRef.current[indexArray.join()];
+    blobVisibleRef.current[indexArrayKey] = !blobVisibleRef.current[indexArrayKey];
     //Special case for Particles
-    if (scope == config.entityCounts.length - 1) {
-      blobVisibleRef.current[indexArray.join() + ',0'] = !blobVisibleRef.current[indexArray.join()];
+    if (lastCompoundEntity) {
+      blobVisibleRef.current[indexArrayKey + ',0'] = !blobVisibleRef.current[indexArrayKey];
     }
+  }
+
+  const Handle_right_click = ( event, blobVisibleRef, scope, config ) => { 
+    // Stop the event from bubbling up
+    event.stopPropagation();
+    console.log("Handle_right_click", id, "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope, "config:", config);
+    // The largest blob has an empty key
+    blobVisibleRef.current[''] = true;
   }
   
   function Relations({ internalRef, relationsRef, linesRef, newLinesRef }) {
@@ -1515,9 +1484,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       ))}
       
       <mesh 
-        ref           = { hull_ref } 
+        ref           = { blobRef } 
         userData      = {{ visible : false, clicks : 0 }}
-        onContextMenu = { event => global_scope = 0  }	 
+        onContextMenu = { event => Handle_right_click( event, blobVisibleRef, scope, config )  }	 
         onClick       = { event => { 	
           Handle_click( event, blobVisibleRef, scope, config );
         }}>
