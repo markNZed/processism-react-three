@@ -1,10 +1,10 @@
 import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import * as THREE from 'three';
 
-const CustomGroup = forwardRef(({ children, position }, ref) => {
+const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) => {
   const internalRef = useRef();
   const impulseRef = useRef(new THREE.Vector3());
-  const centerRef = useRef(new THREE.Vector3());
+  const centerRef = useRef();
 
   useImperativeHandle(ref, () => ({
     get current() {
@@ -20,11 +20,17 @@ const CustomGroup = forwardRef(({ children, position }, ref) => {
       impulseRef.current.add(newImpulse);
     },
     getCenter: () => {
-        const result = centerRef.current.clone();
-        return result
+      if (centerRef.current) {
+        return centerRef.current.clone();
+      } else {
+        return null;
+      }
     }, 
     setCenter: (center) => {
-        return centerRef.current.copy(center);
+      if (!centerRef.current) {
+        centerRef.current = new THREE.Vector3()
+      }
+      return centerRef.current.copy(center);
     }, 
     worldToLocal: (vector) => {
       return internalRef.current.worldToLocal(vector);
@@ -35,13 +41,23 @@ const CustomGroup = forwardRef(({ children, position }, ref) => {
     getWorldPosition: (vector) => {
       return internalRef.current.getWorldPosition(vector);
     },    
+    getUserData: () => {
+      if (internalRef.current) {
+        return internalRef.current.userData;
+      } else {
+        return null;
+      }
+    },
+    setUserData: (userData) => {
+      internalRef.current.userData = userData;
+    },
   }), [internalRef]);
 
   return (
-    <group ref={internalRef} position={position}>
+    <group ref={internalRef} position={position} userData={userData}>
       {children}
     </group>
   );
 });
 
-export default CustomGroup;
+export default CompoundEntityGroup;

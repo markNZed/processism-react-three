@@ -53,7 +53,7 @@ function SceneThree() {
         <>
             <AnimationController animations={animationSequence} useStore={useStore}>
                 <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={false} >
-                    <Perf />
+                    <Perf position={"bottom-left"} minimal={true}/>
                     <Scene>
 
                         <EntityScopes

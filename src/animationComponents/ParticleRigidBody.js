@@ -42,7 +42,8 @@ const ParticleRigidBody = forwardRef((props, ref) => {
     }, 
     getUserData: () => {
       if (internalRef.current) {
-        return structuredClone(internalRef.current.userData);
+        // Returning a reference not a deep copy because we had circular reference issues with deep copy
+        return internalRef.current.userData;
       } else {
         return null;
       }
