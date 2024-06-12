@@ -402,7 +402,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   // jsg
   const blobRef               = useRef()
   let   compilation            = useRef()
-  let   compilation_done       = useRef(false);
   const blobVisibleRef         = props.blobVisibleRef || useRef({0: true});
   const prevAncestorVisibleRef = useRef(true);
   const indexArrayKey = indexArray.join()
@@ -1114,13 +1113,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         positions      : [],
         scopeOuters    : [],
         uniqueIndexes  : [],
-        uniqueIndexesToPosition : [],
-        position_index : 0,
-        hull           : [],
-        scope          : 0,			  
+        uniqueIndexesToPosition : [],	  
       }
 
       const n = particleCountRef.current;
+      // Only need positions, uniqueIndexesToPosition, uniqueIndexes outside of this section ?
       for( let i = 0; i < n ; ++i ) {
         compilation.current.positions.push( new THREE.Vector3())
         compilation.current.scopeOuters.push(flattenedParticleRefs.current[i].current.userData.scopeOuter)
@@ -1217,8 +1214,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       }
             
     }
-
-    compilation_done.current = true;
         
     const points_to_geometry = points =>{
       const curve           = new THREE.CatmullRomCurve3( points, true )
@@ -1275,8 +1270,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   });
 
   const Handle_click = ( event, blobVisibleRef, scope, config ) => { 
-    // Stop the event from bubbling up
-    event.stopPropagation();
     console.log("Handle_click", id, "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope, "config:", config)
     // If a higher blob is visible then ignore
     for (let i = scope - 1; i >= 0; i--) {
@@ -1285,6 +1278,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         return
       }
     }
+    // Stop the event from bubbling up
+    event.stopPropagation();
     // Alternate visibility
     blobVisibleRef.current[indexArrayKey] = !blobVisibleRef.current[indexArrayKey];
     //Special case for Particles
