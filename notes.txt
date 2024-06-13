@@ -65,3 +65,5 @@ Process = sequence of relations that repeat (locally, abstractly, metaphorically
 Emergent substrate - processing particles to form entities in another dimension e.g. processor constructs objects/relations. Particle can traverse the "plane" and form objects - no it is the plan that traverses the particles back-and-forth. A bit like Turing machine. Stream of particles could generate objects. Impredicative if the planes are arranged into a loop - this could be end-to-end trained ? Can inset LLM and fine-tune
 
 To avoid the blob from shrinking we could use the center point between the joint rather than the joint.
+
+The "middle" of joints is not workig at the abstraction of top

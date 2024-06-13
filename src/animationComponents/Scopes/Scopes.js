@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Circle as CircleDrei, Text, QuadraticBezierLine } from '@react-three/drei';
+import { Circle as CircleDrei, Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
 import CompoundEntityGroup from './CompoundEntityGroup'; 
 import * as THREE from 'three';
-import withAnimationState from '../withAnimationState';
-import { Circle } from './';
-import useStore from '../useStore';
+import withAnimationState from '../../withAnimationState';
+import { Circle } from '..';
+import useStore from '../../useStore';
 import { useSphericalJoint, useRapier, useBeforePhysicsStep, useAfterPhysicsStep, BallCollider, vec3 } from '@react-three/rapier';
 import { useControls } from 'leva'
 import _ from 'lodash';
@@ -30,11 +30,11 @@ const ZERO_VECTOR = new THREE.Vector3();
 
 /*
  This is the Component that gets exported and is instantiated in the scene
- There is a recursive structure under EntityScopes where
+ There is a recursive structure under Scopes where
  a CompoundEntity will instantiate multiple CompoundEntity to a certain depth (length of config.entityCounts array)
  the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
 */
-const EntityScopes = React.forwardRef((props, ref) => {
+const Scopes = React.forwardRef((props, ref) => {
 
   // Leva controls
   // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
@@ -193,7 +193,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
 
   // Initialization logging/debug
   useEffect(() => {
-    console.log("EntityScopes mounting");
+    console.log("Scopes mounting");
   }, []);
 
   // Pass in radius so we can calculate new radius for next scope an pass in same way to CompoundEntity
@@ -1586,7 +1586,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   );
 }));
 
-export default withAnimationState(EntityScopes);
+export default withAnimationState(Scopes);
 
 // Distribute evenly around the perimeter
 const generateEntityPositions = (radius, count) => {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Scene from './Scene';
-import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText, EmergentEntityNoBoundary, EntityScopes } from '../animationComponents';
+import { Camera, Scopes } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
@@ -45,7 +45,7 @@ function SceneThree({isAnimating}) {
 
     //timestep defaults to 1 / 60 timeStep={"vary"} 
     // Physics allowSleep={true} ?
-    // Physics is paused so we can manually control the step from EntityScopes
+    // Physics is paused so we can manually control the step from Scopes
     // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
     // numSolverIterations={2} numAdditionalFrictionIterations={2}
 
@@ -60,8 +60,8 @@ function SceneThree({isAnimating}) {
                     <Perf position={"bottom-left"} minimal={true}/>
                     <Scene>
 
-                        <EntityScopes
-                            id={"EntityScopes1"}
+                        <Scopes
+                            id={"Scopes1"}
                             color={"blue"}
                             isAnimating={isAnimating}
                         />
