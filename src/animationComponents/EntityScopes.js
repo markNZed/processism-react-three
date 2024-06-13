@@ -1028,7 +1028,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
       const currentPos = new THREE.Vector3();
       const currentScale = new THREE.Vector3();
       const currentQuaternion = new THREE.Quaternion();
-      const invisibleScale = new THREE.Vector3(0.1, 0.1, 0.1); // Why does this work with 0.1 ?
+      const emptyMatrix = new THREE.Matrix4();
   
       for (let i = 0; i < particleCountRef.current; i++) {
         const instanceMatrix = new THREE.Matrix4(); // a new instance to avoid transfer between iterations
@@ -1046,19 +1046,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
         // Get the color from userData
         const color = flattenedParticleRefs.current[i].current.userData.color || 'red';
         userColor.set(color);
-
-        // Get the visibility from userData
-        const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
-        if (!visible) {
-          if (!currentScale.equals(invisibleScale)) {
-            currentScale.copy(invisibleScale); // Set scale to 0 to hide
-            matrixChanged = true;
-          }
-        // Compare and update the scale if necessary
-        } else if (!currentScale.equals(userScale)) {
-          currentScale.copy(userScale);
-          matrixChanged = true;
-        }
   
         // Compare and update the position if necessary
         if (!currentPos.equals(pos)) {
@@ -1070,6 +1057,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           instanceMatrix.compose(currentPos, currentQuaternion, currentScale);
           mesh.setMatrixAt(i, instanceMatrix);
         }
+
+        // Get the visibility from userData
+        const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
+        if (!visible) {
+          mesh.setMatrixAt(i, emptyMatrix);
+          matrixChanged = true;
+        } 
   
         // Update the color only if it has changed beyond the tolerance threshold
         if (mesh.instanceColor) {
