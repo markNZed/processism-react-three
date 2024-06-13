@@ -12,6 +12,9 @@ import { getColor } from './utils';
 import Joint from './Joint'
 import Blob from './Blob';
 import DebugRender from './DebugRender';
+import useLimitedLog from '../../hooks/useLimitedLog';
+import useEntityRef from './useEntityRef';
+
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -90,6 +93,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const newLinesRef = useRef({});
     const childGetEntityRefFnRef = useRef([]);
     const { world, rapier } = useRapier();
+    const limitedLog = useLimitedLog(100); 
+    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef);
 
     ////////////////////////////////////////
     // Constants impacting particle behavior
@@ -101,63 +106,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     // Initialization logging/debug
     useEffect(() => {
-        if (scope == 0) console.log("Mounting from scope 0", id);
+        if (scope == 0) limitedLog("Mounting from scope 0", id);
         if (isDebug) {
             //console.log("jointsData", id, jointsData);
         }
     }, []);
-
-    // Function to log multiple arguments, limited to 100 total logs (avoids flooding the JS console)
-    const limitedLog = (...args) => {
-        if (logCountRef.current < 100) {
-            console.log(...args);  // Log all arguments passed
-            logCountRef.current += 1;  // Increment the log count
-        }
-    };
-
-    // getEntityRefFn finds an entity ref by walking the CompoundEntity tree.
-    // The getEntityRefFn can be called in a parent or child
-    // If we need to broaden the scope to find the entity then call parent's getEntityRefFn
-    // If we need to narrow the scope to find the entity then call child's getEntityRefFn
-    // It is simmilar to a walker
-    // A more efficient approach would use Zustand to store/fetch the entityRef 
-    // but this is not realistic in terms of what a CompoundEntity should "know"
-
-    // Register the child's getEntityRefFn with the parent when the child mounts
-    useEffect(() => {
-        if (props.registerGetEntityRefFn) {
-            props.registerGetEntityRefFn(index, getEntityRefFn);
-        }
-    }, [props.registerGetEntityRefFn]);
-
-    // Passed to the child to register the child function in childGetEntityRefFnRef.current
-    const registerGetEntityRefFn = (childIndex, method) => {
-        childGetEntityRefFnRef.current[childIndex] = method;
-    };
-
-    // path is similar to the indexArray e.g. [3,6,7] would fetch the 7th entity from scope 2 
-    const getEntityRefFn = (path) => {
-        // Check if this Compound Entity is on the path
-        for (let i = 0; i < indexArray.length; i++) {
-            const val = indexArray[i];
-            if (val !== path[i]) {
-                // Need to broader scope (call getEntityRefFn in parent)
-                return props.getEntityRefFn(path);
-            }
-        }
-        // We have a match so return the ref of this CompoundEntity
-        if (path.length == indexArray.length) {
-            return internalRef;
-        }
-        // Return an entity of this CompoundEntity
-        if (path.length == indexArray.length + 1) {
-            const entityIndex = path[path.length - 1];
-            return entityRefs[entityIndex];
-        }
-        // Need to narrow the scope (call getEntityRefFn in child)
-        const childIndex = path[indexArray.length];
-        return childGetEntityRefFnRef.current[childIndex](path);
-    };
 
     const areAllParticlesRegistered = () => {
         return particlesRegisteredRef.current.every(ref => ref === true);
