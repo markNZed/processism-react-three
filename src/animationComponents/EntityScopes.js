@@ -162,7 +162,7 @@ const EntityScopes = React.forwardRef((props, ref) => {
   useFrame(() => {
     framesPerStepCount.current++;
     if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
-    if (framesPerStepCount.current == 0) {
+    if (framesPerStepCount.current == 0 && props.isAnimating) {
       step(fixedDelta);
     }
   });
@@ -191,7 +191,10 @@ const EntityScopes = React.forwardRef((props, ref) => {
     lastStepEnd.current = endTime;
   });
 
-  console.log("config", config);
+  // Initialization logging/debug
+  useEffect(() => {
+    console.log("EntityScopes mounting");
+  }, []);
 
   // Pass in radius so we can calculate new radius for next scope an pass in same way to CompoundEntity
   return (
@@ -199,7 +202,6 @@ const EntityScopes = React.forwardRef((props, ref) => {
     {config && remountConfigState && (
       <CompoundEntity 
         key={JSON.stringify(remountConfigState)}
-        {...props} 
         id={`Scope`}
         ref={ref} 
         config={{...config, ...remountConfigState}} 
@@ -400,13 +402,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   const chainRef = props.chainRef || useRef({});
   
   // jsg
-  const blobRef               = useRef()
-  let   blobData            = useRef()
-  const blobVisibleRef         = props.blobVisibleRef || useRef({0: true});
+  const blobRef = useRef()
+  let   blobData = useRef()
+  const blobVisibleRef = props.blobVisibleRef || useRef({0: true});
   const prevParentVisibleRef = useRef(true);
   const indexArrayStr = indexArray.join()
 
-  
   // Key is the uniqueIndex of a particle. Value is an array of joint ids
   // Any change to particleJointsRef needs to be made to jointRefsRef also
   const particleJointsRef = props.particleJointsRef || useRef({});
@@ -432,7 +433,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   
   // Initialization logging/debug
   useEffect(() => {
-    //console.log("Mounting", id);
+    if (scope ==0) console.log("Mounting from scope 0", id);
     if (isDebug) {
       //console.log("jointsData", id, jointsData);
     }

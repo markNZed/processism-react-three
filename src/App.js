@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import SceneManager from './SceneManager';
 import SceneSelector from './SceneSelector';
 
@@ -33,15 +33,12 @@ function CameraAdjuster({ isOrthographic }) {
 }
 
 export default function App() {
-  const { sceneComponent, isOrthographic, key } = SceneManager();
   const [isAnimating, setIsAnimating] = useState(true); // Animation state
-
+  const { sceneComponent, isOrthographic, key } = SceneManager(isAnimating);
+  
   const toggleAnimation = () => {
     setIsAnimating(!isAnimating); // Toggle animation state
   };
-
-  // This is not stopping physics - would need to set value in Zustand and stop physics too
-  const DisableRender = () => useFrame(() => null, 1000)
 
   return (
     <>
@@ -50,7 +47,6 @@ export default function App() {
         {isAnimating ? 'Stop Animation' : 'Start Animation'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
-        {!isAnimating && <DisableRender />}
         {sceneComponent}
         <CameraAdjuster isOrthographic={isOrthographic} />
       </Canvas>

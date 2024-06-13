@@ -25,7 +25,7 @@ Instead of bottom-up: inside-out
  ****************************/
 
 
-function SceneThree() {
+function SceneThree({isAnimating}) {
 
     // Delay, animationComponent id, animationState
     const animationSequence = [
@@ -49,6 +49,10 @@ function SceneThree() {
     // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
     // numSolverIterations={2} numAdditionalFrictionIterations={2}
 
+    useEffect(() => {
+        console.log("SceneThree mounting isAnimating", isAnimating);
+    }, []);
+
     return (
         <>
             <AnimationController animations={animationSequence} useStore={useStore}>
@@ -57,9 +61,9 @@ function SceneThree() {
                     <Scene>
 
                         <EntityScopes
-                            id="EntityScopes1"
-                            //radius={emergentEntityRadius}
-                            color="blue"
+                            id={"EntityScopes1"}
+                            color={"blue"}
+                            isAnimating={isAnimating}
                         />
 
                     </Scene>
