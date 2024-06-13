@@ -5,134 +5,136 @@ import * as THREE from 'three';
 const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, internalRef, color }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
+    const worldMatrixRef = useRef(new THREE.Matrix4());
+
+    // Helper function to recursively build the ordered list
+    // Returns null if a chain is dangling
+    function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueIndex = null, visited = new Set()) {
+        if (uniqueIndex === null) {
+            uniqueIndex = blobOuterUniqueIndexes[0];
+        }
+        const result = [];
+        // Prevent infinite loops
+        if (visited.has(uniqueIndex)) return null;
+        visited.add(uniqueIndex);
+        if (blobOuterUniqueIndexes.includes(uniqueIndex)) {
+            result.push(uniqueIndex)
+        } else {
+            // chain is dangling (not looping)
+            return null;
+        }
+        const linkedIndexes = chainRef.current[uniqueIndex];
+        let foundJoint = false
+        if (linkedIndexes.length > 2) {
+            for (let i = 0; i < linkedIndexes.length; i++) {
+                // Joints have more than 2 links
+                if (chainRef.current[linkedIndexes[i]].length > 2) {
+                    const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited);
+                    if (recursiveResult) {
+                        foundJoint = true;
+                        result.push(...recursiveResult);
+                    }
+                }
+            }
+        }
+        if (!foundJoint) {
+            for (let i = 0; i < linkedIndexes.length; i++) {
+                const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited)
+                if (recursiveResult) {
+                    result.push(...recursiveResult);
+                    // recursiveResult is not null but it may be dangling further along the chain
+                }
+            }
+        }
+        return result;
+    }
+
+    function filterMiddleIndexes(chainRef, indexes) {
+        const jointIndexes = [];
+        // Find all indexes from the provided list that are joints i.e. more than 2 links
+        for (let i = 0; i < indexes.length; i++) {
+            const idx = indexes[i];
+            if (chainRef.current[idx].length > 2) {
+                jointIndexes.push(i);
+            }
+        }
+        const middleIndexes = [];
+        // Find indexes that are in the middle between joints
+        for (let i = 1; i < jointIndexes.length; i++) {
+            // Calculate the middle index
+            const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
+            // Avoid duplicating joints
+            if (!jointIndexes.includes(midIndex)) {
+                middleIndexes.push(indexes[midIndex]);
+            }
+        }
+        // Calculate the middle position between the first and last link with wraparound
+        const firstJoint = jointIndexes[0];
+        const lastJoint = jointIndexes[jointIndexes.length - 1];
+        const indexesLength = indexes.length;
+        const distance = (indexesLength - firstJoint + lastJoint);
+        const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
+        middleIndexes.push(indexes[middle]);
+        return middleIndexes;
+    }
+
+    useEffect(() => {
+
+        blobData.current = {
+            positions: [],
+            flattenedIndexes: [],
+        }
+
+        let blobOuterUniqueIndexes = [];
+        let flattenedIndexes = [];
+        for (let i = 0; i < flattenedParticleRefs.current.length; ++i) {
+            const outer = flattenedParticleRefs.current[i].current.userData.scopeOuter[scope];
+            if (outer) {
+                const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
+                blobOuterUniqueIndexes.push(uniqueIndex);
+                flattenedIndexes.push(i);
+            }
+        }
+
+        if (!blobOuterUniqueIndexes.length) {
+            console.error("blobOuterUniqueIndexes is empty!", id, particleCountRef.current.length);
+        }
+
+        let blobIndexes;
+        if (lastCompoundEntity) {
+            blobIndexes = blobOuterUniqueIndexes;
+        } else {
+            const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
+            if (!orderedIndexes) console.error("orderedIndexes is empty!", id);
+            blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
+        }
+
+        for (let i = 0; i < blobIndexes.length; ++i) {
+            blobData.current.positions.push(new THREE.Vector3());
+            const indexInOuter = blobOuterUniqueIndexes.indexOf(blobIndexes[i]);
+            const flattenedIndex = flattenedIndexes[indexInOuter];
+            blobData.current.flattenedIndexes.push(flattenedIndex);
+        }
+
+        blobVisibleRef.current[indexArrayStr] = (scope == 0);
+
+        // Because lastCompoundEntity needs to look after Particles 
+        if (lastCompoundEntity) {
+            blobVisibleRef.current[indexArrayStr + ',0'] = false;
+        }
+    },[]);
+
+    const points_to_geometry = points => {
+        const curve = new THREE.CatmullRomCurve3(points, true)
+        const ten_fold_points = curve.getPoints(points.length * 10)
+        const shape = new THREE.Shape(ten_fold_points)
+        const shape_geometry = new THREE.ShapeGeometry(shape)
+        return shape_geometry
+    }
 
     useFrame(() => {
 
-        if (!blobData.current) {
-
-            blobData.current = {
-                positions: [],
-                flattenedIndexes: [],
-            }
-
-            // Helper function to recursively build the ordered list
-            // Returns null if a chain is dangling
-            function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueIndex = null, visited = new Set()) {
-                if (uniqueIndex === null) {
-                    uniqueIndex = blobOuterUniqueIndexes[0];
-                }
-                const result = [];
-                // Prevent infinite loops
-                if (visited.has(uniqueIndex)) return null;
-                visited.add(uniqueIndex);
-                if (blobOuterUniqueIndexes.includes(uniqueIndex)) {
-                    result.push(uniqueIndex)
-                } else {
-                    // chain is dangling (not looping)
-                    return null;
-                }
-                const linkedIndexes = chainRef.current[uniqueIndex];
-                let foundJoint = false
-                if (linkedIndexes.length > 2) {
-                    for (let i = 0; i < linkedIndexes.length; i++) {
-                        // Joints have more than 2 links
-                        if (chainRef.current[linkedIndexes[i]].length > 2) {
-                            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited);
-                            if (recursiveResult) {
-                                foundJoint = true;
-                                result.push(...recursiveResult);
-                            }
-                        }
-                    }
-                }
-                if (!foundJoint) {
-                    for (let i = 0; i < linkedIndexes.length; i++) {
-                        const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited)
-                        if (recursiveResult) {
-                            result.push(...recursiveResult);
-                            // recursiveResult is not null but it may be dangling further along the chain
-                        }
-                    }
-                }
-                return result;
-            }
-
-            function filterMiddleIndexes(chainRef, indexes) {
-                const jointIndexes = [];
-                // Find all indexes from the provided list that are joints i.e. more than 2 links
-                for (let i = 0; i < indexes.length; i++) {
-                    const idx = indexes[i];
-                    if (chainRef.current[idx].length > 2) {
-                        jointIndexes.push(i);
-                    }
-                }
-                const middleIndexes = [];
-                // Find indexes that are in the middle between joints
-                for (let i = 1; i < jointIndexes.length; i++) {
-                    // Calculate the middle index
-                    const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
-                    // Avoid duplicating joints
-                    if (!jointIndexes.includes(midIndex)) {
-                        middleIndexes.push(indexes[midIndex]);
-                    }
-                }
-                // Calculate the middle position between the first and last link with wraparound
-                const firstJoint = jointIndexes[0];
-                const lastJoint = jointIndexes[jointIndexes.length - 1];
-                const indexesLength = indexes.length;
-                const distance = (indexesLength - firstJoint + lastJoint);
-                const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
-                middleIndexes.push(indexes[middle]);
-                return middleIndexes;
-            }
-
-            let blobOuterUniqueIndexes = [];
-            let flattenedIndexes = [];
-            for (let i = 0; i < flattenedParticleRefs.current.length; ++i) {
-                const outer = flattenedParticleRefs.current[i].current.userData.scopeOuter[scope];
-                if (outer) {
-                    const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
-                    blobOuterUniqueIndexes.push(uniqueIndex);
-                    flattenedIndexes.push(i);
-                }
-            }
-
-            if (!blobOuterUniqueIndexes.length) {
-                console.error("blobOuterUniqueIndexes is empty!", id, particleCountRef.current.length);
-            }
-
-            let blobIndexes;
-            if (lastCompoundEntity) {
-                blobIndexes = blobOuterUniqueIndexes;
-            } else {
-                const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
-                if (!orderedIndexes) console.error("orderedIndexes is empty!", id);
-                blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
-            }
-
-            for (let i = 0; i < blobIndexes.length; ++i) {
-                blobData.current.positions.push(new THREE.Vector3());
-                const indexInOuter = blobOuterUniqueIndexes.indexOf(blobIndexes[i]);
-                const flattenedIndex = flattenedIndexes[indexInOuter];
-                blobData.current.flattenedIndexes.push(flattenedIndex);
-            }
-
-            blobVisibleRef.current[indexArrayStr] = (scope == 0);
-
-            // Bbecause lastCompoundEntity needs to look after Particles 
-            if (lastCompoundEntity) {
-                blobVisibleRef.current[indexArrayStr + ',0'] = false;
-            }
-
-        }
-
-        const points_to_geometry = points => {
-            const curve = new THREE.CatmullRomCurve3(points, true)
-            const ten_fold_points = curve.getPoints(points.length * 10)
-            const shape = new THREE.Shape(ten_fold_points)
-            const shape_geometry = new THREE.ShapeGeometry(shape)
-            return shape_geometry
-        }
+        if (!blobData.current) return;
 
         let ancestorVisible = false;
         let parentVisible = false;
@@ -147,7 +149,8 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
             }
         }
 
-        // Special case to look after Particles
+        // Special case to look after particles where visibility is managed from the parent ComponentEntity
+        // to avoid needing to have blob related functionality in teh Particle component
         if (lastCompoundEntity && ancestorVisible) blobVisibleRef.current[indexArrayStr + ',0'] = false;
 
         const parentVanished = !parentVisible && prevParentVisibleRef.current;
@@ -157,7 +160,6 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
         prevParentVisibleRef.current = parentVisible;
 
         if (lastCompoundEntity) {
-            console.log("HERE", blobVisibleRef.current[indexArrayStr + ',0'])
             for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
                 flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayStr + ',0'];
             }
@@ -166,7 +168,6 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
         if (!ancestorVisible && blobVisibleRef.current[indexArrayStr]) {
 
             const worldVector = new THREE.Vector3();
-
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
                 const pos = flattenedParticleRefs.current[flattenedIndex].current.translation();
@@ -180,46 +181,49 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
             blobRef.current.geometry = geometry;
             blobRef.current.visible = blobVisibleRef.current[indexArrayStr];
 
+            if (scope == 0) console.log("blobRef", blobRef)
+
         } else {
             blobRef.current.visible = false;
         }
 
     });
 
+    const handleOnClick = (event) => {
+        console.log("handleOnClick", "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope)
+        // If a higher blob is visible then ignore
+        for (let i = scope - 1; i >= 0; i--) {
+            const key = indexArray.slice(0, i).join(); // create a string for the key
+            if (blobVisibleRef.current[key]) {
+                return
+            }
+        }
+        // Stop the event from bubbling up
+        event.stopPropagation();
+        // Alternate visibility
+        blobVisibleRef.current[indexArrayStr] = !blobVisibleRef.current[indexArrayStr];
+        //Special case for Particles
+        if (lastCompoundEntity) {
+            blobVisibleRef.current[indexArrayStr + ',0'] = !blobVisibleRef.current[indexArrayStr];
+        }
+    }
+    
+    const handleOnContextMenu = (event, blobVisibleRef, scope) => {
+        // Stop the event from bubbling up
+        event.stopPropagation();
+        console.log("handleOnContextMenu", "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope);
+        // The largest blob has an empty key
+        blobVisibleRef.current[''] = true;
+    }
+    
+
     return (
         <mesh ref={blobRef}
-            onClick={(event) => Handle_click(event, blobVisibleRef, scope, indexArrayStr, lastCompoundEntity, indexArray)}
-            onContextMenu={(event) => Handle_right_click(event, blobVisibleRef)}>
+            onClick={(event) => handleOnClick(event)}
+            onContextMenu={(event) => handleOnContextMenu(event, blobVisibleRef)}>
             <meshBasicMaterial color={color} />
         </mesh>
     );
 };
 
 export default Blob;
-
-const Handle_click = (event, blobVisibleRef, scope, indexArrayStr, lastCompoundEntity, indexArray) => {
-    console.log("Handle_click", "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope)
-    // If a higher blob is visible then ignore
-    for (let i = scope - 1; i >= 0; i--) {
-        const key = indexArray.slice(0, i).join(); // create a string for the key
-        if (blobVisibleRef.current[key]) {
-            return
-        }
-    }
-    // Stop the event from bubbling up
-    event.stopPropagation();
-    // Alternate visibility
-    blobVisibleRef.current[indexArrayStr] = !blobVisibleRef.current[indexArrayStr];
-    //Special case for Particles
-    if (lastCompoundEntity) {
-        blobVisibleRef.current[indexArrayStr + ',0'] = !blobVisibleRef.current[indexArrayStr];
-    }
-}
-
-const Handle_right_click = (event, blobVisibleRef, scope) => {
-    // Stop the event from bubbling up
-    event.stopPropagation();
-    console.log("Handle_right_click", "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope);
-    // The largest blob has an empty key
-    blobVisibleRef.current[''] = true;
-}

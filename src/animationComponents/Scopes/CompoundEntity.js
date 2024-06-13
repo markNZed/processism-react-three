@@ -730,8 +730,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 if (visible === false) {
                     mesh.setMatrixAt(i, emptyMatrix);
                     matrixChanged = true;
-                } else {
-                    console.log("Visible", id, "currentPos", currentPos, "currentQuaternion", currentQuaternion, "currentScale", currentScale);
                 }
 
                 // Update the color only if it has changed beyond the tolerance threshold
@@ -951,6 +949,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
                 {frameStateRef.current !== "init" && (
                     <Blob
+                        id={`blob-${id}`}
                         blobRef={blobRef}
                         blobData={blobData}
                         blobVisibleRef={blobVisibleRef}
