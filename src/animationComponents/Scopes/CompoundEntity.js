@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Circle as CircleDrei, Text } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
@@ -11,6 +11,7 @@ import Particle from './Particle';
 import { getColor } from './utils';
 import Joint from './Joint'
 import Blob from './Blob';
+import DebugRender from './DebugRender';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -699,7 +700,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             const currentPos = new THREE.Vector3();
             const currentScale = new THREE.Vector3();
             const currentQuaternion = new THREE.Quaternion();
-            const invisibleScale = new THREE.Vector3(0.001,0.001,0.001);
+            const invisibleScale = new THREE.Vector3(0.001,0.001,0.001); // 0 does not work
 
             for (let i = 0; i < particleCountRef.current; i++) {
                 const instanceMatrix = new THREE.Matrix4(); // a new instance to avoid transfer between iterations
@@ -1003,46 +1004,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 />
 
                 {isDebug && (
-                    <>
-                        <Circle
-                            id={`${id}.CircleInitialPosition`}
-                            initialState={{
-                                radius: radius,
-                                color: color,
-                                opacity: 0,
-                            }}
-                        />
-                        <Circle
-                            id={`${id}.CircleCenter`}
-                            initialState={{
-                                radius: radius,
-                                color: color,
-                                opacity: 0.2,
-                            }}
-                        />
-                        {newJoints.current.map((particles, i) => (
-                            <>
-                                <CircleDrei
-                                    args={[0.1, 8]}
-                                    position={localJointPosition(internalRef, particles.a, "A")}
-                                    material-color="red"
-                                />
-                                <CircleDrei
-                                    args={[0.1, 8]}
-                                    position={localJointPosition(internalRef, particles.b, "B")}
-                                    material-color="green"
-                                />
-                            </>
-                        ))}
-                        {jointsData.map((data, i) => (
-                            <CircleDrei
-                                args={[0.1, 16]}
-                                position={[data.position.x, data.position.y, 0.3]}
-                            />
-                        ))}
-                    </>
+                    <DebugRender
+                        id={id}
+                        radius={radius}
+                        color={color}
+                        initialPosition={initialPosition}
+                        jointsData={jointsData}
+                        newJoints={newJoints}
+                        scope={scope}
+                        index={index}
+                        localJointPosition={localJointPosition}
+                        internalRef={internalRef}
+                    />
                 )}
+
             </CompoundEntityGroup>
+
             {isDebug && (
                 <>
                     <Text

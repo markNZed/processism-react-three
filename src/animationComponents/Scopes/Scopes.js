@@ -54,7 +54,7 @@ const Scopes = React.forwardRef((props, ref) => {
 
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
-        debug: false,
+        debug: true,
         colors: [props.color || null, getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,
         overshootScaling: controls.overshootScaling,
