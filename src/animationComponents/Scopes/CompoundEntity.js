@@ -10,6 +10,7 @@ import _ from 'lodash';
 import Particle from './Particle';
 import { getColor } from './utils';
 import Joint from './Joint'
+import Blob from './Blob';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -70,13 +71,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // Used for the Particles
     const instancedMeshRef = useRef();
     const chainRef = props.chainRef || useRef({});
-
-    // jsg
     const blobRef = useRef()
-    let blobData = useRef()
+    const blobData = useRef()
     const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
-    const prevParentVisibleRef = useRef(true);
-    const indexArrayStr = indexArray.join()
 
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
@@ -730,9 +727,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
                 // Get the visibility from userData
                 const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
-                if (!visible) {
+                if (visible === false) {
                     mesh.setMatrixAt(i, emptyMatrix);
                     matrixChanged = true;
+                } else {
+                    console.log("Visible", id, "currentPos", currentPos, "currentQuaternion", currentQuaternion, "currentScale", currentScale);
                 }
 
                 // Update the color only if it has changed beyond the tolerance threshold
@@ -767,214 +766,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             }
         }
     });
-
-    // Blob geometry calculation
-    useFrame(() => {
-        if (frameStateRef.current === "init") return;
-
-        if (!blobData.current) {
-
-            blobData.current = {
-                positions: [],
-                flattenedIndexes: [],
-            }
-
-            // Helper function to recursively build the ordered list
-            // Returns null if a chain is dangling
-            function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueIndex = null, visited = new Set()) {
-                if (uniqueIndex === null) {
-                    uniqueIndex = blobOuterUniqueIndexes[0];
-                }
-                const result = [];
-                // Prevent infinite loops
-                if (visited.has(uniqueIndex)) return null;
-                visited.add(uniqueIndex);
-                if (blobOuterUniqueIndexes.includes(uniqueIndex)) {
-                    result.push(uniqueIndex)
-                } else {
-                    // chain is dangling (not looping)
-                    return null;
-                }
-                const linkedIndexes = chainRef.current[uniqueIndex];
-                let foundJoint = false
-                if (linkedIndexes.length > 2) {
-                    for (let i = 0; i < linkedIndexes.length; i++) {
-                        // Joints have more than 2 links
-                        if (chainRef.current[linkedIndexes[i]].length > 2) {
-                            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited);
-                            if (recursiveResult) {
-                                foundJoint = true;
-                                result.push(...recursiveResult);
-                            }
-                        }
-                    }
-                }
-                if (!foundJoint) {
-                    for (let i = 0; i < linkedIndexes.length; i++) {
-                        const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited)
-                        if (recursiveResult) {
-                            result.push(...recursiveResult);
-                            // recursiveResult is not null but it may be dangling further along the chain
-                        }
-                    }
-                }
-                return result;
-            }
-
-            function filterMiddleIndexes(chainRef, indexes) {
-                const jointIndexes = [];
-                // Find all indexes from the provided list that are joints i.e. more than 2 links
-                for (let i = 0; i < indexes.length; i++) {
-                    const idx = indexes[i];
-                    if (chainRef.current[idx].length > 2) {
-                        jointIndexes.push(i);
-                    }
-                }
-                const middleIndexes = [];
-                // Find indexes that are in the middle between joints
-                for (let i = 1; i < jointIndexes.length; i++) {
-                    // Calculate the middle index
-                    const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
-                    // Avoid duplicating joints
-                    if (!jointIndexes.includes(midIndex)) {
-                        middleIndexes.push(indexes[midIndex]);
-                    }
-                }
-                // Calculate the middle position between the first and last link with wraparound
-                const firstJoint = jointIndexes[0];
-                const lastJoint = jointIndexes[jointIndexes.length - 1];
-                const indexesLength = indexes.length;
-                const distance = (indexesLength - firstJoint + lastJoint);
-                const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
-                middleIndexes.push(indexes[middle]);
-                return middleIndexes;
-            }
-
-            let blobOuterUniqueIndexes = [];
-            let flattenedIndexes = [];
-            for (let i = 0; i < flattenedParticleRefs.current.length; ++i) {
-                const outer = flattenedParticleRefs.current[i].current.userData.scopeOuter[scope];
-                if (outer) {
-                    const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
-                    blobOuterUniqueIndexes.push(uniqueIndex);
-                    flattenedIndexes.push(i);
-                }
-            }
-
-            if (!blobOuterUniqueIndexes.length) {
-                console.error("blobOuterUniqueIndexes is empty!", id, particleCountRef.current.length);
-            }
-
-            let blobIndexes;
-            if (lastCompoundEntity) {
-                blobIndexes = blobOuterUniqueIndexes;
-            } else {
-                const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
-                if (!orderedIndexes) console.error("orderedIndexes is empty!", id);
-                blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
-            }
-
-            for (let i = 0; i < blobIndexes.length; ++i) {
-                blobData.current.positions.push(new THREE.Vector3());
-                const indexInOuter = blobOuterUniqueIndexes.indexOf(blobIndexes[i]);
-                const flattenedIndex = flattenedIndexes[indexInOuter];
-                blobData.current.flattenedIndexes.push(flattenedIndex);
-            }
-
-            blobVisibleRef.current[indexArrayStr] = (scope == 0);
-
-            // Bbecause lastCompoundEntity needs to look after Particles 
-            if (lastCompoundEntity) {
-                blobVisibleRef.current[indexArrayStr + ',0'] = false;
-            }
-
-        }
-
-        const points_to_geometry = points => {
-            const curve = new THREE.CatmullRomCurve3(points, true)
-            const ten_fold_points = curve.getPoints(points.length * 10)
-            const shape = new THREE.Shape(ten_fold_points)
-            const shape_geometry = new THREE.ShapeGeometry(shape)
-            return shape_geometry
-        }
-
-        let ancestorVisible = false;
-        let parentVisible = false;
-        const parentScope = scope - 1;
-        for (let i = parentScope; i >= 0; i--) {
-            const key = indexArray.slice(0, i).join(); // create a string for the key
-            if (blobVisibleRef.current[key]) {
-                blobVisibleRef.current[indexArrayStr] = false;
-                ancestorVisible = true;
-                if (i == parentScope) parentVisible = true;
-                break;
-            }
-        }
-
-        // Special case to look after Particles
-        if (lastCompoundEntity && ancestorVisible) blobVisibleRef.current[indexArrayStr + ',0'] = false;
-
-        const parentVanished = !parentVisible && prevParentVisibleRef.current;
-        if (parentVanished) {
-            blobVisibleRef.current[indexArrayStr] = true;
-        }
-        prevParentVisibleRef.current = parentVisible;
-
-        if (lastCompoundEntity) {
-            for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
-                flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayStr + ',0'];
-            }
-        }
-
-        if (!ancestorVisible && blobVisibleRef.current[indexArrayStr]) {
-
-            const worldVector = new THREE.Vector3();
-
-            const blobPoints = blobData.current.positions.map((positiion, i) => {
-                const flattenedIndex = blobData.current.flattenedIndexes[i]
-                const pos = flattenedParticleRefs.current[flattenedIndex].current.translation();
-                worldVector.set(pos.x, pos.y, pos.z);
-                positiion.copy(internalRef.current.worldToLocal(worldVector))
-                return positiion;
-            });
-
-            const geometry = points_to_geometry(blobPoints);
-            blobRef.current.geometry.dispose();
-            blobRef.current.geometry = geometry;
-            blobRef.current.visible = blobVisibleRef.current[indexArrayStr];
-
-        } else {
-            blobRef.current.visible = false;
-        }
-
-    });
-
-    const Handle_click = (event, blobVisibleRef, scope, config) => {
-        console.log("Handle_click", id, "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope, "config:", config)
-        // If a higher blob is visible then ignore
-        for (let i = scope - 1; i >= 0; i--) {
-            const key = indexArray.slice(0, i).join(); // create a string for the key
-            if (blobVisibleRef.current[key]) {
-                return
-            }
-        }
-        // Stop the event from bubbling up
-        event.stopPropagation();
-        // Alternate visibility
-        blobVisibleRef.current[indexArrayStr] = !blobVisibleRef.current[indexArrayStr];
-        //Special case for Particles
-        if (lastCompoundEntity) {
-            blobVisibleRef.current[indexArrayStr + ',0'] = !blobVisibleRef.current[indexArrayStr];
-        }
-    }
-
-    const Handle_right_click = (event, blobVisibleRef, scope, config) => {
-        // Stop the event from bubbling up
-        event.stopPropagation();
-        console.log("Handle_right_click", id, "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope, "config:", config);
-        // The largest blob has an empty key
-        blobVisibleRef.current[''] = true;
-    }
 
     function Relations({ internalRef, relationsRef, linesRef, newLinesRef }) {
 
@@ -1158,15 +949,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     />
                 ))}
 
-                <mesh
-                    ref={blobRef}
-                    userData={{ visible: false, clicks: 0 }}
-                    onContextMenu={event => Handle_right_click(event, blobVisibleRef, scope, config)}
-                    onClick={event => {
-                        Handle_click(event, blobVisibleRef, scope, config);
-                    }}>
-                    <meshBasicMaterial color={color} />
-                </mesh>
+                {frameStateRef.current !== "init" && (
+                    <Blob
+                        blobRef={blobRef}
+                        blobData={blobData}
+                        blobVisibleRef={blobVisibleRef}
+                        indexArray={indexArray}
+                        scope={scope}
+                        flattenedParticleRefs={flattenedParticleRefs}
+                        chainRef={chainRef}
+                        lastCompoundEntity={lastCompoundEntity}
+                        internalRef={internalRef}
+                        color={color}
+                    />
+                )}
 
                 {scope == 0 && particleCountRef.current && (
                     <instancedMesh
