@@ -15,6 +15,7 @@ import DebugRender from './DebugRender';
 import useLimitedLog from '../../hooks/useLimitedLog';
 import useEntityRef from './useEntityRef';
 import useParticlesRegistration from './useParticlesRegistration';
+import InstancedParticles from './InstancedParticles';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -93,8 +94,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         particleRadiusRef,
         areAllParticlesRegistered
     } = useParticlesRegistration(props, index, scope, id, jointsData, config);
-    const particleCount = flattenedParticleRefs.current.length;
-
+    const particleCount = useMemo(() => flattenedParticleRefs?.current?.length, [flattenedParticleRefs.current]);
 
     ////////////////////////////////////////
     // Constants impacting particle behavior
@@ -614,99 +614,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     });
 
-    // Because we are using instanced meshes of the particles to improve performance they are instantiated at scope 0
-    // The Particle contains the associated rigid body with the physics information.
-    // The particle positions (etc.) are collated here to update all the instances at once.
-    useFrame(() => {
-        if (scope === 0 && instancedMeshRef.current && areAllParticlesRegistered()) {
-            const mesh = instancedMeshRef.current;
-
-            const userColor = new THREE.Color();
-            let colorChanged = false; // Track if any color has changed
-            let matrixChanged = false; // Track if any position or scale has changed
-            const colorTolerance = 0.01; // Define a tolerance for color comparison
-            const userScale = new THREE.Vector3();
-            const currentPos = new THREE.Vector3();
-            const currentScale = new THREE.Vector3();
-            const currentQuaternion = new THREE.Quaternion();
-            const invisibleScale = new THREE.Vector3(0.001,0.001,0.001); // 0 does not work
-
-            for (let i = 0; i < particleCount; i++) {
-                const instanceMatrix = new THREE.Matrix4(); // a new instance to avoid transfer between iterations
-                // Get the current matrix of the instance
-                mesh.getMatrixAt(i, instanceMatrix);
-                instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
-
-                // Get the position of the rigid body (world position)
-                const pos = flattenedParticleRefs.current[i].current.translation();
-
-                // Get the scale from userData
-                const scale = flattenedParticleRefs.current[i].current.userData.scale || 1;
-                userScale.set(scale, scale, scale);
-
-                // Get the color from userData
-                const color = flattenedParticleRefs.current[i].current.userData.color || 'red';
-                userColor.set(color);
-
-                // Compare and update the position if necessary
-                if (!currentPos.equals(pos)) {
-                    currentPos.copy(pos);
-                    matrixChanged = true;
-                }
-
-                // Compare and update the scale if necessary
-                if (!currentScale.equals(userScale)) {
-                    currentScale.copy(userScale);
-                    matrixChanged = true;
-                }
-
-                // Get the visibility from userData
-                const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
-                if (visible === false) {
-                    currentScale.copy(invisibleScale);
-                    matrixChanged = true;
-                } else {
-                    console.log("visible", id);
-                }
-
-                if (matrixChanged) {
-                    instanceMatrix.compose(currentPos, currentQuaternion, currentScale);
-                    mesh.setMatrixAt(i, instanceMatrix);
-                }
-
-                // Update the color only if it has changed beyond the tolerance threshold
-                if (mesh.instanceColor) {
-                    const currentColor = new THREE.Color();
-                    mesh.getColorAt(i, currentColor);
-
-                    if (
-                        Math.abs(currentColor.r - userColor.r) > colorTolerance ||
-                        Math.abs(currentColor.g - userColor.g) > colorTolerance ||
-                        Math.abs(currentColor.b - userColor.b) > colorTolerance
-                    ) {
-                        //console.log("Color change", i, userColor)
-                        mesh.setColorAt(i, userColor);
-                        colorChanged = true;
-                    }
-                } else {
-                    // If instanceColor is not set, set it now
-                    mesh.setColorAt(i, userColor);
-                    colorChanged = true;
-                }
-            }
-
-            // Update the instance matrix to reflect changes only if positions or scales changed
-            if (matrixChanged) {
-                mesh.instanceMatrix.needsUpdate = true;
-            }
-
-            // Update the instance color only if any color has changed
-            if (colorChanged && mesh.instanceColor) {
-                mesh.instanceColor.needsUpdate = true;
-            }
-        }
-    });
-
     function Relations({ internalRef, relationsRef, linesRef, newLinesRef }) {
 
         const segmentIndexRef = useRef({}); // Keeps track of the current segment index
@@ -823,6 +730,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     // Should use entity instead of particle as per relations 
     const handlePointerDown = (event) => {
+        event.stopPropagation();
         const instanceId = event.instanceId;
         if (instanceId !== undefined) {
             const userData = flattenedParticleRefs.current[instanceId].current.userData;
@@ -905,15 +813,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     />
                 )}
 
-                {scope == 0 && particleCount && (
-                    <instancedMesh
+                {scope === 0 && particleCount && (
+                    <InstancedParticles
                         ref={instancedMeshRef}
-                        args={[null, null, particleCount]}
-                        onClick={(e) => handlePointerDown(e)}
-                    >
-                        <circleGeometry args={[particleRadiusRef.current, 16]} />
-                        <meshStandardMaterial />
-                    </instancedMesh>
+                        particleCount={particleCount}
+                        flattenedParticleRefs={flattenedParticleRefs}
+                        particleRadiusRef={particleRadiusRef}
+                        onClick={handlePointerDown}
+                    />
                 )}
 
                 {entitiesRegisteredRef.current && (
