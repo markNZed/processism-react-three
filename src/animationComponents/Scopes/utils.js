@@ -10,10 +10,10 @@
 export const getColor = (config, scope, defaultValue) => {
     const colorConfig = config.colors[scope];
     if (colorConfig === null || colorConfig === undefined) {
-      return defaultValue;
+        return defaultValue;
     }
     if (typeof colorConfig === 'function') {
-      return colorConfig();
+        return colorConfig();
     }
     return colorConfig;
 };
@@ -23,4 +23,3 @@ export const getColor = (config, scope, defaultValue) => {
  * Example:
  * export const addNumbers = (a, b) => a + b;
  */
-  
