@@ -5,24 +5,13 @@ import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
 import useStore from '../../useStore';
-import { useSphericalJoint, useRapier, vec3 } from '@react-three/rapier';
+import { useRapier, vec3 } from '@react-three/rapier';
 import _ from 'lodash';
 import Particle from './Particle';
-import { getColor } from './utils.js';
+import { getColor } from './utils';
+import Joint from './Joint'
 
 const ZERO_VECTOR = new THREE.Vector3();
-
-// Joints connect Particles and when the joints form a loop the group of Particles will behave like a soft body
-const Joint = ({ a, b, jointRefsRef }) => {
-    const aUserData = a.ref.getUserData()
-    const bUserData = b.ref.getUserData()
-    const jointRefsIndex = `${aUserData.uniqueIndex}-${bUserData.uniqueIndex}`;
-    jointRefsRef.current[jointRefsIndex] = useSphericalJoint(a.ref, b.ref, [
-        [a.offset.x, a.offset.y, a.offset.z],
-        [b.offset.x, b.offset.y, b.offset.z]
-    ])
-    return null
-}
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = [], initialPosition = [0, 0, 0], scope = 0, radius, config, ...props }, ref) => {
 
