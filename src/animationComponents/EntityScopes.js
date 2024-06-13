@@ -401,10 +401,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
   
   // jsg
   const blobRef               = useRef()
-  let   compilation            = useRef()
+  let   blobData            = useRef()
   const blobVisibleRef         = props.blobVisibleRef || useRef({0: true});
-  const prevAncestorVisibleRef = useRef(true);
-  const indexArrayKey = indexArray.join()
+  const prevParentVisibleRef = useRef(true);
+  const indexArrayStr = indexArray.join()
 
   
   // Key is the uniqueIndex of a particle. Value is an array of joint ids
@@ -1103,47 +1103,40 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     }
   });
 
-  // Blob rendering
+  // Blob geometry calculation
   useFrame(() => {
     if (frameStateRef.current === "init") return;
   
-    if( ! compilation.current) {
+    if( ! blobData.current) {
 
-      compilation.current = {
+      blobData.current = {
         positions      : [],
-        scopeOuters    : [],
-        uniqueIndexes  : [],
-        uniqueIndexesToPosition : [],	  
-      }
-
-      const n = particleCountRef.current;
-      // Only need positions, uniqueIndexesToPosition, uniqueIndexes outside of this section ?
-      for( let i = 0; i < n ; ++i ) {
-        compilation.current.positions.push( new THREE.Vector3())
-        compilation.current.scopeOuters.push(flattenedParticleRefs.current[i].current.userData.scopeOuter)
-        const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
-        compilation.current.uniqueIndexes.push(uniqueIndex)
-        compilation.current.uniqueIndexesToPosition[uniqueIndex] = i;
+        flattenedIndexes : [],
       }
 
       // Helper function to recursively build the ordered list
-      // Using chainRef and blobIndexes which are not passed in as aargs
-      function buildOrderedIndexes(uniqueIndex, visited = new Set()) {
+      // Returns null if a chain is dangling
+      function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueIndex = null, visited = new Set()) {
+        if (uniqueIndex === null) {
+          uniqueIndex = blobOuterUniqueIndexes[0];
+        }
         const result = [];
 				// Prevent infinite loops
 				if (visited.has(uniqueIndex)) return null;
 				visited.add(uniqueIndex);
-				if (blobIndexes.includes(uniqueIndex)) {
+				if (blobOuterUniqueIndexes.includes(uniqueIndex)) {
 					result.push(uniqueIndex)
 				} else {
+          // chain is dangling (not looping)
 					return null;
 				}
-				const connectedIndexes = chainRef.current[uniqueIndex];
+				const linkedIndexes = chainRef.current[uniqueIndex];
         let foundJoint = false
-        if (connectedIndexes.length > 2) {
-          for (let i = 0; i < connectedIndexes.length; i++) {
-            if (chainRef.current[connectedIndexes[i]].length > 2) {
-              const recursiveResult = buildOrderedIndexes(connectedIndexes[i], visited);
+        if (linkedIndexes.length > 2) {
+          for (let i = 0; i < linkedIndexes.length; i++) {
+            // Joints have more than 2 links
+            if (chainRef.current[linkedIndexes[i]].length > 2) {
+              const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited);
               if (recursiveResult) {
                 foundJoint = true;
                 result.push(...recursiveResult);
@@ -1152,10 +1145,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           }
         }
         if (!foundJoint) {
-          for (let i = 0; i < connectedIndexes.length; i++) {
-            const recursiveResult = buildOrderedIndexes(connectedIndexes[i], visited)
+          for (let i = 0; i < linkedIndexes.length; i++) {
+            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited)
             if (recursiveResult) {
               result.push(...recursiveResult);
+              // recursiveResult is not null but it may be dangling further along the chain
             }
           }
         }
@@ -1172,45 +1166,61 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
           }
         }
         const middleIndexes = [];
-        // Now, find indexes that are exactly in the middle between joints
+        // Find indexes that are in the middle between joints
         for (let i = 1; i < jointIndexes.length; i++) {
           // Calculate the middle index
           const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
-          // Avoid adding joints
+          // Avoid duplicating joints
           if (!jointIndexes.includes(midIndex)) {
             middleIndexes.push(indexes[midIndex]);
           }
         }
-        // Calculate the correct middle position between the first and last link with wraparound
+        // Calculate the middle position between the first and last link with wraparound
         const firstJoint = jointIndexes[0];
         const lastJoint = jointIndexes[jointIndexes.length - 1];
         const indexesLength = indexes.length;
         const distance = (indexesLength - firstJoint + lastJoint);
-        const middle = (firstJoint + Math.floor(distance / 2)) % indexes.length;
+        const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
         middleIndexes.push(indexes[middle]);
         return middleIndexes;
       }
       
-      let blobIndexes = [];
-      for (let i = 0; i < compilation.current.positions.length; i++) {
-        if ( compilation.current.scopeOuters[i][scope] ) {
-          blobIndexes.push(compilation.current.uniqueIndexes[i]);
+      let blobOuterUniqueIndexes = [];
+      let flattenedIndexes = [];
+      for( let i = 0; i < flattenedParticleRefs.current.length ; ++i ) {
+        const outer = flattenedParticleRefs.current[i].current.userData.scopeOuter[scope];
+        if ( outer ) {
+          const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
+          blobOuterUniqueIndexes.push(uniqueIndex);
+          flattenedIndexes.push(i);
         }
       }
 
-      if (lastCompoundEntity) {
-        compilation.current.orderedIndexes = blobIndexes;
-      } else {
-        const firstIndex = blobIndexes[0];
-        const orderedIndexes = buildOrderedIndexes(firstIndex);
-        const midJointIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
-        compilation.current.orderedIndexes = midJointIndexes;
+      if (!blobOuterUniqueIndexes.length) {
+        console.error("blobOuterUniqueIndexes is empty!", id, particleCountRef.current.length);
       }
 
-      blobVisibleRef.current[indexArrayKey] = (scope == 0);
-      
+      let blobIndexes;
       if (lastCompoundEntity) {
-        blobVisibleRef.current[indexArrayKey + ',0'] = false;
+        blobIndexes = blobOuterUniqueIndexes;
+      } else {
+        const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
+        if (!orderedIndexes) console.error("orderedIndexes is empty!", id);
+        blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
+      }
+
+      for( let i = 0; i < blobIndexes.length ; ++i ) {
+        blobData.current.positions.push( new THREE.Vector3()) ;
+        const indexInOuter = blobOuterUniqueIndexes.indexOf(blobIndexes[i]);
+        const flattenedIndex = flattenedIndexes[indexInOuter];
+        blobData.current.flattenedIndexes.push(flattenedIndex);
+      }
+
+      blobVisibleRef.current[indexArrayStr] = (scope == 0);
+      
+      // Bbecause lastCompoundEntity needs to look after Particles 
+      if (lastCompoundEntity) {
+        blobVisibleRef.current[indexArrayStr + ',0'] = false;
       }
             
     }
@@ -1224,47 +1234,52 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     }
 
     let ancestorVisible = false;
-    for (let i = scope - 1; i >= 0; i--) {
+    let parentVisible = false;
+    const parentScope = scope - 1;
+    for (let i = parentScope; i >= 0; i--) {
       const key = indexArray.slice(0, i).join(); // create a string for the key
       if (blobVisibleRef.current[key]) {
-        blobVisibleRef.current[indexArrayKey] = false;
-        if (lastCompoundEntity) blobVisibleRef.current[indexArrayKey + ',0'] = false;
+        blobVisibleRef.current[indexArrayStr] = false;
         ancestorVisible = true;
+        if (i == parentScope) parentVisible = true;
         break;
       }
     }
 
-    const ancestorVanished = !ancestorVisible && prevAncestorVisibleRef.current;
+    // Special case to look after Particles
+    if (lastCompoundEntity && ancestorVisible) blobVisibleRef.current[indexArrayStr + ',0'] = false;
 
-    if (ancestorVanished) {
-      blobVisibleRef.current[indexArrayKey] = true;
+    const parentVanished = !parentVisible && prevParentVisibleRef.current;
+    if (parentVanished) {
+      blobVisibleRef.current[indexArrayStr] = true;
     }
-
-    prevAncestorVisibleRef.current = ancestorVisible;
-
-    blobRef.current.visible = blobVisibleRef.current[indexArrayKey];
+    prevParentVisibleRef.current = parentVisible;
 
     if (lastCompoundEntity) {
       for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
-        flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayKey + ',0'];
+        flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayStr + ',0'];
       }
     }
 
-    if (!ancestorVisible && blobRef.current.visible) {
+    if (!ancestorVisible && blobVisibleRef.current[indexArrayStr]) {
     
       const worldVector = new THREE.Vector3();
 
-      const blobPoints = compilation.current.orderedIndexes.map((idx) => {
-        const positionIdx = compilation.current.uniqueIndexesToPosition[idx];
-        const pos = flattenedParticleRefs.current[positionIdx].current.translation();
+      const blobPoints = blobData.current.positions.map((positiion, i) => {
+        const flattenedIndex = blobData.current.flattenedIndexes[i]
+        const pos = flattenedParticleRefs.current[flattenedIndex].current.translation();
         worldVector.set(pos.x, pos.y, pos.z); 
-        compilation.current.positions[positionIdx].copy(internalRef.current.worldToLocal(worldVector))
-        return compilation.current.positions[positionIdx];
+        positiion.copy(internalRef.current.worldToLocal(worldVector))
+        return positiion;
       });
 
       const geometry = points_to_geometry(blobPoints);
       blobRef.current.geometry.dispose();
       blobRef.current.geometry = geometry;
+      blobRef.current.visible = blobVisibleRef.current[indexArrayStr];
+
+    } else {
+      blobRef.current.visible = false;
     }
 
   });
@@ -1281,10 +1296,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray=[], 
     // Stop the event from bubbling up
     event.stopPropagation();
     // Alternate visibility
-    blobVisibleRef.current[indexArrayKey] = !blobVisibleRef.current[indexArrayKey];
+    blobVisibleRef.current[indexArrayStr] = !blobVisibleRef.current[indexArrayStr];
     //Special case for Particles
     if (lastCompoundEntity) {
-      blobVisibleRef.current[indexArrayKey + ',0'] = !blobVisibleRef.current[indexArrayKey];
+      blobVisibleRef.current[indexArrayStr + ',0'] = !blobVisibleRef.current[indexArrayStr];
     }
   }
 
