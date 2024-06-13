@@ -728,24 +728,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         );
     }
 
-    // Should use entity instead of particle as per relations 
-    const handlePointerDown = (event) => {
-        event.stopPropagation();
-        const instanceId = event.instanceId;
-        if (instanceId !== undefined) {
-            const userData = flattenedParticleRefs.current[instanceId].current.userData;
-            const currentScale = userData.scale;
-            // Maybe we should have a function on the particle that allows for scaling
-            console.log("handlePointerDown", id, instanceId, userData, flattenedParticleRefs.current[instanceId].current);
-            if (currentScale && currentScale != 1) {
-                flattenedParticleRefs.current[instanceId].current.userData.scale = 1.0;
-            } else {
-                flattenedParticleRefs.current[instanceId].current.userData.scale = 2.0;
-            }
-            flattenedParticleRefs.current[instanceId].current.userData.color = 'pink';
-        }
-    };
-
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
@@ -800,11 +782,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
                 {scope === 0 && particleCount && (
                     <InstancedParticles
+                        id={`particles-${id}`}
                         ref={instancedMeshRef}
                         particleCount={particleCount}
                         flattenedParticleRefs={flattenedParticleRefs}
                         particleRadiusRef={particleRadiusRef}
-                        onClick={handlePointerDown}
                     />
                 )}
 

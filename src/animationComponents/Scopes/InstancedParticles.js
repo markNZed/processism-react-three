@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
-const InstancedParticles = React.forwardRef(({ particleCount, flattenedParticleRefs, particleRadiusRef, onClick }, ref) => {
+const InstancedParticles = React.forwardRef(({ id, particleCount, flattenedParticleRefs, particleRadiusRef }, ref) => {
     const instancedMeshRef = useRef();
 
     useFrame(() => {
@@ -78,11 +78,29 @@ const InstancedParticles = React.forwardRef(({ particleCount, flattenedParticleR
         }
     });
 
+    // Should use entity instead of particle as per relations 
+    const handlePointerDown = (event) => {
+        event.stopPropagation();
+        const instanceId = event.instanceId;
+        if (instanceId !== undefined) {
+            const userData = flattenedParticleRefs.current[instanceId].current.userData;
+            const currentScale = userData.scale;
+            // Maybe we should have a function on the particle that allows for scaling
+            console.log("handlePointerDown", id, instanceId, userData, flattenedParticleRefs.current[instanceId].current);
+            if (currentScale && currentScale != 1) {
+                flattenedParticleRefs.current[instanceId].current.userData.scale = 1.0;
+            } else {
+                flattenedParticleRefs.current[instanceId].current.userData.scale = 2.0;
+            }
+            flattenedParticleRefs.current[instanceId].current.userData.color = 'pink';
+        }
+    };
+
     return (
         <instancedMesh
             ref={instancedMeshRef}
             args={[null, null, particleCount]}
-            onClick={onClick}
+            onClick={handlePointerDown}
         >
             <circleGeometry args={[particleRadiusRef.current, 16]} />
             <meshStandardMaterial />
