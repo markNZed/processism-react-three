@@ -14,7 +14,7 @@ import Blob from './Blob';
 import DebugRender from './DebugRender';
 import useLimitedLog from '../../hooks/useLimitedLog';
 import useEntityRef from './useEntityRef';
-
+import useParticlesRegistration from './useParticlesRegistration';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -36,10 +36,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const getComponentRef = useStore((state) => state.getComponentRef);
     // Array of refs to entities (either CompoundEntity or Particles)
     const entityRefs = Array.from({ length: entityCount }, () => useRef());
-    // An array of entityCount length that stores the particle refs associated with each entity
-    const entityParticlesRefs = Array.from({ length: entityCount }, () => useRef([]));
-    // A simple array with all the refs
-    const flattenedParticleRefs = useRef();
     // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
     // Layout to avoid Particle overlap
@@ -60,18 +56,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
-    // All true when all entities have registered a ref
-    const entitiesRegisteredRef = useRef(false);
-    // All true when all Particles in all entities have registered a ref
-    // Note the particles are grouped by entity
-    const particlesRegisteredRef = useRef(Array.from({ length: entityCount }, () => false));
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
     // This is the array of joints to be added by this CompoundEntity
     const newJoints = useRef([]);
-    // Info about Particle at the deepest scope
-    const particleRadiusRef = useRef();
-    const particleCountRef = useRef();
-    const particleAreaRef = useRef();
     // Used for the Particles
     const instancedMeshRef = useRef();
     const chainRef = props.chainRef || useRef({});
@@ -85,16 +72,29 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
     // Any change to jointRefsRef needs to be made to particleJointsRef also
     const jointRefsRef = props.jointRefsRef || useRef({});
-    const logCountRef = useRef(0);  // Ref to track the number of logs
     const linesRef = useRef({});
     const relationsRef = useRef({});
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueIndex: id });
     const newLinesRef = useRef({});
-    const childGetEntityRefFnRef = useRef([]);
     const { world, rapier } = useRapier();
     const limitedLog = useLimitedLog(100); 
-    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef);
+    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefs);
+    const {
+        registerParticlesFn,
+        // An array of entityCount length that stores the particle refs associated with each entity
+        entityParticlesRefsRef,
+        // All true when all Particles in all entities have registered a ref
+        // All true when all entities have registered a ref
+        entitiesRegisteredRef,
+        // A simple array with all the refs
+        flattenedParticleRefs,
+        particleAreaRef,
+        particleRadiusRef,
+        areAllParticlesRegistered
+    } = useParticlesRegistration(props, index, scope, id, jointsData, config);
+    const particleCount = flattenedParticleRefs.current.length;
+
 
     ////////////////////////////////////////
     // Constants impacting particle behavior
@@ -104,7 +104,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const maxDisplacement = (config.maxDisplacementScaling || 1) * radius;
     const attractorScaling = config.attractorScaling[scope];
 
-    // Initialization logging/debug
+    // Logging/debug
     useEffect(() => {
         if (scope == 0) limitedLog("Mounting from scope 0", id);
         if (isDebug) {
@@ -112,32 +112,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         }
     }, []);
 
-    const areAllParticlesRegistered = () => {
-        return particlesRegisteredRef.current.every(ref => ref === true);
-    };
-
-    // Pass up the Particle refs from lower scope so we can find Particles for joints at the scope of this entity
-    // The particle radius gets passed up to calculate joint offsets
-    const registerParticlesFn = (entityIndex, particleRefs, particleRadius) => {
-        entityParticlesRefs[entityIndex].current = [...entityParticlesRefs[entityIndex].current, ...particleRefs];
-        particleRadiusRef.current = particleRadius;
-        particlesRegisteredRef.current[entityIndex] = true;
-        if (areAllParticlesRegistered() && !entitiesRegisteredRef.current) {
-            entitiesRegisteredRef.current = true;
-            flattenedParticleRefs.current = entityParticlesRefs.flatMap(refs => refs.current);
-            if (props.registerParticlesFn) {
-                props.registerParticlesFn(index, flattenedParticleRefs.current, particleRadius);
-            }
-            particleCountRef.current = flattenedParticleRefs.current.length;
-            particleAreaRef.current = calculateCircleArea(particleRadius);
-            if (scope == 0) {
-                console.log(`All particles (radius: ${particleRadiusRef.current}m) are registered`, id, flattenedParticleRefs.current.length, jointsData);
-            }
-        }
-    };
-
     // Map joints to Particles and align the joint with the initial Particle layout
-    const allocateJointsToParticles = (entityParticlesRefs, jointsData) => {
+    const allocateJointsToParticles = (entityParticlesRefsRef, jointsData) => {
         // Create a new Vector3 to store the world position of this CompoundEntity
         const worldPosition = new THREE.Vector3();
         internalRef.current.getWorldPosition(worldPosition);
@@ -146,14 +122,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
         const allocateJoints = jointsData.map((jointData, i) => {
 
-            function findClosestParticle(entityParticlesRefs, jointData, worldPosition, excludedEntityIndex) {
+            function findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, excludedEntityIndex) {
                 let minDistance = Infinity;
                 let closestParticleIndex = -1;
                 let closestParticlePosition = new THREE.Vector3();
                 let particleEntityIndex = -1;
                 let closestParticleRef;
 
-                entityParticlesRefs.forEach((entity, entityIndex) => {
+                entityParticlesRefsRef.current.forEach((entity, entityIndex) => {
                     if (entityIndex === excludedEntityIndex) return;
                     entity.current.forEach((particleRef, j) => {
                         const pos = particleRef.current.translation();
@@ -177,13 +153,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             }
 
             // Initial setup for A
-            const resultA = findClosestParticle(entityParticlesRefs, jointData, worldPosition, -1);
+            const resultA = findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, -1);
             const closestParticleAPosition = resultA.closestParticlePosition;
             const particleAEntityIndex = resultA.particleEntityIndex;
             const closestParticleARef = resultA.closestParticleRef;
 
             // Initial setup for B (excluding the entity of particle A)
-            const resultB = findClosestParticle(entityParticlesRefs, jointData, worldPosition, particleAEntityIndex);
+            const resultB = findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, particleAEntityIndex);
             const closestParticleBPosition = resultB.closestParticlePosition;
             const closestParticleBRef = resultB.closestParticleRef;
 
@@ -261,13 +237,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     directionToCenter.negate().normalize();
                     if (impulse.length() == 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current / entityRefs.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefs.length);
                     }
                     // If the entity gets too far from the center then pull it back toward the center
                     const overshoot = displacement.length() - maxDisplacement;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current / entityRefs.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefs.length);
                         impulse.multiplyScalar(overshoot * overshootScaling);
                     }
                     // Model attractor
@@ -339,7 +315,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // Could maintain a list of "detached" particles at the CompoundEntity level (can filter for center calc)
     // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
     //   What needs to change ? 
-    //     entityCount, entityRefs, entityParticlesRefs, flattenedParticleRefs, entityPositions, jointsData, 
+    //     entityCount, entityRefs, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
     //     entitiesRegisteredRef, particlesRegisteredRef, newJoints, particleJointsRef
     //   Zustand might be able to store refs when we useRef but not sure that has advantages
     //   Data structures that require remounting could be in Zustand
@@ -557,7 +533,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         scopeOuter[scope] = outer;
                         //if (outer && scope == 0) particleRef.current.userData.color = "black";
                     });
-                    newJoints.current = allocateJointsToParticles(entityParticlesRefs, jointsData);
+                    newJoints.current = allocateJointsToParticles(entityParticlesRefsRef, jointsData);
                     // Joints are at different CompoundEntity levels
                     // The joints from higher entities are not added to the array (need to init it from props I guess)
                     // We need a unique id for all the joints
@@ -596,7 +572,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     entityRefs.forEach((entity, i) => {
                         if (entity.current) {
                             // Add an impulse that is unique to each entity
-                            const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefs[i].current.length);
+                            const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefsRef.current[i].current.length);
                             entity.current.addImpulse(perEntityImpulse);
                         }
                     });
@@ -616,7 +592,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 const displacement = centerRef.current.clone();
                 displacement.sub(prevCenterRef.current);
                 const impulseDirection = displacement.normalize(); // keep moving in the direction of the displacement
-                impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCountRef.current);
+                impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount);
                 frameStateRef.current = "entityImpulses";
                 break;
             case "entityImpulses":
@@ -655,7 +631,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             const currentQuaternion = new THREE.Quaternion();
             const invisibleScale = new THREE.Vector3(0.001,0.001,0.001); // 0 does not work
 
-            for (let i = 0; i < particleCountRef.current; i++) {
+            for (let i = 0; i < particleCount; i++) {
                 const instanceMatrix = new THREE.Matrix4(); // a new instance to avoid transfer between iterations
                 // Get the current matrix of the instance
                 mesh.getMatrixAt(i, instanceMatrix);
@@ -689,6 +665,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 if (visible === false) {
                     currentScale.copy(invisibleScale);
                     matrixChanged = true;
+                } else {
+                    console.log("visible", id);
                 }
 
                 if (matrixChanged) {
@@ -927,10 +905,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     />
                 )}
 
-                {scope == 0 && particleCountRef.current && (
+                {scope == 0 && particleCount && (
                     <instancedMesh
                         ref={instancedMeshRef}
-                        args={[null, null, particleCountRef.current]}
+                        args={[null, null, particleCount]}
                         onClick={(e) => handlePointerDown(e)}
                     >
                         <circleGeometry args={[particleRadiusRef.current, 16]} />
@@ -1031,10 +1009,4 @@ const generateJointsData = (positions) => {
     return jointsData;
 };
 
-const calculateCircleArea = (radius) => {
-    if (radius <= 0) {
-        return "Radius must be a positive number.";
-    }
-    return Math.PI * Math.pow(radius, 2);
-};
 

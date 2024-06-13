@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-const useEntityRef = (props, index, indexArray, internalRef) => {
+const useEntityRef = (props, index, indexArray, internalRef, entityRefs) => {
     const childGetEntityRefFnRef = useRef([]);
 
     const getEntityRefFn = useCallback((path) => {

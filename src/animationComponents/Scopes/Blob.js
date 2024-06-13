@@ -5,7 +5,7 @@ import * as THREE from 'three';
 const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
-    const worldMatrixRef = useRef(new THREE.Matrix4());
+    const worldVector = new THREE.Vector3();
 
     // Helper function to recursively build the ordered list
     // Returns null if a chain is dangling
@@ -167,7 +167,6 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
 
         if (!ancestorVisible && blobVisibleRef.current[indexArrayStr]) {
 
-            const worldVector = new THREE.Vector3();
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
                 const pos = flattenedParticleRefs.current[flattenedIndex].current.translation();
