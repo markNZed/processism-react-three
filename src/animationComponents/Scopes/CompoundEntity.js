@@ -746,21 +746,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         }
     };
 
-    // This is only used in debug
-    const localJointPosition = (groupRef, particle, side) => {
-        const worldPosition = particle.ref.current.translation();
-        const xOffset = particle.offset.x;
-        const yOffset = particle.offset.y;
-        const zOffset = 0.4;
-        const worldVector = new THREE.Vector3(worldPosition.x, worldPosition.y, worldPosition.z);
-        const localVector = groupRef.current.worldToLocal(worldVector);
-        localVector.x += xOffset;
-        localVector.y += yOffset;
-        localVector.z += zOffset;
-        const result = [localVector.x, localVector.y, localVector.z];
-        return result
-    };
-
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
@@ -851,7 +836,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         newJoints={newJoints}
                         scope={scope}
                         index={index}
-                        localJointPosition={localJointPosition}
                         internalRef={internalRef}
                     />
                 )}
