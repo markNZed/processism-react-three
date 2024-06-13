@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, internalRef, color }) => {
+const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
     const worldMatrixRef = useRef(new THREE.Matrix4());
@@ -172,7 +172,7 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
                 const pos = flattenedParticleRefs.current[flattenedIndex].current.translation();
                 worldVector.set(pos.x, pos.y, pos.z);
-                positiion.copy(internalRef.current.worldToLocal(worldVector))
+                positiion.copy(worldToLocalFn(worldVector))
                 return positiion;
             });
 
@@ -180,8 +180,6 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
             blobRef.current.geometry.dispose();
             blobRef.current.geometry = geometry;
             blobRef.current.visible = blobVisibleRef.current[indexArrayStr];
-
-            if (scope == 0) console.log("blobRef", blobRef)
 
         } else {
             blobRef.current.visible = false;

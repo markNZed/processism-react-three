@@ -958,7 +958,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         flattenedParticleRefs={flattenedParticleRefs}
                         chainRef={chainRef}
                         lastCompoundEntity={lastCompoundEntity}
-                        internalRef={internalRef}
+                        worldToLocalFn={internalRef.current.worldToLocal}
                         color={color}
                     />
                 )}
