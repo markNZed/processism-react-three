@@ -627,23 +627,27 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                             particleJointsRef.current[bIndex] = [jointIndex]
                         }
                     });
-                    if (config.initialImpulse) {
-                        const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
-                            (Math.random() - 0.5) * impulsePerParticle,
-                            (Math.random() - 0.5) * impulsePerParticle,
-                            0
-                        ));
-                        entityRefs.forEach((entity, i) => {
-                            if (entity.current) {
-                                // Add an impulse that is unique to each entity
-                                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefs[i].current.length);
-                                entity.current.addImpulse(perEntityImpulse);
-                            }
-                        });
-                    }
                     setApplyInitialImpulse(false);
-                    frameStateRef.current = "findCenter";
+                    frameStateRef.current = "initialImpulse";
                 }
+                break;
+            case "initialImpulse":
+                //return // Uncomment to stop before impulses
+                if (config.initialImpulse) {
+                    const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
+                        (Math.random() - 0.5) * impulsePerParticle,
+                        (Math.random() - 0.5) * impulsePerParticle,
+                        0
+                    ));
+                    entityRefs.forEach((entity, i) => {
+                        if (entity.current) {
+                            // Add an impulse that is unique to each entity
+                            const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefs[i].current.length);
+                            entity.current.addImpulse(perEntityImpulse);
+                        }
+                    });
+                }
+                frameStateRef.current = "findCenter";
                 break;
             case "findCenter":
                 prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
@@ -684,7 +688,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // The Particle contains the associated rigid body with the physics information.
     // The particle positions (etc.) are collated here to update all the instances at once.
     useFrame(() => {
-        if (scope === 0 && instancedMeshRef.current && frameStateRef.current !== "init") {
+        if (scope === 0 && instancedMeshRef.current && areAllParticlesRegistered()) {
             const mesh = instancedMeshRef.current;
 
             const userColor = new THREE.Color();
@@ -695,7 +699,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             const currentPos = new THREE.Vector3();
             const currentScale = new THREE.Vector3();
             const currentQuaternion = new THREE.Quaternion();
-            const emptyMatrix = new THREE.Matrix4();
+            const invisibleScale = new THREE.Vector3(0.001,0.001,0.001);
 
             for (let i = 0; i < particleCountRef.current; i++) {
                 const instanceMatrix = new THREE.Matrix4(); // a new instance to avoid transfer between iterations
@@ -720,16 +724,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     matrixChanged = true;
                 }
 
-                if (matrixChanged) {
-                    instanceMatrix.compose(currentPos, currentQuaternion, currentScale);
-                    mesh.setMatrixAt(i, instanceMatrix);
+                // Compare and update the scale if necessary
+                if (!currentScale.equals(userScale)) {
+                    currentScale.copy(userScale);
+                    matrixChanged = true;
                 }
 
                 // Get the visibility from userData
                 const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
                 if (visible === false) {
-                    mesh.setMatrixAt(i, emptyMatrix);
+                    currentScale.copy(invisibleScale);
                     matrixChanged = true;
+                }
+
+                if (matrixChanged) {
+                    instanceMatrix.compose(currentPos, currentQuaternion, currentScale);
+                    mesh.setMatrixAt(i, instanceMatrix);
                 }
 
                 // Update the color only if it has changed beyond the tolerance threshold
@@ -988,7 +998,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     id={`${id}.mounting`}
                     initialState={{
                         radius: 0,
-                        color: color,
                         opacity: 0,
                     }}
                 />
