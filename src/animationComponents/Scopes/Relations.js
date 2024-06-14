@@ -2,12 +2,14 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-function Relations({ internalRef, relationsRef, linesRef, newLinesRef, config, scope }) {
+function Relations({ internalRef, relationsRef, config, scope }) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
     const lineWidth = (config.entityCounts.length - scope);
     const material = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: lineWidth });
     const [linesUpdate, setLinesUpdate] = useState(0);
+    const linesRef = useRef({});
+    const newLinesRef = useRef({});
 
     useFrame(() => {
         let update = false;

@@ -2,10 +2,12 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color, jointScopeRef }) => {
+const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color, jointScopeRef }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
+    const blobRef = useRef()
+    const blobData = useRef()
 
     // Helper function to recursively build the ordered list
     // Returns null if a chain is dangling
@@ -78,6 +80,8 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
             const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
             // Avoid duplicating joints
             if (!jointIndexes.includes(midIndex)) {
+                if (scope == 0) console.log("indexes[jointIndexes[i - 1]]", indexes[jointIndexes[i - 1]])
+                //middleIndexes.push(indexes[jointIndexes[i - 1]]);
                 middleIndexes.push(indexes[midIndex]);
             }
         }
@@ -87,6 +91,7 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
         const indexesLength = indexes.length;
         const distance = (indexesLength - lastJoint + firstJoint);
         const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
+        //middleIndexes.push(indexes[lastJoint]);
         middleIndexes.push(indexes[middle]);
         return middleIndexes;
     }
@@ -128,7 +133,8 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
         } else {
             const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
             if (!orderedIndexes.length) console.error("orderedIndexes is empty!", id);
-            blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
+            //blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
+            blobIndexes = orderedIndexes;
         }
 
         for (let i = 0; i < blobIndexes.length; ++i) {

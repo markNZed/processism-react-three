@@ -57,8 +57,8 @@ const useImpulses = (
 
     const applyInitialImpulses = (flattenedParticleRefs) => {
         const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, () => new THREE.Vector3(
-            (Math.random() - 0.5) * impulsePerParticle,
-            (Math.random() - 0.5) * impulsePerParticle,
+            (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
+            (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
             0
         ));
         entityRefsArray.forEach((entity, i) => {

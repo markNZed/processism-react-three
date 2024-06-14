@@ -57,27 +57,26 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     const frameStateRef = useRef("init");
     const initialPositionVector = new THREE.Vector3(...initialPosition);
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
-    // This is the array of joints to be added by this CompoundEntity
+    // This is the array of joints added by this CompoundEntity
     const newJoints = useRef([]);
-    // Used for the Particles
-    const instancedMeshRef = useRef();
+    // Key is uniqueIndex of the particle. Value is array of linked (through joints) uniqueIndex 
+    //Sould be moved into ZuStand
     const chainRef = props.chainRef || useRef({});
-    const blobRef = useRef()
-    const blobData = useRef()
+    //Sould be moved into ZuStand
     const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
 
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
+    //Sould be moved into ZuStand
     const particleJointsRef = props.particleJointsRef || useRef({});
     const jointScopeRef = props.jointScopeRef || useRef({});
     // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
     // Any change to jointRefsRef needs to be made to particleJointsRef also
     const jointRefsRef = props.jointRefsRef || useRef({});
-    const linesRef = useRef({});
+
     const relationsRef = useRef({});
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueIndex: id });
-    const newLinesRef = useRef({});
     const limitedLog = useLimitedLog(100); 
 
     // Logging/debug
@@ -86,9 +85,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     }, []);
 
     // Use the custom hook for creating random relations
+    // Maybe rename to useAnimateRelations (useImpulse could be broken out into useAnimateImpulses)
     useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray);
 
-    // Distribute within the perimeter
+    // Distribute entities within the perimeter
     const generateEntityPositions = (radius, count) => {
         const positions = []
         const angleStep = (2 * Math.PI) / count
@@ -101,28 +101,33 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
         return positions
     }
 
-    // Layout to avoid Particle overlap
+    // Layout to avoid Particle overlap (which can cause extreme forces in Rapier)
     const entityPositions = useMemo(() => {
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
 
     const index = scope ? indexArray[scope - 1] : 0;
 
+    //Sould be moved into ZuStand ?
     const {
         registerParticlesFn,
         // An array of entityCount length that stores the particle refs associated with each entity
+        //Sould be moved into ZuStand
         entityParticlesRefsRef,
         // All true when all entities have registered a ref
         entitiesRegisteredRef,
         // A simple array with all the refs
         flattenedParticleRefs,
         particleCount,
+        //Sould be moved into ZuStand
         particleAreaRef,
+        //Sould be moved into ZuStand
         particleRadiusRef,
         areAllParticlesRegistered
     } = useParticlesRegistration(props, index, scope, id, config);
 
-    // Order of args is not good with such large numbres of args
+    // Relying on order of args is not good with such large numbres of args
+    //Sould be moved into ZuStand for particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef,
     const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
@@ -164,6 +169,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                     frameStateRef.current = "initialImpulse";
                 }
                 break;
+            // Should move this into useImpulses
             case "initialImpulse":
                 if (config.initialImpulse) {
                     applyInitialImpulses(flattenedParticleRefs);
@@ -173,11 +179,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
             case "findCenter":
                 prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = calculateCenter();
+                // could use ZuStand to avoid needing extensions to group e.g. setCenter
+                // Could also manage the impulses through ZuStand
                 internalRef.current.setCenter(centerRef.current);
                 if (centerRef.current && prevCenterRef.current) {
                     frameStateRef.current = "calcEntityImpulses";
                 }
                 break;
+            // Should move this into useImpulses
             case "calcEntityImpulses":
                 // Could calculate velocity and direction here
                 calculateImpulses(centerRef, prevCenterRef);
@@ -230,8 +239,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                 {frameStateRef.current !== "init" && (
                     <Blob
                         id={`blob-${id}`}
-                        blobRef={blobRef}
-                        blobData={blobData}
                         blobVisibleRef={blobVisibleRef}
                         indexArray={indexArray}
                         scope={scope}
@@ -247,8 +254,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                 {scope === 0 && particleCount && (
                     <InstancedParticles
                         id={`particles-${id}`}
-                        ref={instancedMeshRef}
-                        particleCount={particleCount}
                         flattenedParticleRefs={flattenedParticleRefs}
                         particleRadiusRef={particleRadiusRef}
                     />
@@ -258,8 +263,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                     <Relations
                         internalRef={internalRef}
                         relationsRef={relationsRef}
-                        linesRef={linesRef}
-                        newLinesRef={newLinesRef}
                         config={config}
                         scope={scope}
                     />

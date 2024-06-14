@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
-const InstancedParticles = React.forwardRef(({ id, particleCount, flattenedParticleRefs, particleRadiusRef }, ref) => {
+const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs, particleRadiusRef }, ref) => {
     const instancedMeshRef = useRef();
 
     useFrame(() => {
@@ -18,7 +18,7 @@ const InstancedParticles = React.forwardRef(({ id, particleCount, flattenedParti
             const currentQuaternion = new THREE.Quaternion();
             const invisibleScale = new THREE.Vector3(0.001, 0.001, 0.001);
 
-            for (let i = 0; i < particleCount; i++) {
+            for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
                 const instanceMatrix = new THREE.Matrix4();
                 mesh.getMatrixAt(i, instanceMatrix);
                 instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
@@ -99,7 +99,7 @@ const InstancedParticles = React.forwardRef(({ id, particleCount, flattenedParti
     return (
         <instancedMesh
             ref={instancedMeshRef}
-            args={[null, null, particleCount]}
+            args={[null, null, flattenedParticleRefs.current.length]}
             onClick={handlePointerDown}
         >
             <circleGeometry args={[particleRadiusRef.current, 16]} />

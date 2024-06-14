@@ -236,7 +236,7 @@ const useJoints = (
             }
             let outer = distanceToCenter >= (distanceToFirstJoint);
             particleRef.current.userData.scopeOuter[scope] = outer;
-            if (scope == 1 && outer) particleRef.current.userData.color = "black";
+            //if (scope == 1 && outer) particleRef.current.userData.color = "black";
         });
 
         return newJoints;
