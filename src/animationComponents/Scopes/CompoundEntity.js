@@ -18,6 +18,7 @@ import InstancedParticles from './InstancedParticles';
 import Relations from './Relations';
 import useRandomRelations from './useRandomRelations';
 import { useJoints } from './useJoints';
+import { useImpulses } from './useImpulses';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -41,17 +42,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const entityRefsRef = useRef(Array.from({ length: entityCount }, () => useRef()));
     // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
-    // Joints aligned based on entityPositions
-    // An impulse to get some random behavior at the beginning
-    const [applyInitialImpulse, setApplyInitialImpulse] = useState(true);
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
     const prevCenterRef = useRef();
     // State machine that distributes computation across frames
     const frameStateRef = useRef("init");
     const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
-    // Impulse that will be applied to Particles of this CompoundEntity
-    const impulseRef = useRef();
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
     // This is the array of joints to be added by this CompoundEntity
     const newJoints = useRef([]);
@@ -75,14 +71,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const newLinesRef = useRef({});
     const limitedLog = useLimitedLog(100); 
     const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefsRef);
-
-    ////////////////////////////////////////
-    // Constants impacting particle behavior
-    ////////////////////////////////////////
-    const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
-    const overshootScaling = config.overshootScaling || 1;
-    const maxDisplacement = (config.maxDisplacementScaling || 1) * radius;
-    const attractorScaling = config.attractorScaling[scope];
 
     // Logging/debug
     useEffect(() => {
@@ -128,6 +116,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, entityRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
+    const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
+        internalRef,
+        entitiesRegisteredRef,
+        entityRefsRef,
+        particleAreaRef,
+        particleCount,
+        config,
+        scope,
+    );
+
     // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
     const calculateCenter = () => {
         const center = new THREE.Vector3();
@@ -147,83 +145,21 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         return center;
     };
 
-    // Distribute impulses to each entity
-    const entityImpulses = (center, impulseIn) => {
-        const impulse = impulseIn.clone();
-        impulse.multiplyScalar(1 / entityRefsRef.current.length);
-        entityRefsRef.current.forEach((entity, i) => {
-            if (entity.current) {
-                const entityCenter = entity.current.getCenter();
-                if (entityCenter) {
-                    const displacement = entityCenter.clone()
-                    displacement.sub(center);
-                    const directionToCenter = displacement.clone();
-                    directionToCenter.negate().normalize();
-                    if (impulse.length() == 0) {
-                        impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsRef.current.length);
-                    }
-                    // If the entity gets too far from the center then pull it back toward the center
-                    const overshoot = displacement.length() - maxDisplacement;
-                    if (overshoot > 0) {
-                        impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsRef.current.length);
-                        impulse.multiplyScalar(overshoot * overshootScaling);
-                    }
-                    // Model attractor
-                    if (attractorScaling) {
-                        const directionToCenter = attractorScaling > 0 ? displacement.negate().normalize() : displacement.normalize();
-                        directionToCenter.multiplyScalar(impulse.length() * Math.abs(attractorScaling));
-                        impulse.add(directionToCenter);
-                    }
-                    entity.current.addImpulse(impulse);
-                }
-            }
-        });
-    };
-
-    useFrame(() => {
-        // Transfer the CompoundEntity's impulse to entities
-        if (entitiesRegisteredRef.current === true) {
-            const impulse = internalRef.current.getImpulse();
-            if (impulse.length() > 0) {
-                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsRef.current.length);
-                entityRefsRef.current.forEach((entity) => {
-                    entity.current.addImpulse(perEntityImpulse);
-                });
-                internalRef.current.setImpulse(ZERO_VECTOR);
-            }
-        }
-    });
-
     useFrame(() => {
         // State machine allows for computation to be distributed across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
-                if (applyInitialImpulse && areAllParticlesRegistered()) {
+                if (areAllParticlesRegistered()) {
                     newJoints.current = initializeJoints(flattenedParticleRefs, initialPosition);
-                    setApplyInitialImpulse(false);
                     frameStateRef.current = "initialImpulse";
                 }
                 break;
             case "initialImpulse":
-                //return // Uncomment to stop before impulses
                 if (config.initialImpulse) {
-                    const initialImpulseVectors = Array.from({ length: entityCount }, () => new THREE.Vector3(
-                        (Math.random() - 0.5) * impulsePerParticle,
-                        (Math.random() - 0.5) * impulsePerParticle,
-                        0
-                    ));
-                    entityRefsRef.current.forEach((entity, i) => {
-                        if (entity.current) {
-                            // Add an impulse that is unique to each entity
-                            const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefsRef.current[i].current.length);
-                            entity.current.addImpulse(perEntityImpulse);
-                        }
-                    });
+                    applyInitialImpulses(entityRefsRef, flattenedParticleRefs);
                 }
                 frameStateRef.current = "findCenter";
-                break;
+                break
             case "findCenter":
                 prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = calculateCenter();
@@ -234,11 +170,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 break;
             case "calcEntityImpulses":
                 // Could calculate velocity and direction here
-                const displacement = centerRef.current.clone();
-                displacement.sub(prevCenterRef.current);
-                const impulseDirection = displacement.normalize(); // keep moving in the direction of the displacement
-                impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount);
-                frameStateRef.current = "entityImpulses";
+                calculateImpulses(centerRef, prevCenterRef);
                 break;
             case "entityImpulses":
                 entityImpulses(prevCenterRef.current, impulseRef.current);
@@ -246,15 +178,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 break;
             default:
                 break;
-        }
-
-        if (isDebug) {
-            const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
-            if (circleCenterRef && circleCenterRef.current && internalRef.current && centerRef.current) {
-                // Convert the centerRef.current to the local space of the entity
-                const localCenter = internalRef.current.worldToLocal(centerRef.current.clone());
-                circleCenterRef.current.position.copy(localCenter);
-            }
         }
 
     });
@@ -341,19 +264,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     }}
                 />
 
-                {isDebug && (
-                    <DebugRender
-                        id={id}
-                        radius={radius}
-                        color={color}
-                        initialPosition={initialPosition}
-                        jointsData={jointsData}
-                        newJoints={newJoints}
-                        scope={scope}
-                        index={index}
-                        internalRef={internalRef}
-                    />
-                )}
+                <DebugRender
+                    id={id}
+                    radius={radius}
+                    color={color}
+                    initialPosition={initialPosition}
+                    jointsData={jointsData}
+                    newJoints={newJoints}
+                    scope={scope}
+                    index={index}
+                    internalRef={internalRef}
+                    isDebug={isDebug}
+                    centerRef={centerRef}
+                />
 
             </CompoundEntityGroup>
 
