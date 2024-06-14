@@ -16,6 +16,8 @@ import useLimitedLog from '../../hooks/useLimitedLog';
 import useEntityRef from './useEntityRef';
 import useParticlesRegistration from './useParticlesRegistration';
 import InstancedParticles from './InstancedParticles';
+import Relations from './Relations';
+import useRandomRelations from './useRandomRelations';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -111,6 +113,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             //console.log("jointsData", id, jointsData);
         }
     }, []);
+
+    // Use the custom hook for creating random relations
+    useRandomRelations(config, frameStateRef, entityCount, entityRefs, getEntityRefFn, relationsRef, indexArray);
 
     // Map joints to Particles and align the joint with the initial Particle layout
     const allocateJointsToParticles = (entityParticlesRefsRef, jointsData) => {
@@ -419,78 +424,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         }
     }, []);
 
-    // Create relations between entities at a random time interval
-    useEffect(() => {
-        // Generate a random number between 1000 and 10000 which determines the duration of relations
-        const randomDuration = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
-        const interval = setInterval(() => {
-            if (config.showRelations && frameStateRef.current !== "init") {
-                const relationCount = Math.ceil(entityCount * 0.2)
-                let relationFound = 0;
-                const allKeys = Object.keys(relationsRef.current);
-                // Randomly delete keys so we remove relations (and create space for new ones)
-                allKeys.forEach(key => {
-                    if (Math.random() < 0.25) {
-                        delete relationsRef.current[key];
-                    }
-                });
-                // Update relationFound after removing relations
-                relationFound = Object.keys(relationsRef.current).length;
-                while (relationFound < relationCount) {
-
-                    // Randomly select an entity from this CompoundEntity
-                    const randomIndexFrom = Math.floor(Math.random() * entityCount);
-                    const entityRefFrom = entityRefs[randomIndexFrom];
-                    const userDataFrom = entityRefFrom.current.getUserData() || {};
-                    const fromId = userDataFrom.uniqueIndex;
-
-                    // Randomly select an entity which entityRefFrom will go to
-                    let entityRefTo;
-                    // Some of the time we want to select an entity outside of this CompoundEntity
-                    if (Math.random() < 0.2) {
-                        let randomPath = [];
-                        for (let i = 0; i < config.entityCounts.length; i++) {
-                            const max = config.entityCounts[i];
-                            // Bias to chose entities that are close to this CompoundEntity
-                            if (Math.random() < 0.9) {
-                                if (indexArray[i]) {
-                                    randomPath.push(indexArray[i]);
-                                    continue;
-                                }
-                                break;
-                            }
-                            const randomIndex = Math.floor(Math.random() * max);
-                            randomPath.push(randomIndex);
-                        }
-                        // getEntityRefFn will walk the CompoundEntity tree to find the entityRef 
-                        entityRefTo = getEntityRefFn(randomPath)
-                        // Most of the time we want to select an entity inside this CompoundEntity
-                    } else {
-                        let randomIndexTo = Math.floor(Math.random() * entityCount);
-                        entityRefTo = entityRefs[randomIndexTo];
-                    }
-
-                    const userDataTo = entityRefTo.current.getUserData() || {};
-                    const toId = userDataTo.uniqueIndex;
-
-                    // Avoid selecting the same entity for from and to 
-                    if (fromId == toId) continue;
-
-                    const randomIndexFromRelations = userDataFrom.relations || [];
-                    entityRefFrom.current.setUserData({ ...userDataFrom, relations: [...randomIndexFromRelations, entityRefTo] });
-
-                    if (!relationsRef.current[fromId]) relationsRef.current[fromId] = {};
-                    relationsRef.current[fromId][toId] = [entityRefFrom, entityRefTo];
-
-                    relationFound++
-                }
-            }
-        }, randomDuration);
-        return () => {
-            clearInterval(interval); // Cleanup interval on component unmount
-        }
-    }, [config.showRelations]);
-
     useFrame(() => {
         // Transfer the CompoundEntity's impulse to entities
         if (entitiesRegisteredRef.current === true) {
@@ -614,120 +547,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     });
 
-    function Relations({ internalRef, relationsRef, linesRef, newLinesRef }) {
-
-        const segmentIndexRef = useRef({}); // Keeps track of the current segment index
-        const numPoints = 12;
-        const lineWidth = (config.entityCounts.length - scope)
-        const material = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: lineWidth });
-        const [linesUpdate, setLinesUpdate] = useState(0);
-
-        useFrame(() => {
-            let update = false;
-            // Create new lines (only if relation is new)
-            Object.keys(relationsRef.current).forEach(fromId => {
-                Object.keys(relationsRef.current[fromId]).forEach(toId => {
-                    if (linesRef.current[fromId] && linesRef.current[fromId][toId]) return;
-                    const geometry = new THREE.BufferGeometry();
-                    const positions = new Float32Array(numPoints * 3);
-                    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                    const line = new THREE.Line(geometry, material);
-                    if (!linesRef.current[fromId]) linesRef.current[fromId] = {};
-                    linesRef.current[fromId][toId] = { ref: React.createRef(), line };
-                    newLinesRef.current[`${fromId}-${toId}`] = true;
-                    update = true;
-                });
-            });
-
-            if (update) setLinesUpdate(prev => prev + 1);
-
-            Object.keys(linesRef.current).forEach(fromId => {
-                Object.keys(linesRef.current[fromId]).forEach(toId => {
-                    // Remove lineRef for relations that no longer exist
-                    if (!relationsRef.current[fromId]) {
-                        delete linesRef.current[fromId];
-                        return;
-                    } else if (!relationsRef.current[fromId][toId]) {
-                        delete linesRef.current[fromId][toId];
-                        return;
-                    }
-                    const { ref, line } = linesRef.current[fromId][toId];
-                    if (ref.current) {
-                        const startPoint = internalRef.current.worldToLocal(relationsRef.current[fromId][toId][0].current.getCenter());
-                        const endPoint = internalRef.current.worldToLocal(relationsRef.current[fromId][toId][1].current.getCenter());
-                        const start = new THREE.Vector3(startPoint.x, startPoint.y, startPoint.z);
-                        const end = new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z);
-                        const distance = start.distanceTo(end);
-                        const curveAmount = distance * 0.5;
-                        const mid = new THREE.Vector3(
-                            (start.x + end.x) / 2 + curveAmount * 0.2,
-                            (start.y + end.y) / 2 + curveAmount * 0.2,
-                            (start.z + end.z) / 2 + curveAmount,
-                        );
-
-                        const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-                        const points = curve.getPoints(numPoints - 1); // This return one more point than numPoints - number of segments ?
-                        const positions = line.geometry.attributes.position.array;
-
-                        if (!segmentIndexRef.current[`${fromId}-${toId}`]) {
-                            segmentIndexRef.current[`${fromId}-${toId}`] = 1
-                        }
-
-                        if (newLinesRef.current[`${fromId}-${toId}`]) {
-                            if (segmentIndexRef.current[`${fromId}-${toId}`] == numPoints) {
-                                delete newLinesRef.current[`${fromId}-${toId}`]
-                            }
-                        } else {
-                            segmentIndexRef.current[`${fromId}-${toId}`] = numPoints;
-                        }
-
-                        // Determine the number of segments to reveal
-                        const segmentCount = Math.min(numPoints, segmentIndexRef.current[`${fromId}-${toId}`]);
-
-                        // segmentCount is initialized to 1 so we get a first segment
-                        for (let j = 0; j < segmentCount; j++) {
-                            positions[j * 3] = points[j].x;
-                            positions[j * 3 + 1] = points[j].y;
-                            positions[j * 3 + 2] = points[j].z;
-                        }
-
-                        if (segmentCount < numPoints) {
-                            // Set remaining positions to the last revealed point
-                            const lastVisiblePoint = points[segmentCount - 1];
-                            for (let j = segmentCount; j < numPoints; j++) {
-                                positions[j * 3] = lastVisiblePoint.x;
-                                positions[j * 3 + 1] = lastVisiblePoint.y;
-                                positions[j * 3 + 2] = lastVisiblePoint.z;
-                            }
-                        }
-
-                        line.geometry.attributes.position.needsUpdate = true;
-
-                        // Increment the segment index for the next frame
-                        segmentIndexRef.current[`${fromId}-${toId}`] = Math.min(segmentIndexRef.current[`${fromId}-${toId}`] + 1, numPoints);
-                    }
-                });
-            });
-        });
-
-        return (
-            <>
-                {linesRef.current && (
-                    <group>
-                        {Object.keys(linesRef.current).map(fromId =>
-                            Object.keys(linesRef.current[fromId]).map((toId) => {
-                                const { ref, line } = linesRef.current[fromId][toId];
-                                return (
-                                    <primitive key={`${linesUpdate}-${fromId}-${toId}`} object={line} ref={ref} />
-                                );
-                            })
-                        )}
-                    </group>
-                )}
-            </>
-        );
-    }
-
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
@@ -796,6 +615,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         relationsRef={relationsRef}
                         linesRef={linesRef}
                         newLinesRef={newLinesRef}
+                        config={config}
+                        scope={scope}
                     />
                 )}
 
