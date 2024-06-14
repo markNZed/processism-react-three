@@ -13,7 +13,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, in
     useImperativeHandle(ref, () => internalRef.current);
 
     const isDebug = props.debug || config.debug;
-    const color = useMemo(() => getColor(config, scope, props.color || "blue"));
+    const configColor = config.colors[scope];
+    const color = useMemo(() => getColor(configColor, props.color));
     const [colliderRadius, setColliderRadius] = useState(radius);
     const registeredRef = useRef(false);
     const [initialize, setInitialize] = useState(true);

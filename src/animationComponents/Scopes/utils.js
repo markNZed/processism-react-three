@@ -7,8 +7,7 @@
  * @param {*} defaultValue - A default value to return if the specific setting is not found.
  * @returns {*} - The color setting from the configuration or the default return value.
  */
-export const getColor = (config, scope, defaultValue) => {
-    const colorConfig = config.colors[scope];
+export const getColor = (colorConfig, defaultValue) => {
     if (colorConfig === null || colorConfig === undefined) {
         return defaultValue;
     }

@@ -2,7 +2,7 @@ import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 
-export const useJoints = (
+const useJoints = (
     particleJointsRef,
     jointRefsRef,
     entityRefsArray,
@@ -340,3 +340,5 @@ export const useJoints = (
         initializeJoints,
     };
 };
+
+export default useJoints;

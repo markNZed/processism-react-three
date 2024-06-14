@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
-export const useImpulses = (
+const useImpulses = (
     id,
     internalRef,
     entitiesRegisteredRef,
@@ -84,3 +84,5 @@ export const useImpulses = (
 
     return { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses };
 };
+
+export default useImpulses;

@@ -5,20 +5,20 @@ import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
 import _ from 'lodash';
-import Particle from './Particle';
 import { getColor } from './utils';
+import Particle from './Particle';
+import InstancedParticles from './InstancedParticles';
 import Joint from './Joint'
 import Blob from './Blob';
-import DebugRender from './DebugRender';
+import Relations from './Relations';
 import useLimitedLog from '../../hooks/useLimitedLog';
 import useEntityRef from './useEntityRef';
 import useParticlesRegistration from './useParticlesRegistration';
-import InstancedParticles from './InstancedParticles';
-import Relations from './Relations';
 import useRandomRelations from './useRandomRelations';
-import { useJoints } from './useJoints';
-import { useImpulses } from './useImpulses';
+import useJoints from './useJoints';
+import useImpulses from './useImpulses';
 import useEntityStore from './useEntityStore';
+import DebugRender from './DebugRender';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = [], initialPosition = [0, 0, 0], scope = 0, radius, config, ...props }, ref) => {
 
@@ -30,9 +30,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     const entityCount = config.entityCounts[scope];
     // Store the color in a a state so it si consistent across renders, setColor is not used
-    const color = useMemo(() => getColor(config, scope, props.color || "blue"), [config, scope, props.color]);
-    const lastCompoundEntity = (scope == config.entityCounts.length - 1);
+    const configColor = config.colors[scope];
+    const color = useMemo(() => getColor(configColor, props.color), [configColor, props.color]);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
+    const lastCompoundEntity = (scope == config.entityCounts.length - 1);
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;
 
     // Array of refs to entities (either CompoundEntity or Particles)
@@ -56,7 +57,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const prevCenterRef = useRef();
     // State machine that distributes computation across frames
     const frameStateRef = useRef("init");
-    const initialPositionVector = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
+    const initialPositionVector = new THREE.Vector3(...initialPosition);
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
     // This is the array of joints to be added by this CompoundEntity
     const newJoints = useRef([]);
@@ -89,7 +90,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // Use the custom hook for creating random relations
     useRandomRelations(config, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef, indexArray);
 
-    // Distribute evenly around the perimeter
+    // Distribute within the perimeter
     const generateEntityPositions = (radius, count) => {
         const positions = []
         const angleStep = (2 * Math.PI) / count
@@ -111,17 +112,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         registerParticlesFn,
         // An array of entityCount length that stores the particle refs associated with each entity
         entityParticlesRefsRef,
-        // All true when all Particles in all entities have registered a ref
         // All true when all entities have registered a ref
         entitiesRegisteredRef,
         // A simple array with all the refs
         flattenedParticleRefs,
+        particleCount,
         particleAreaRef,
         particleRadiusRef,
         areAllParticlesRegistered
     } = useParticlesRegistration(props, index, scope, id, config);
-
-    const particleCount = useMemo(() => flattenedParticleRefs?.current?.length, [flattenedParticleRefs.current]);
 
     const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, entityRefsArray, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
@@ -211,7 +210,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}
-                        userData={{ color }}
                         blobVisibleRef={blobVisibleRef}
                         particleJointsRef={particleJointsRef}
                         jointRefsRef={jointRefsRef}

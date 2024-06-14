@@ -37,8 +37,8 @@ const Scopes = React.forwardRef((props, ref) => {
     const [controlsConfig, setControlsConfig] = useState({
         scopeCount: { value: 3, step: 1, },
         radius: { value: props.radius || 10, min: 1, max: 20 },
-        impulsePerParticle: { value: 5, min: 0.001, max: 10, step: 0.001, label: "Impulse per Particle" },
-        overshootScaling: { value: 5, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
+        impulsePerParticle: { value: 1.5, min: 0.001, max: 10, step: 0.001, label: "Impulse per Particle" },
+        overshootScaling: { value: 2, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
         attractorScaling: { value: [0, -0.8, -0.1], label: "Attractor Scaling" },

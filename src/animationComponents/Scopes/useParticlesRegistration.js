@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { calculateCircleArea } from './utils';
 
 const useParticlesRegistration = (props, index, scope, id, config) => {
@@ -8,6 +8,8 @@ const useParticlesRegistration = (props, index, scope, id, config) => {
     const flattenedParticleRefs = useRef();
     const particleAreaRef = useRef();
     const particleRadiusRef = useRef();
+    const [particleCount, setParticleCount] = useState()
+
 
     const areAllParticlesRegistered = useCallback(() => {
         return particlesRegisteredRef.current.every(ref => ref === true);
@@ -22,6 +24,8 @@ const useParticlesRegistration = (props, index, scope, id, config) => {
             entitiesRegisteredRef.current = true;
             flattenedParticleRefs.current = entityParticlesRefsRef.current.flatMap(refs => refs.current);
 
+            setParticleCount(flattenedParticleRefs.current.length);
+
             if (props.registerParticlesFn) {
                 props.registerParticlesFn(index, flattenedParticleRefs.current, particleRadius);
             }
@@ -34,7 +38,7 @@ const useParticlesRegistration = (props, index, scope, id, config) => {
         }
     }, [areAllParticlesRegistered, props, index, scope, id]);
 
-    return { registerParticlesFn, entityParticlesRefsRef, entitiesRegisteredRef, flattenedParticleRefs, particleAreaRef, particleRadiusRef, areAllParticlesRegistered };
+    return { registerParticlesFn, entityParticlesRefsRef, entitiesRegisteredRef, flattenedParticleRefs, particleCount, particleAreaRef, particleRadiusRef, areAllParticlesRegistered };
 };
 
 export default useParticlesRegistration;
