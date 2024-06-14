@@ -69,6 +69,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
     const particleJointsRef = props.particleJointsRef || useRef({});
+    const jointScopeRef = props.jointScopeRef || useRef({});
     // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
     // Any change to jointRefsRef needs to be made to particleJointsRef also
     const jointRefsRef = props.jointRefsRef || useRef({});
@@ -121,7 +122,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
         areAllParticlesRegistered
     } = useParticlesRegistration(props, index, scope, id, config);
 
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
+    // Order of args is not good with such large numbres of args
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -210,6 +212,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                         config={config}
                         blobVisibleRef={blobVisibleRef}
                         particleJointsRef={particleJointsRef}
+                        jointScopeRef={jointScopeRef}
                         jointRefsRef={jointRefsRef}
                         chainRef={chainRef}
                     />
@@ -237,6 +240,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                         lastCompoundEntity={lastCompoundEntity}
                         worldToLocalFn={internalRef.current.worldToLocal}
                         color={color}
+                        jointScopeRef={jointScopeRef}
                     />
                 )}
 

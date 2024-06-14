@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color }) => {
+const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color, jointScopeRef }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
@@ -25,9 +25,9 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
         }
         const linkedIndexes = chainRef.current[uniqueIndex];
         let foundJoint = false
+        // Joints have more than 2 links
         if (linkedIndexes.length > 2) {
             for (let i = 0; i < linkedIndexes.length; i++) {
-                // Joints have more than 2 links
                 if (chainRef.current[linkedIndexes[i]].length > 2) {
                     const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, linkedIndexes[i], visited);
                     if (recursiveResult) {
@@ -55,7 +55,20 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
         for (let i = 0; i < indexes.length; i++) {
             const idx = indexes[i];
             if (chainRef.current[idx].length > 2) {
-                jointIndexes.push(i);
+                // Check it is a link on this scope
+                const linkedIndexes = chainRef.current[idx];
+                let onChain = true;
+                onChain = false;
+                // If the joint was not created at this scope then skip
+                for (let j = 0; j < linkedIndexes.length; j++) {
+                    const jointIndex = `${idx}-${linkedIndexes[j]}`;
+                    const jointScope = jointScopeRef.current[jointIndex];
+                    if (scope === jointScope) {
+                        onChain = true;
+                        break;
+                    }
+                }
+                if (onChain) jointIndexes.push(i);
             }
         }
         const middleIndexes = [];
@@ -68,6 +81,13 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
                 middleIndexes.push(indexes[midIndex]);
             }
         }
+        // Calculate the middle position between the first and last link with wraparound
+        const firstJoint = jointIndexes[0];
+        const lastJoint = jointIndexes[jointIndexes.length - 1];
+        const indexesLength = indexes.length;
+        const distance = (indexesLength - lastJoint + firstJoint);
+        const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
+        middleIndexes.push(indexes[middle]);
         return middleIndexes;
     }
 
@@ -107,9 +127,7 @@ const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flatte
             blobIndexes = blobOuterUniqueIndexes;
         } else {
             const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
-            // Complete the loop (will be needed to find the last "middle" point)
-            orderedIndexes.push(orderedIndexes[0]);
-            if (!orderedIndexes) console.error("orderedIndexes is empty!", id);
+            if (!orderedIndexes.length) console.error("orderedIndexes is empty!", id);
             blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
         }
 

@@ -5,6 +5,7 @@ import useEntityStore from './useEntityStore';
 
 const useJoints = (
     particleJointsRef,
+    jointScopeRef,
     jointRefsRef,
     particleRadiusRef,
     chainRef,
@@ -56,6 +57,7 @@ const useJoints = (
         const aUserData = a.ref.userData || a.ref.getUserData();
         const bUserData = b.ref.userData || b.ref.getUserData();
         const jointRefsRefIndex = `${aUserData.uniqueIndex}-${bUserData.uniqueIndex}`;
+        const jointRefsRefIndexReverse = `${bUserData.uniqueIndex}-${aUserData.uniqueIndex}`;
         const jointRef = { current: null }; // Create a plain object to hold the reference
         jointRef.current = world.createImpulseJoint(
             rapier.JointData.spherical(a.offset, b.offset),
@@ -65,6 +67,8 @@ const useJoints = (
         );
         jointRefsRef.current[jointRefsRefIndex] = jointRef;
         particleJointsRef.current[aUserData.uniqueIndex].push(jointRefsRefIndex);
+        jointScopeRef.current[jointRefsRefIndex] = scope;
+        jointScopeRef.current[jointRefsRefIndexReverse] = scope;
         console.log("createJoint", id, jointRefsRefIndex, jointRef);
         return jointRef;
     };
@@ -79,6 +83,10 @@ const useJoints = (
         body2Joints = body2Joints.filter(obj => obj !== jointKey);
         particleJointsRef.current[body1.userData.uniqueIndex] = body1Joints;
         particleJointsRef.current[body2.userData.uniqueIndex] = body2Joints;
+        const jointIndex = `${body1.userData.uniqueIndex}-${body2.userData.uniqueIndex}`;
+        const jointIndexReverse = `${body2.userData.uniqueIndex}-${body1.userData.uniqueIndex}`;
+        delete jointScopeRef.current[jointIndex];
+        delete jointScopeRef.current[jointIndexReverse];
         if (jointRef.current) {
             const joint = jointRef.current;
             jointRef.current = undefined;
@@ -188,28 +196,15 @@ const useJoints = (
     const initializeJoints = (flattenedParticleRefs, initialPosition) => {
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
-        const firstJointData = jointsData[0];
-        const firstJointPosition = new THREE.Vector3(firstJointData.position.x, firstJointData.position.y, firstJointData.position.z);
-        const distanceToFirstJoint = centerRef.current.distanceTo(internalRef.current.localToWorld(firstJointPosition));
-        
-        flattenedParticleRefs.current.forEach(particleRef => {
-            const particlePosition = particleRef.current.translation();
-            const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
-            const distanceToCenter = centerRef.current.distanceTo(particleVector);
-            if (!particleRef.current.userData.scopeOuter) {
-                particleRef.current.userData.scopeOuter = {};
-            }
-            const offset = [-0.2, -0.2, 0];
-            let outer = distanceToCenter >= (distanceToFirstJoint + offset[scope]);
-            particleRef.current.userData.scopeOuter[scope] = outer;
-            //if (scope ==0 && outer) particleRef.current.userData.color = "black";
-        });
 
         const newJoints = allocateJointsToParticles(entityParticlesRefsRef, jointsData, internalRef);
         newJoints.forEach((particles, i) => {
             const aIndex = particles.a.ref.current.userData.uniqueIndex;
             const bIndex = particles.b.ref.current.userData.uniqueIndex;
             const jointIndex = `${aIndex}-${bIndex}`;
+            const jointIndexReverse = `${bIndex}-${aIndex}`;
+            jointScopeRef.current[jointIndex] = scope;
+            jointScopeRef.current[jointIndexReverse] = scope;
             if (particleJointsRef.current[aIndex]) {
                 if (!particleJointsRef.current[aIndex].includes(jointIndex)) {
                     particleJointsRef.current[aIndex].push(jointIndex);
@@ -225,6 +220,25 @@ const useJoints = (
                 particleJointsRef.current[bIndex] = [jointIndex];
             }
         });
+
+        // Distance to the first joint
+        // We place the joints first because they will not align with the perimeter of the scope
+        const jointPosition = newJoints[0].a.ref.translation();
+        const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
+        const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef.current;
+
+        flattenedParticleRefs.current.forEach(particleRef => {
+            const particlePosition = particleRef.current.translation();
+            const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
+            const distanceToCenter = centerRef.current.distanceTo(particleVector);
+            if (!particleRef.current.userData.scopeOuter) {
+                particleRef.current.userData.scopeOuter = {};
+            }
+            let outer = distanceToCenter >= (distanceToFirstJoint);
+            particleRef.current.userData.scopeOuter[scope] = outer;
+            if (scope == 1 && outer) particleRef.current.userData.color = "black";
+        });
+
         return newJoints;
     };
 
