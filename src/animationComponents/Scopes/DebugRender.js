@@ -18,7 +18,7 @@ const localJointPosition = (groupRef, particle, side) => {
     return [localVector.x, localVector.y, localVector.z];
 };
 
-const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJoints, scope, index, internalRef, isDebug, centerRef }) => {
+const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJoints, index, internalRef, isDebug, centerRef }) => {
     const getComponentRef = useStore((state) => state.getComponentRef);
 
     useEffect(() => {

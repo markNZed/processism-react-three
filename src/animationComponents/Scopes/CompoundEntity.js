@@ -19,7 +19,7 @@ import useImpulses from './useImpulses';
 import useEntityStore from './useEntityStore';
 import DebugRender from './DebugRender';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = [], initialPosition = [0, 0, 0], scope = 0, radius, config, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initialPosition = [0, 0, 0], scope = 0, radius, config, ...props }, ref) => {
 
     const isDebug = props.debug || config.debug;
 
@@ -104,6 +104,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const entityPositions = useMemo(() => {
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
+
+    const index = scope ? indexArray[scope - 1] : 0;
 
     const {
         registerParticlesFn,
@@ -201,7 +203,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         radius={entityRadius}
                         color={color}
                         scope={scope + 1}
-                        index={i}
                         indexArray={[...indexArray, i]}
                         ref={entityRef}
                         registerParticlesFn={registerParticlesFn}
@@ -276,7 +277,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     initialPosition={initialPosition}
                     jointsData={jointsData}
                     newJoints={newJoints}
-                    scope={scope}
                     index={index}
                     internalRef={internalRef}
                     isDebug={isDebug}

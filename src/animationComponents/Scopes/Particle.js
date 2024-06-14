@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { getColor } from './utils.js';
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, initialPosition, radius, config, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPosition, radius, config, ...props }, ref) => {
 
     const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
     useImperativeHandle(ref, () => internalRef.current);
@@ -18,6 +18,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, indexArray, scope, in
     const [colliderRadius, setColliderRadius] = useState(radius);
     const registeredRef = useRef(false);
     const [initialize, setInitialize] = useState(true);
+    const index = scope ? indexArray[scope - 1] : 0;
 
     // Calculate the unique global index for the Particle
     const calculateUniqueIndex = (indexArray, entityCounts) => {
