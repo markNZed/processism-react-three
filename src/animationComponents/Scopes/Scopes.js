@@ -6,6 +6,7 @@ import { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from '@react-thr
 import { useControls } from 'leva'
 import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
+import useStore from '../../useStore'
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -29,6 +30,8 @@ import CompoundEntity from './CompoundEntity'
  the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
 */
 const Scopes = React.forwardRef((props, ref) => {
+
+    const pausePhysics = useStore((state) => state.pausePhysics);
 
     // Leva controls
     // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
@@ -158,7 +161,7 @@ const Scopes = React.forwardRef((props, ref) => {
     useFrame(() => {
         framesPerStepCount.current++;
         if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
-        if (framesPerStepCount.current == 0 && props.isAnimating) {
+        if (framesPerStepCount.current == 0 && props.isAnimating && !pausePhysics) {
             step(fixedDelta);
         }
     });

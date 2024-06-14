@@ -5,7 +5,7 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import useStore from '../../useStore';
 
-const localJointPosition = (groupRef, particle, side) => {
+const localJointPosition = (groupRef, particle) => {
     const worldPosition = particle.ref.current.translation();
     const xOffset = particle.offset.x;
     const yOffset = particle.offset.y;
@@ -18,7 +18,7 @@ const localJointPosition = (groupRef, particle, side) => {
     return [localVector.x, localVector.y, localVector.z];
 };
 
-const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJoints, index, internalRef, isDebug, centerRef }) => {
+const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJointsRef, index, internalRef, isDebug, centerRef }) => {
     const getComponentRef = useStore((state) => state.getComponentRef);
 
     useEffect(() => {
@@ -51,18 +51,18 @@ const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJoints
                     opacity: 0.2,
                 }}
             />
-            {newJoints.current.map((particles, i) => (
+            {newJointsRef.current.map((particles, i) => (
                 <React.Fragment key={`${id}.${i}`}>
                     <CircleDrei
                         key={`${id}.${i}.a`}
                         args={[0.1, 8]}
-                        position={localJointPosition(internalRef, particles.a, "A")}
+                        position={localJointPosition(internalRef, particles.a)}
                         material-color="red"
                     />
                     <CircleDrei
                         key={`${id}.${i}.b`}
                         args={[0.1, 8]}
-                        position={localJointPosition(internalRef, particles.b, "B")}
+                        position={localJointPosition(internalRef, particles.b)}
                         material-color="green"
                     />
                 </React.Fragment>

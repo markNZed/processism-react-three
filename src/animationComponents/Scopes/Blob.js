@@ -80,7 +80,6 @@ const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, ch
             const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
             // Avoid duplicating joints
             if (!jointIndexes.includes(midIndex)) {
-                if (scope == 0) console.log("indexes[jointIndexes[i - 1]]", indexes[jointIndexes[i - 1]])
                 //middleIndexes.push(indexes[jointIndexes[i - 1]]);
                 middleIndexes.push(indexes[midIndex]);
             }
@@ -185,6 +184,7 @@ const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, ch
 
         if (lastCompoundEntity) {
             for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
+                // Could add config option to show particles
                 flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayStr + ',0'];
             }
         }

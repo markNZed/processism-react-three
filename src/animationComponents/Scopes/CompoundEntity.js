@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef, useImperativeHandle } from 'react';
+import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
 import _ from 'lodash';
+import useStore from '../../useStore'
 import { getColor } from './utils';
 import Particle from './Particle';
 import InstancedParticles from './InstancedParticles';
@@ -58,7 +59,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     const initialPositionVector = new THREE.Vector3(...initialPosition);
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
     // This is the array of joints added by this CompoundEntity
-    const newJoints = useRef([]);
+    // Joints could be held in ZuStand and instantiated in top
+    // Instead of Joint we should use the create function
+    const newJointsRef = useRef([]);
     // Key is uniqueIndex of the particle. Value is array of linked (through joints) uniqueIndex 
     //Sould be moved into ZuStand
     const chainRef = props.chainRef || useRef({});
@@ -77,7 +80,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     const relationsRef = useRef({});
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueIndex: id });
-    const limitedLog = useLimitedLog(100); 
+    const limitedLog = useLimitedLog(100);
+    const [initializePhysics, setInitializePhysics] = useState(false); 
+    const [initializedPhysics, setInitializedPhysics] = useState(false); 
 
     // Logging/debug
     useEffect(() => {
@@ -141,6 +146,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
         scope,
     );
 
+    const setPausePhysics = useStore((state) => state.setPausePhysics)
+
     // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
     const calculateCenter = () => {
         const center = new THREE.Vector3();
@@ -160,14 +167,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
         return center;
     };
 
+    useEffect(() => {
+        if (initializePhysics && !initializedPhysics) {
+            newJointsRef.current = initializeJoints(flattenedParticleRefs, initialPosition);
+            frameStateRef.current = "initialImpulse";
+            // Need to set state to trigger re-rendering of this component
+            // otherwise the satte machine gets stuck
+            setInitializedPhysics(true);
+        }
+    }, [initializePhysics]);
+
     useFrame(() => {
         // State machine allows for computation to be distributed across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
-                if (areAllParticlesRegistered()) {
-                    newJoints.current = initializeJoints(flattenedParticleRefs, initialPosition);
-                    frameStateRef.current = "initialImpulse";
-                }
+                // Use a state to trigger the initializeJoints as this may take longer than a frame
+                if (!initializePhysics && areAllParticlesRegistered()) setInitializePhysics(true);
                 break;
             // Should move this into useImpulses
             case "initialImpulse":
@@ -227,15 +242,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                     />
                 ))}
 
-                {newJoints.current.map((particles, i) => (
-                    <Joint
-                        a={particles.a}
-                        b={particles.b}
-                        key={`${id}-${i}-joint`}
-                        jointRefsRef={jointRefsRef}
-                    />
-                ))}
-
                 {frameStateRef.current !== "init" && (
                     <Blob
                         id={`blob-${id}`}
@@ -283,7 +289,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
                     color={color}
                     initialPosition={initialPosition}
                     jointsData={jointsData}
-                    newJoints={newJoints}
+                    newJointsRef={newJointsRef}
                     index={index}
                     internalRef={internalRef}
                     isDebug={isDebug}

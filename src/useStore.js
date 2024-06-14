@@ -8,6 +8,8 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   setReloadScene: (reloadScene) => set({ reloadScene }), 
   usePhysics: false, 
   setUsePhysics: (usePhysics) => set({ usePhysics }), 
+  pausePhysics: false, 
+  setPausePhysics: (usePhysics) => set({ usePhysics }), 
   components: {},
   registerComponent: (id, ref) => set(state => {
     const sceneId = `${state.currentScene}.${id}`;

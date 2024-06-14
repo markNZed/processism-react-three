@@ -2,6 +2,7 @@ import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useEntityStore from './useEntityStore';
+import useStore from '../../useStore'
 
 const useJoints = (
     particleJointsRef,
@@ -22,6 +23,7 @@ const useJoints = (
     const { getEntityRefs } = useEntityStore(state => ({
         getEntityRefs: state.getEntityRefs,
     }));
+    const setPausePhysics = useStore((state) => state.setPausePhysics)
 
     // Return the center point of all the joints
     const generateJointsData = (positions) => {
@@ -53,7 +55,7 @@ const useJoints = (
         return generateJointsData(entityPositions);
     }, [entityPositions]);
 
-    const createJoint = (a, b, id) => {
+    const createJoint = (a, b) => {
         const aUserData = a.ref.userData || a.ref.getUserData();
         const bUserData = b.ref.userData || b.ref.getUserData();
         const jointRefsRefIndex = `${aUserData.uniqueIndex}-${bUserData.uniqueIndex}`;
@@ -239,6 +241,28 @@ const useJoints = (
             //if (scope == 1 && outer) particleRef.current.userData.color = "black";
         });
 
+        // Create the joints
+        newJoints.forEach((particles) => {
+            //const { offset1, offset2 } = calculateJointOffsets(particles.a.ref.current, particles.b.ref.current, particleRadiusRef.current);
+            // Offset needs to be in local coordinates - should be OK for 
+            const a = {
+                ref: particles.a.ref.current,
+                offset: particles.a.offset,
+            }
+            const b = {
+                ref: particles.b.ref.current,
+                offset: particles.b.offset,
+            }
+            createJoint(a, b);
+        });
+
+        if (false && scope == 0) {
+            newJoints[0].a.ref = newJoints[0].a.ref.current;
+            newJoints[0].b.ref = newJoints[0].b.ref.current;
+            createJoint(newJoints[0].a, newJoints[0].b);
+            console.log("newJoints[0].a, newJoints[0].b", newJoints[0].a, newJoints[0].b)
+        }
+
         return newJoints;
     };
 
@@ -342,7 +366,7 @@ const useJoints = (
                 jointsToCreate.forEach(([a, b]) => {
                     a.ref.userData.color = 'orange';
                     b.ref.userData.color = 'orange';
-                    const newJointRef = createJoint(a, b);
+                    createJoint(a, b);
                 })
             }
             clearInterval(interval);
