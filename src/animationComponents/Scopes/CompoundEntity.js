@@ -5,7 +5,6 @@ import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
 import useStore from '../../useStore';
-import { useRapier, vec3 } from '@react-three/rapier';
 import _ from 'lodash';
 import Particle from './Particle';
 import { getColor } from './utils';
@@ -18,6 +17,7 @@ import useParticlesRegistration from './useParticlesRegistration';
 import InstancedParticles from './InstancedParticles';
 import Relations from './Relations';
 import useRandomRelations from './useRandomRelations';
+import { useJoints } from './useJoints';
 
 const ZERO_VECTOR = new THREE.Vector3();
 
@@ -31,24 +31,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     const entityCount = config.entityCounts[scope];
     // Store the color in a a state so it si consistent across renders, setColor is not used
-    const [color, setColor] = useState(getColor(config, scope, props.color || "blue"));
+    const color = useMemo(() => getColor(config, scope, props.color || "blue"), [config, scope, props.color]);
     const lastCompoundEntity = (scope == config.entityCounts.length - 1);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;
     // Used for Circle animation when isDebug, the position is managed by r3f not rapier
     const getComponentRef = useStore((state) => state.getComponentRef);
     // Array of refs to entities (either CompoundEntity or Particles)
-    const entityRefs = Array.from({ length: entityCount }, () => useRef());
+    const entityRefsRef = useRef(Array.from({ length: entityCount }, () => useRef()));
     // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
-    // Layout to avoid Particle overlap
-    const entityPositions = useMemo(() => {
-        return generateEntityPositions(radius - entityRadius, entityCount);
-    }, [radius, entityRadius, entityCount]);
     // Joints aligned based on entityPositions
-    const jointsData = useMemo(() => {
-        return generateJointsData(entityPositions);
-    }, [entityPositions]);
     // An impulse to get some random behavior at the beginning
     const [applyInitialImpulse, setApplyInitialImpulse] = useState(true);
     // Track the center of this CompoundEntity
@@ -80,23 +73,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueIndex: id });
     const newLinesRef = useRef({});
-    const { world, rapier } = useRapier();
     const limitedLog = useLimitedLog(100); 
-    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefs);
-    const {
-        registerParticlesFn,
-        // An array of entityCount length that stores the particle refs associated with each entity
-        entityParticlesRefsRef,
-        // All true when all Particles in all entities have registered a ref
-        // All true when all entities have registered a ref
-        entitiesRegisteredRef,
-        // A simple array with all the refs
-        flattenedParticleRefs,
-        particleAreaRef,
-        particleRadiusRef,
-        areAllParticlesRegistered
-    } = useParticlesRegistration(props, index, scope, id, jointsData, config);
-    const particleCount = useMemo(() => flattenedParticleRefs?.current?.length, [flattenedParticleRefs.current]);
+    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefsRef);
 
     ////////////////////////////////////////
     // Constants impacting particle behavior
@@ -109,111 +87,52 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // Logging/debug
     useEffect(() => {
         if (scope == 0) limitedLog("Mounting from scope 0", id);
-        if (isDebug) {
-            //console.log("jointsData", id, jointsData);
-        }
     }, []);
 
     // Use the custom hook for creating random relations
-    useRandomRelations(config, frameStateRef, entityCount, entityRefs, getEntityRefFn, relationsRef, indexArray);
+    useRandomRelations(config, frameStateRef, entityCount, entityRefsRef, getEntityRefFn, relationsRef, indexArray);
 
-    // Map joints to Particles and align the joint with the initial Particle layout
-    const allocateJointsToParticles = (entityParticlesRefsRef, jointsData) => {
-        // Create a new Vector3 to store the world position of this CompoundEntity
-        const worldPosition = new THREE.Vector3();
-        internalRef.current.getWorldPosition(worldPosition);
-        // Vector3 to be used for particle world position
-        const particleWorldPosition = new THREE.Vector3();
+    // Distribute evenly around the perimeter
+    const generateEntityPositions = (radius, count) => {
+        const positions = []
+        const angleStep = (2 * Math.PI) / count
+        for (let i = 0; i < count; i++) {
+            const angle = i * angleStep
+            const x = radius * Math.cos(angle)
+            const y = radius * Math.sin(angle)
+            positions.push(new THREE.Vector3(x, y, 0))
+        }
+        return positions
+    }
 
-        const allocateJoints = jointsData.map((jointData, i) => {
+    // Layout to avoid Particle overlap
+    const entityPositions = useMemo(() => {
+        return generateEntityPositions(radius - entityRadius, entityCount);
+    }, [radius, entityRadius, entityCount]);
 
-            function findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, excludedEntityIndex) {
-                let minDistance = Infinity;
-                let closestParticleIndex = -1;
-                let closestParticlePosition = new THREE.Vector3();
-                let particleEntityIndex = -1;
-                let closestParticleRef;
+    const {
+        registerParticlesFn,
+        // An array of entityCount length that stores the particle refs associated with each entity
+        entityParticlesRefsRef,
+        // All true when all Particles in all entities have registered a ref
+        // All true when all entities have registered a ref
+        entitiesRegisteredRef,
+        // A simple array with all the refs
+        flattenedParticleRefs,
+        particleAreaRef,
+        particleRadiusRef,
+        areAllParticlesRegistered
+    } = useParticlesRegistration(props, index, scope, id, config);
 
-                entityParticlesRefsRef.current.forEach((entity, entityIndex) => {
-                    if (entityIndex === excludedEntityIndex) return;
-                    entity.current.forEach((particleRef, j) => {
-                        const pos = particleRef.current.translation();
-                        particleWorldPosition.set(pos.x, pos.y, pos.z);
-                        const distance = particleWorldPosition.distanceTo(new THREE.Vector3(
-                            jointData.position.x + worldPosition.x,
-                            jointData.position.y + worldPosition.y,
-                            jointData.position.z + worldPosition.z
-                        ));
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            closestParticleIndex = j; // will be 0 all the time at the lowest level (one particle per entity)
-                            closestParticlePosition.copy(particleWorldPosition);
-                            particleEntityIndex = entityIndex;
-                            closestParticleRef = particleRef;
-                        }
-                    });
-                });
+    const particleCount = useMemo(() => flattenedParticleRefs?.current?.length, [flattenedParticleRefs.current]);
 
-                return { minDistance, closestParticleIndex, closestParticlePosition, particleEntityIndex, closestParticleRef };
-            }
-
-            // Initial setup for A
-            const resultA = findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, -1);
-            const closestParticleAPosition = resultA.closestParticlePosition;
-            const particleAEntityIndex = resultA.particleEntityIndex;
-            const closestParticleARef = resultA.closestParticleRef;
-
-            // Initial setup for B (excluding the entity of particle A)
-            const resultB = findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, particleAEntityIndex);
-            const closestParticleBPosition = resultB.closestParticlePosition;
-            const closestParticleBRef = resultB.closestParticleRef;
-
-            // Calculate the direction vector between the two closest particles
-            const direction = new THREE.Vector3()
-                .subVectors(closestParticleBPosition, closestParticleAPosition)
-                .normalize();
-
-            // Calculate the offset to the boundary of the particle
-            const offsetA = direction.clone().multiplyScalar(particleRadiusRef.current);
-            const offsetB = direction.clone().multiplyScalar(-particleRadiusRef.current);
-
-            const uniqueIndexA = closestParticleARef.current.userData.uniqueIndex
-            const uniqueIndexB = closestParticleBRef.current.userData.uniqueIndex
-
-            if (chainRef.current[uniqueIndexA]) {
-                if (!chainRef.current[uniqueIndexA].includes(uniqueIndexB)) {
-                    chainRef.current[uniqueIndexA].push(uniqueIndexB)
-                }
-            } else {
-                chainRef.current[uniqueIndexA] = [uniqueIndexB]
-            }
-            if (chainRef.current[uniqueIndexB]) {
-                if (!chainRef.current[uniqueIndexB].includes(uniqueIndexA)) {
-                    chainRef.current[uniqueIndexB].push(uniqueIndexA)
-                }
-            } else {
-                chainRef.current[uniqueIndexB] = [uniqueIndexA]
-            }
-
-            return {
-                a: {
-                    ref: closestParticleARef,
-                    offset: offsetA
-                },
-                b: {
-                    ref: closestParticleBRef,
-                    offset: offsetB
-                },
-            };
-        });
-        return allocateJoints;
-    };
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, entityRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
     // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
     const calculateCenter = () => {
         const center = new THREE.Vector3();
         let activeEntities = 0;
-        entityRefs.forEach((entity) => {
+        entityRefsRef.current.forEach((entity) => {
             if (entity.current) {
                 const entityCenter = entity.current.getCenter();
                 if (entityCenter) {
@@ -231,8 +150,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     // Distribute impulses to each entity
     const entityImpulses = (center, impulseIn) => {
         const impulse = impulseIn.clone();
-        impulse.multiplyScalar(1 / entityRefs.length);
-        entityRefs.forEach((entity, i) => {
+        impulse.multiplyScalar(1 / entityRefsRef.current.length);
+        entityRefsRef.current.forEach((entity, i) => {
             if (entity.current) {
                 const entityCenter = entity.current.getCenter();
                 if (entityCenter) {
@@ -242,13 +161,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                     directionToCenter.negate().normalize();
                     if (impulse.length() == 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefs.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsRef.current.length);
                     }
                     // If the entity gets too far from the center then pull it back toward the center
                     const overshoot = displacement.length() - maxDisplacement;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefs.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsRef.current.length);
                         impulse.multiplyScalar(overshoot * overshootScaling);
                     }
                     // Model attractor
@@ -263,174 +182,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         });
     };
 
-    const createJoint = (a, b) => {
-        const aUserData = a.ref.userData || a.ref.getUserData();
-        const bUserData = b.ref.userData || b.ref.getUserData();
-        const jointRefsRefIndex = `${aUserData.uniqueIndex}-${bUserData.uniqueIndex}`;
-        const jointRef = { current: null }; // Create a plain object to hold the reference
-        jointRef.current = world.createImpulseJoint(
-            rapier.JointData.spherical(a.offset, b.offset),
-            a.ref,
-            b.ref,
-            true
-        );
-        jointRefsRef.current[jointRefsRefIndex] = jointRef;
-        particleJointsRef.current[aUserData.uniqueIndex].push(jointRefsRefIndex)
-        console.log("createJoint", id, jointRefsRefIndex, jointRef);
-        return jointRef;
-    };
-
-    const removeJoint = (jointKey) => {
-        const jointRef = jointRefsRef.current[jointKey];
-        // Get the particles
-        const body1 = jointRef.current.body1();
-        const body2 = jointRef.current.body2();
-        // Remove the joint from the particleJointsRef
-        let body1Joints = particleJointsRef.current[body1.userData.uniqueIndex];
-        let body2Joints = particleJointsRef.current[body2.userData.uniqueIndex];
-        body1Joints = body1Joints.filter(obj => obj !== jointKey);
-        body2Joints = body2Joints.filter(obj => obj !== jointKey);
-        particleJointsRef.current[body1.userData.uniqueIndex] = body1Joints;
-        particleJointsRef.current[body2.userData.uniqueIndex] = body2Joints;
-        //console.log("removeJoint", id, jointRef);
-        if (jointRef.current) {
-            const joint = jointRef.current;
-            jointRef.current = undefined;
-            if (world.getImpulseJoint(joint.handle)) {
-                world.removeImpulseJoint(joint, true);
-            }
-            delete jointRefsRef.current[jointKey]
-        }
-    };
-
-    const calculateJointOffsets = (body1, body2, particleRadius) => {
-        const body1position = body1.translation();
-        const body2position = body2.translation();
-        const direction = new THREE.Vector3()
-            .subVectors(body1position, body2position)
-            .normalize();
-        const offset1 = direction.clone().multiplyScalar(-particleRadius);
-        const offset2 = direction.clone().multiplyScalar(particleRadius);
-        return { offset1, offset2 };
-    };
-
-    // Experimenting on how to migrate an entity
-    // Start with single particle
-    // Need to remove the entity from CompoundEntity center calculations - where does it belong?
-    // Could maintain a list of "detached" particles at the CompoundEntity level (can filter for center calc)
-    // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
-    //   What needs to change ? 
-    //     entityCount, entityRefs, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
-    //     entitiesRegisteredRef, particlesRegisteredRef, newJoints, particleJointsRef
-    //   Zustand might be able to store refs when we useRef but not sure that has advantages
-    //   Data structures that require remounting could be in Zustand
-    //   The entityid could be a unique id that is generated from a singleton rather than ordered.
-    //   Work on dynamic change of entityCounts from GUI
-    //     When config changes it should impact all Components as it is a prop
-    // Could have a "move" entity command that is similar to getEntityRefFn so from anywhere we can call
-    // moveEntityFn and it would find the entity and detach it then find the destination and attach it
-
-    useEffect(() => {
-        if (!config.detach) return
-        // Generate a random number between 1000 and 10000 which determines the duration of relations
-        const randomDuration = 1000; //Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
-        const interval = setInterval(() => {
-            // With "Scope-3" this is at scope 1 so userData.uniqueIndex is e.g. "Scope-3-5" not a Particle index
-            if (frameStateRef.current !== "init" && id == "Scope-8-3") {
-                // Randomly select an entity from this CompoundEntity
-                const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
-                const entityRef = entityRefs[randomIndexFrom];
-                const userData = entityRef.current.getUserData();
-                const entityUniqueIndex = userData.uniqueIndex;
-                const entityJointIndexes = particleJointsRef.current[entityUniqueIndex];
-                let replacementEntity;
-                let closestIndex;
-                let closestDistance = Infinity;
-                // Create a new Vector3 to store the world position of this CompoundEntity
-                const worldPosition = new THREE.Vector3();
-                internalRef.current.getWorldPosition(worldPosition);
-                // Vector3 to be used for particle world position
-                const particleWorldPosition = new THREE.Vector3();
-                entityJointIndexes.forEach((jointKey) => {
-                    const jointRef = jointRefsRef.current[jointKey];
-                    const body1 = jointRef.current.body1();
-                    const body2 = jointRef.current.body2();
-                    // Entity needs to store parent entity in userData ?
-                    // Find the entity which is closest to the center of this CompoundEntity
-                    function replaceEntity(body, entityUniqueIndex) {
-                        if (body.userData.uniqueIndex === entityUniqueIndex) return false;
-                        const pos = body.translation();
-                        particleWorldPosition.set(pos.x, pos.y, pos.z);
-                        const distance = particleWorldPosition.distanceTo(particleWorldPosition);
-                        if (distance < closestDistance) {
-                            closestDistance = distance;
-                            return true
-                        } else {
-                            return false;
-                        }
-                    }
-                    if (replaceEntity(body1, entityUniqueIndex)) {
-                        replacementEntity = body1;
-                        closestIndex = body1.userData.uniqueIndex;
-                    }
-                    if (replaceEntity(body2, entityUniqueIndex)) {
-                        replacementEntity = body2;
-                        closestIndex = body2.userData.uniqueIndex;
-                    }
-                    //console.log("Joint anchors", jointKey, a1, body1, a2, body2);
-                });
-                console.log("Detach a random entity", id, entityUniqueIndex, entityRef, "closestIndex", closestIndex, "replacementEntity", replacementEntity);
-                const jointsToCreate = [];
-                entityJointIndexes.forEach((jointKey) => {
-                    const jointRef = jointRefsRef.current[jointKey];
-                    let body1 = jointRef.current.body1();
-                    let body2 = jointRef.current.body2();
-                    if (replacementEntity.userData.uniqueIndex == body1.userData.uniqueIndex) return;
-                    if (replacementEntity.userData.uniqueIndex == body2.userData.uniqueIndex) return;
-                    if (body1.userData.uniqueIndex === entityUniqueIndex) {
-                        body1 = replacementEntity;
-                    }
-                    if (body2.userData.uniqueIndex === entityUniqueIndex) {
-                        body2 = replacementEntity;
-                    }
-                    // Can't just copy the offset, need to recalculate them. Create a function for this ?
-                    // The radius of the replacement may not be the same...
-                    const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadiusRef.current);
-                    // Offset needs to be in local coordinates - should be OK for 
-                    const a = {
-                        ref: body1,
-                        offset: offset1,
-                    }
-                    const b = {
-                        ref: body2,
-                        offset: offset2,
-                    }
-                    jointsToCreate.push([a, b]);
-                });
-                entityJointIndexes.forEach((jointKey) => {
-                    removeJoint(jointKey);
-                    console.log("removeJoint", jointKey);
-                });
-                jointsToCreate.forEach(([a, b]) => {
-                    a.ref.userData.color = 'orange';
-                    b.ref.userData.color = 'orange';
-                    const newJointRef = createJoint(a, b);
-                })
-            }
-            clearInterval(interval);
-        }, randomDuration);
-        return () => {
-            clearInterval(interval); // Cleanup interval on component unmount
-        }
-    }, []);
-
     useFrame(() => {
         // Transfer the CompoundEntity's impulse to entities
         if (entitiesRegisteredRef.current === true) {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
-                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefs.length);
-                entityRefs.forEach((entity) => {
+                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsRef.current.length);
+                entityRefsRef.current.forEach((entity) => {
                     entity.current.addImpulse(perEntityImpulse);
                 });
                 internalRef.current.setImpulse(ZERO_VECTOR);
@@ -442,54 +200,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         // State machine allows for computation to be distributed across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
-                // Initial random impulse to get more interesting behavior
                 if (applyInitialImpulse && areAllParticlesRegistered()) {
-                    centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
-                    // Get distance from center ot first joint
-                    const firstJointData = jointsData[0];
-                    const firstJointPosition = new THREE.Vector3(firstJointData.position.x, firstJointData.position.y, firstJointData.position.z);
-                    const distanceToFirstJoint = centerRef.current.distanceTo(internalRef.current.localToWorld(firstJointPosition));
-                    // foreach particle set a userData entry userData.scopeOuter[scope] = true if the particle is closer to the center than the joint
-                    flattenedParticleRefs.current.forEach(particleRef => {
-                        const particlePosition = particleRef.current.translation();
-                        const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
-                        const distanceToCenter = centerRef.current.distanceTo(particleVector);
-                        if (!particleRef.current.userData.scopeOuter) {
-                            particleRef.current.userData.scopeOuter = {};
-                        }
-                        const offset = [-0.15, -0.2, 0]; // Why 0.15 ???
-                        let outer = distanceToCenter >= (distanceToFirstJoint + offset[scope]);
-                        const scopeOuter = particleRef.current.userData.scopeOuter;
-                        if (scopeOuter[scope + 1] === false) {
-                            outer = false;
-                        }
-                        scopeOuter[scope] = outer;
-                        //if (outer && scope == 0) particleRef.current.userData.color = "black";
-                    });
-                    newJoints.current = allocateJointsToParticles(entityParticlesRefsRef, jointsData);
-                    // Joints are at different CompoundEntity levels
-                    // The joints from higher entities are not added to the array (need to init it from props I guess)
-                    // We need a unique id for all the joints
-                    newJoints.current.forEach((particles, i) => {
-                        // At this point userData is not available ?
-                        const aIndex = particles.a.ref.current.userData.uniqueIndex
-                        const bIndex = particles.b.ref.current.userData.uniqueIndex
-                        const jointIndex = `${aIndex}-${bIndex}`;
-                        if (particleJointsRef.current[aIndex]) {
-                            if (!particleJointsRef.current[aIndex].includes(jointIndex)) {
-                                particleJointsRef.current[aIndex].push(jointIndex);
-                            }
-                        } else {
-                            particleJointsRef.current[aIndex] = [jointIndex]
-                        }
-                        if (particleJointsRef.current[bIndex]) {
-                            if (!particleJointsRef.current[bIndex].includes(jointIndex)) {
-                                particleJointsRef.current[bIndex].push(jointIndex);
-                            }
-                        } else {
-                            particleJointsRef.current[bIndex] = [jointIndex]
-                        }
-                    });
+                    newJoints.current = initializeJoints(flattenedParticleRefs, initialPosition);
                     setApplyInitialImpulse(false);
                     frameStateRef.current = "initialImpulse";
                 }
@@ -502,7 +214,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         (Math.random() - 0.5) * impulsePerParticle,
                         0
                     ));
-                    entityRefs.forEach((entity, i) => {
+                    entityRefsRef.current.forEach((entity, i) => {
                         if (entity.current) {
                             // Add an impulse that is unique to each entity
                             const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(entityParticlesRefsRef.current[i].current.length);
@@ -550,7 +262,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
-                {entityRefs.map((entityRef, i) => (
+                {entityRefsRef.current.map((entityRef, i) => (
                     <Entity
                         key={`${id}-${i}`}
                         id={`${id}-${i}`}
@@ -663,44 +375,5 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 }));
 
 export default CompoundEntity;
-
-// Distribute evenly around the perimeter
-const generateEntityPositions = (radius, count) => {
-    const positions = []
-    const angleStep = (2 * Math.PI) / count
-    for (let i = 0; i < count; i++) {
-        const angle = i * angleStep
-        const x = radius * Math.cos(angle)
-        const y = radius * Math.sin(angle)
-        positions.push(new THREE.Vector3(x, y, 0))
-    }
-    return positions
-}
-
-// Return the center point of all the joints
-const generateJointsData = (positions) => {
-    const jointsData = positions.map((pos, i) => {
-        let nextPos;
-        if (i == positions.length - 1) {
-            nextPos = positions[0];
-        } else {
-            nextPos = positions[i + 1];
-        }
-
-        // Calculate midpoint
-        const midX = (pos.x + nextPos.x) / 2;
-        const midY = (pos.y + nextPos.y) / 2;
-        const midZ = (pos.z + nextPos.z) / 2;
-
-        return {
-            position: {
-                x: midX,
-                y: midY,
-                z: midZ,
-            },
-        };
-    });
-    return jointsData;
-};
 
 

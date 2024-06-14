@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-const useEntityRef = (props, index, indexArray, internalRef, entityRefs) => {
+const useEntityRef = (props, index, indexArray, internalRef, entityRefsRef) => {
     const childGetEntityRefFnRef = useRef([]);
 
     const getEntityRefFn = useCallback((path) => {
@@ -19,7 +19,7 @@ const useEntityRef = (props, index, indexArray, internalRef, entityRefs) => {
         // Return an entity of this CompoundEntity
         if (path.length === indexArray.length + 1) {
             const entityIndex = path[path.length - 1];
-            return entityRefs[entityIndex];
+            return entityRefsRef.current[entityIndex];
         }
         // Need to narrow the scope (call getEntityRefFn in child)
         const childIndex = path[indexArray.length];

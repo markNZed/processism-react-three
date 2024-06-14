@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { calculateCircleArea } from './utils';
 
-const useParticlesRegistration = (props, index, scope, id, jointsData, config) => {
+const useParticlesRegistration = (props, index, scope, id, config) => {
     const entityParticlesRefsRef = useRef(Array.from({ length: config.entityCounts[scope] }, () => useRef([])));
     const particlesRegisteredRef = useRef(Array.from({ length: config.entityCounts[scope] }, () => false));
     const entitiesRegisteredRef = useRef(false);
@@ -29,10 +29,10 @@ const useParticlesRegistration = (props, index, scope, id, jointsData, config) =
             particleAreaRef.current = calculateCircleArea(particleRadius);
 
             if (scope === 0) {
-                console.log(`All particles (radius: ${particleRadiusRef.current}m) are registered`, id, flattenedParticleRefs.current.length, jointsData);
+                console.log(`All particles (radius: ${particleRadiusRef.current}m) are registered`, id, flattenedParticleRefs.current.length);
             }
         }
-    }, [areAllParticlesRegistered, props, index, scope, id, jointsData]);
+    }, [areAllParticlesRegistered, props, index, scope, id]);
 
     return { registerParticlesFn, entityParticlesRefsRef, entitiesRegisteredRef, flattenedParticleRefs, particleAreaRef, particleRadiusRef, areAllParticlesRegistered };
 };
