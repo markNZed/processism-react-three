@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color }) => {
+const Blob = ({ id, blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
@@ -68,13 +68,6 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
                 middleIndexes.push(indexes[midIndex]);
             }
         }
-        // Calculate the middle position between the first and last link with wraparound
-        const firstJoint = jointIndexes[0];
-        const lastJoint = jointIndexes[jointIndexes.length - 1];
-        const indexesLength = indexes.length;
-        const distance = (indexesLength - firstJoint + lastJoint);
-        const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
-        middleIndexes.push(indexes[middle]);
         return middleIndexes;
     }
 
@@ -88,7 +81,16 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
         let blobOuterUniqueIndexes = [];
         let flattenedIndexes = [];
         for (let i = 0; i < flattenedParticleRefs.current.length; ++i) {
-            const outer = flattenedParticleRefs.current[i].current.userData.scopeOuter[scope];
+            const scopeOuter = flattenedParticleRefs.current[i].current.userData.scopeOuter;
+            let outer = scopeOuter[scope];
+            if (outer) {
+                for (let j = Object.keys(scopeOuter).length - 1;j > scope; j--) {
+                    if (!scopeOuter[j.toString()]) {
+                        outer = false;
+                        break;
+                    }
+                }
+            }
             if (outer) {
                 const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
                 blobOuterUniqueIndexes.push(uniqueIndex);
@@ -97,7 +99,7 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
         }
 
         if (!blobOuterUniqueIndexes.length) {
-            console.error("blobOuterUniqueIndexes is empty!", id, particleCountRef.current.length);
+            console.error("blobOuterUniqueIndexes is empty!", id, flattenedParticleRefs.current.length);
         }
 
         let blobIndexes;
@@ -105,6 +107,8 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
             blobIndexes = blobOuterUniqueIndexes;
         } else {
             const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
+            // Complete the loop (will be needed to find the last "middle" point)
+            orderedIndexes.push(orderedIndexes[0]);
             if (!orderedIndexes) console.error("orderedIndexes is empty!", id);
             blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
         }
@@ -118,10 +122,6 @@ const Blob = ({ blobRef, blobData, blobVisibleRef, indexArray, scope, flattenedP
 
         blobVisibleRef.current[indexArrayStr] = (scope == 0);
 
-        // Because lastCompoundEntity needs to look after Particles 
-        if (lastCompoundEntity) {
-            blobVisibleRef.current[indexArrayStr + ',0'] = false;
-        }
     },[]);
 
     const points_to_geometry = points => {

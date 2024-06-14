@@ -5,7 +5,7 @@ import { useRapier, vec3 } from '@react-three/rapier';
 export const useJoints = (
     particleJointsRef,
     jointRefsRef,
-    entityRefsRef,
+    entityRefsArray,
     particleRadiusRef,
     chainRef,
     frameStateRef,
@@ -196,13 +196,10 @@ export const useJoints = (
             if (!particleRef.current.userData.scopeOuter) {
                 particleRef.current.userData.scopeOuter = {};
             }
-            const offset = [-0.15, -0.2, 0];
+            const offset = [-0.2, -0.2, 0];
             let outer = distanceToCenter >= (distanceToFirstJoint + offset[scope]);
-            const scopeOuter = particleRef.current.userData.scopeOuter;
-            if (scopeOuter[scope + 1] === false) {
-                outer = false;
-            }
-            scopeOuter[scope] = outer;
+            particleRef.current.userData.scopeOuter[scope] = outer;
+            //if (scope ==0 && outer) particleRef.current.userData.color = "black";
         });
 
         const newJoints = allocateJointsToParticles(entityParticlesRefsRef, jointsData, internalRef);
@@ -234,7 +231,7 @@ export const useJoints = (
     // Could maintain a list of "detached" particles at the CompoundEntity level (can filter for center calc)
     // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
     //   What needs to change ? 
-    //     entityCount, entityRefsRef, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
+    //     entityCount, entityRefsArray, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
     //     entitiesRegisteredRef, particlesRegisteredRef, newJoints, particleJointsRef
     //   Zustand might be able to store refs when we useRef but not sure that has advantages
     //   Data structures that require remounting could be in Zustand
@@ -253,7 +250,7 @@ export const useJoints = (
             if (frameStateRef.current !== "init" && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
-                const entityRef = entityRefsRef.current[randomIndexFrom];
+                const entityRef = entityRefsArray[randomIndexFrom];
                 const userData = entityRef.current.getUserData();
                 const entityUniqueIndex = userData.uniqueIndex;
                 const entityJointIndexes = particleJointsRef.current[entityUniqueIndex];

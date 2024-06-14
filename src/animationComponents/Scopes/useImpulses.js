@@ -3,9 +3,10 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
 export const useImpulses = (
+    id,
     internalRef,
     entitiesRegisteredRef,
-    entityRefsRef,
+    entityRefsArray,
     particleAreaRef,
     particleCount,
     config,
@@ -17,8 +18,8 @@ export const useImpulses = (
 
     const entityImpulses = (center, impulseIn) => {
         const impulse = impulseIn.clone();
-        impulse.multiplyScalar(1 / entityRefsRef.current.length);
-        entityRefsRef.current.forEach((entity, i) => {
+        impulse.multiplyScalar(1 / entityRefsArray.length);
+        entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
                 const entityCenter = entity.current.getCenter();
                 if (entityCenter) {
@@ -28,12 +29,12 @@ export const useImpulses = (
                     directionToCenter.negate().normalize();
                     if (impulse.length() == 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsRef.current.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsArray.length);
                     }
                     const overshoot = displacement.length() - config.maxDisplacement;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsRef.current.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsArray.length);
                         impulse.multiplyScalar(config.overshootScaling);
                     }
                     if (config.attractorScaling) {
@@ -47,15 +48,15 @@ export const useImpulses = (
         });
     };
 
-    const applyInitialImpulses = (entityRefsRef, flattenedParticleRefs) => {
-        const initialImpulseVectors = Array.from({ length: entityRefsRef.current.length }, () => new THREE.Vector3(
+    const applyInitialImpulses = (entityRefsArray, flattenedParticleRefs) => {
+        const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, () => new THREE.Vector3(
             (Math.random() - 0.5) * impulsePerParticle,
             (Math.random() - 0.5) * impulsePerParticle,
             0
         ));
-        entityRefsRef.current.forEach((entity, i) => {
+        entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
-                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(flattenedParticleRefs.current[i].current.length);
+                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(flattenedParticleRefs.current.length);
                 entity.current.addImpulse(perEntityImpulse);
             }
         });
@@ -72,8 +73,8 @@ export const useImpulses = (
         if (entitiesRegisteredRef.current === true) {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
-                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsRef.current.length);
-                entityRefsRef.current.forEach((entity) => {
+                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);
+                entityRefsArray.forEach((entity) => {
                     entity.current.addImpulse(perEntityImpulse);
                 });
                 internalRef.current.setImpulse(new THREE.Vector3());

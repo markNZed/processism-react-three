@@ -1,7 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
+import useEntityStore from './useEntityStore';
 
-const useEntityRef = (props, index, indexArray, internalRef, entityRefsRef) => {
+const useEntityRef = (props, index, indexArray, internalRef, entityRefsArray) => {
     const childGetEntityRefFnRef = useRef([]);
+    const { getEntityRefs } = useEntityStore();
 
     const getEntityRefFn = useCallback((path) => {
         // Check if this Compound Entity is on the path
@@ -19,12 +21,12 @@ const useEntityRef = (props, index, indexArray, internalRef, entityRefsRef) => {
         // Return an entity of this CompoundEntity
         if (path.length === indexArray.length + 1) {
             const entityIndex = path[path.length - 1];
-            return entityRefsRef.current[entityIndex];
+            return entityRefsArray[entityIndex];
         }
         // Need to narrow the scope (call getEntityRefFn in child)
         const childIndex = path[indexArray.length];
         return childGetEntityRefFnRef.current[childIndex](path);
-    }, [indexArray, internalRef, props]);
+    }, [indexArray, internalRef, props, entityRefsArray]);
 
     const registerGetEntityRefFn = useCallback((childIndex, method) => {
         childGetEntityRefFnRef.current[childIndex] = method;
@@ -34,7 +36,7 @@ const useEntityRef = (props, index, indexArray, internalRef, entityRefsRef) => {
         if (props.registerGetEntityRefFn) {
             props.registerGetEntityRefFn(index, getEntityRefFn);
         }
-    }, [props.registerGetEntityRefFn, getEntityRefFn]);
+    }, [props.registerGetEntityRefFn, getEntityRefFn, index]);
 
     return {
         getEntityRefFn,

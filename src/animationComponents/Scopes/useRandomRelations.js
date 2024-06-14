@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-function useRandomRelations(config, frameStateRef, entityCount, entityRefsRef, getEntityRefFn, relationsRef, indexArray) {
+function useRandomRelations(config, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef, indexArray) {
     useEffect(() => {
         // Generate a random number between 1000 and 10000 which determines the duration of relations
         const randomDuration = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
@@ -21,7 +21,7 @@ function useRandomRelations(config, frameStateRef, entityCount, entityRefsRef, g
 
                     // Randomly select an entity from this CompoundEntity
                     const randomIndexFrom = Math.floor(Math.random() * entityCount);
-                    const entityRefFrom = entityRefsRef.current[randomIndexFrom];
+                    const entityRefFrom = entityRefsArray[randomIndexFrom];
                     const userDataFrom = entityRefFrom.current.getUserData() || {};
                     const fromId = userDataFrom.uniqueIndex;
 
@@ -48,7 +48,7 @@ function useRandomRelations(config, frameStateRef, entityCount, entityRefsRef, g
                         // Most of the time we want to select an entity inside this CompoundEntity
                     } else {
                         let randomIndexTo = Math.floor(Math.random() * entityCount);
-                        entityRefTo = entityRefsRef.current[randomIndexTo];
+                        entityRefTo = entityRefsArray[randomIndexTo];
                     }
 
                     const userDataTo = entityRefTo.current.getUserData() || {};
@@ -70,7 +70,7 @@ function useRandomRelations(config, frameStateRef, entityCount, entityRefsRef, g
         return () => {
             clearInterval(interval); // Cleanup interval on component unmount
         };
-    }, [config.showRelations, frameStateRef, entityCount, entityRefsRef, getEntityRefFn, relationsRef]);
+    }, [config.showRelations, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef]);
 }
 
 export default useRandomRelations;

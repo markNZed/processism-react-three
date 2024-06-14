@@ -67,3 +67,8 @@ Emergent substrate - processing particles to form entities in another dimension 
 To avoid the blob from shrinking we could use the center point between the joint rather than the joint.
 
 The "middle" of joints is not workig at the abstraction of top
+
+Use Refs for High-Frequency Updates: 
+  Keep using refs for state that changes very frequently (e.g., impulses, frame state).
+Use Zustand for Less Frequent Updates: 
+  Use Zustand for state that changes less frequently and benefits from centralization (e.g., entity references, initialization flags).

@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
-import useStore from '../../useStore';
 import _ from 'lodash';
 import Particle from './Particle';
 import { getColor } from './utils';
@@ -19,8 +18,7 @@ import Relations from './Relations';
 import useRandomRelations from './useRandomRelations';
 import { useJoints } from './useJoints';
 import { useImpulses } from './useImpulses';
-
-const ZERO_VECTOR = new THREE.Vector3();
+import useEntityStore from './useEntityStore';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = [], initialPosition = [0, 0, 0], scope = 0, radius, config, ...props }, ref) => {
 
@@ -36,10 +34,21 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const lastCompoundEntity = (scope == config.entityCounts.length - 1);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;
-    // Used for Circle animation when isDebug, the position is managed by r3f not rapier
-    const getComponentRef = useStore((state) => state.getComponentRef);
+
     // Array of refs to entities (either CompoundEntity or Particles)
-    const entityRefsRef = useRef(Array.from({ length: entityCount }, () => useRef()));
+    const { initializeEntityRefs, getEntityRefs } = useEntityStore(state => ({
+        initializeEntityRefs: (id, count) => state.initializeEntityRefs(id, count),
+        getEntityRefs: (id) => state.getEntityRefs(id),
+    }));
+
+    useEffect(() => {
+        if (!getEntityRefs(id).length) {
+            initializeEntityRefs(id, entityCount);
+        }
+    }, [entityCount, id, initializeEntityRefs, getEntityRefs]);
+
+    const entityRefsArray = getEntityRefs(id);
+    
     // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
     // Track the center of this CompoundEntity
@@ -70,7 +79,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const localUserDataRef = useRef({ uniqueIndex: id });
     const newLinesRef = useRef({});
     const limitedLog = useLimitedLog(100); 
-    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefsRef);
+    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefsArray);
 
     // Logging/debug
     useEffect(() => {
@@ -78,7 +87,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     }, []);
 
     // Use the custom hook for creating random relations
-    useRandomRelations(config, frameStateRef, entityCount, entityRefsRef, getEntityRefFn, relationsRef, indexArray);
+    useRandomRelations(config, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef, indexArray);
 
     // Distribute evenly around the perimeter
     const generateEntityPositions = (radius, count) => {
@@ -114,12 +123,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
 
     const particleCount = useMemo(() => flattenedParticleRefs?.current?.length, [flattenedParticleRefs.current]);
 
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, entityRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, entityRefsArray, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
+        id,
         internalRef,
         entitiesRegisteredRef,
-        entityRefsRef,
+        entityRefsArray,
         particleAreaRef,
         particleCount,
         config,
@@ -130,7 +140,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const calculateCenter = () => {
         const center = new THREE.Vector3();
         let activeEntities = 0;
-        entityRefsRef.current.forEach((entity) => {
+        entityRefsArray.forEach((entity) => {
             if (entity.current) {
                 const entityCenter = entity.current.getCenter();
                 if (entityCenter) {
@@ -156,7 +166,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 break;
             case "initialImpulse":
                 if (config.initialImpulse) {
-                    applyInitialImpulses(entityRefsRef, flattenedParticleRefs);
+                    applyInitialImpulses(entityRefsArray, flattenedParticleRefs);
                 }
                 frameStateRef.current = "findCenter";
                 break
@@ -171,12 +181,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
             case "calcEntityImpulses":
                 // Could calculate velocity and direction here
                 calculateImpulses(centerRef, prevCenterRef);
+                frameStateRef.current = "entityImpulses";
                 break;
             case "entityImpulses":
                 entityImpulses(prevCenterRef.current, impulseRef.current);
                 frameStateRef.current = "findCenter";
                 break;
             default:
+                console.error("Unexpected state", id, frameStateRef.current)
                 break;
         }
 
@@ -185,7 +197,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
-                {entityRefsRef.current.map((entityRef, i) => (
+                {entityRefsArray.map((entityRef, i) => (
                     <Entity
                         key={`${id}-${i}`}
                         id={`${id}-${i}`}
