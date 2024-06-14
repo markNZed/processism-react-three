@@ -1,11 +1,19 @@
 import { useEffect } from 'react';
+import useEntityStore from './useEntityStore';
 
-function useRandomRelations(config, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef, indexArray) {
+function useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray) {
+
+    const { getEntityRefByPath, getEntityRefs } = useEntityStore(state => ({
+        getEntityRefByPath: state.getEntityRefByPath,
+        getEntityRefs: state.getEntityRefs,
+    }));
+
     useEffect(() => {
         // Generate a random number between 1000 and 10000 which determines the duration of relations
         const randomDuration = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
             if (config.showRelations && frameStateRef.current !== "init") {
+                const entityRefsArray = getEntityRefs(indexArray);
                 const relationCount = Math.ceil(entityCount * 0.2);
                 let relationFound = 0;
                 const allKeys = Object.keys(relationsRef.current);
@@ -36,15 +44,13 @@ function useRandomRelations(config, frameStateRef, entityCount, entityRefsArray,
                             if (Math.random() < 0.9) {
                                 if (indexArray[i]) {
                                     randomPath.push(indexArray[i]);
-                                    continue;
+                                    break;
                                 }
-                                break;
                             }
                             const randomIndex = Math.floor(Math.random() * max);
                             randomPath.push(randomIndex);
                         }
-                        // getEntityRefFn will walk the CompoundEntity tree to find the entityRef 
-                        entityRefTo = getEntityRefFn(randomPath);
+                        entityRefTo = getEntityRefByPath(randomPath);
                         // Most of the time we want to select an entity inside this CompoundEntity
                     } else {
                         let randomIndexTo = Math.floor(Math.random() * entityCount);
@@ -70,7 +76,7 @@ function useRandomRelations(config, frameStateRef, entityCount, entityRefsArray,
         return () => {
             clearInterval(interval); // Cleanup interval on component unmount
         };
-    }, [config.showRelations, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef]);
+    }, [config.showRelations, frameStateRef, entityCount, getEntityRefByPath, relationsRef]);
 }
 
 export default useRandomRelations;

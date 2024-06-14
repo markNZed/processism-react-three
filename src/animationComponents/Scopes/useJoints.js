@@ -1,11 +1,11 @@
 import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
+import useEntityStore from './useEntityStore';
 
 const useJoints = (
     particleJointsRef,
     jointRefsRef,
-    entityRefsArray,
     particleRadiusRef,
     chainRef,
     frameStateRef,
@@ -18,6 +18,9 @@ const useJoints = (
 ) => {
 
     const { world, rapier } = useRapier();
+    const { getEntityRefs } = useEntityStore(state => ({
+        getEntityRefs: state.getEntityRefs,
+    }));
 
     // Return the center point of all the joints
     const generateJointsData = (positions) => {
@@ -231,7 +234,7 @@ const useJoints = (
     // Could maintain a list of "detached" particles at the CompoundEntity level (can filter for center calc)
     // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
     //   What needs to change ? 
-    //     entityCount, entityRefsArray, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
+    //     entityCount, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
     //     entitiesRegisteredRef, particlesRegisteredRef, newJoints, particleJointsRef
     //   Zustand might be able to store refs when we useRef but not sure that has advantages
     //   Data structures that require remounting could be in Zustand
@@ -250,7 +253,7 @@ const useJoints = (
             if (frameStateRef.current !== "init" && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
-                const entityRef = entityRefsArray[randomIndexFrom];
+                const entityRef = getEntityRefs(randomIndexFrom);
                 const userData = entityRef.current.getUserData();
                 const entityUniqueIndex = userData.uniqueIndex;
                 const entityJointIndexes = particleJointsRef.current[entityUniqueIndex];

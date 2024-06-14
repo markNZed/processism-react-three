@@ -12,7 +12,6 @@ import Joint from './Joint'
 import Blob from './Blob';
 import Relations from './Relations';
 import useLimitedLog from '../../hooks/useLimitedLog';
-import useEntityRef from './useEntityRef';
 import useParticlesRegistration from './useParticlesRegistration';
 import useRandomRelations from './useRandomRelations';
 import useJoints from './useJoints';
@@ -36,19 +35,18 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const lastCompoundEntity = (scope == config.entityCounts.length - 1);
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;
 
-    // Array of refs to entities (either CompoundEntity or Particles)
     const { initializeEntityRefs, getEntityRefs } = useEntityStore(state => ({
-        initializeEntityRefs: (id, count) => state.initializeEntityRefs(id, count),
-        getEntityRefs: (id) => state.getEntityRefs(id),
+        initializeEntityRefs: state.initializeEntityRefs,
+        getEntityRefs: state.getEntityRefs,
     }));
 
     useEffect(() => {
-        if (!getEntityRefs(id).length) {
-            initializeEntityRefs(id, entityCount);
+        if (!getEntityRefs(indexArray).length) {
+            initializeEntityRefs(indexArray, entityCount);
         }
-    }, [entityCount, id, initializeEntityRefs, getEntityRefs]);
+    }, [entityCount, indexArray, initializeEntityRefs, getEntityRefs]);
 
-    const entityRefsArray = getEntityRefs(id);
+    const entityRefsArray = getEntityRefs(indexArray);
     
     // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
@@ -80,7 +78,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     const localUserDataRef = useRef({ uniqueIndex: id });
     const newLinesRef = useRef({});
     const limitedLog = useLimitedLog(100); 
-    const { getEntityRefFn, registerGetEntityRefFn } = useEntityRef(props, index, indexArray, internalRef, entityRefsArray);
 
     // Logging/debug
     useEffect(() => {
@@ -88,7 +85,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
     }, []);
 
     // Use the custom hook for creating random relations
-    useRandomRelations(config, frameStateRef, entityCount, entityRefsArray, getEntityRefFn, relationsRef, indexArray);
+    useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray);
 
     // Distribute within the perimeter
     const generateEntityPositions = (radius, count) => {
@@ -122,13 +119,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
         areAllParticlesRegistered
     } = useParticlesRegistration(props, index, scope, id, config);
 
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, entityRefsArray, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
         internalRef,
         entitiesRegisteredRef,
-        entityRefsArray,
+        indexArray,
         particleAreaRef,
         particleCount,
         config,
@@ -165,7 +162,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                 break;
             case "initialImpulse":
                 if (config.initialImpulse) {
-                    applyInitialImpulses(entityRefsArray, flattenedParticleRefs);
+                    applyInitialImpulses(flattenedParticleRefs);
                 }
                 frameStateRef.current = "findCenter";
                 break
@@ -213,8 +210,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, index, indexArray = []
                         blobVisibleRef={blobVisibleRef}
                         particleJointsRef={particleJointsRef}
                         jointRefsRef={jointRefsRef}
-                        getEntityRefFn={getEntityRefFn}
-                        registerGetEntityRefFn={registerGetEntityRefFn}
                         chainRef={chainRef}
                     />
                 ))}

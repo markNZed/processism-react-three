@@ -1,12 +1,13 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import useEntityStore from './useEntityStore';
 
 const useImpulses = (
     id,
     internalRef,
     entitiesRegisteredRef,
-    entityRefsArray,
+    indexArray,
     particleAreaRef,
     particleCount,
     config,
@@ -15,6 +16,12 @@ const useImpulses = (
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
+
+    const { getEntityRefs } = useEntityStore(state => ({
+        getEntityRefs: state.getEntityRefs,
+    }));
+
+    const entityRefsArray = getEntityRefs(indexArray);
 
     const entityImpulses = (center, impulseIn) => {
         const impulse = impulseIn.clone();
@@ -48,7 +55,7 @@ const useImpulses = (
         });
     };
 
-    const applyInitialImpulses = (entityRefsArray, flattenedParticleRefs) => {
+    const applyInitialImpulses = (flattenedParticleRefs) => {
         const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, () => new THREE.Vector3(
             (Math.random() - 0.5) * impulsePerParticle,
             (Math.random() - 0.5) * impulsePerParticle,

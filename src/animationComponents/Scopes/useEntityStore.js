@@ -2,17 +2,25 @@ import { create } from 'zustand';
 
 const useEntityStore = create((set, get) => ({
   entityRefs: {},
-  setEntityRefs: (id, refs) => set(state => ({
-    entityRefs: { ...state.entityRefs, [id]: refs },
+  setEntityRefs: (indexArray, refs) => set(state => ({
+    entityRefs: { ...state.entityRefs, [indexArray.join('.')]: refs },
   })),
-  getEntityRefs: (id) => get().entityRefs[id] || [],
-  initializeEntityRefs: (id, count) => {
-    if (!get().entityRefs[id]) {
+  getEntityRefs: (indexArray) => {
+    return get().entityRefs[indexArray.join('.')] || [];
+  },
+  initializeEntityRefs: (indexArray, count) => {
+    const key = indexArray.join('.');
+    if (!get().entityRefs[key]) {
       const refs = Array.from({ length: count }, () => ({ current: null }));
       set(state => ({
-        entityRefs: { ...state.entityRefs, [id]: refs },
+        entityRefs: { ...state.entityRefs, [key]: refs },
       }));
     }
+  },
+  getEntityRefByPath: (path) => {
+    const key = path.slice(0, -1).join('.');
+    const index = path[path.length - 1];
+    return get().entityRefs[key]?.[index];
   },
 }));
 
