@@ -9,7 +9,6 @@ import useStore from '../../useStore'
 import { getColor } from './utils';
 import Particle from './Particle';
 import InstancedParticles from './InstancedParticles';
-import Joint from './Joint'
 import Blob from './Blob';
 import Relations from './Relations';
 import useLimitedLog from '../../hooks/useLimitedLog';

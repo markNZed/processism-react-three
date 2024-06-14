@@ -161,6 +161,7 @@ const Scopes = React.forwardRef((props, ref) => {
     useFrame(() => {
         framesPerStepCount.current++;
         if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
+        // Should replace props.isAnimating with pausePhysics
         if (framesPerStepCount.current == 0 && props.isAnimating && !pausePhysics) {
             step(fixedDelta);
         }
