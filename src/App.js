@@ -43,7 +43,7 @@ export default function App() {
 
   return (
     <>
-      { false && (
+      { true && (
         //Added here as a hack for interactive testing
         <TreeStoreDemo />
       )}

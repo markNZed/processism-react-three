@@ -200,34 +200,35 @@ const useTreeStore = create((set, get) => ({
       return { nodes, propertyLookups };
     }),
   
-    // Function to move a node to a new parent in the tree.
-    moveNode: (nodeId, newParentId) => set(state => {
-      const nodes = { ...state.nodes };
-      const nodeToMove = nodes[nodeId];
-      if (!nodeToMove) throw new Error(`Node ${nodeId} does not exist`);
-      const newParentNode = nodes[newParentId];
-      if (!newParentNode) throw new Error(`New parent node ${newParentId} does not exist`);
+// Function to move a node to a new parent in the tree.
+moveNode: (nodeId, newParentId) => set(state => {
+    const nodes = { ...state.nodes };
+    const nodeToMove = nodes[nodeId];
+    if (!nodeToMove) throw new Error(`Node ${nodeId} does not exist`);
+    const newParentNode = nodes[newParentId];
+    if (!newParentNode) throw new Error(`New parent node ${newParentId} does not exist`);
   
-      removeNodeFromParent(nodes, nodeId);
-      const newDepth = (newParentNode.depth || 0) + 1;
+    removeNodeFromParent(nodes, nodeId);
+    const newDepth = (newParentNode.depth || 0) + 1;
   
-      const updateDepthRecursively = (nId, depth) => {
-        nodes[nId].depth = depth;
-        nodes[nId].children.forEach(childId => updateDepthRecursively(childId, depth + 1));
-      };
+    const updateDepthRecursively = (nId, depth) => {
+      nodes[nId].depth = depth;
+      nodes[nId].children.forEach(childId => updateDepthRecursively(childId, depth + 1));
+    };
   
-      updateDepthRecursively(nodeId, newDepth);
+    updateDepthRecursively(nodeId, newDepth);
   
-      return {
-        nodes: {
-          ...nodes,
-          [newParentId]: {
-            ...newParentNode,
-            children: [...(newParentNode.children || []), nodeId],
-          },
+    return {
+      nodes: {
+        ...nodes,
+        [newParentId]: {
+          ...newParentNode,
+          children: [...(newParentNode.children || []), nodeId],
         },
-      };
-    }),
+      },
+    };
+  }),
+  
   
     // Function to retrieve nodes by a specific property and depth.
     getNodesByPropertyAndDepth: (property, value, depth) => {
@@ -268,13 +269,12 @@ const useTreeStore = create((set, get) => ({
       traverse(nodes['root']);
     },
   
-    // Function to copy a subtree to a new parent node.
-  // Function to copy a subtree to a new parent node.
-  copySubtree: (nodeId, newParentId) => set(state => {
+// Function to copy a subtree to a new parent node.
+copySubtree: (nodeId, newParentId) => set(state => {
     const nodes = { ...state.nodes };
     if (!nodes[nodeId]) throw new Error(`Node ${nodeId} does not exist`);
     if (!nodes[newParentId]) throw new Error(`New parent node ${newParentId} does not exist`);
-
+  
     const generateUniqueId = (baseId) => {
       let newId = `${baseId}_copy`;
       let counter = 1;
@@ -284,28 +284,31 @@ const useTreeStore = create((set, get) => ({
       }
       return newId;
     };
-
-    const copyRecursively = (node) => {
+  
+    const copyRecursively = (node, parentDepth) => {
       const newNodeId = generateUniqueId(node.id);
+      const newDepth = parentDepth + 1;
       const newNode = {
         ...JSON.parse(JSON.stringify(node)), // Ensuring a deep copy of the node properties
         id: newNodeId,
+        depth: newDepth,
         children: [],
       };
       newNode.children = node.children.map(childId => {
-        const copiedChild = copyRecursively(nodes[childId]);
+        const copiedChild = copyRecursively(nodes[childId], newDepth);
         return copiedChild.id;
       });
       nodes[newNode.id] = newNode;
       return newNode;
     };
-
+  
     const nodeToCopy = nodes[nodeId];
-    const newSubtree = copyRecursively(nodeToCopy);
+    const newSubtree = copyRecursively(nodeToCopy, nodes[newParentId].depth || 0);
     nodes[newParentId].children.push(newSubtree.id);
-
+  
     return { nodes };
   }),
+  
 
   }));
   
