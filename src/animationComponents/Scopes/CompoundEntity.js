@@ -28,7 +28,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     useImperativeHandle(ref, () => internalRef.current);
 
     const entityCount = config.entityCounts[scope];
-    // Store the color in a a state so it si consistent across renders, setColor is not used
+    // Store the color in a a state so it is consistent across renders (when defined by a function)
     const configColor = config.colors[scope];
     const color = useMemo(() => getColor(configColor, props.color), [configColor, props.color]);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
@@ -48,7 +48,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
 
     const entityRefsArray = getEntityRefs(indexArray);
     
-    // The entity radius fills the boundary of CompoundEntity with a margin to avoid overlap
+    // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
@@ -58,13 +58,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     const initialPositionVector = new THREE.Vector3(...initialPosition);
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
     // This is the array of joints added by this CompoundEntity
-    // Joints could be held in ZuStand and instantiated in top
-    // Instead of Joint we should use the create function
+    // Joints could be held in ZuStand
     const newJointsRef = useRef([]);
     // Key is uniqueIndex of the particle. Value is array of linked (through joints) uniqueIndex 
-    //Sould be moved into ZuStand
+    // Sould be moved into ZuStand and subscribe to tree to maintian itself
     const chainRef = props.chainRef || useRef({});
-    //Sould be moved into ZuStand
+    //Sould be moved into ZuStand - property in the tree
     const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
 
     // Key is the uniqueIndex of a particle. Value is an array of joint ids

@@ -71,7 +71,7 @@ const useJoints = (
         particleJointsRef.current[aUserData.uniqueIndex].push(jointRefsRefIndex);
         jointScopeRef.current[jointRefsRefIndex] = scope;
         jointScopeRef.current[jointRefsRefIndexReverse] = scope;
-        console.log("createJoint", id, jointRefsRefIndex, jointRef);
+        //console.log("createJoint", id, jointRefsRefIndex, jointRef);
         return jointRef;
     };
 

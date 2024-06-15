@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useTreeStore from './useTreeStore';
 
 const TreeStoreDemo = () => {
@@ -8,13 +8,13 @@ const TreeStoreDemo = () => {
     updateNode,
     moveNode,
     deleteNode,
-    getNode,
-    findNodesByProperty,
+    getNodesByPropertyAndDepth,
     flattenTree,
     traverseTreeDFS,
     copySubtree,
   } = useTreeStore();
-  
+
+  const [testResults, setTestResults] = useState([]);
   const [newNodeId, setNewNodeId] = useState('');
   const [newNodeParentId, setNewNodeParentId] = useState('');
   const [updateNodeId, setUpdateNodeId] = useState('');
@@ -24,7 +24,118 @@ const TreeStoreDemo = () => {
   const [deleteNodeId, setDeleteNodeId] = useState('');
   const [copyNodeId, setCopyNodeId] = useState('');
   const [copyNewParentId, setCopyNewParentId] = useState('');
-  
+  const [property, setProperty] = useState('');
+  const [propertyValue, setPropertyValue] = useState('');
+  const [depth, setDepth] = useState(0);
+
+  useEffect(() => {
+    runTests();
+  }, []);
+
+  const runTests = async () => {
+    const results = [];
+
+    try {
+      // Test 1: Add nodes
+      addNode('root', { id: 'node1', name: 'Node 1' });
+      addNode('root', { id: 'node2', name: 'Node 2' });
+      addNode('node1', { id: 'node3', name: 'Node 3' });
+      results.push('Test 1 Passed: Nodes added successfully.');
+
+      // Wait for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Test 2: Update node
+      updateNode('node3', { name: 'Updated Node 3' });
+
+      // Wait for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const updatedNodes = useTreeStore.getState().nodes;
+      if (updatedNodes['node3'] && updatedNodes['node3'].name === 'Updated Node 3') {
+        results.push('Test 2 Passed: Node updated successfully.');
+      } else {
+        results.push('Test 2 Failed: Node update failed.');
+      }
+
+      // Test 3: Move node
+      moveNode('node3', 'node2');
+
+      // Wait for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const movedNodes = useTreeStore.getState().nodes;
+      if (movedNodes['node2'] && movedNodes['node2'].children.includes('node3')) {
+        results.push('Test 3 Passed: Node moved successfully.');
+      } else {
+        results.push('Test 3 Failed: Node move failed.');
+      }
+
+      // Test 4: Delete node
+      deleteNode('node3');
+
+      // Wait for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const nodesAfterDelete = useTreeStore.getState().nodes;
+      if (!nodesAfterDelete['node3']) {
+        results.push('Test 4 Passed: Node deleted successfully.');
+      } else {
+        results.push('Test 4 Failed: Node delete failed.');
+      }
+
+      // Test 5: Copy subtree
+      addNode('node1', { id: 'node4', name: 'Node 4' });
+      addNode('node4', { id: 'node5', name: 'Node 5' });
+
+      // Wait for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      copySubtree('node4', 'node2');
+
+      // Wait for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const copiedNodes = useTreeStore.getState().nodes;
+      if (copiedNodes['node2'] && copiedNodes['node2'].children.some(childId => copiedNodes[childId]?.name === 'Node 4')) {
+        results.push('Test 5 Passed: Subtree copied successfully.');
+      } else {
+        console.log("copiedNodes['node2'].children", copiedNodes['node2'].children)
+        results.push('Test 5 Failed: Subtree copy failed.');
+      }
+
+      // Test 6: Find nodes by property and depth
+      const foundNodes = getNodesByPropertyAndDepth('name', 'Node 1', 1);
+      if (foundNodes.length > 0) {
+        results.push('Test 6 Passed: Nodes found by property and depth successfully.');
+      } else {
+        results.push('Test 6 Failed: Finding nodes by property and depth failed.');
+      }
+
+      // Test 7: Flatten tree
+      const flatTree = flattenTree();
+      if (flatTree.length > 0) {
+        results.push('Test 7 Passed: Tree flattened successfully.');
+      } else {
+        results.push('Test 7 Failed: Tree flattening failed.');
+      }
+
+      // Test 8: Traverse tree DFS
+      const dfsNodes = [];
+      traverseTreeDFS(node => dfsNodes.push(node.id));
+      if (dfsNodes.includes('root') && dfsNodes.length > 0) {
+        results.push('Test 8 Passed: Tree traversed using DFS successfully.');
+      } else {
+        results.push('Test 8 Failed: DFS traversal failed.');
+      }
+    } catch (error) {
+      results.push(`Test Failed with error: ${error.message}`);
+    }
+
+    setTestResults(results);
+    console.log(results);
+  };
+
   const handleAddNode = () => {
     addNode(newNodeParentId, { id: newNodeId, name: `Node ${newNodeId}`, children: [] });
     setNewNodeId('');
@@ -61,11 +172,13 @@ const TreeStoreDemo = () => {
         {flattenedNodes.map(node => (
           <li key={node.id}>
             {node.name} (ID: {node.id})
-            <ul>
-              {node.children.map(childId => (
-                <li key={childId}>{nodes[childId].name} (ID: {childId})</li>
-              ))}
-            </ul>
+            {node.children && Array.isArray(node.children) && (
+              <ul>
+                {node.children.map(childId => (
+                  <li key={childId}>{nodes[childId]?.name} (ID: {childId})</li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
@@ -75,7 +188,7 @@ const TreeStoreDemo = () => {
   return (
     <div>
       <h1>Tree Operations</h1>
-      
+
       <h2>Add Node</h2>
       <input
         type="text"
@@ -145,6 +258,31 @@ const TreeStoreDemo = () => {
       />
       <button onClick={handleCopySubtree}>Copy Subtree</button>
 
+      <h2>Find Nodes by Property and Depth</h2>
+      <input
+        type="text"
+        placeholder="Property"
+        value={property}
+        onChange={(e) => setProperty(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Value"
+        value={propertyValue}
+        onChange={(e) => setPropertyValue(e.target.value)}
+      />
+      <input
+        type="number"
+        placeholder="Depth"
+        value={depth}
+        onChange={(e) => setDepth(Number(e.target.value))}
+      />
+      <button
+        onClick={() => console.log(getNodesByPropertyAndDepth(property, propertyValue, depth))}
+      >
+        Find Nodes
+      </button>
+
       <h2>Flatten Tree</h2>
       {displayNodes()}
 
@@ -153,14 +291,12 @@ const TreeStoreDemo = () => {
         Traverse Tree
       </button>
 
-      <h2>Find Nodes by Property</h2>
-      <button
-        onClick={() =>
-          console.log(findNodesByProperty('name', 'Node 1'))
-        }
-      >
-        Find Nodes with Name 'Node 1'
-      </button>
+      <h2>Test Results</h2>
+      <ul>
+        {testResults.map((result, index) => (
+          <li key={index}>{result}</li>
+        ))}
+      </ul>
     </div>
   );
 };

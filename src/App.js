@@ -44,7 +44,7 @@ export default function App() {
   return (
     <>
       { false && (
-        //Added here for interactive testing
+        //Added here as a hack for interactive testing
         <TreeStoreDemo />
       )}
       <SceneSelector />
