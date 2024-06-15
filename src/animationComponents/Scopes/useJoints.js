@@ -1,8 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
-import useEntityStore from './useEntityStore';
-import useStore from '../../useStore'
 
 const useJoints = (
     particleJointsRef,
@@ -17,13 +15,12 @@ const useJoints = (
     entityPositions,
     scope,
     entityParticlesRefsRef,
+    children,
 ) => {
 
     const { world, rapier } = useRapier();
-    const { getEntityRefs } = useEntityStore(state => ({
-        getEntityRefs: state.getEntityRefs,
-    }));
-    const setPausePhysics = useStore((state) => state.setPausePhysics)
+
+    const getEntityRefs = children.map(entity => entity.ref);
 
     // Return the center point of all the joints
     const generateJointsData = (positions) => {

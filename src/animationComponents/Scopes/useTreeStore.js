@@ -88,10 +88,15 @@ const createNode = (id, properties = {}, children = []) => ({
 const useTreeStore = create((set, get) => ({
     // Initial state with a root node.
     nodes: {
-      root: createNode('root', {}, []),
+      root: createNode('root', {depth: 0}, []),
     },
     // Object to maintain lookups for node properties.
     propertyLookups: {},
+
+    getNode: (nodeId) => {
+        const nodes = get().nodes;
+        return nodes[nodeId];
+    },
   
     // Function to add a new node to the tree.
     addNode: (parentId, node) => set(state => {
@@ -124,12 +129,12 @@ const useTreeStore = create((set, get) => ({
       const updatedLookups = { ...state.propertyLookups };
       Object.keys(updates).forEach(prop => {
         if (prop !== 'id' && prop !== 'children' && prop !== 'depth') {
-          const oldValues = Array.isArray(node[prop]) ? node[prop] : [node[prop]];
+          const oldValues = Array.isArray(node[prop]) ? node[prop] : node[prop] ? [node[prop]] : [];
           const newValues = Array.isArray(updates[prop]) ? updates[prop] : [updates[prop]];
   
           oldValues.forEach(value => {
             if (updatedLookups[prop]) {
-              updatedLookups[prop][value] = updatedLookups[prop][value].filter(
+               updatedLookups[prop][value] = updatedLookups[prop][value].filter(
                 nodeId => nodeId !== id
               );
               if (updatedLookups[prop][value].length === 0) {
@@ -307,8 +312,7 @@ copySubtree: (nodeId, newParentId) => set(state => {
     nodes[newParentId].children.push(newSubtree.id);
   
     return { nodes };
-  }),
-  
+  }),  
 
   }));
   

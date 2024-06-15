@@ -24,6 +24,7 @@
     "react-scripts": "5.0.1",
     "three": "^0.159.0",
     "three-csg-ts": "^3.1.14",
+    "uuid": "^10.0.0",
     "zustand": "^4.5.2"
   },
   "scripts": {

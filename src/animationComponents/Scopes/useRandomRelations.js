@@ -1,19 +1,40 @@
 import { useEffect } from 'react';
-import useEntityStore from './useEntityStore';
+import useTreeStore from './useTreeStore';
 
-function useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray) {
+function useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray, children) {
 
-    const { getEntityRefByPath, getEntityRefs } = useEntityStore(state => ({
-        getEntityRefByPath: state.getEntityRefByPath,
-        getEntityRefs: state.getEntityRefs,
-    }));
+    const {
+        addNode,
+        updateNode,
+        getNode,
+        moveNode,
+        deleteNode,
+        getNodesByPropertyAndDepth,
+        flattenTree,
+        traverseTreeDFS,
+        copySubtree,
+    } = useTreeStore(); 
+
+
+    const getEntityRefByPath = (path) => {
+        //console.log("getEntityRefByPath", path);
+        let id = "root";
+        let entity = getNode(id);
+        let entityRef = entity.ref;
+        path.slice(0, -1).forEach((i) => {
+            entity = getNode(entity.children[i]);
+            entityRef = entity.ref;
+        });
+        return entityRef;
+    };
+
+    const entityRefsArray = children.map(entity => entity.ref);
 
     useEffect(() => {
         // Generate a random number between 1000 and 10000 which determines the duration of relations
         const randomDuration = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
             if (config.showRelations && frameStateRef.current !== "init") {
-                const entityRefsArray = getEntityRefs(indexArray);
                 const relationCount = Math.ceil(entityCount * 0.2);
                 let relationFound = 0;
                 const allKeys = Object.keys(relationsRef.current);

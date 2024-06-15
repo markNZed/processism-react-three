@@ -5,7 +5,6 @@ import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
 import _ from 'lodash';
-import useStore from '../../useStore'
 import { getColor } from './utils';
 import Particle from './Particle';
 import InstancedParticles from './InstancedParticles';
@@ -16,37 +15,48 @@ import useParticlesRegistration from './useParticlesRegistration';
 import useRandomRelations from './useRandomRelations';
 import useJoints from './useJoints';
 import useImpulses from './useImpulses';
-import useEntityStore from './useEntityStore';
 import DebugRender from './DebugRender';
+import useTreeStore from './useTreeStore';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initialPosition = [0, 0, 0], scope = 0, radius, config, ...props }, ref) => {
-
-    const isDebug = props.debug || config.debug;
+const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = [], initialPosition = [0, 0, 0], radius, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const entityCount = config.entityCounts[scope];
+    const {
+        addNode,
+        updateNode,
+        getNode,
+        moveNode,
+        deleteNode,
+        getNodesByPropertyAndDepth,
+        flattenTree,
+        traverseTreeDFS,
+        copySubtree,
+    } = useTreeStore(); 
+
+    const node = getNode(id);
+    const scope = node.depth;
+    const config = node.config;
+    const isDebug = props.debug || config.debug;
+    const childrenId = node.children;
+    const entityCount = childrenId.length;
+    const children  = node.children.map(childId => getNode(childId));
+    //const entityCount = config.entityCounts[scope];
     // Store the color in a a state so it is consistent across renders (when defined by a function)
+    //const configColor = config.colors[scope];
     const configColor = config.colors[scope];
     const color = useMemo(() => getColor(configColor, props.color), [configColor, props.color]);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
-    const lastCompoundEntity = (scope == config.entityCounts.length - 1);
+    //const lastCompoundEntity = (scope == config.entityCounts.length - 1);
+    const lastCompoundEntity = useMemo(() => {
+        const firstChild = getNode(childrenId[0]);
+        return firstChild.leaf;
+    },[childrenId[0]]);
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;
 
-    const { initializeEntityRefs, getEntityRefs } = useEntityStore(state => ({
-        initializeEntityRefs: state.initializeEntityRefs,
-        getEntityRefs: state.getEntityRefs,
-    }));
-
-    useEffect(() => {
-        if (!getEntityRefs(indexArray).length) {
-            initializeEntityRefs(indexArray, entityCount);
-        }
-    }, [entityCount, indexArray, initializeEntityRefs, getEntityRefs]);
-
-    const entityRefsArray = getEntityRefs(indexArray);
+    // Up to here converting to useTreeStore
     
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
@@ -89,7 +99,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
 
     // Use the custom hook for creating random relations
     // Maybe rename to useAnimateRelations (useImpulse could be broken out into useAnimateImpulses)
-    useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray);
+    useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray, children);
 
     // Distribute entities within the perimeter
     const generateEntityPositions = (radius, count) => {
@@ -131,7 +141,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
 
     // Relying on order of args is not good with such large numbres of args
     //Sould be moved into ZuStand for particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef,
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef);
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -142,17 +152,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
         particleCount,
         config,
         scope,
+        children,
     );
-
-    const setPausePhysics = useStore((state) => state.setPausePhysics)
 
     // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
     const calculateCenter = () => {
         const center = new THREE.Vector3();
         let activeEntities = 0;
-        entityRefsArray.forEach((entity) => {
-            if (entity.current) {
-                const entityCenter = entity.current.getCenter();
+        children.forEach((entity) => {
+            if (entity.ref) {
+                const entityCenter = entity.ref.current.getCenter();
                 if (entityCenter) {
                     center.add(entityCenter);
                     activeEntities++;
@@ -219,16 +228,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, indexArray = [], initi
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
-                {entityRefsArray.map((entityRef, i) => (
+                {children.map((entity, i) => (
                     <Entity
                         key={`${id}-${i}`}
-                        id={`${id}-${i}`}
+                        id={`${entity.id}`}
                         initialPosition={entityPositions[i].toArray()}
                         radius={entityRadius}
                         color={color}
                         scope={scope + 1}
                         indexArray={[...indexArray, i]}
-                        ref={entityRef}
+                        ref={entity.ref}
                         registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}

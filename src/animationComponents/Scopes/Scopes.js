@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import withAnimationState from '../../withAnimationState';
@@ -7,6 +7,8 @@ import { useControls } from 'leva'
 import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
+import useTreeStore from './useTreeStore';
+import { v4 as uuidv4 } from 'uuid';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -32,6 +34,10 @@ import useStore from '../../useStore'
 const Scopes = React.forwardRef((props, ref) => {
 
     const pausePhysics = useStore((state) => state.pausePhysics);
+
+    // Using forwardRef and need to access the ref from inside this component too
+    const internalRef = useRef();
+    useImperativeHandle(ref, () => internalRef.current);
 
     // Leva controls
     // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
@@ -91,6 +97,7 @@ const Scopes = React.forwardRef((props, ref) => {
     const stepCount = useRef(0); // Counter to track the number of steps
     const lastStepEnd = useRef(0);
     const averageOver = 1000;
+    const [treeReady, setTreeReady] = useState(false);
 
     // Because this renders then remountConfig gets reset then entityCounts has an undefined value if we reduce te scope
     useEffect(() => {
@@ -196,15 +203,71 @@ const Scopes = React.forwardRef((props, ref) => {
         console.log("Scopes mounting");
     }, []);
 
+    const {
+        addNode,
+        updateNode,
+        getNode,
+        moveNode,
+        deleteNode,
+        getNodesByPropertyAndDepth,
+        flattenTree,
+        traverseTreeDFS,
+        copySubtree,
+      } = useTreeStore(); 
+      
+    function addNodesRecursively(entityCounts, parentId = "root") {
+        if (entityCounts.length === 0) {
+            return;
+        }
+    
+        const [currentCount, ...restCounts] = entityCounts;
+    
+        for (let i = 0; i < currentCount; i++) {
+            const nodeId = uuidv4();
+            const node = {
+                id: nodeId,
+                leaf: restCounts.length === 0,
+                ref: React.createRef(),
+            };
+            addNode(parentId, node);    
+            addNodesRecursively(restCounts, nodeId);
+        }
+    }
+
+    function updateNodesConfigRecursively(config, id = "root") {
+        const node = getNode(id);
+        updateNode(id, {config});
+        node.children.forEach((childId) => {
+            updateNodesConfigRecursively(config, childId);
+        });
+    }
+
+    // Initialization the tree store, do not have a UI for this yet
+    useEffect(() => {
+        console.log("useEffect Initialization")
+        if (remountConfigState.entityCounts) {
+            const newConfig = { ...config, ...remountConfigState };
+            const entityCountsStr = remountConfigState.entityCounts.toString();
+            const rootNode = getNode("root");
+            console.log("useEffect Initialization", rootNode.entityCountsStr, entityCountsStr)
+            if (rootNode.entityCountsStr !== entityCountsStr)   {
+                addNodesRecursively(remountConfigState.entityCounts);
+                updateNode("root", {entityCountsStr, ref: internalRef});
+                updateNodesConfigRecursively(newConfig);
+                setTreeReady(true)
+            } else if (JSON.stringify(rootNode.config) !== JSON.stringify(newConfig))  {
+                updateNodesConfigRecursively(newConfig);
+            }
+        }
+    }, [config, remountConfigState]);
+
     // Pass in radius so we can calculate new radius for next scope an pass in same way to CompoundEntity
     return (
         <>
-            {config && remountConfigState && (
+            {treeReady && (
                 <CompoundEntity
                     key={JSON.stringify(remountConfigState)}
-                    id={`Scope`}
-                    ref={ref}
-                    config={{ ...config, ...remountConfigState }}
+                    ref={internalRef}
                     radius={remountConfigState.radius}
                 />
             )}

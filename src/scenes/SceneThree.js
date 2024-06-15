@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import Scene from './Scene';
 import { Camera, Scopes } from '../animationComponents';
-import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
-import { Physics, useRapier } from '@react-three/rapier';
+import { Physics } from '@react-three/rapier';
 import { Perf } from 'r3f-perf'
 
 /****************************
