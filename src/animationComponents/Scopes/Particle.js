@@ -20,20 +20,6 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
     const [initialize, setInitialize] = useState(true);
     const index = scope ? indexArray[scope - 1] : 0;
 
-    // Calculate the unique global index for the Particle
-    const calculateUniqueIndex = (indexArray, entityCounts) => {
-        let multiplier = 1;
-        let uniqueIndex = 0;
-        for (let i = indexArray.length - 1; i >= 0; i--) {
-            uniqueIndex += indexArray[i] * multiplier;
-            multiplier *= entityCounts[i];
-        }
-        return uniqueIndex;
-    };
-
-    // With adding/removing Particles this may not be unique - use a singleton to get a unique id
-    const uniqueIndex = useMemo(() => calculateUniqueIndex(indexArray, config.entityCounts), [indexArray, config.entityCounts]);
-
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
         if (internalRef.current) {
@@ -51,9 +37,9 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
                 const newRadius = relativeScale * colliderRadius
                 setColliderRadius(newRadius);
                 internalRef.current.setUserData(userData)
-                props.particleJointsRef.current[uniqueIndex].forEach((jointIndex) => {
+                props.particleJointsRef.current[id].forEach((jointIndex) => {
                     const joint = props.jointRefsRef.current[jointIndex].current;
-                    if (joint.body1().userData.uniqueIndex == uniqueIndex) {
+                    if (joint.body1().userData.uniqueIndex == id) {
                         const a1 = joint.anchor1();
                         joint.setAnchor1({
                             x: a1.x * relativeScale,
@@ -61,7 +47,7 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
                             z: a1.z * relativeScale,
                         })
                     }
-                    if (joint.body2().userData.uniqueIndex == uniqueIndex) {
+                    if (joint.body2().userData.uniqueIndex == id) {
                         const a2 = joint.anchor2();
                         joint.setAnchor2({
                             x: a2.x * relativeScale,
@@ -87,7 +73,7 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
     // Set the initial userData, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && internalRef.current) {
-            internalRef.current.setUserData({ color: color, uniqueIndex: uniqueIndex });
+            internalRef.current.setUserData({ color: color, uniqueIndex: id });
             setInitialize(false);
         }
     }, [internalRef]);
@@ -117,7 +103,7 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
                         anchorX="center"
                         anchorY="middle"
                     >
-                        {uniqueIndex}
+                        {id}
                     </Text>
                 </>
             )}
