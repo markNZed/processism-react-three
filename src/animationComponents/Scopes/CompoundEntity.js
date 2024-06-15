@@ -36,7 +36,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         copySubtree,
     } = useTreeStore(); 
 
-    const node = getNode(id);
+    let node = getNode(id);
     const scope = node.depth;
     const config = node.config;
     const isDebug = props.debug || config.debug;
@@ -54,10 +54,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         const firstChild = getNode(childrenId[0]);
         return firstChild.leaf;
     },[childrenId[0]]);
-    const Entity = lastCompoundEntity ? Particle : CompoundEntity;
-
-    // Up to here converting to useTreeStore
-    
+    const Entity = lastCompoundEntity ? Particle : CompoundEntity;    
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
     // Track the center of this CompoundEntity
@@ -66,15 +63,33 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     // State machine that distributes computation across frames
     const frameStateRef = useRef("init");
     const initialPositionVector = new THREE.Vector3(...initialPosition);
+
     // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
     // This is the array of joints added by this CompoundEntity
     // Joints could be held in ZuStand
-    const newJointsRef = useRef([]);
+    //const newJointsRef = useRef([]);
     // Key is uniqueIndex of the particle. Value is array of linked (through joints) uniqueIndex 
     // Sould be moved into ZuStand and subscribe to tree to maintian itself
-    const chainRef = props.chainRef || useRef({});
+    
+    //const chainRef = props.chainRef || useRef({});
     //Sould be moved into ZuStand - property in the tree
-    const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
+    // Could be a side state
+    //const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
+
+
+    /*
+    // Up to here converting to useTreeStore
+    const node = {
+                id: nodeId,
+                leaf: restCounts.length === 0,
+                ref: React.createRef(),
+                joints: [],
+                particles: [],
+                relations: [],
+                chain: [],
+                visible: false,
+            };
+    */
 
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
@@ -140,8 +155,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     } = useParticlesRegistration(props, index, scope, id, config);
 
     // Relying on order of args is not good with such large numbres of args
-    //Sould be moved into ZuStand for particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef,
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, chainRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children);
+    //Sould be moved into ZuStand for particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -176,7 +191,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     useEffect(() => {
         if (initializePhysics && !initializedPhysics) {
-            newJointsRef.current = initializeJoints(flattenedParticleRefs, initialPosition);
+            // Maybe use a variable instead of getNode so we can update and not sync node
+            updateNode(id, {joints: initializeJoints(flattenedParticleRefs, initialPosition)});
+            node = getNode(id);
             frameStateRef.current = "initialImpulse";
             // Need to set state to trigger re-rendering of this component
             // otherwise the satte machine gets stuck
@@ -241,22 +258,18 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}
-                        blobVisibleRef={blobVisibleRef}
                         particleJointsRef={particleJointsRef}
                         jointScopeRef={jointScopeRef}
                         jointRefsRef={jointRefsRef}
-                        chainRef={chainRef}
                     />
                 ))}
 
                 {frameStateRef.current !== "init" && (
                     <Blob
-                        id={`blob-${id}`}
-                        blobVisibleRef={blobVisibleRef}
+                        id={`${id}`}
                         indexArray={indexArray}
                         scope={scope}
                         flattenedParticleRefs={flattenedParticleRefs}
-                        chainRef={chainRef}
                         lastCompoundEntity={lastCompoundEntity}
                         worldToLocalFn={internalRef.current.worldToLocal}
                         color={color}
@@ -296,7 +309,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                     color={color}
                     initialPosition={initialPosition}
                     jointsData={jointsData}
-                    newJointsRef={newJointsRef}
+                    newJointsRef={node.joints}
                     index={index}
                     internalRef={internalRef}
                     isDebug={isDebug}

@@ -1,13 +1,21 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import useTreeStore from './useTreeStore';
 
-const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, chainRef, lastCompoundEntity, worldToLocalFn, color, jointScopeRef }) => {
+const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color, jointScopeRef }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
+    const {
+        updateNode,
+        getNode,
+        propagateValue,
+    } = useTreeStore(); 
+    const node = getNode(id);
+    const chainRef = useRef(node.chain);
 
     // Helper function to recursively build the ordered list
     // Returns null if a chain is dangling
@@ -143,7 +151,7 @@ const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, ch
             blobData.current.flattenedIndexes.push(flattenedIndex);
         }
 
-        blobVisibleRef.current[indexArrayStr] = (scope == 0);
+        updateNode(id, {visible: scope == 0})
 
     },[]);
 
@@ -159,37 +167,15 @@ const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, ch
 
         if (!blobData.current) return;
 
-        let ancestorVisible = false;
-        let parentVisible = false;
-        const parentScope = scope - 1;
-        for (let i = parentScope; i >= 0; i--) {
-            const key = indexArray.slice(0, i).join(); // create a string for the key
-            if (blobVisibleRef.current[key]) {
-                blobVisibleRef.current[indexArrayStr] = false;
-                ancestorVisible = true;
-                if (i == parentScope) parentVisible = true;
-                break;
-            }
-        }
-
-        // Special case to look after particles where visibility is managed from the parent ComponentEntity
-        // to avoid needing to have blob related functionality in teh Particle component
-        if (lastCompoundEntity && ancestorVisible) blobVisibleRef.current[indexArrayStr + ',0'] = false;
-
-        const parentVanished = !parentVisible && prevParentVisibleRef.current;
-        if (parentVanished) {
-            blobVisibleRef.current[indexArrayStr] = true;
-        }
-        prevParentVisibleRef.current = parentVisible;
-
+        // Probably don't need anything specai lfor this because we have nodes for th eparticles
         if (lastCompoundEntity) {
             for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
                 // Could add config option to show particles
-                flattenedParticleRefs.current[i].current.userData.visible = blobVisibleRef.current[indexArrayStr + ',0'];
+                flattenedParticleRefs.current[i].current.userData.visible = node.visibleParticles;
             }
         }
 
-        if (!ancestorVisible && blobVisibleRef.current[indexArrayStr]) {
+        if (node.visible) {
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
@@ -202,7 +188,7 @@ const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, ch
             const geometry = points_to_geometry(blobPoints);
             blobRef.current.geometry.dispose();
             blobRef.current.geometry = geometry;
-            blobRef.current.visible = blobVisibleRef.current[indexArrayStr];
+            blobRef.current.visible = node.visible;
 
         } else {
             blobRef.current.visible = false;
@@ -211,37 +197,52 @@ const Blob = ({ id, blobVisibleRef, indexArray, scope, flattenedParticleRefs, ch
     });
 
     const handleOnClick = (event) => {
-        console.log("handleOnClick", "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope)
+        //console.log("handleOnClick", "event:", event, "node.visible:", node.visible, "scope:", scope)
         // If a higher blob is visible then ignore
+        // Walk up the tree but this is wrong as it also need to go down the branch
+        let ancestorId = node.parentId;
         for (let i = scope - 1; i >= 0; i--) {
-            const key = indexArray.slice(0, i).join(); // create a string for the key
-            if (blobVisibleRef.current[key]) {
-                return
-            }
+            const ancestorNode = getNode(ancestorId) ;
+            if (ancestorNode.visible) return;
+            ancestorId = ancestorNode.parentId
         }
         // Stop the event from bubbling up
         event.stopPropagation();
         // Alternate visibility
-        blobVisibleRef.current[indexArrayStr] = !blobVisibleRef.current[indexArrayStr];
-        //Special case for Particles
-        if (lastCompoundEntity) {
-            blobVisibleRef.current[indexArrayStr + ',0'] = !blobVisibleRef.current[indexArrayStr];
+        const updateNodeValue = {};
+        updateNodeValue["visible"] = !node.visible;
+        if (lastCompoundEntity) updateNodeValue["visibleParticles"] = node.visible
+        if (node.visible) {
+            // The children need to become visible
+            node.children.forEach(childId => {
+                updateNode(childId, {visible: true});
+            });
+        } else {
+            // All the children should become invisible (could be many scopes below)
+            // This is very slow
+            node.children.forEach(childId => {
+                propagateValue(childId, "visible", false)
+            });
         }
+        updateNode(id, updateNodeValue);
     }
     
-    const handleOnContextMenu = (event, blobVisibleRef, scope) => {
+    const handleOnContextMenu = (event) => {
         // Stop the event from bubbling up
         event.stopPropagation();
-        console.log("handleOnContextMenu", "event:", event, "blobVisibleRef.current:", blobVisibleRef.current, "scope:", scope);
-        // The largest blob has an empty key
-        blobVisibleRef.current[''] = true;
+        //console.log("handleOnContextMenu", "event:", event, "node.visible:", node.visible, "scope:", scope);
+        updateNode("root", {visible: true});
+        const rootNode = getNode("root");
+        rootNode.children.forEach(childId => {
+            propagateValue(childId, "visible", false)
+        });
     }
     
 
     return (
         <mesh ref={blobRef}
             onClick={(event) => handleOnClick(event)}
-            onContextMenu={(event) => handleOnContextMenu(event, blobVisibleRef)}>
+            onContextMenu={(event) => handleOnContextMenu(event)}>
             <meshBasicMaterial color={color} />
         </mesh>
     );

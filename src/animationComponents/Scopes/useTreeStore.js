@@ -314,6 +314,22 @@ copySubtree: (nodeId, newParentId) => set(state => {
     return { nodes };
   }),  
 
+  propagateValue: (nodeId, property, value) => set(state => {
+    const nodes = { ...state.nodes };
+  
+    const updateSubtree = (currentId) => {
+      nodes[currentId][property] = value;
+      if (nodes[currentId].children && Array.isArray(nodes[currentId].children)) {
+        nodes[currentId].children.forEach(childId => updateSubtree(childId));
+      }
+    };
+  
+    updateSubtree(nodeId);
+  
+    return { nodes };
+  }),
+  
+
   }));
   
   export default useTreeStore;

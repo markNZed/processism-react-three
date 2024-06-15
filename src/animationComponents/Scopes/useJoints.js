@@ -1,14 +1,15 @@
 import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
+import useTreeStore from './useTreeStore';
 
 const useJoints = (
     particleJointsRef,
     jointScopeRef,
     jointRefsRef,
     particleRadiusRef,
-    chainRef,
     frameStateRef,
+    // Should pass the node not the id
     id,
     config,
     internalRef,
@@ -19,6 +20,13 @@ const useJoints = (
 ) => {
 
     const { world, rapier } = useRapier();
+    const {
+        updateNode,
+        getNode,
+    } = useTreeStore(); 
+
+    const node = getNode(id);
+    const chainRef = useRef(node.chain);
 
     const getEntityRefs = children.map(entity => entity.ref);
 
@@ -189,6 +197,7 @@ const useJoints = (
                 },
             };
         });
+        updateNode(id, {chain: chainRef.current});
         return allocateJoints;
     };
 

@@ -214,6 +214,18 @@ const Scopes = React.forwardRef((props, ref) => {
         traverseTreeDFS,
         copySubtree,
       } = useTreeStore(); 
+
+    const nodeTemplate = {
+        id: null,
+        leaf: false,
+        ref: null,
+        joints: [],
+        particles: [],
+        relations: [],
+        chain: {},
+        visible: false,
+        parentId: null,
+    };
       
     function addNodesRecursively(entityCounts, parentId = "root") {
         if (entityCounts.length === 0) {
@@ -225,9 +237,11 @@ const Scopes = React.forwardRef((props, ref) => {
         for (let i = 0; i < currentCount; i++) {
             const nodeId = uuidv4();
             const node = {
+                ...nodeTemplate,
                 id: nodeId,
                 leaf: restCounts.length === 0,
                 ref: React.createRef(),
+                parentId: parentId,
             };
             addNode(parentId, node);    
             addNodesRecursively(restCounts, nodeId);
@@ -244,15 +258,13 @@ const Scopes = React.forwardRef((props, ref) => {
 
     // Initialization the tree store, do not have a UI for this yet
     useEffect(() => {
-        console.log("useEffect Initialization")
         if (remountConfigState.entityCounts) {
             const newConfig = { ...config, ...remountConfigState };
             const entityCountsStr = remountConfigState.entityCounts.toString();
             const rootNode = getNode("root");
-            console.log("useEffect Initialization", rootNode.entityCountsStr, entityCountsStr)
             if (rootNode.entityCountsStr !== entityCountsStr)   {
                 addNodesRecursively(remountConfigState.entityCounts);
-                updateNode("root", {entityCountsStr, ref: internalRef});
+                updateNode("root", {...nodeTemplate, entityCountsStr, ref: internalRef, visible: true});
                 updateNodesConfigRecursively(newConfig);
                 setTreeReady(true)
             } else if (JSON.stringify(rootNode.config) !== JSON.stringify(newConfig))  {
