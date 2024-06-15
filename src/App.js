@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import SceneManager from './SceneManager';
 import SceneSelector from './SceneSelector';
+import { TreeStoreDemo } from './animationComponents';
 
 /**
  * Handles camera adjustments on window resize for react-three-fiber.
@@ -42,6 +43,10 @@ export default function App() {
 
   return (
     <>
+      { false && (
+        //Added here for interactive testing
+        <TreeStoreDemo />
+      )}
       <SceneSelector />
       <button onClick={toggleAnimation}>
         {isAnimating ? 'Stop Animation' : 'Start Animation'}

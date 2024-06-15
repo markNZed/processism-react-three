@@ -72,3 +72,5 @@ Use Refs for High-Frequency Updates:
   Keep using refs for state that changes very frequently (e.g., impulses, frame state).
 Use Zustand for Less Frequent Updates: 
   Use Zustand for state that changes less frequently and benefits from centralization (e.g., entity references, initialization flags).
+
+Use a central tree-like structure to configure the system. THe uniqueIndex needs to be a unique id and indexArray would be a lookup into the tree data structure. The entity subscribes to the tree in ZuStand and aligns it's state on changes. The tree can also noddte when a node has been updated and then the node can clear this down.
