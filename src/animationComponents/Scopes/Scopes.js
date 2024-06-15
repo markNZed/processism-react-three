@@ -8,7 +8,6 @@ import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import useTreeStore from './useTreeStore';
-import { v4 as uuidv4 } from 'uuid';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -214,18 +213,6 @@ const Scopes = React.forwardRef((props, ref) => {
         traverseTreeDFS,
         copySubtree,
       } = useTreeStore(); 
-
-    const nodeTemplate = {
-        id: null,
-        leaf: false,
-        ref: null,
-        joints: [],
-        particles: [],
-        relations: [],
-        chain: {},
-        visible: false,
-        parentId: null,
-    };
       
     function addNodesRecursively(entityCounts, parentId = "root") {
         if (entityCounts.length === 0) {
@@ -235,16 +222,13 @@ const Scopes = React.forwardRef((props, ref) => {
         const [currentCount, ...restCounts] = entityCounts;
     
         for (let i = 0; i < currentCount; i++) {
-            const nodeId = uuidv4();
             const node = {
-                ...nodeTemplate,
-                id: nodeId,
                 leaf: restCounts.length === 0,
                 ref: React.createRef(),
                 parentId: parentId,
             };
-            addNode(parentId, node);    
-            addNodesRecursively(restCounts, nodeId);
+            const newId = addNode(parentId, node);    
+            addNodesRecursively(restCounts, newId);
         }
     }
 
@@ -264,7 +248,7 @@ const Scopes = React.forwardRef((props, ref) => {
             const rootNode = getNode("root");
             if (rootNode.entityCountsStr !== entityCountsStr)   {
                 addNodesRecursively(remountConfigState.entityCounts);
-                updateNode("root", {...nodeTemplate, entityCountsStr, ref: internalRef, visible: true});
+                updateNode("root", {entityCountsStr, ref: internalRef, visible: true});
                 updateNodesConfigRecursively(newConfig);
                 setTreeReady(true)
             } else if (JSON.stringify(rootNode.config) !== JSON.stringify(newConfig))  {

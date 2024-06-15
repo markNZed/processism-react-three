@@ -1,4 +1,5 @@
 import create from 'zustand';
+import uniqueIdGenerator from './uniqueIdGenerator';
 
 /**
  * Zustand Tree Store
@@ -47,12 +48,24 @@ import create from 'zustand';
  * This module provides a flexible and efficient way to manage hierarchical data structures with dynamic properties, making it suitable for various applications such as file systems, organizational charts, and more.
  */
 
+const nodeTemplate = {
+  leaf: false,
+  ref: null,
+  joints: [],
+  particles: [],
+  relations: [],
+  chain: {},
+  visible: false,
+  parentId: null,
+};
+
 // Function to create a new node with given properties and children.
-const createNode = (id, properties = {}, children = []) => ({
-    id,
-    ...properties,
-    children,
-  });
+const createNode = (id = null, properties = {}, children = []) => ({
+  ...nodeTemplate,
+  id: id || uniqueIdGenerator.getNextId(),
+  ...properties,
+  children,
+});
   
   // Helper function to remove a node from its parent's children array.
   const removeNodeFromParent = (nodes, nodeId) => {
@@ -99,42 +112,50 @@ const useTreeStore = create((set, get) => ({
     },
   
     // Function to add a new node to the tree.
-    addNode: (parentId, node) => set(state => {
-      if (state.nodes[node.id]) throw new Error(`Node ID ${node.id} already exists`);
-      const parentNode = state.nodes[parentId];
-      if (!parentNode) throw new Error(`Parent node ${parentId} does not exist`);
+    addNode: (parentId, node) => {
+      let newNodeId;
+      set(state => {
+        if (state.nodes[node.id]) throw new Error(`Node ID ${node.id} already exists`);
+        const parentNode = state.nodes[parentId];
+        if (!parentNode) throw new Error(`Parent node ${parentId} does not exist`);
   
-      const nodeDepth = (parentNode.depth || 0) + 1;
-      const newNode = { ...node, depth: nodeDepth, children: node.children || [] };
+        const nodeDepth = (parentNode.depth || 0) + 1;
+        const newNode = { ...nodeTemplate, ...node, id: uniqueIdGenerator.getNextId(), depth: nodeDepth, children: node.children || [] };
+        newNodeId = newNode.id;
   
-      return {
-        nodes: {
-          ...state.nodes,
-          [newNode.id]: newNode,
-          [parentId]: {
-            ...parentNode,
-            children: [...(parentNode.children || []), newNode.id],
+        return {
+          nodes: {
+            ...state.nodes,
+            [newNode.id]: newNode,
+            [parentId]: {
+              ...parentNode,
+              children: [...(parentNode.children || []), newNode.id],
+            },
           },
-        },
-        propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
-      };
-    }),
-  
+          propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
+        };
+      });
+      return newNodeId;
+    },
+
     // Function to update an existing node's properties.
     updateNode: (id, updates) => set(state => {
       const node = state.nodes[id];
       if (!node) throw new Error(`Node ${id} does not exist`);
   
+      // Allow updates to be a function similar to setState
+      const updatedProperties = typeof updates === 'function' ? updates(node) : updates;
+  
       // Update property lookups before applying changes
       const updatedLookups = { ...state.propertyLookups };
-      Object.keys(updates).forEach(prop => {
+      Object.keys(updatedProperties).forEach(prop => {
         if (prop !== 'id' && prop !== 'children' && prop !== 'depth') {
           const oldValues = Array.isArray(node[prop]) ? node[prop] : node[prop] ? [node[prop]] : [];
-          const newValues = Array.isArray(updates[prop]) ? updates[prop] : [updates[prop]];
+          const newValues = Array.isArray(updatedProperties[prop]) ? updatedProperties[prop] : [updatedProperties[prop]];
   
           oldValues.forEach(value => {
-            if (updatedLookups[prop]) {
-               updatedLookups[prop][value] = updatedLookups[prop][value].filter(
+            if (updatedLookups[prop] && updatedLookups[prop][value]) {
+              updatedLookups[prop][value] = updatedLookups[prop][value].filter(
                 nodeId => nodeId !== id
               );
               if (updatedLookups[prop][value].length === 0) {
@@ -155,20 +176,21 @@ const useTreeStore = create((set, get) => ({
         }
       });
   
-      const newDepth = updates.parentId ? (state.nodes[updates.parentId].depth || 0) + 1 : node.depth;
+      const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
   
       return {
         nodes: {
           ...state.nodes,
           [id]: {
             ...node,
-            ...updates,
+            ...updatedProperties,
             depth: newDepth,
           },
         },
         propertyLookups: updatedLookups,
       };
     }),
+  
   
     // Function to delete a node from the tree.
     deleteNode: (id) => set(state => {

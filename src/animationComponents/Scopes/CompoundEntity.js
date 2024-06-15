@@ -90,6 +90,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 visible: false,
             };
     */
+    //chainRef is broken - we bild a chian at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
 
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
@@ -156,7 +157,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     // Relying on order of args is not good with such large numbres of args
     //Sould be moved into ZuStand for particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children);
+    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,

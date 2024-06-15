@@ -17,6 +17,7 @@ const useJoints = (
     scope,
     entityParticlesRefsRef,
     children,
+    node,
 ) => {
 
     const { world, rapier } = useRapier();
@@ -25,7 +26,6 @@ const useJoints = (
         getNode,
     } = useTreeStore(); 
 
-    const node = getNode(id);
     const chainRef = useRef(node.chain);
 
     const getEntityRefs = children.map(entity => entity.ref);
@@ -74,6 +74,9 @@ const useJoints = (
         );
         jointRefsRef.current[jointRefsRefIndex] = jointRef;
         particleJointsRef.current[aUserData.uniqueIndex].push(jointRefsRefIndex);
+        updateNode(aUserData.uniqueIndex, p => ({
+            joints: [...p.joints, jointRefsRefIndex]
+        }));
         jointScopeRef.current[jointRefsRefIndex] = scope;
         jointScopeRef.current[jointRefsRefIndexReverse] = scope;
         //console.log("createJoint", id, jointRefsRefIndex, jointRef);
@@ -89,7 +92,9 @@ const useJoints = (
         body1Joints = body1Joints.filter(obj => obj !== jointKey);
         body2Joints = body2Joints.filter(obj => obj !== jointKey);
         particleJointsRef.current[body1.userData.uniqueIndex] = body1Joints;
+        updateNode(body1.userData.uniqueIndex, {joints: body1Joints});
         particleJointsRef.current[body2.userData.uniqueIndex] = body2Joints;
+        updateNode(body2.userData.uniqueIndex, {joints: body2Joints});
         const jointIndex = `${body1.userData.uniqueIndex}-${body2.userData.uniqueIndex}`;
         const jointIndexReverse = `${body2.userData.uniqueIndex}-${body1.userData.uniqueIndex}`;
         delete jointScopeRef.current[jointIndex];
@@ -216,16 +221,24 @@ const useJoints = (
             if (particleJointsRef.current[aIndex]) {
                 if (!particleJointsRef.current[aIndex].includes(jointIndex)) {
                     particleJointsRef.current[aIndex].push(jointIndex);
+                    updateNode(aIndex, p => ({
+                        joints: [...p.joints, jointIndex]
+                    }));
                 }
             } else {
                 particleJointsRef.current[aIndex] = [jointIndex];
+                updateNode(aIndex, {joints: jointIndex});
             }
             if (particleJointsRef.current[bIndex]) {
                 if (!particleJointsRef.current[bIndex].includes(jointIndex)) {
                     particleJointsRef.current[bIndex].push(jointIndex);
+                    updateNode(bIndex, p => ({
+                        joints: [...p.joints, jointIndex]
+                    }));
                 }
             } else {
                 particleJointsRef.current[bIndex] = [jointIndex];
+                updateNode(bIndex, {joints: jointIndex});
             }
         });
 
