@@ -4,7 +4,6 @@ import { useRapier, vec3 } from '@react-three/rapier';
 import useTreeStore from './useTreeStore';
 
 const useJoints = (
-    particleJointsRef,
     jointScopeRef,
     jointRefsRef,
     particleRadiusRef,
@@ -73,7 +72,6 @@ const useJoints = (
             true
         );
         jointRefsRef.current[jointRefsRefIndex] = jointRef;
-        particleJointsRef.current[aUserData.uniqueIndex].push(jointRefsRefIndex);
         updateNode(aUserData.uniqueIndex, p => ({
             joints: [...p.joints, jointRefsRefIndex]
         }));
@@ -87,13 +85,11 @@ const useJoints = (
         const jointRef = jointRefsRef.current[jointKey];
         const body1 = jointRef.current.body1();
         const body2 = jointRef.current.body2();
-        let body1Joints = particleJointsRef.current[body1.userData.uniqueIndex];
-        let body2Joints = particleJointsRef.current[body2.userData.uniqueIndex];
+        let body1Joints = getNodeProperty(body1.userData.uniqueIndex, joints);
+        let body2Joints = getNodeProperty(body2.userData.uniqueIndex, joints);
         body1Joints = body1Joints.filter(obj => obj !== jointKey);
         body2Joints = body2Joints.filter(obj => obj !== jointKey);
-        particleJointsRef.current[body1.userData.uniqueIndex] = body1Joints;
         updateNode(body1.userData.uniqueIndex, {joints: body1Joints});
-        particleJointsRef.current[body2.userData.uniqueIndex] = body2Joints;
         updateNode(body2.userData.uniqueIndex, {joints: body2Joints});
         const jointIndex = `${body1.userData.uniqueIndex}-${body2.userData.uniqueIndex}`;
         const jointIndexReverse = `${body2.userData.uniqueIndex}-${body1.userData.uniqueIndex}`;
@@ -218,28 +214,12 @@ const useJoints = (
             const jointIndexReverse = `${bIndex}-${aIndex}`;
             jointScopeRef.current[jointIndex] = scope;
             jointScopeRef.current[jointIndexReverse] = scope;
-            if (particleJointsRef.current[aIndex]) {
-                if (!particleJointsRef.current[aIndex].includes(jointIndex)) {
-                    particleJointsRef.current[aIndex].push(jointIndex);
-                    updateNode(aIndex, p => ({
-                        joints: [...p.joints, jointIndex]
-                    }));
-                }
-            } else {
-                particleJointsRef.current[aIndex] = [jointIndex];
-                updateNode(aIndex, {joints: jointIndex});
-            }
-            if (particleJointsRef.current[bIndex]) {
-                if (!particleJointsRef.current[bIndex].includes(jointIndex)) {
-                    particleJointsRef.current[bIndex].push(jointIndex);
-                    updateNode(bIndex, p => ({
-                        joints: [...p.joints, jointIndex]
-                    }));
-                }
-            } else {
-                particleJointsRef.current[bIndex] = [jointIndex];
-                updateNode(bIndex, {joints: jointIndex});
-            }
+            updateNode(aIndex, p => ({
+                joints: p.joints.includes(jointIndex) ? p.joints : [...p.joints, jointIndex]
+            }));
+            updateNode(bIndex, p => ({
+                joints: p.joints.includes(jointIndex) ? p.joints : [...p.joints, jointIndex]
+            }));
         });
 
         // Distance to the first joint
@@ -275,13 +255,6 @@ const useJoints = (
             createJoint(a, b);
         });
 
-        if (false && scope == 0) {
-            newJoints[0].a.ref = newJoints[0].a.ref.current;
-            newJoints[0].b.ref = newJoints[0].b.ref.current;
-            createJoint(newJoints[0].a, newJoints[0].b);
-            console.log("newJoints[0].a, newJoints[0].b", newJoints[0].a, newJoints[0].b)
-        }
-
         return newJoints;
     };
 
@@ -292,7 +265,7 @@ const useJoints = (
     // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
     //   What needs to change ? 
     //     entityCount, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
-    //     entitiesRegisteredRef, particlesRegisteredRef, newJoints, particleJointsRef
+    //     entitiesRegisteredRef, particlesRegisteredRef, newJoints
     //   Zustand might be able to store refs when we useRef but not sure that has advantages
     //   Data structures that require remounting could be in Zustand
     //   The entityid could be a unique id that is generated from a singleton rather than ordered.
@@ -313,7 +286,7 @@ const useJoints = (
                 const entityRef = getEntityRefs(randomIndexFrom);
                 const userData = entityRef.current.getUserData();
                 const entityUniqueIndex = userData.uniqueIndex;
-                const entityJointIndexes = particleJointsRef.current[entityUniqueIndex];
+                const entityJointIndexes = getNodeProperty(entityUniqueIndex, joints);
                 let replacementEntity;
                 let closestIndex;
                 let closestDistance = Infinity;

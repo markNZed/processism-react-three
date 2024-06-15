@@ -110,6 +110,13 @@ const useTreeStore = create((set, get) => ({
         const nodes = get().nodes;
         return nodes[nodeId];
     },
+
+    getNodeProperty: (nodeId, property) => {
+        const nodes = get().nodes;
+        const node = nodes[nodeId];
+        if (!node) throw new Error(`Node ${nodeId} does not exist`);
+        return node[property];
+    },
   
     // Function to add a new node to the tree.
     addNode: (parentId, node) => {

@@ -95,7 +95,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
     //Sould be moved into ZuStand
-    const particleJointsRef = props.particleJointsRef || useRef({});
+    //const particleJointsRef = props.particleJointsRef || useRef({});
     const jointScopeRef = props.jointScopeRef || useRef({});
     // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
     // Any change to jointRefsRef needs to be made to particleJointsRef also
@@ -156,8 +156,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     } = useParticlesRegistration(props, index, scope, id, config);
 
     // Relying on order of args is not good with such large numbres of args
-    //Sould be moved into ZuStand for particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef
-    const { jointsData, initializeJoints } = useJoints(particleJointsRef, jointScopeRef, jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
+    //Sould be moved into ZuStand for jointScopeRef, jointRefsRef, particleRadiusRef
+    const { jointsData, initializeJoints } = useJoints(jointScopeRef, jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -259,7 +259,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}
-                        particleJointsRef={particleJointsRef}
                         jointScopeRef={jointScopeRef}
                         jointRefsRef={jointRefsRef}
                     />
