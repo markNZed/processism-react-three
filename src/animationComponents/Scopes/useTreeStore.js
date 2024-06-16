@@ -60,7 +60,7 @@ const nodeTemplate = {
   parentId: null,
 };
 
-const ignorePropertyLookup = ['id', 'children', 'ref', 'parentId'];
+const ignorePropertyLookup = ['id', 'children', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef'];
 
 // Function to create a new node with given properties and children.
 const createNode = (id = null, properties = {}, children = []) => ({

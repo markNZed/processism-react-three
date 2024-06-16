@@ -49,7 +49,7 @@ const useParticlesRegistration = (props, index, scope, id, config) => {
         }
     }, [areAllParticlesRegistered, props, index, scope, id]);
 
-    return { registerParticlesFn, entityParticlesRefsRef, entitiesRegisteredRef, flattenedParticleRefs, particleCount, particleAreaRef, particleRadiusRef, areAllParticlesRegistered };
+    return { registerParticlesFn, entityParticlesRefsRef, flattenedParticleRefs, particleCount, particleAreaRef, particleRadiusRef, areAllParticlesRegistered };
 };
 
 export default useParticlesRegistration;

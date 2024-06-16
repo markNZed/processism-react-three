@@ -6,12 +6,12 @@ import useTreeStore from './useTreeStore';
 const useImpulses = (
     id,
     internalRef,
-    entitiesRegisteredRef,
     indexArray,
     particleCount,
     config,
     scope,
     children,
+    frameStateRef,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
@@ -76,8 +76,9 @@ const useImpulses = (
         impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount);
     };
 
+    // Impulse on every frame
     useFrame(() => {
-        if (entitiesRegisteredRef.current === true) {
+        if (frameStateRef.current !== 'init') {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
                 const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);

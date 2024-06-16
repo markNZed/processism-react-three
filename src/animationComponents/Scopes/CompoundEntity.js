@@ -157,19 +157,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     //Sould be moved into ZuStand ?
     // Each particle could store the array of CompoundEntiites that includes it
     // Could "refresh" this explicitly - no when adding every node (too slow)
-    // Each CompoundEntity could maintain a lis tof all lower entities - the tree could do this ?
+    // Each CompoundEntity could maintain a list of all lower entities - the tree could do this ?
     // That would also cover entityParticlesRefsRef
     // Maybe a store for "global" e.g. particleRadiusRef "system"
     //   Could just write into node["root"] 
     //     moved particleRadiusRef and particleAreaRef
     // What does it mean when a particle is registered ? When internalRef is valid e.. rididBodyReady (isParticle can be this)
+    // From the Particle can we know the ancestors and then simply push the particles ?
+    // node has the parentId - recurse up ? 
+    // Could build only when we need it ?
     const {
         registerParticlesFn,
         // An array of entityCount length that stores the particle refs associated with each entity
         //Sould be moved into ZuStand
         entityParticlesRefsRef,
-        // All true when all entities have registered a ref
-        entitiesRegisteredRef,
         // A simple array with all the refs
         flattenedParticleRefs,
         particleCount,
@@ -184,12 +185,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
         internalRef,
-        entitiesRegisteredRef,
         indexArray,
         particleCount,
         config,
         scope,
         children,
+        frameStateRef,
     );
 
     // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
@@ -232,7 +233,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 break;
             // Should move this into useImpulses
             case "initialImpulse":
-                //if (scope == 0) console.log("getAllpropertyLookups", getAllpropertyLookups(), "getAllNodes", getAllNodes());
+                if (scope == 0) console.log("getAllpropertyLookups", getAllpropertyLookups(), "getAllNodes", getAllNodes());
                 if (config.initialImpulse) {
                     applyInitialImpulses(flattenedParticleRefs);
                 }
@@ -303,7 +304,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                     />
                 )}
 
-                {entitiesRegisteredRef.current && (
+                {frameStateRef.current !== "init" && (
                     <Relations
                         internalRef={internalRef}
                         config={config}
