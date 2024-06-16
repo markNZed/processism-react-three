@@ -92,5 +92,5 @@ CompoundEntity -> Outer Particles (filtered set of nodes)
 CompoundEntity -> Joints (node property)
 Each node in tree has these properties and we need a "flat" view of the property
 
-uuid is too long
+
 

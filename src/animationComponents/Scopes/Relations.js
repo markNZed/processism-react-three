@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import useRelationStore from './useRelationStore';
 
-function Relations({ internalRef, relationsRef, config, scope }) {
+function Relations({ internalRef, config, scope }) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
     const lineWidth = (config.entityCounts.length - scope);
@@ -10,12 +11,13 @@ function Relations({ internalRef, relationsRef, config, scope }) {
     const [linesUpdate, setLinesUpdate] = useState(0);
     const linesRef = useRef({});
     const newLinesRef = useRef({});
+    const { setRelation, getRelation, getAllRelations, addRelation, removeRelation, clearRelation, clearAllRelations } = useRelationStore();
 
     useFrame(() => {
         let update = false;
         // Create new lines (only if relation is new)
-        Object.keys(relationsRef.current).forEach(fromId => {
-            Object.keys(relationsRef.current[fromId]).forEach(toId => {
+        Object.keys(getAllRelations()).forEach(fromId => {
+            Object.keys(getRelation(fromId)).forEach(toId => {
                 if (linesRef.current[fromId] && linesRef.current[fromId][toId]) return;
                 const geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(numPoints * 3);
@@ -33,17 +35,17 @@ function Relations({ internalRef, relationsRef, config, scope }) {
         Object.keys(linesRef.current).forEach(fromId => {
             Object.keys(linesRef.current[fromId]).forEach(toId => {
                 // Remove lineRef for relations that no longer exist
-                if (!relationsRef.current[fromId]) {
+                if (!getRelation(fromId)) {
                     delete linesRef.current[fromId];
                     return;
-                } else if (!relationsRef.current[fromId][toId]) {
+                } else if (!getRelation(fromId, toId)) {
                     delete linesRef.current[fromId][toId];
                     return;
                 }
                 const { ref, line } = linesRef.current[fromId][toId];
                 if (ref.current) {
-                    const startPoint = internalRef.current.worldToLocal(relationsRef.current[fromId][toId][0].current.getCenter());
-                    const endPoint = internalRef.current.worldToLocal(relationsRef.current[fromId][toId][1].current.getCenter());
+                    const startPoint = internalRef.current.worldToLocal(getRelation(fromId, toId)[0].current.getCenter());
+                    const endPoint = internalRef.current.worldToLocal(getRelation(fromId, toId)[1].current.getCenter());
                     const start = new THREE.Vector3(startPoint.x, startPoint.y, startPoint.z);
                     const end = new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z);
                     const distance = start.distanceTo(end);

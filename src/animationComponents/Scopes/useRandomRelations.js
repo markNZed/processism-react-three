@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import useTreeStore from './useTreeStore';
+import useRelationStore from './useRelationStore';
 
-function useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray, children) {
+function useRandomRelations(config, frameStateRef, entityCount, indexArray, children) {
 
     const {
         addNode,
@@ -14,7 +15,7 @@ function useRandomRelations(config, frameStateRef, entityCount, relationsRef, in
         traverseTreeDFS,
         copySubtree,
     } = useTreeStore(); 
-
+    const { setRelation, getRelation, getRelations, getAllRelations, addRelation, removeRelation, removeRelations, clearRelation, clearAllRelations } = useRelationStore();
 
     const getEntityRefByPath = (path) => {
         //console.log("getEntityRefByPath", path);
@@ -37,15 +38,16 @@ function useRandomRelations(config, frameStateRef, entityCount, relationsRef, in
             if (config.showRelations && frameStateRef.current !== "init") {
                 const relationCount = Math.ceil(entityCount * 0.2);
                 let relationFound = 0;
-                const allKeys = Object.keys(relationsRef.current);
+                const allKeys = Object.keys(getAllRelations);
                 // Randomly delete keys so we remove relations (and create space for new ones)
                 allKeys.forEach(key => {
                     if (Math.random() < 0.25) {
-                        delete relationsRef.current[key];
+                        removeRelations(key);
                     }
                 });
                 // Update relationFound after removing relations
-                relationFound = Object.keys(relationsRef.current).length;
+                // We could maintain a count in the Store
+                relationFound = Object.keys(getAllRelations).length;
                 while (relationFound < relationCount) {
 
                     // Randomly select an entity from this CompoundEntity
@@ -87,8 +89,7 @@ function useRandomRelations(config, frameStateRef, entityCount, relationsRef, in
                     const randomIndexFromRelations = userDataFrom.relations || [];
                     entityRefFrom.current.setUserData({ ...userDataFrom, relations: [...randomIndexFromRelations, entityRefTo] });
 
-                    if (!relationsRef.current[fromId]) relationsRef.current[fromId] = {};
-                    relationsRef.current[fromId][toId] = [entityRefFrom, entityRefTo];
+                    setRelation(fromId, toId, [entityRefFrom, entityRefTo]);
 
                     relationFound++;
                 }
@@ -97,7 +98,7 @@ function useRandomRelations(config, frameStateRef, entityCount, relationsRef, in
         return () => {
             clearInterval(interval); // Cleanup interval on component unmount
         };
-    }, [config.showRelations, frameStateRef, entityCount, getEntityRefByPath, relationsRef]);
+    }, [config.showRelations, frameStateRef, entityCount, getEntityRefByPath]);
 }
 
 export default useRandomRelations;

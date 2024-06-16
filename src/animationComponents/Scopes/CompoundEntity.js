@@ -18,6 +18,7 @@ import useImpulses from './useImpulses';
 import DebugRender from './DebugRender';
 import useTreeStore from './useTreeStore';
 import useScopeStore from './useScopeStore';
+import useJointStore from './useJointStore';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = [], initialPosition = [0, 0, 0], radius, ...props }, ref) => {
 
@@ -35,9 +36,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         flattenTree,
         traverseTreeDFS,
         copySubtree,
+        getAllNodes,
+        getAllpropertyLookups,
+        getPropertyAll,
+        getProperty,
     } = useTreeStore(); 
 
     const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
+    const { setJoint, getJoint, addJoint, removeJoint, clearJoint, clearAllJoints } = useJointStore();
 
     let node = getNode(id);
     const scope = node.depth;
@@ -80,21 +86,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     //const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
 
 
-    /*
-    // Up to here converting to useTreeStore
-    const node = {
-                id: nodeId,
-                leaf: restCounts.length === 0,
-                ref: React.createRef(),
-                joints: [],
-                particles: [],
-                relations: [],
-                chain: [],
-                visible: false,
-            };
-    */
-    //chainRef is broken - we bild a chian at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
-
     // Key is the uniqueIndex of a particle. Value is an array of joint ids
     // Any change to particleJointsRef needs to be made to jointRefsRef also
     //Sould be moved into ZuStand
@@ -110,9 +101,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     //const jointScopeRef = props.jointScopeRef || useRef({});
     // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
     // Any change to jointRefsRef needs to be made to particleJointsRef also
-    const jointRefsRef = props.jointRefsRef || useRef({});
+    // maps a jointId to a joint ref for all joints (not just this CompoundEntity)
+    // This should be built "auto-magically" by TreeStore
+    //const jointRefsRef = props.jointRefsRef || useRef({});
 
-    const relationsRef = useRef({});
+    //const relationsRef = useRef({});
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueIndex: id });
     const limitedLog = useLimitedLog(100);
@@ -126,7 +119,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     // Use the custom hook for creating random relations
     // Maybe rename to useAnimateRelations (useImpulse could be broken out into useAnimateImpulses)
-    useRandomRelations(config, frameStateRef, entityCount, relationsRef, indexArray, children);
+    useRandomRelations(config, frameStateRef, entityCount, indexArray, children);
 
     // Distribute entities within the perimeter
     const generateEntityPositions = (radius, count) => {
@@ -148,6 +141,21 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     const index = scope ? indexArray[scope - 1] : 0;
 
+       /*
+    // Up to here converting to useTreeStore
+    const node = {
+                id: nodeId,
+                leaf: restCounts.length === 0,
+                ref: React.createRef(),
+                joints: [],
+                particles: [],
+                relations: [],
+                chain: [],
+                visible: false,
+            };
+    */
+    //chainRef is broken - we bild a chain at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
+
     //Sould be moved into ZuStand ?
     const {
         registerParticlesFn,
@@ -168,7 +176,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     // Relying on order of args is not good with such large numbres of args
     //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
-    const { jointsData, initializeJoints } = useJoints(jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
+    const { jointsData, initializeJoints } = useJoints(particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -208,7 +216,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
             node = getNode(id);
             frameStateRef.current = "initialImpulse";
             // Need to set state to trigger re-rendering of this component
-            // otherwise the satte machine gets stuck
+            // otherwise the state machine gets stuck
             setInitializedPhysics(true);
         }
     }, [initializePhysics]);
@@ -222,6 +230,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 break;
             // Should move this into useImpulses
             case "initialImpulse":
+                //if (scope == 0) console.log("getAllpropertyLookups", getAllpropertyLookups(), "getAllNodes", getAllNodes());
                 if (config.initialImpulse) {
                     applyInitialImpulses(flattenedParticleRefs);
                 }
@@ -270,7 +279,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}
-                        jointRefsRef={jointRefsRef}
                     />
                 ))}
 
@@ -297,7 +305,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 {entitiesRegisteredRef.current && (
                     <Relations
                         internalRef={internalRef}
-                        relationsRef={relationsRef}
                         config={config}
                         scope={scope}
                     />

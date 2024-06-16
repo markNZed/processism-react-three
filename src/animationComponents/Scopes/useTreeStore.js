@@ -59,6 +59,8 @@ const nodeTemplate = {
   parentId: null,
 };
 
+const ignorePropertyLookup = ['id', 'children', 'ref', 'parentId'];
+
 // Function to create a new node with given properties and children.
 const createNode = (id = null, properties = {}, children = []) => ({
   ...nodeTemplate,
@@ -82,7 +84,7 @@ const createNode = (id = null, properties = {}, children = []) => ({
   const updatePropertyLookups = (node, propertyLookups) => {
     const updatedLookups = { ...propertyLookups };
     Object.keys(node).forEach(prop => {
-      if (prop !== 'id' && prop !== 'children' && prop !== 'depth') {
+      if (!ignorePropertyLookup.includes(prop)) {
         const values = Array.isArray(node[prop]) ? node[prop] : [node[prop]];
         values.forEach(value => {
           if (!updatedLookups[prop]) {
@@ -111,9 +113,20 @@ const useTreeStore = create((set, get) => ({
         return nodes[nodeId];
     },
 
+    getAllNodes: () => get().nodes,
+
+    getAllpropertyLookups: () => get().propertyLookups,
+
+    getProperty: (prop, index) => {
+      const propertyLookup = get().propertyLookups(prop);
+      if (!propertyLookup) throw new Error(`Property ${prop} does not exist`);
+      return propertyLookup[index];
+    },
+
+    getPropertyAll: (prop) => get().propertyLookups(prop),
+
     getNodeProperty: (nodeId, property) => {
-        const nodes = get().nodes;
-        const node = nodes[nodeId];
+      const node = get().getNode(nodeId);
         if (!node) throw new Error(`Node ${nodeId} does not exist`);
         return node[property];
     },
@@ -162,7 +175,7 @@ const useTreeStore = create((set, get) => ({
       // Update property lookups before applying changes
       const updatedLookups = { ...state.propertyLookups };
       Object.keys(updatedProperties).forEach(prop => {
-        if (prop !== 'id' && prop !== 'children' && prop !== 'depth') {
+        if (!ignorePropertyLookup.includes(prop)) {
           const oldValues = Array.isArray(node[prop]) ? node[prop] : node[prop] ? [node[prop]] : [];
           const newValues = Array.isArray(updatedProperties[prop]) ? updatedProperties[prop] : [updatedProperties[prop]];
   
@@ -215,7 +228,7 @@ const useTreeStore = create((set, get) => ({
         if (node) {
           // Remove node from property lookups
           Object.keys(node).forEach(prop => {
-            if (prop !== 'id' && prop !== 'children' && prop !== 'depth' && propertyLookups[prop]) {
+            if (!ignorePropertyLookup.includes(prop) && propertyLookups[prop]) {
               const values = Array.isArray(node[prop]) ? node[prop] : [node[prop]];
               values.forEach(value => {
                 propertyLookups[prop][value] = propertyLookups[prop][value].filter(
@@ -276,6 +289,7 @@ moveNode: (nodeId, newParentId) => set(state => {
       const nodeIds = get().propertyLookups[property]?.[value] || [];
       return nodeIds.filter(nodeId => nodes[nodeId].depth === depth);
     },
+    
   
     // Function to flatten the tree into an array.
     flattenTree: () => {

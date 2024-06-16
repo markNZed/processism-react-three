@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useTreeStore from './useTreeStore';
 import useScopeStore from './useScopeStore';
+import useJointStore from './useJointStore';
 
 const useJoints = (
-    jointRefsRef,
     particleRadiusRef,
     frameStateRef,
     // Should pass the node not the id
@@ -25,6 +25,7 @@ const useJoints = (
         getNode,
     } = useTreeStore(); 
     const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
+    const { setJoint, getJoint, addJoint, removeJoint: removeJointStore, clearJoint, clearAllJoints } = useJointStore();
     const scopeNode = getScope(node.depth);
 
     const chainRef = useRef(node.chain);
@@ -73,9 +74,10 @@ const useJoints = (
             b.ref,
             true
         );
-        jointRefsRef.current[jointRefsRefIndex] = jointRef;
+        addJoint(jointRefsRefIndex, jointRef);
+        addJoint(jointRefsRefIndexReverse, jointRef);
         updateNode(aUserData.uniqueIndex, p => ({
-            joints: [...p.joints, jointRefsRefIndex]
+            joints: p.joints.includes(jointRefsRefIndex) ? p.joints : [...p.joints, jointRefsRefIndex]
         }));
         updateScope(scope, p => ({
             joints: [...p.joints, jointRefsRefIndex, jointRefsRefIndexReverse]
@@ -85,7 +87,7 @@ const useJoints = (
     };
 
     const removeJoint = (jointKey) => {
-        const jointRef = jointRefsRef.current[jointKey];
+        const jointRef = getJoint(jointKey);
         const body1 = jointRef.current.body1();
         const body2 = jointRef.current.body2();
         let body1Joints = getNodeProperty(body1.userData.uniqueIndex, joints);
@@ -105,7 +107,7 @@ const useJoints = (
             if (world.getImpulseJoint(joint.handle)) {
                 world.removeImpulseJoint(joint, true);
             }
-            delete jointRefsRef.current[jointKey];
+            removeJointStore(jointKey);
         }
     };
 
@@ -301,7 +303,7 @@ const useJoints = (
                 // Vector3 to be used for particle world position
                 const particleWorldPosition = new THREE.Vector3();
                 entityJointIndexes.forEach((jointKey) => {
-                    const jointRef = jointRefsRef.current[jointKey];
+                    const jointRef = getJoint(jointKey);
                     const body1 = jointRef.current.body1();
                     const body2 = jointRef.current.body2();
                     // Entity needs to store parent entity in userData ?
@@ -331,7 +333,7 @@ const useJoints = (
                 console.log("Detach a random entity", id, entityUniqueIndex, entityRef, "closestIndex", closestIndex, "replacementEntity", replacementEntity);
                 const jointsToCreate = [];
                 entityJointIndexes.forEach((jointKey) => {
-                    const jointRef = jointRefsRef.current[jointKey];
+                    const jointRef = getJoint(jointKey);
                     let body1 = jointRef.current.body1();
                     let body2 = jointRef.current.body2();
                     if (replacementEntity.userData.uniqueIndex == body1.userData.uniqueIndex) return;
