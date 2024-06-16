@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import uniqueIdGenerator from './uniqueIdGenerator';
 
 /**
@@ -119,15 +119,18 @@ const useTreeStore = create((set, get) => ({
     },
   
     // Function to add a new node to the tree.
-    addNode: (parentId, node) => {
+    addNode: (parentId, node, id = null) => {
       let newNodeId;
       set(state => {
         if (state.nodes[node.id]) throw new Error(`Node ID ${node.id} already exists`);
         const parentNode = state.nodes[parentId];
-        if (!parentNode) throw new Error(`Parent node ${parentId} does not exist`);
+        if (!parentNode) {
+          //console.log("state.nodes", state.nodes)
+          throw new Error(`Parent node ${parentId} does not exist when creating node ${JSON.stringify(node)} with id ${id}`);
+        }
   
         const nodeDepth = (parentNode.depth || 0) + 1;
-        const newNode = { ...nodeTemplate, ...node, id: uniqueIdGenerator.getNextId(), depth: nodeDepth, children: node.children || [] };
+        const newNode = { ...nodeTemplate, ...node, id: id || uniqueIdGenerator.getNextId(), depth: nodeDepth, children: node.children || [] };
         newNodeId = newNode.id;
   
         return {
@@ -148,7 +151,10 @@ const useTreeStore = create((set, get) => ({
     // Function to update an existing node's properties.
     updateNode: (id, updates) => set(state => {
       const node = state.nodes[id];
-      if (!node) throw new Error(`Node ${id} does not exist`);
+      if (!node) {
+        console.log(`Node ${id} does not exist`, id)
+        throw new Error(`Node ${id} does not exist`);
+      }
   
       // Allow updates to be a function similar to setState
       const updatedProperties = typeof updates === 'function' ? updates(node) : updates;
@@ -359,7 +365,7 @@ copySubtree: (nodeId, newParentId) => set(state => {
   }),
   
 
-  }));
-  
-  export default useTreeStore;
-  
+}));
+
+
+export default useTreeStore;

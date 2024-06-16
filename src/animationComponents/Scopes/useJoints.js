@@ -2,9 +2,9 @@ import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useTreeStore from './useTreeStore';
+import useScopeStore from './useScopeStore';
 
 const useJoints = (
-    jointScopeRef,
     jointRefsRef,
     particleRadiusRef,
     frameStateRef,
@@ -24,6 +24,8 @@ const useJoints = (
         updateNode,
         getNode,
     } = useTreeStore(); 
+    const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
+    const scopeNode = getScope(node.depth);
 
     const chainRef = useRef(node.chain);
 
@@ -75,8 +77,9 @@ const useJoints = (
         updateNode(aUserData.uniqueIndex, p => ({
             joints: [...p.joints, jointRefsRefIndex]
         }));
-        jointScopeRef.current[jointRefsRefIndex] = scope;
-        jointScopeRef.current[jointRefsRefIndexReverse] = scope;
+        updateScope(scope, p => ({
+            joints: [...p.joints, jointRefsRefIndex, jointRefsRefIndexReverse]
+        }));
         //console.log("createJoint", id, jointRefsRefIndex, jointRef);
         return jointRef;
     };
@@ -93,8 +96,9 @@ const useJoints = (
         updateNode(body2.userData.uniqueIndex, {joints: body2Joints});
         const jointIndex = `${body1.userData.uniqueIndex}-${body2.userData.uniqueIndex}`;
         const jointIndexReverse = `${body2.userData.uniqueIndex}-${body1.userData.uniqueIndex}`;
-        delete jointScopeRef.current[jointIndex];
-        delete jointScopeRef.current[jointIndexReverse];
+        updateScope(scope, p => ({
+            joints: p.joints.filter(joint => joint !== jointIndex && joint !== jointIndexReverse)
+        }));
         if (jointRef.current) {
             const joint = jointRef.current;
             jointRef.current = undefined;
@@ -212,8 +216,9 @@ const useJoints = (
             const bIndex = particles.b.ref.current.userData.uniqueIndex;
             const jointIndex = `${aIndex}-${bIndex}`;
             const jointIndexReverse = `${bIndex}-${aIndex}`;
-            jointScopeRef.current[jointIndex] = scope;
-            jointScopeRef.current[jointIndexReverse] = scope;
+            updateScope(scope, p => ({
+                joints: [...p.joints, jointIndex, jointIndexReverse]
+            }));
             updateNode(aIndex, p => ({
                 joints: p.joints.includes(jointIndex) ? p.joints : [...p.joints, jointIndex]
             }));

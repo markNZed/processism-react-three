@@ -1,9 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import useScopeStore from './useScopeStore';
 import useTreeStore from './useTreeStore';
 
-const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color, jointScopeRef }) => {
+const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color }) => {
     const indexArrayStr = indexArray.join();
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
@@ -16,6 +17,8 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
     } = useTreeStore(); 
     const node = getNode(id);
     const chainRef = useRef(node.chain);
+    const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
+    const scopeNode = getScope(node.depth);
 
     // Helper function to recursively build the ordered list
     // Returns null if a chain is dangling
@@ -72,8 +75,7 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
                 // If the joint was not created at this scope then skip
                 for (let j = 0; j < linkedIndexes.length; j++) {
                     const jointIndex = `${idx}-${linkedIndexes[j]}`;
-                    const jointScope = jointScopeRef.current[jointIndex];
-                    if (scope === jointScope) {
+                    if (scopeNode.joints.includes(jointIndex)) {
                         onChain = true;
                         break;
                     }

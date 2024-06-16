@@ -17,6 +17,7 @@ import useJoints from './useJoints';
 import useImpulses from './useImpulses';
 import DebugRender from './DebugRender';
 import useTreeStore from './useTreeStore';
+import useScopeStore from './useScopeStore';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = [], initialPosition = [0, 0, 0], radius, ...props }, ref) => {
 
@@ -35,6 +36,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         traverseTreeDFS,
         copySubtree,
     } = useTreeStore(); 
+
+    const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
 
     let node = getNode(id);
     const scope = node.depth;
@@ -96,7 +99,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     // Any change to particleJointsRef needs to be made to jointRefsRef also
     //Sould be moved into ZuStand
     //const particleJointsRef = props.particleJointsRef || useRef({});
-    const jointScopeRef = props.jointScopeRef || useRef({});
+    // This is not so obvious - do we use the CompoundEntity associated with that scope ? No this is across branches
+    // Move out and create a dedicated "flat" - much easier
+
+    useEffect(() => {
+        // Each entity at this scope will attempt to add and one will succeed
+        addScope(node.depth, {joints: []});
+    }, []);
+    
+    //const jointScopeRef = props.jointScopeRef || useRef({});
     // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
     // Any change to jointRefsRef needs to be made to particleJointsRef also
     const jointRefsRef = props.jointRefsRef || useRef({});
@@ -156,8 +167,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     } = useParticlesRegistration(props, index, scope, id, config);
 
     // Relying on order of args is not good with such large numbres of args
-    //Sould be moved into ZuStand for jointScopeRef, jointRefsRef, particleRadiusRef
-    const { jointsData, initializeJoints } = useJoints(jointScopeRef, jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
+    //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
+    const { jointsData, initializeJoints } = useJoints(jointRefsRef, particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -259,7 +270,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}
-                        jointScopeRef={jointScopeRef}
                         jointRefsRef={jointRefsRef}
                     />
                 ))}
@@ -273,7 +283,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         lastCompoundEntity={lastCompoundEntity}
                         worldToLocalFn={internalRef.current.worldToLocal}
                         color={color}
-                        jointScopeRef={jointScopeRef}
                     />
                 )}
 

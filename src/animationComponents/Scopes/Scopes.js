@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 import withAnimationState from '../../withAnimationState';
 import { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from '@react-three/rapier';
 import { useControls } from 'leva'
@@ -37,6 +36,18 @@ const Scopes = React.forwardRef((props, ref) => {
     // Using forwardRef and need to access the ref from inside this component too
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
+
+    const {
+        addNode,
+        updateNode,
+        getNode,
+        moveNode,
+        deleteNode,
+        getNodesByPropertyAndDepth,
+        flattenTree,
+        traverseTreeDFS,
+        copySubtree,
+    } = useTreeStore(); 
 
     // Leva controls
     // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
@@ -201,26 +212,12 @@ const Scopes = React.forwardRef((props, ref) => {
     useEffect(() => {
         console.log("Scopes mounting");
     }, []);
-
-    const {
-        addNode,
-        updateNode,
-        getNode,
-        moveNode,
-        deleteNode,
-        getNodesByPropertyAndDepth,
-        flattenTree,
-        traverseTreeDFS,
-        copySubtree,
-      } = useTreeStore(); 
       
     function addNodesRecursively(entityCounts, parentId = "root") {
         if (entityCounts.length === 0) {
             return;
         }
-    
         const [currentCount, ...restCounts] = entityCounts;
-    
         for (let i = 0; i < currentCount; i++) {
             const node = {
                 leaf: restCounts.length === 0,

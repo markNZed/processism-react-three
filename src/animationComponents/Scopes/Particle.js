@@ -5,6 +5,7 @@ import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider } from '@react-three/rapier';
 import _ from 'lodash';
 import { getColor } from './utils.js';
+import useTreeStore from './useTreeStore';
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPosition, radius, config, ...props }, ref) => {
@@ -19,6 +20,11 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
     const registeredRef = useRef(false);
     const [initialize, setInitialize] = useState(true);
     const index = scope ? indexArray[scope - 1] : 0;
+    const {
+        updateNode,
+        getNode,
+    } = useTreeStore(); 
+    const node = getNode(id);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -37,7 +43,7 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
                 const newRadius = relativeScale * colliderRadius
                 setColliderRadius(newRadius);
                 internalRef.current.setUserData(userData)
-                props.particleJointsRef.current[id].forEach((jointIndex) => {
+                node.joints.forEach((jointIndex) => {
                     const joint = props.jointRefsRef.current[jointIndex].current;
                     if (joint.body1().userData.uniqueIndex == id) {
                         const a1 = joint.anchor1();
