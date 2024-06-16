@@ -6,7 +6,6 @@ import useScopeStore from './useScopeStore';
 import useJointStore from './useJointStore';
 
 const useJoints = (
-    particleRadiusRef,
     frameStateRef,
     // Should pass the node not the id
     id,
@@ -23,7 +22,9 @@ const useJoints = (
     const {
         updateNode,
         getNode,
+        getNodeProperty,
     } = useTreeStore(); 
+    const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
     const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
     const { setJoint, getJoint, addJoint, removeJoint: removeJointStore, clearJoint, clearAllJoints } = useJointStore();
     const scopeNode = getScope(node.depth);
@@ -172,8 +173,8 @@ const useJoints = (
                 .subVectors(closestParticleBPosition, closestParticleAPosition)
                 .normalize();
 
-            const offsetA = direction.clone().multiplyScalar(particleRadiusRef.current);
-            const offsetB = direction.clone().multiplyScalar(-particleRadiusRef.current);
+            const offsetA = direction.clone().multiplyScalar(particleRadiusRef);
+            const offsetB = direction.clone().multiplyScalar(-particleRadiusRef);
 
             const uniqueIndexA = closestParticleARef.current.userData.uniqueIndex;
             const uniqueIndexB = closestParticleBRef.current.userData.uniqueIndex;
@@ -233,7 +234,7 @@ const useJoints = (
         // We place the joints first because they will not align with the perimeter of the scope
         const jointPosition = newJoints[0].a.ref.translation();
         const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
-        const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef.current;
+        const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef;
 
         flattenedParticleRefs.current.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
@@ -249,7 +250,7 @@ const useJoints = (
 
         // Create the joints
         newJoints.forEach((particles) => {
-            //const { offset1, offset2 } = calculateJointOffsets(particles.a.ref.current, particles.b.ref.current, particleRadiusRef.current);
+            //const { offset1, offset2 } = calculateJointOffsets(particles.a.ref.current, particles.b.ref.current, particleRadiusRef);
             // Offset needs to be in local coordinates - should be OK for 
             const a = {
                 ref: particles.a.ref.current,
@@ -346,7 +347,7 @@ const useJoints = (
                     }
                     // Can't just copy the offset, need to recalculate them. Create a function for this ?
                     // The radius of the replacement may not be the same...
-                    const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadiusRef.current);
+                    const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadiusRef);
                     // Offset needs to be in local coordinates - should be OK for 
                     const a = {
                         ref: body1,

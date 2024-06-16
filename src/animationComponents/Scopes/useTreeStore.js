@@ -49,7 +49,8 @@ import uniqueIdGenerator from './uniqueIdGenerator';
  */
 
 const nodeTemplate = {
-  leaf: false,
+  deepestCompoundEntity: false,
+  isParticle: false,
   ref: null,
   joints: [],
   particles: [],
@@ -118,7 +119,7 @@ const useTreeStore = create((set, get) => ({
     getAllpropertyLookups: () => get().propertyLookups,
 
     getProperty: (prop, index) => {
-      const propertyLookup = get().propertyLookups(prop);
+      const propertyLookup = get().propertyLookups[prop];
       if (!propertyLookup) throw new Error(`Property ${prop} does not exist`);
       return propertyLookup[index];
     },

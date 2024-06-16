@@ -80,6 +80,7 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
     useEffect(() => {
         if (initialize && internalRef.current) {
             internalRef.current.setUserData({ color: color, uniqueIndex: id });
+            updateNode(id, {isParticle: true})
             setInitialize(false);
         }
     }, [internalRef]);

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { calculateCircleArea } from './utils';
+import useTreeStore from './useTreeStore';
 
 const useParticlesRegistration = (props, index, scope, id, config) => {
     const entityParticlesRefsRef = useRef(Array.from({ length: config.entityCounts[scope] }, () => useRef([])));
@@ -9,6 +10,10 @@ const useParticlesRegistration = (props, index, scope, id, config) => {
     const particleAreaRef = useRef();
     const particleRadiusRef = useRef();
     const [particleCount, setParticleCount] = useState()
+
+    const {
+        updateNode,
+    } = useTreeStore(); 
 
 
     const areAllParticlesRegistered = useCallback(() => {
@@ -29,6 +34,12 @@ const useParticlesRegistration = (props, index, scope, id, config) => {
             if (props.registerParticlesFn) {
                 props.registerParticlesFn(index, flattenedParticleRefs.current, particleRadius);
             }
+
+            updateNode("root", {
+                particleRadiusRef: particleRadius,
+                particleAreaRef: calculateCircleArea(particleRadius),
+
+            });
 
             particleAreaRef.current = calculateCircleArea(particleRadius);
 

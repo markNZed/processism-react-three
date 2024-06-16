@@ -1,12 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import useTreeStore from './useTreeStore';
 
-const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs, particleRadiusRef }, ref) => {
+const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref) => {
     const instancedMeshRef = useRef();
+    const {
+        getNodeProperty,
+    } = useTreeStore();
+    const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
 
     useFrame(() => {
-        if (instancedMeshRef.current && flattenedParticleRefs && particleRadiusRef) {
+        if (instancedMeshRef.current && flattenedParticleRefs) {
             const mesh = instancedMeshRef.current;
             const userColor = new THREE.Color();
             let colorChanged = false;
@@ -102,7 +107,7 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs, partic
             args={[null, null, flattenedParticleRefs.current.length]}
             onClick={handlePointerDown}
         >
-            <circleGeometry args={[particleRadiusRef.current, 16]} />
+            <circleGeometry args={[particleRadiusRef, 16]} />
             <meshStandardMaterial />
         </instancedMesh>
     );

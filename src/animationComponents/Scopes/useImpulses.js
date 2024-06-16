@@ -1,13 +1,13 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import useTreeStore from './useTreeStore';
 
 const useImpulses = (
     id,
     internalRef,
     entitiesRegisteredRef,
     indexArray,
-    particleAreaRef,
     particleCount,
     config,
     scope,
@@ -16,6 +16,10 @@ const useImpulses = (
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
+    const {
+        getNodeProperty,
+    } = useTreeStore();
+    const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
 
     const entityRefsArray = children.map(entity => entity.ref);
 
@@ -32,12 +36,12 @@ const useImpulses = (
                     directionToCenter.negate().normalize();
                     if (impulse.length() == 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsArray.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount / entityRefsArray.length);
                     }
                     const overshoot = displacement.length() - config.maxDisplacement;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount / entityRefsArray.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount / entityRefsArray.length);
                         impulse.multiplyScalar(config.overshootScaling);
                     }
                     if (config.attractorScaling) {
@@ -69,7 +73,7 @@ const useImpulses = (
         const displacement = centerRef.current.clone();
         displacement.sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize();
-        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef.current * particleCount);
+        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount);
     };
 
     useFrame(() => {

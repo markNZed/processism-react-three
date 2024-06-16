@@ -18,7 +18,8 @@ import useImpulses from './useImpulses';
 import DebugRender from './DebugRender';
 import useTreeStore from './useTreeStore';
 import useScopeStore from './useScopeStore';
-import useJointStore from './useJointStore';
+
+// useTreeStore -> useEntityStore ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = [], initialPosition = [0, 0, 0], radius, ...props }, ref) => {
 
@@ -43,7 +44,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     } = useTreeStore(); 
 
     const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
-    const { setJoint, getJoint, addJoint, removeJoint, clearJoint, clearAllJoints } = useJointStore();
 
     let node = getNode(id);
     const scope = node.depth;
@@ -59,10 +59,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const color = useMemo(() => getColor(configColor, props.color), [configColor, props.color]);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
     //const lastCompoundEntity = (scope == config.entityCounts.length - 1);
-    const lastCompoundEntity = useMemo(() => {
-        const firstChild = getNode(childrenId[0]);
-        return firstChild.leaf;
-    },[childrenId[0]]);
+    const lastCompoundEntity = node.deepestCompoundEntity;
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;    
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
@@ -145,7 +142,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     // Up to here converting to useTreeStore
     const node = {
                 id: nodeId,
-                leaf: restCounts.length === 0,
+                deepestCompoundEntity: restCounts.length === 1,
+                isParticle: restCounts.length === 0,
                 ref: React.createRef(),
                 joints: [],
                 particles: [],
@@ -157,6 +155,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     //chainRef is broken - we bild a chain at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
 
     //Sould be moved into ZuStand ?
+    // Each particle could store the array of CompoundEntiites that includes it
+    // Could "refresh" this explicitly - no when adding every node (too slow)
+    // Each CompoundEntity could maintain a lis tof all lower entities - the tree could do this ?
+    // That would also cover entityParticlesRefsRef
+    // Maybe a store for "global" e.g. particleRadiusRef "system"
+    //   Could just write into node["root"] 
+    //     moved particleRadiusRef and particleAreaRef
+    // What does it mean when a particle is registered ? When internalRef is valid e.. rididBodyReady (isParticle can be this)
     const {
         registerParticlesFn,
         // An array of entityCount length that stores the particle refs associated with each entity
@@ -167,23 +173,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         // A simple array with all the refs
         flattenedParticleRefs,
         particleCount,
-        //Sould be moved into ZuStand
-        particleAreaRef,
-        //Sould be moved into ZuStand
-        particleRadiusRef,
         areAllParticlesRegistered
     } = useParticlesRegistration(props, index, scope, id, config);
 
     // Relying on order of args is not good with such large numbres of args
     //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
-    const { jointsData, initializeJoints } = useJoints(particleRadiusRef, frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
+    // Replace scope for depth
+    const { jointsData, initializeJoints } = useJoints(frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
         internalRef,
         entitiesRegisteredRef,
         indexArray,
-        particleAreaRef,
         particleCount,
         config,
         scope,
@@ -298,7 +300,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                     <InstancedParticles
                         id={`particles-${id}`}
                         flattenedParticleRefs={flattenedParticleRefs}
-                        particleRadiusRef={particleRadiusRef}
                     />
                 )}
 
