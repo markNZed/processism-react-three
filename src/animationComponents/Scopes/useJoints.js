@@ -6,10 +6,10 @@ import useScopeStore from './useScopeStore';
 import useJointStore from './useJointStore';
 
 const useJoints = (
-    frameStateRef,
+    frameState,
     entityPositions,
     node,
-    children,
+    entityNodes,
 ) => {
 
     const { world, rapier } = useRapier();
@@ -30,7 +30,7 @@ const useJoints = (
 
     const chainRef = useRef(node.chain);
 
-    const entityRefs = children.map(entity => entity.ref);
+    const entityRefs = entityNodes.map(entity => entity.ref);
 
     // Return the center point of all the joints
     const generateJointsData = (positions) => {
@@ -208,7 +208,7 @@ const useJoints = (
         return allocateJoints;
     };
 
-    const initializeJoints = (flattenedParticleRefs, initialPosition) => {
+    const initializeJoints = (particleRefs, initialPosition) => {
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
         const entitiesParticlesRefs = [];
@@ -239,7 +239,7 @@ const useJoints = (
         const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
         const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef;
 
-        flattenedParticleRefs.forEach(particleRef => {
+        particleRefs.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);
@@ -275,7 +275,7 @@ const useJoints = (
     // Could maintain a list of "detached" particles at the CompoundEntity level (can filter for center calc)
     // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
     //   What needs to change ? 
-    //     entityCount, entitiesParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
+    //     entityCount, entitiesParticlesRefsRef, particleRefs, entityPositions, jointsData, 
     //     entitiesRegisteredRef, particlesRegisteredRef, newJoints
     //   Zustand might be able to store refs when we useRef but not sure that has advantages
     //   Data structures that require remounting could be in Zustand
@@ -291,7 +291,7 @@ const useJoints = (
         const randomDuration = 1000; //Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
             // With "Scope-3" this is at scope 1 so userData.uniqueIndex is e.g. "Scope-3-5" not a Particle index
-            if (frameStateRef.current !== "init" && id == "Scope-8-3") {
+            if (frameState !== "init" && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
                 const entityRef = entityRefs(randomIndexFrom);

@@ -220,7 +220,7 @@ const Scopes = React.forwardRef((props, ref) => {
         const [currentCount, ...restCounts] = entityCounts;
         for (let i = 0; i < currentCount; i++) {
             const node = {
-                deepestCompoundEntity: restCounts.length === 1,
+                lastCompoundEntity: restCounts.length === 1,
                 isParticle: restCounts.length === 0,
                 ref: React.createRef(),
                 parentId: parentId,

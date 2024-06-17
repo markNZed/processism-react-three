@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import useScopeStore from './useScopeStore';
 import useEntityStore from './useEntityStore';
 
-const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color }) => {
+const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
@@ -14,10 +14,11 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
         getNode,
         propagateValue,
     } = useEntityStore(); 
-    const node = getNode(id);
     const chainRef = useRef(node.chain);
     const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
     const scopeNode = getScope(node.depth);
+    const worldToLocalFn = node.ref.current.worldToLocal;
+    const id = node.id;
 
     // Helper function to recursively build the ordered list
     // Returns null if a chain is dangling
@@ -67,11 +68,11 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
         for (let i = 0; i < indexes.length; i++) {
             const idx = indexes[i];
             if (chainRef.current[idx].length > 2) {
-                // Check it is a link on this scope
+                // Check it is a link on this depth
                 const linkedIndexes = chainRef.current[idx];
                 let onChain = true;
                 onChain = false;
-                // If the joint was not created at this scope then skip
+                // If the joint was not created at this depth then skip
                 for (let j = 0; j < linkedIndexes.length; j++) {
                     const jointIndex = `${idx}-${linkedIndexes[j]}`;
                     if (scopeNode.joints.includes(jointIndex)) {
@@ -113,12 +114,12 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
 
         let blobOuterUniqueIndexes = [];
         let flattenedIndexes = [];
-        for (let i = 0; i < flattenedParticleRefs.length; ++i) {
-            const scopeOuter = flattenedParticleRefs[i].current.getUserData().scopeOuter;
+        for (let i = 0; i < particleRefs.length; ++i) {
+            const scopeOuter = particleRefs[i].current.getUserData().scopeOuter;
             if (scopeOuter) {
-                let outer = scopeOuter[scope];
+                let outer = scopeOuter[node.depth];
                 if (outer) {
-                    for (let j = Object.keys(scopeOuter).length - 1;j > scope; j--) {
+                    for (let j = Object.keys(scopeOuter).length - 1;j > node.depth; j--) {
                         if (!scopeOuter[j.toString()]) {
                             outer = false;
                             break;
@@ -126,7 +127,7 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
                     }
                 }
                 if (outer) {
-                    const uniqueIndex = flattenedParticleRefs[i].current.getUserData().uniqueIndex;
+                    const uniqueIndex = particleRefs[i].current.getUserData().uniqueIndex;
                     blobOuterUniqueIndexes.push(uniqueIndex);
                     flattenedIndexes.push(i);
                 }
@@ -134,7 +135,7 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
         }
 
         if (!blobOuterUniqueIndexes.length) {
-            console.error("blobOuterUniqueIndexes is empty!", id, flattenedParticleRefs.length);
+            console.error("blobOuterUniqueIndexes is empty!", id, particleRefs.length);
         }
 
         let blobIndexes;
@@ -155,7 +156,7 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
             blobData.current.flattenedIndexes.push(flattenedIndex);
         }
 
-        updateNode(id, {visible: scope == 0})
+        updateNode(id, {visible: node.depth == 0})
 
     },[]);
 
@@ -173,9 +174,9 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
 
         // Probably don't need anything specai lfor this because we have nodes for th eparticles
         if (lastCompoundEntity) {
-            for (let i = 0; i < flattenedParticleRefs.length; i++) {
+            for (let i = 0; i < particleRefs.length; i++) {
                 // Could add config option to show particles
-                flattenedParticleRefs[i].current.getUserData().visible = node.visibleParticles;
+                particleRefs[i].current.getUserData().visible = node.visibleParticles;
             }
         }
 
@@ -183,7 +184,7 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
-                const pos = flattenedParticleRefs[flattenedIndex].current.translation();
+                const pos = particleRefs[flattenedIndex].current.translation();
                 worldVector.set(pos.x, pos.y, pos.z);
                 positiion.copy(worldToLocalFn(worldVector))
                 return positiion;
@@ -203,11 +204,11 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
     });
 
     const handleOnClick = (event) => {
-        //console.log("handleOnClick", "event:", event, "node.visible:", node.visible, "scope:", scope)
+        //console.log("handleOnClick", "event:", event, "node.visible:", node.visible, "depth:", node.depth)
         // If a higher blob is visible then ignore
         // Walk up the tree but this is wrong as it also need to go down the branch
         let ancestorId = node.parentId;
-        for (let i = scope - 1; i >= 0; i--) {
+        for (let i = node.depth - 1; i >= 0; i--) {
             const ancestorNode = getNode(ancestorId) ;
             if (ancestorNode.visible) return;
             ancestorId = ancestorNode.parentId
@@ -236,7 +237,7 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
     const handleOnContextMenu = (event) => {
         // Stop the event from bubbling up
         event.stopPropagation();
-        //console.log("handleOnContextMenu", "event:", event, "node.visible:", node.visible, "scope:", scope);
+        //console.log("handleOnContextMenu", "event:", event, "node.visible:", node.visible, "depth:", node.depth);
         updateNode("root", {visible: true});
         const rootNode = getNode("root");
         rootNode.childrenIds.forEach(childId => {

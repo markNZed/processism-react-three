@@ -3,13 +3,13 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useEntityStore from './useEntityStore';
 
-const useImpulses = (
+const useAnimateImpulses = (
     particleCount,
     node,
-    children,
-    frameStateRef,
+    entityNodes,
+    frameState,
     initialPositionVector,
-    flattenedParticleRefs,
+    particleRefs,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
@@ -27,7 +27,7 @@ const useImpulses = (
     const centerRef = useRef(new THREE.Vector3());
     const prevCenterRef = useRef(new THREE.Vector3());
 
-    const entityRefsArray = children.map(entity => entity.ref);
+    const entityRefsArray = entityNodes.map(entity => entity.ref);
 
     const entityImpulses = (center, impulseIn) => {
         const impulse = impulseIn.clone();
@@ -61,7 +61,7 @@ const useImpulses = (
         });
     };
 
-    const applyInitialImpulses = (flattenedParticleRefs) => {
+    const applyInitialImpulses = (particleRefs) => {
         const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, () => new THREE.Vector3(
             (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
             (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
@@ -69,7 +69,7 @@ const useImpulses = (
         ));
         entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
-                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(flattenedParticleRefs.length);
+                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(particleRefs.length);
                 entity.current.addImpulse(perEntityImpulse);
             }
         });
@@ -84,7 +84,7 @@ const useImpulses = (
 
     // Impulse on every frame
     useFrame(() => {
-        if (frameStateRef.current !== 'init') {
+        if (frameState !== 'init') {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
                 const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);
@@ -100,13 +100,13 @@ const useImpulses = (
         // State machine allows for computation to be distributed across frames, reducing load on the physics engine
         switch (impulseStateRef.current) {
             case "init":
-                if (frameStateRef.current !== "init") impulseStateRef.current = "initialImpulse";
+                if (frameState !== "init") impulseStateRef.current = "initialImpulse";
                 break;
                 // Maybe we should wait for all entities to be registered - so state machines are syned
-            // Should move this into useImpulses
+            // Should move this into useAnimateImpulses
             case "initialImpulse":
-                if (config.initialImpulse && flattenedParticleRefs) {
-                    applyInitialImpulses(flattenedParticleRefs);
+                if (config.initialImpulse && particleRefs) {
+                    applyInitialImpulses(particleRefs);
                 }
                 impulseStateRef.current = "calcEntityImpulses";
                 break
@@ -135,4 +135,4 @@ const useImpulses = (
 
 };
 
-export default useImpulses;
+export default useAnimateImpulses;

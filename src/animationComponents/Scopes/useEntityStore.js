@@ -51,7 +51,7 @@ import uniqueIdGenerator from './uniqueIdGenerator';
 // Should distinguish operations that can change nodeCount
 
 const nodeTemplate = {
-    deepestCompoundEntity: false,
+    lastCompoundEntity: false,
     isParticle: false,
     ref: null,
     joints: [],
@@ -127,7 +127,9 @@ const useEntityStore = create((set, get) => ({
         return propertyLookup[index];
     },
 
-    getPropertyAll: (prop) => get().propertyLookups(prop),
+    getPropertyAll: (prop) => get().propertyLookups[prop],
+
+    getPropertyAllKeys: (prop) => Object.keys(get().propertyLookups[prop]),
 
     getNodeProperty: (nodeId, property) => {
         const node = get().getNode(nodeId);

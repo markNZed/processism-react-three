@@ -3,10 +3,10 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useRelationStore from './useRelationStore';
 
-function Relations({ internalRef, config, scope }) {
+function Relations({ internalRef, config, depth }) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
-    const lineWidth = (config.entityCounts.length - scope);
+    const lineWidth = (config.entityCounts.length - depth);
     const material = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: lineWidth });
     const [linesUpdate, setLinesUpdate] = useState(0);
     const linesRef = useRef({});

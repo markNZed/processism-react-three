@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useEntityStore from './useEntityStore';
 
-const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref) => {
+const InstancedParticles = React.forwardRef(({ id, particleRefs }, ref) => {
     const instancedMeshRef = useRef();
     const {
         getNodeProperty,
@@ -11,7 +11,7 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
 
     useFrame(() => {
-        if (instancedMeshRef.current && flattenedParticleRefs) {
+        if (instancedMeshRef.current && particleRefs) {
             const mesh = instancedMeshRef.current;
             const userColor = new THREE.Color();
             let colorChanged = false;
@@ -23,15 +23,15 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
             const currentQuaternion = new THREE.Quaternion();
             const invisibleScale = new THREE.Vector3(0.001, 0.001, 0.001);
 
-            for (let i = 0; i < flattenedParticleRefs.length; i++) {
+            for (let i = 0; i < particleRefs.length; i++) {
                 const instanceMatrix = new THREE.Matrix4();
                 mesh.getMatrixAt(i, instanceMatrix);
                 instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
 
-                const pos = flattenedParticleRefs[i].current.translation();
-                const scale = flattenedParticleRefs[i].current.getUserData().scale || 1;
+                const pos = particleRefs[i].current.translation();
+                const scale = particleRefs[i].current.getUserData().scale || 1;
                 userScale.set(scale, scale, scale);
-                const color = flattenedParticleRefs[i].current.getUserData().color || 'red';
+                const color = particleRefs[i].current.getUserData().color || 'red';
                 userColor.set(color);
 
                 if (!currentPos.equals(pos)) {
@@ -44,7 +44,7 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
                     matrixChanged = true;
                 }
 
-                const visible = flattenedParticleRefs[i].current.getUserData().visible || false;
+                const visible = particleRefs[i].current.getUserData().visible || false;
                 if (!visible) {
                     currentScale.copy(invisibleScale);
                     matrixChanged = true;
@@ -88,23 +88,23 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
         event.stopPropagation();
         const instanceId = event.instanceId;
         if (instanceId !== undefined) {
-            const userData = flattenedParticleRefs[instanceId].current.getUserData();
+            const userData = particleRefs[instanceId].current.getUserData();
             const currentScale = userData.scale;
             // Maybe we should have a function on the particle that allows for scaling
-            console.log("handlePointerDown", id, instanceId, userData, flattenedParticleRefs[instanceId]);
+            console.log("handlePointerDown", id, instanceId, userData, particleRefs[instanceId]);
             if (currentScale && currentScale != 1) {
-                flattenedParticleRefs[instanceId].current.getUserData().scale = 1.0;
+                particleRefs[instanceId].current.getUserData().scale = 1.0;
             } else {
-                flattenedParticleRefs[instanceId].current.getUserData().scale = 2.0;
+                particleRefs[instanceId].current.getUserData().scale = 2.0;
             }
-            flattenedParticleRefs[instanceId].current.getUserData().color = 'pink';
+            particleRefs[instanceId].current.getUserData().color = 'pink';
         }
     };
 
     return (
         <instancedMesh
             ref={instancedMeshRef}
-            args={[null, null, flattenedParticleRefs.length]}
+            args={[null, null, particleRefs.length]}
             onClick={handlePointerDown}
         >
             <circleGeometry args={[particleRadiusRef, 16]} />

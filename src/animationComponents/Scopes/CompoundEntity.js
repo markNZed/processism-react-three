@@ -5,20 +5,20 @@ import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import { Circle } from '..';
 import _ from 'lodash';
-import { getColor } from './utils';
+import * as utils from './utils';
 import Particle from './Particle';
 import InstancedParticles from './InstancedParticles';
 import Blob from './Blob';
 import Relations from './Relations';
 import useLimitedLog from '../../hooks/useLimitedLog';
-import useRandomRelations from './useRandomRelations';
+import useAnimateRelations from './useAnimateRelations';
 import useJoints from './useJoints';
-import useImpulses from './useImpulses';
+import useAnimateImpulses from './useAnimateImpulses';
 import DebugRender from './DebugRender';
 import useEntityStore from './useEntityStore';
 import useScopeStore from './useScopeStore';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = [], initialPosition = [0, 0, 0], radius, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPosition = [0, 0, 0], radius, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const internalRef = useRef();
@@ -33,75 +33,39 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const { addScope } = useScopeStore();
 
     let node = getNode(id);
-    const scope = node.depth;
-    const config = node.config;
-    const isDebug = props.debug || config.debug;
+    const isDebug = node.debug || props.debug || node.config.debug;
     const entityCount = node.childrenIds.length;
-    const children  = node.childrenIds.map(childId => getNode(childId));
-    //const entityCount = config.entityCounts[scope];
+    const entityNodes  = node.childrenIds.map(childId => getNode(childId));
     // Store the color in a a state so it is consistent across renders (when defined by a function)
-    //const configColor = config.colors[scope];
-    const configColor = config.colors[scope];
-    const color = useMemo(() => getColor(configColor, props.color), [configColor, props.color]);
+    const configColor = node.config.colors[node.depth];
+    const color = useMemo(() => utils.getColor(configColor, props.color), [configColor, props.color]);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
-    //const lastCompoundEntity = (scope == config.entityCounts.length - 1);
-    const lastCompoundEntity = node.deepestCompoundEntity;
+    const lastCompoundEntity = node.lastCompoundEntity;
     const Entity = lastCompoundEntity ? Particle : CompoundEntity;    
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
     // State machine that distributes computation across frames
-    const frameStateRef = useRef("init");
+    const [frameState, setFrameState] = useState("init");
     const initialPositionVector = new THREE.Vector3(...initialPosition);
-
-    // Joints allow for soft body like behavior and create the structure at each scope (joining entities)
-    // This is the array of joints added by this CompoundEntity
-    // Joints could be held in ZuStand
-    //const newJointsRef = useRef([]);
-    // Key is uniqueIndex of the particle. Value is array of linked (through joints) uniqueIndex 
-    // Sould be moved into ZuStand and subscribe to tree to maintian itself
-    
-    //const chainRef = props.chainRef || useRef({});
-    //Sould be moved into ZuStand - property in the tree
-    // Could be a side state
-    //const blobVisibleRef = props.blobVisibleRef || useRef({ 0: true });
-
-
-    // Key is the uniqueIndex of a particle. Value is an array of joint ids
-    // Any change to particleJointsRef needs to be made to jointRefsRef also
-    //Sould be moved into ZuStand
-    //const particleJointsRef = props.particleJointsRef || useRef({});
-    // This is not so obvious - do we use the CompoundEntity associated with that scope ? No this is across branches
-    // Move out and create a dedicated "flat" - much easier
 
     useEffect(() => {
         // Each entity at this scope will attempt to add and one will succeed
         addScope(node.depth, {joints: []});
     }, []);
-    
-    //const jointScopeRef = props.jointScopeRef || useRef({});
-    // indexed with `${a.uniqueIndex}-${b.uniqueIndex}`
-    // Any change to jointRefsRef needs to be made to particleJointsRef also
-    // maps a jointId to a joint ref for all joints (not just this CompoundEntity)
-    // This should be built "auto-magically" by TreeStore
-    //const jointRefsRef = props.jointRefsRef || useRef({});
 
-    //const relationsRef = useRef({});
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueIndex: id });
     const limitedLog = useLimitedLog(100);
-    const [initializePhysics, setInitializePhysics] = useState(false); 
-    const [initializedPhysics, setInitializedPhysics] = useState(false); 
+    const [initializePhysics, setInitializePhysics] = useState(false);  
 
     // Logging/debug
     useEffect(() => {
-        if (scope == 0) limitedLog("Mounting from scope 0", id);
+        if (node.depth == 0) limitedLog("Mounting CompoundEntity at depth 0", id);
     }, []);
 
-    // Use the custom hook for creating random relations
-    // Maybe rename to useAnimateRelations (useImpulse could be broken out into useAnimateImpulses)
-    useRandomRelations(config, frameStateRef, entityCount, indexArray, node, children);
+    useAnimateRelations(node.config, frameState, entityCount, node, entityNodes);
 
     // Distribute entities within the perimeter
     const generateEntityPositions = (radius, count) => {
@@ -121,19 +85,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
 
-    const index = scope ? indexArray[scope - 1] : 0;
-
     //chainRef is broken - we bild a chain at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
 
-    const [flattenedParticleRefs, setFlattenedParticleRefs] = useState([]);
+    const [particleRefs, setParticleRefs] = useState([]);
     const [particleCount, setParticleCount] = useState(0); 
 
-    // Relying on order of args is not good with such large numbres of args
-    //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
-    // Replace scope for depth
-    const { jointsData, initializeJoints } = useJoints(frameStateRef, entityPositions, node, children);
+    const { jointsData, initializeJoints } = useJoints(frameState, entityPositions, node, entityNodes);
 
-    useImpulses(particleCount, node, children, frameStateRef, initialPositionVector, flattenedParticleRefs);
+    useAnimateImpulses(particleCount, node, entityNodes, frameState, initialPositionVector, particleRefs);
 
     const areAllParticlesRegistered = () => {
         getAllParticleRefs(node.id).forEach((ref) => {
@@ -146,9 +105,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const calculateCenter = () => {
         const center = new THREE.Vector3();
         let activeEntities = 0;
-        children.forEach((entity) => {
-            if (entity.ref) {
-                const entityCenter = entity.ref.current.getCenter();
+        entityNodes.forEach((entityNode) => {
+            if (entityNode.ref) {
+                const entityCenter = entityNode.ref.current.getCenter();
                 if (entityCenter) {
                     center.add(entityCenter);
                     activeEntities++;
@@ -162,23 +121,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     };
 
     useEffect(() => {
-        if (initializePhysics && !initializedPhysics) {
+        if (initializePhysics) {
             const allParticles = getAllParticleRefs(node.id);
-            setFlattenedParticleRefs(allParticles);
+            setParticleRefs(allParticles);
             // Maybe use a variable instead of getNode so we can update and not sync node
             updateNode(id, {joints: initializeJoints(allParticles, initialPosition)});
             node = getNode(id);
             setParticleCount(allParticles.length);
-            frameStateRef.current = "findCenter";
-            // Need to set state to trigger re-rendering of this component
-            // otherwise the state machine gets stuck
-            setInitializedPhysics(true);
+            setFrameState("findCenter");
         }
     }, [initializePhysics]);
 
     useFrame(() => {
-        // State machine allows for computation to be distributed across frames, reducing load on the physics engine
-        switch (frameStateRef.current) {
+        // State machine can distribute computation across frames, reducing load on the physics engine
+        switch (frameState) {
             case "init":
                 // Use a state to trigger the initializeJoints as this may take longer than a frame
                 if (!initializePhysics && areAllParticlesRegistered()) setInitializePhysics(true);
@@ -190,7 +146,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 internalRef.current.setCenter(centerRef.current);
                 break;
             default:
-                console.error("Unexpected state", id, frameStateRef.current)
+                console.error("Unexpected state", id, frameState)
                 break;
         }
 
@@ -199,40 +155,38 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     return (
         <>
             <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
-                {children.map((entity, i) => (
+                {entityNodes.map((entity, i) => (
                     <Entity
                         key={`${id}-${i}`}
                         id={`${entity.id}`}
                         initialPosition={entityPositions[i].toArray()}
                         radius={entityRadius}
                         color={color}
-                        indexArray={[...indexArray, i]}
                         ref={entity.ref}
                         debug={isDebug}
-                        config={config}
+                        config={node.config}
+                        index={`${i}`}
                     />
                 ))}
-                {particleCount > 0 && (
+                {frameState !== "init" && (
                     <Blob
-                        id={`${id}`}
-                        scope={scope}
-                        flattenedParticleRefs={flattenedParticleRefs}
+                        particleRefs={particleRefs}
                         lastCompoundEntity={lastCompoundEntity}
-                        worldToLocalFn={internalRef.current.worldToLocal}
                         color={color}
+                        node={node}
                     />
                 )}
-                {scope === 0 && particleCount > 0 && (
+                {node.depth === 0 && frameState !== "init" && (
                     <InstancedParticles
-                        id={`particles-${id}`}
-                        flattenedParticleRefs={flattenedParticleRefs}
+                        id={`${id}`}
+                        particleRefs={particleRefs}
                     />
                 )}
-                {particleCount > 0 && (
+                {frameState !== "init" && (
                     <Relations
                         internalRef={internalRef}
-                        config={config}
-                        scope={scope}
+                        config={node.config}
+                        depth={node.depth}
                     />
                 )}
                 <Circle
@@ -249,7 +203,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                     initialPosition={initialPosition}
                     jointsData={jointsData}
                     newJointsRef={node.joints}
-                    index={index}
+                    index={props.index || 0}
                     internalRef={internalRef}
                     isDebug={isDebug}
                     centerRef={centerRef}
@@ -263,7 +217,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                     anchorX="center"
                     anchorY="middle"
                 >
-                    {index}
+                    {props.index || 0}
                 </Text>
             )}
         </>
