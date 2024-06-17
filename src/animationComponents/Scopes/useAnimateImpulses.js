@@ -14,8 +14,7 @@ const useAnimateImpulses = (
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
     const config = node.config;
-    const scope = node.depth;
-    const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
+    const impulsePerParticle = (config.impulsePerParticle || 0.02) * (node.depth + 1);
     const {
         getNodeProperty,
     } = useEntityStore();
@@ -111,7 +110,7 @@ const useAnimateImpulses = (
                 impulseStateRef.current = "calcEntityImpulses";
                 break
             case "findCenter":
-                prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
+                prevCenterRef.current = node.depth == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = internalRef.current.getCenter();
                 if (centerRef.current && prevCenterRef.current) {
                     impulseStateRef.current = "calcEntityImpulses";

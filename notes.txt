@@ -94,5 +94,8 @@ Each node in tree has these properties and we need a "flat" view of the property
 
 Initialization is too slow
 
+Use node instead of CompoundEntityGroup for impulse, center, position., userData (same with RigidBody)
+use vec3
+
 
 

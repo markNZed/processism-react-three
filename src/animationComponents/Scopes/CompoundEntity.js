@@ -169,25 +169,25 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
                     />
                 ))}
                 {frameState !== "init" && (
-                    <Blob
-                        particleRefs={particleRefs}
-                        lastCompoundEntity={lastCompoundEntity}
-                        color={color}
-                        node={node}
-                    />
-                )}
-                {node.depth === 0 && frameState !== "init" && (
-                    <InstancedParticles
-                        id={`${id}`}
-                        particleRefs={particleRefs}
-                    />
-                )}
-                {frameState !== "init" && (
-                    <Relations
-                        internalRef={internalRef}
-                        config={node.config}
-                        depth={node.depth}
-                    />
+                    <>
+                        <Blob
+                            particleRefs={particleRefs}
+                            lastCompoundEntity={lastCompoundEntity}
+                            color={color}
+                            node={node}
+                        />
+                        <Relations
+                            internalRef={internalRef}
+                            config={node.config}
+                            depth={node.depth}
+                        />
+                        {node.depth === 0 && (
+                            <InstancedParticles
+                                id={`${id}`}
+                                particleRefs={particleRefs}
+                            />
+                        )}
+                    </>
                 )}
                 <Circle
                     id={`${id}.mounting`}
