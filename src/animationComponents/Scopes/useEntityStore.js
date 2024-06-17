@@ -15,10 +15,10 @@ import uniqueIdGenerator from './uniqueIdGenerator';
  * 
  * ### Basic Usage:
  * ```javascript
- * import useTreeStore from './path-to-store';
+ * import useEntityStore from './path-to-store';
  * 
  * // Access the store
- * const store = useTreeStore();
+ * const store = useEntityStore();
  * 
  * // Add a new node
  * store.addNode('root', { id: 'node1', name: 'Node 1' });
@@ -103,7 +103,7 @@ const updatePropertyLookups = (node, propertyLookups) => {
     return updatedLookups;
 };
 
-const useTreeStore = create((set, get) => ({
+const useEntityStore = create((set, get) => ({
     // Initial state with a root node.
     nodes: {
         root: createNode('root', { depth: 0 }, []),
@@ -405,4 +405,4 @@ const useTreeStore = create((set, get) => ({
 }));
 
 
-export default useTreeStore;
+export default useEntityStore;

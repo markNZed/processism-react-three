@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 import useScopeStore from './useScopeStore';
 import useJointStore from './useJointStore';
 
@@ -18,7 +18,7 @@ const useJoints = (
         getNode,
         getNodeProperty,
         getAllParticleRefs,
-    } = useTreeStore(); 
+    } = useEntityStore(); 
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
     const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
     const { setJoint, getJoint, addJoint, removeJoint: removeJointStore, clearJoint, clearAllJoints } = useJointStore();

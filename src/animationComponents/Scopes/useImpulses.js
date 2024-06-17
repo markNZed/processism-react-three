@@ -1,13 +1,15 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 
 const useImpulses = (
     particleCount,
     node,
     children,
     frameStateRef,
+    initialPositionVector,
+    flattenedParticleRefs,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
@@ -16,10 +18,14 @@ const useImpulses = (
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
     const {
         getNodeProperty,
-    } = useTreeStore();
+    } = useEntityStore();
     const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
     const id = node.id;
     const internalRef = node.ref;
+    const impulseStateRef = useRef('init');
+    // Track the center of this CompoundEntity
+    const centerRef = useRef(new THREE.Vector3());
+    const prevCenterRef = useRef(new THREE.Vector3());
 
     const entityRefsArray = children.map(entity => entity.ref);
 
@@ -90,7 +96,43 @@ const useImpulses = (
         }
     });
 
-    return { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses };
+    useFrame(() => {
+        // State machine allows for computation to be distributed across frames, reducing load on the physics engine
+        switch (impulseStateRef.current) {
+            case "init":
+                if (frameStateRef.current !== "init") impulseStateRef.current = "initialImpulse";
+                break;
+                // Maybe we should wait for all entities to be registered - so state machines are syned
+            // Should move this into useImpulses
+            case "initialImpulse":
+                if (config.initialImpulse && flattenedParticleRefs) {
+                    applyInitialImpulses(flattenedParticleRefs);
+                }
+                impulseStateRef.current = "calcEntityImpulses";
+                break
+            case "findCenter":
+                prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
+                centerRef.current = internalRef.current.getCenter();
+                if (centerRef.current && prevCenterRef.current) {
+                    impulseStateRef.current = "calcEntityImpulses";
+                }
+                break;
+            case "calcEntityImpulses":
+                // Could calculate velocity and direction here
+                calculateImpulses(centerRef, prevCenterRef);
+                impulseStateRef.current = "entityImpulses";
+                break;
+            case "entityImpulses":
+                entityImpulses(prevCenterRef.current, impulseRef.current);
+                impulseStateRef.current = "findCenter";
+                break;
+            default:
+                console.error("Unexpected state", id, impulseStateRef.current)
+                break;
+        }
+
+    });
+
 };
 
 export default useImpulses;

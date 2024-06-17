@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useScopeStore from './useScopeStore';
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 
 const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color }) => {
     const prevParentVisibleRef = useRef(true);
@@ -13,7 +13,7 @@ const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLoc
         updateNode,
         getNode,
         propagateValue,
-    } = useTreeStore(); 
+    } = useEntityStore(); 
     const node = getNode(id);
     const chainRef = useRef(node.chain);
     const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();

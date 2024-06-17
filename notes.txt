@@ -75,7 +75,7 @@ Use Zustand for Less Frequent Updates:
 
 Use a central tree-like structure to configure the system. THe uniqueIndex needs to be a unique id and indexArray would be a lookup into the tree data structure. The entity subscribes to the tree in ZuStand and aligns it's state on changes. The tree can also noddte when a node has been updated and then the node can clear this down.
 
-Maybe the tree will need a lock so we can performa a sequence of operations.
+Maybe the tree will need a lock so we can perform a sequence of operations.
 
 Maintain relations that can avoid searchingthe tree e.g.
 Particles, Joints, CompoundEntitiy, Relation, Blob (property of CompoundEntity), Scope
@@ -91,6 +91,8 @@ CompoundEntity -> Particles (nodes)
 CompoundEntity -> Outer Particles (filtered set of nodes)
 CompoundEntity -> Joints (node property)
 Each node in tree has these properties and we need a "flat" view of the property
+
+Initialization is too slow
 
 
 

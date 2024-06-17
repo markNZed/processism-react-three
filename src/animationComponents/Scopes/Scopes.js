@@ -6,7 +6,7 @@ import { useControls } from 'leva'
 import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -47,7 +47,7 @@ const Scopes = React.forwardRef((props, ref) => {
         flattenTree,
         traverseTreeDFS,
         copySubtree,
-    } = useTreeStore(); 
+    } = useEntityStore(); 
 
     // Leva controls
     // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these

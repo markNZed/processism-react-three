@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 import useRelationStore from './useRelationStore';
 
 function useRandomRelations(config, frameStateRef, entityCount, indexArray, node, children) {
@@ -14,7 +14,7 @@ function useRandomRelations(config, frameStateRef, entityCount, indexArray, node
         flattenTree,
         traverseTreeDFS,
         copySubtree,
-    } = useTreeStore(); 
+    } = useEntityStore(); 
     const { setRelation, getRelation, getRelations, getAllRelations, addRelation, removeRelation, removeRelations, clearRelation, clearAllRelations } = useRelationStore();
 
     const getEntityRefByPath = (path) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 
-const TreeStoreDemo = () => {
+const EntityStoreDemo = () => {
   const {
     nodes,
     addNode,
@@ -12,7 +12,7 @@ const TreeStoreDemo = () => {
     flattenTree,
     traverseTreeDFS,
     copySubtree,
-  } = useTreeStore();
+  } = useEntityStore();
 
   const [testResults, setTestResults] = useState([]);
   const [newNodeId, setNewNodeId] = useState('');
@@ -51,7 +51,7 @@ const TreeStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const updatedNodes = useTreeStore.getState().nodes;
+      const updatedNodes = useEntityStore.getState().nodes;
       if (updatedNodes['node3'] && updatedNodes['node3'].name === 'Updated Node 3') {
         results.push('Test 2 Passed: Node updated successfully.');
       } else {
@@ -64,7 +64,7 @@ const TreeStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const movedNodes = useTreeStore.getState().nodes;
+      const movedNodes = useEntityStore.getState().nodes;
       if (movedNodes['node2'] && movedNodes['node2'].childrenIds.includes('node3')) {
         results.push('Test 3 Passed: Node moved successfully.');
       } else {
@@ -77,7 +77,7 @@ const TreeStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const nodesAfterDelete = useTreeStore.getState().nodes;
+      const nodesAfterDelete = useEntityStore.getState().nodes;
       if (!nodesAfterDelete['node3']) {
         results.push('Test 4 Passed: Node deleted successfully.');
       } else {
@@ -96,7 +96,7 @@ const TreeStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const copiedNodes = useTreeStore.getState().nodes;
+      const copiedNodes = useEntityStore.getState().nodes;
       if (copiedNodes['node2'] && copiedNodes['node2'].childrenIds.some(childId => copiedNodes[childId]?.name === 'Node 4')) {
         results.push('Test 5 Passed: Subtree copied successfully.');
       } else {
@@ -301,4 +301,4 @@ const TreeStoreDemo = () => {
   );
 };
 
-export default TreeStoreDemo;
+export default EntityStoreDemo;

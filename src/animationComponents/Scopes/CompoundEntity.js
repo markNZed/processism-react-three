@@ -15,10 +15,8 @@ import useRandomRelations from './useRandomRelations';
 import useJoints from './useJoints';
 import useImpulses from './useImpulses';
 import DebugRender from './DebugRender';
-import useTreeStore from './useTreeStore';
+import useEntityStore from './useEntityStore';
 import useScopeStore from './useScopeStore';
-
-// useTreeStore -> useEntityStore ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = [], initialPosition = [0, 0, 0], radius, ...props }, ref) => {
 
@@ -27,23 +25,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     useImperativeHandle(ref, () => internalRef.current);
 
     const {
-        addNode,
         updateNode,
         getNode,
-        moveNode,
-        deleteNode,
-        getNodesByPropertyAndDepth,
-        flattenTree,
-        traverseTreeDFS,
-        copySubtree,
-        getAllNodes,
-        getAllpropertyLookups,
-        getPropertyAll,
-        getProperty,
         getAllParticleRefs,
-    } = useTreeStore(); 
+    } = useEntityStore(); 
 
-    const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
+    const { addScope } = useScopeStore();
 
     let node = getNode(id);
     const scope = node.depth;
@@ -64,7 +51,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const entityRadius = Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99;
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
-    const prevCenterRef = useRef();
     // State machine that distributes computation across frames
     const frameStateRef = useRef("init");
     const initialPositionVector = new THREE.Vector3(...initialPosition);
@@ -147,22 +133,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     // Replace scope for depth
     const { jointsData, initializeJoints } = useJoints(frameStateRef, entityPositions, node, children);
 
-        /*
-    // Up to here converting to useTreeStore
-    const node = {
-                id: nodeId,
-                deepestCompoundEntity: restCounts.length === 1,
-                isParticle: restCounts.length === 0,
-                ref: React.createRef(),
-                joints: [],
-                particles: [],
-                relations: [],
-                chain: [],
-                visible: false,
-            };
-    */
-
-    const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(particleCount, node, children, frameStateRef);
+    useImpulses(particleCount, node, children, frameStateRef, initialPositionVector, flattenedParticleRefs);
 
     const areAllParticlesRegistered = () => {
         getAllParticleRefs(node.id).forEach((ref) => {
@@ -198,7 +169,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
             updateNode(id, {joints: initializeJoints(allParticles, initialPosition)});
             node = getNode(id);
             setParticleCount(allParticles.length);
-            frameStateRef.current = "initialImpulse";
+            frameStateRef.current = "findCenter";
             // Need to set state to trigger re-rendering of this component
             // otherwise the state machine gets stuck
             setInitializedPhysics(true);
@@ -213,33 +184,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 if (!initializePhysics && areAllParticlesRegistered()) setInitializePhysics(true);
                 break;
                 // Maybe we should wait for all entities to be registered - so state machines are syned
-            // Should move this into useImpulses
-            case "initialImpulse":
-                if (scope == 0) console.log("getAllpropertyLookups", getAllpropertyLookups(), "getAllNodes", getAllNodes());
-                if (config.initialImpulse && flattenedParticleRefs) {
-                    applyInitialImpulses(flattenedParticleRefs);
-                }
-                frameStateRef.current = "findCenter";
-                break
             case "findCenter":
-                prevCenterRef.current = scope == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = calculateCenter();
                 // could use ZuStand to avoid needing extensions to group e.g. setCenter
-                // Could also manage the impulses through ZuStand
                 internalRef.current.setCenter(centerRef.current);
-                if (centerRef.current && prevCenterRef.current) {
-                    frameStateRef.current = "calcEntityImpulses";
-                }
-                break;
-            // Should move this into useImpulses
-            case "calcEntityImpulses":
-                // Could calculate velocity and direction here
-                calculateImpulses(centerRef, prevCenterRef);
-                frameStateRef.current = "entityImpulses";
-                break;
-            case "entityImpulses":
-                entityImpulses(prevCenterRef.current, impulseRef.current);
-                frameStateRef.current = "findCenter";
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)
