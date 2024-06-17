@@ -4,8 +4,7 @@ import * as THREE from 'three';
 import useScopeStore from './useScopeStore';
 import useTreeStore from './useTreeStore';
 
-const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color }) => {
-    const indexArrayStr = indexArray.join();
+const Blob = ({ id, scope, flattenedParticleRefs, lastCompoundEntity, worldToLocalFn, color }) => {
     const prevParentVisibleRef = useRef(true);
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
@@ -221,13 +220,13 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
         if (lastCompoundEntity) updateNodeValue["visibleParticles"] = node.visible
         if (node.visible) {
             // The children need to become visible
-            node.children.forEach(childId => {
+            node.childrenIds.forEach(childId => {
                 updateNode(childId, {visible: true});
             });
         } else {
             // All the children should become invisible (could be many scopes below)
             // This is very slow
-            node.children.forEach(childId => {
+            node.childrenIds.forEach(childId => {
                 propagateValue(childId, "visible", false)
             });
         }
@@ -240,12 +239,11 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
         //console.log("handleOnContextMenu", "event:", event, "node.visible:", node.visible, "scope:", scope);
         updateNode("root", {visible: true});
         const rootNode = getNode("root");
-        rootNode.children.forEach(childId => {
+        rootNode.childrenIds.forEach(childId => {
             propagateValue(childId, "visible", false)
         });
     }
     
-
     return (
         <mesh ref={blobRef}
             onClick={(event) => handleOnClick(event)}

@@ -7,14 +7,9 @@ import useJointStore from './useJointStore';
 
 const useJoints = (
     frameStateRef,
-    // Should pass the node not the id
-    id,
-    config,
-    internalRef,
     entityPositions,
-    scope,
-    children,
     node,
+    children,
 ) => {
 
     const { world, rapier } = useRapier();
@@ -28,6 +23,10 @@ const useJoints = (
     const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
     const { setJoint, getJoint, addJoint, removeJoint: removeJointStore, clearJoint, clearAllJoints } = useJointStore();
     const scopeNode = getScope(node.depth);
+    const id = node.id;
+    const scope = node.depth;
+    const config = node.config;
+    const internalRef = node.ref;
 
     const chainRef = useRef(node.chain);
 
@@ -213,8 +212,8 @@ const useJoints = (
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
         const entitiesParticlesRefs = [];
-        children.map(entity => {
-            entitiesParticlesRefs.push(getAllParticleRefs(entity.id))
+        node.childrenIds.forEach(childId => {
+            entitiesParticlesRefs.push(getAllParticleRefs(childId))
         });
 
         const newJoints = allocateJointsToParticles(entitiesParticlesRefs, jointsData, internalRef);

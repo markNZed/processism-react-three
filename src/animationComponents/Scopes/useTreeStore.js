@@ -62,22 +62,22 @@ const nodeTemplate = {
     parentId: null,
 };
 
-const ignorePropertyLookup = ['id', 'children', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef', 'particleCount'];
+const ignorePropertyLookup = ['id', 'childrenIds', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef', 'particleCount'];
 
-// Function to create a new node with given properties and children.
-const createNode = (id = null, properties = {}, children = []) => ({
+// Function to create a new node with given properties and childrenIds.
+const createNode = (id = null, properties = {}, childrenIds = []) => ({
     ...nodeTemplate,
     id: id || uniqueIdGenerator.getNextId(),
     ...properties,
-    children,
+    childrenIds,
 });
 
-// Helper function to remove a node from its parent's children array.
+// Helper function to remove a node from its parent's childrenIds array.
 const removeNodeFromParent = (nodes, nodeId) => {
     for (let key in nodes) {
         const node = nodes[key];
-        if (node.children.includes(nodeId)) {
-            node.children = node.children.filter(childId => childId !== nodeId);
+        if (node.childrenIds.includes(nodeId)) {
+            node.childrenIds = node.childrenIds.filter(childId => childId !== nodeId);
             break;
         }
     }
@@ -147,7 +147,7 @@ const useTreeStore = create((set, get) => ({
             }
 
             const nodeDepth = (parentNode.depth || 0) + 1;
-            const newNode = { ...nodeTemplate, ...node, id: id || uniqueIdGenerator.getNextId(), depth: nodeDepth, children: node.children || [] };
+            const newNode = { ...nodeTemplate, ...node, id: id || uniqueIdGenerator.getNextId(), depth: nodeDepth, childrenIds: node.childrenIds || [] };
             newNodeId = newNode.id;
             state.nodeCount++;
 
@@ -157,7 +157,7 @@ const useTreeStore = create((set, get) => ({
                     [newNode.id]: newNode,
                     [parentId]: {
                         ...parentNode,
-                        children: [...(parentNode.children || []), newNode.id],
+                        childrenIds: [...(parentNode.childrenIds || []), newNode.id],
                     },
                 },
                 propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
@@ -247,7 +247,7 @@ const useTreeStore = create((set, get) => ({
                 });
 
                 // Recursively delete child nodes
-                node.children.forEach(childId => deleteRecursively(childId));
+                node.childrenIds.forEach(childId => deleteRecursively(childId));
                 delete nodes[nodeId];
                 state.nodeCount--;
             }
@@ -272,7 +272,7 @@ const useTreeStore = create((set, get) => ({
 
         const updateDepthRecursively = (nId, depth) => {
             nodes[nId].depth = depth;
-            nodes[nId].children.forEach(childId => updateDepthRecursively(childId, depth + 1));
+            nodes[nId].childrenIds.forEach(childId => updateDepthRecursively(childId, depth + 1));
         };
 
         updateDepthRecursively(nodeId, newDepth);
@@ -282,7 +282,7 @@ const useTreeStore = create((set, get) => ({
                 ...nodes,
                 [newParentId]: {
                     ...newParentNode,
-                    children: [...(newParentNode.children || []), nodeId],
+                    childrenIds: [...(newParentNode.childrenIds || []), nodeId],
                 },
             },
         };
@@ -305,8 +305,8 @@ const useTreeStore = create((set, get) => ({
         while (stack.length) {
             const node = stack.pop();
             result.push(node);
-            if (node.children && Array.isArray(node.children)) {
-                node.children.forEach(childId => {
+            if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                node.childrenIds.forEach(childId => {
                     const childNode = nodes[childId];
                     if (childNode) {
                         stack.push(childNode);
@@ -322,8 +322,8 @@ const useTreeStore = create((set, get) => ({
         const nodes = get().nodes;
         const traverse = (node) => {
             callback(node);
-            if (node.children && Array.isArray(node.children)) {
-                node.children.forEach(childId => traverse(nodes[childId]));
+            if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                node.childrenIds.forEach(childId => traverse(nodes[childId]));
             }
         };
         traverse(nodes[id]);
@@ -337,8 +337,8 @@ const useTreeStore = create((set, get) => ({
             if (node.isParticle) {
                 particles.push(node.ref);
             }
-            if (node.children && Array.isArray(node.children)) {
-                node.children.forEach(childId => traverse(nodes[childId]));
+            if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                node.childrenIds.forEach(childId => traverse(nodes[childId]));
             }
         };
         traverse(nodes[id]);
@@ -368,9 +368,9 @@ const useTreeStore = create((set, get) => ({
                 ...JSON.parse(JSON.stringify(node)), // Ensuring a deep copy of the node properties
                 id: newNodeId,
                 depth: newDepth,
-                children: [],
+                childrenIds: [],
             };
-            newNode.children = node.children.map(childId => {
+            newNode.childrenIds = node.childrenIds.map(childId => {
                 const copiedChild = copyRecursively(nodes[childId], newDepth);
                 return copiedChild.id;
             });
@@ -381,7 +381,7 @@ const useTreeStore = create((set, get) => ({
 
         const nodeToCopy = nodes[nodeId];
         const newSubtree = copyRecursively(nodeToCopy, nodes[newParentId].depth || 0);
-        nodes[newParentId].children.push(newSubtree.id);
+        nodes[newParentId].childrenIds.push(newSubtree.id);
 
         return { nodes };
     }),
@@ -391,8 +391,8 @@ const useTreeStore = create((set, get) => ({
 
         const updateSubtree = (currentId) => {
             nodes[currentId][property] = value;
-            if (nodes[currentId].children && Array.isArray(nodes[currentId].children)) {
-                nodes[currentId].children.forEach(childId => updateSubtree(childId));
+            if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
+                nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
             }
         };
 

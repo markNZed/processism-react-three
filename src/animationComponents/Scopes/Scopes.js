@@ -233,7 +233,7 @@ const Scopes = React.forwardRef((props, ref) => {
     function updateNodesConfigRecursively(config, id = "root") {
         const node = getNode(id);
         updateNode(id, {config});
-        node.children.forEach((childId) => {
+        node.childrenIds.forEach((childId) => {
             updateNodesConfigRecursively(config, childId);
         });
     }

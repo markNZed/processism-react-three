@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import useTreeStore from './useTreeStore';
 import useRelationStore from './useRelationStore';
 
-function useRandomRelations(config, frameStateRef, entityCount, indexArray, children) {
+function useRandomRelations(config, frameStateRef, entityCount, indexArray, node, children) {
 
     const {
         addNode,
@@ -23,13 +23,13 @@ function useRandomRelations(config, frameStateRef, entityCount, indexArray, chil
         let entity = getNode(id);
         let entityRef = entity.ref;
         path.slice(0, -1).forEach((i) => {
-            entity = getNode(entity.children[i]);
+            entity = getNode(entity.childrenIds[i]);
             entityRef = entity.ref;
         });
         return entityRef;
     };
 
-    const entityRefsArray = children.map(entity => entity.ref);
+    const entityRefs = children.map(entity => entity.ref);
 
     useEffect(() => {
         // Generate a random number between 1000 and 10000 which determines the duration of relations
@@ -52,7 +52,7 @@ function useRandomRelations(config, frameStateRef, entityCount, indexArray, chil
 
                     // Randomly select an entity from this CompoundEntity
                     const randomIndexFrom = Math.floor(Math.random() * entityCount);
-                    const entityRefFrom = entityRefsArray[randomIndexFrom];
+                    const entityRefFrom = entityRefs[randomIndexFrom];
                     const userDataFrom = entityRefFrom.current.getUserData() || {};
                     const fromId = userDataFrom.uniqueIndex;
 
@@ -77,7 +77,7 @@ function useRandomRelations(config, frameStateRef, entityCount, indexArray, chil
                         // Most of the time we want to select an entity inside this CompoundEntity
                     } else {
                         let randomIndexTo = Math.floor(Math.random() * entityCount);
-                        entityRefTo = entityRefsArray[randomIndexTo];
+                        entityRefTo = entityRefs[randomIndexTo];
                     }
 
                     const userDataTo = entityRefTo.current.getUserData() || {};

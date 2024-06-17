@@ -4,22 +4,22 @@ import { useFrame } from '@react-three/fiber';
 import useTreeStore from './useTreeStore';
 
 const useImpulses = (
-    id,
-    internalRef,
-    indexArray,
     particleCount,
-    config,
-    scope,
+    node,
     children,
     frameStateRef,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
+    const config = node.config;
+    const scope = node.depth;
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (scope + 1);
     const {
         getNodeProperty,
     } = useTreeStore();
     const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
+    const id = node.id;
+    const internalRef = node.ref;
 
     const entityRefsArray = children.map(entity => entity.ref);
 

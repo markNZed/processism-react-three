@@ -49,9 +49,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const scope = node.depth;
     const config = node.config;
     const isDebug = props.debug || config.debug;
-    const childrenId = node.children;
-    const entityCount = childrenId.length;
-    const children  = node.children.map(childId => getNode(childId));
+    const entityCount = node.childrenIds.length;
+    const children  = node.childrenIds.map(childId => getNode(childId));
     //const entityCount = config.entityCounts[scope];
     // Store the color in a a state so it is consistent across renders (when defined by a function)
     //const configColor = config.colors[scope];
@@ -116,7 +115,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     // Use the custom hook for creating random relations
     // Maybe rename to useAnimateRelations (useImpulse could be broken out into useAnimateImpulses)
-    useRandomRelations(config, frameStateRef, entityCount, indexArray, children);
+    useRandomRelations(config, frameStateRef, entityCount, indexArray, node, children);
 
     // Distribute entities within the perimeter
     const generateEntityPositions = (radius, count) => {
@@ -143,7 +142,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
     const [flattenedParticleRefs, setFlattenedParticleRefs] = useState([]);
     const [particleCount, setParticleCount] = useState(0); 
 
-    /*
+    // Relying on order of args is not good with such large numbres of args
+    //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
+    // Replace scope for depth
+    const { jointsData, initializeJoints } = useJoints(frameStateRef, entityPositions, node, children);
+
+        /*
     // Up to here converting to useTreeStore
     const node = {
                 id: nodeId,
@@ -158,21 +162,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
             };
     */
 
-    // Relying on order of args is not good with such large numbres of args
-    //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
-    // Replace scope for depth
-    const { jointsData, initializeJoints } = useJoints(frameStateRef, id, config, internalRef, entityPositions, scope, children, node);
-
-    const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
-        id,
-        internalRef,
-        indexArray,
-        particleCount,
-        config,
-        scope,
-        children,
-        frameStateRef,
-    );
+    const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(particleCount, node, children, frameStateRef);
 
     const areAllParticlesRegistered = () => {
         getAllParticleRefs(node.id).forEach((ref) => {
@@ -204,10 +194,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         if (initializePhysics && !initializedPhysics) {
             const allParticles = getAllParticleRefs(node.id);
             setFlattenedParticleRefs(allParticles);
-            setParticleCount(allParticles.length);
             // Maybe use a variable instead of getNode so we can update and not sync node
             updateNode(id, {joints: initializeJoints(allParticles, initialPosition)});
             node = getNode(id);
+            setParticleCount(allParticles.length);
             frameStateRef.current = "initialImpulse";
             // Need to set state to trigger re-rendering of this component
             // otherwise the state machine gets stuck
@@ -274,11 +264,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         config={config}
                     />
                 ))}
-
-                {particleCount && (
+                {particleCount > 0 && (
                     <Blob
                         id={`${id}`}
-                        indexArray={indexArray}
                         scope={scope}
                         flattenedParticleRefs={flattenedParticleRefs}
                         lastCompoundEntity={lastCompoundEntity}
@@ -286,23 +274,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         color={color}
                     />
                 )}
-
-                {scope === 0 && particleCount && (
+                {scope === 0 && particleCount > 0 && (
                     <InstancedParticles
                         id={`particles-${id}`}
                         flattenedParticleRefs={flattenedParticleRefs}
                     />
                 )}
-
-                {frameStateRef.current !== "init" && (
+                {particleCount > 0 && (
                     <Relations
                         internalRef={internalRef}
                         config={config}
                         scope={scope}
                     />
                 )}
-
-                {/* Unclear why we need this but without it the remounting caused by GUI controls changing the key does not work*/}
                 <Circle
                     id={`${id}.mounting`}
                     initialState={{
@@ -310,7 +294,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         opacity: 0,
                     }}
                 />
-
                 <DebugRender
                     id={id}
                     radius={radius}
@@ -323,24 +306,21 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                     isDebug={isDebug}
                     centerRef={centerRef}
                 />
-
             </CompoundEntityGroup>
-
             {isDebug && (
-                <>
-                    <Text
-                        position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
-                        fontSize={radius / 2} // Adjust font size based on circle radius
-                        color="black"
-                        anchorX="center"
-                        anchorY="middle"
-                    >
-                        {index}
-                    </Text>
-                </>
+                <Text
+                    position={[initialPosition[0], initialPosition[1], 0.1]}
+                    fontSize={radius / 2}
+                    color="black"
+                    anchorX="center"
+                    anchorY="middle"
+                >
+                    {index}
+                </Text>
             )}
         </>
     );
+
 }));
 
 export default CompoundEntity;

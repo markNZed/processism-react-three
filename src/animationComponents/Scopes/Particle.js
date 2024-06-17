@@ -91,7 +91,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             <ParticleRigidBody
                 ref={internalRef}
                 position={initialPosition}
-                type="dynamic"
+                type={"dynamic"}
                 colliders={false}
                 linearDamping={0.5}
                 angularDamping={0.5}
