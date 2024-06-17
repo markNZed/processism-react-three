@@ -13,7 +13,6 @@ const useJoints = (
     internalRef,
     entityPositions,
     scope,
-    entityParticlesRefsRef,
     children,
     node,
 ) => {
@@ -23,6 +22,7 @@ const useJoints = (
         updateNode,
         getNode,
         getNodeProperty,
+        getAllParticleRefs,
     } = useTreeStore(); 
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
     const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
@@ -31,7 +31,7 @@ const useJoints = (
 
     const chainRef = useRef(node.chain);
 
-    const getEntityRefs = children.map(entity => entity.ref);
+    const entityRefs = children.map(entity => entity.ref);
 
     // Return the center point of all the joints
     const generateJointsData = (positions) => {
@@ -123,24 +123,24 @@ const useJoints = (
         return { offset1, offset2 };
     };
 
-    const allocateJointsToParticles = (entityParticlesRefsRef, jointsData, internalRef) => {
+    const allocateJointsToParticles = (entitiesParticlesRefs, jointsData, internalRef) => {
         const worldPosition = new THREE.Vector3();
         internalRef.current.getWorldPosition(worldPosition);
         const particleWorldPosition = new THREE.Vector3();
 
         const allocateJoints = jointsData.map((jointData, i) => {
 
-            function findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, excludedEntityIndex) {
+            function findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, excludedEntityIndex) {
                 let minDistance = Infinity;
                 let closestParticleIndex = -1;
                 let closestParticlePosition = new THREE.Vector3();
                 let particleEntityIndex = -1;
                 let closestParticleRef;
 
-                entityParticlesRefsRef.current.forEach((entity, entityIndex) => {
+                entitiesParticlesRefs.forEach((entityRefs, entityIndex) => {
                     if (entityIndex === excludedEntityIndex) return;
-                    entity.current.forEach((particleRef, j) => {
-                        const pos = particleRef.current.translation();
+                    entityRefs.forEach((particleRef, j) => {
+                        const pos = particleRef.current.current.translation();
                         particleWorldPosition.set(pos.x, pos.y, pos.z);
                         const distance = particleWorldPosition.distanceTo(new THREE.Vector3(
                             jointData.position.x + worldPosition.x,
@@ -152,7 +152,7 @@ const useJoints = (
                             closestParticleIndex = j;
                             closestParticlePosition.copy(particleWorldPosition);
                             particleEntityIndex = entityIndex;
-                            closestParticleRef = particleRef;
+                            closestParticleRef = particleRef.current;
                         }
                     });
                 });
@@ -160,12 +160,12 @@ const useJoints = (
                 return { minDistance, closestParticleIndex, closestParticlePosition, particleEntityIndex, closestParticleRef };
             }
 
-            const resultA = findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, -1);
+            const resultA = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, null);
             const closestParticleAPosition = resultA.closestParticlePosition;
             const particleAEntityIndex = resultA.particleEntityIndex;
             const closestParticleARef = resultA.closestParticleRef;
 
-            const resultB = findClosestParticle(entityParticlesRefsRef, jointData, worldPosition, particleAEntityIndex);
+            const resultB = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, particleAEntityIndex);
             const closestParticleBPosition = resultB.closestParticlePosition;
             const closestParticleBRef = resultB.closestParticleRef;
 
@@ -212,8 +212,12 @@ const useJoints = (
     const initializeJoints = (flattenedParticleRefs, initialPosition) => {
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
+        const entitiesParticlesRefs = [];
+        children.map(entity => {
+            entitiesParticlesRefs.push(getAllParticleRefs(entity.id))
+        });
 
-        const newJoints = allocateJointsToParticles(entityParticlesRefsRef, jointsData, internalRef);
+        const newJoints = allocateJointsToParticles(entitiesParticlesRefs, jointsData, internalRef);
         newJoints.forEach((particles, i) => {
             const aIndex = particles.a.ref.current.userData.uniqueIndex;
             const bIndex = particles.b.ref.current.userData.uniqueIndex;
@@ -236,15 +240,15 @@ const useJoints = (
         const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
         const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef;
 
-        flattenedParticleRefs.current.forEach(particleRef => {
+        flattenedParticleRefs.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);
-            if (!particleRef.current.userData.scopeOuter) {
-                particleRef.current.userData.scopeOuter = {};
-            }
+            const userData = particleRef.current.getUserData();
+            if (!userData.scopeOuter) userData.scopeOuter = {};
             let outer = distanceToCenter >= (distanceToFirstJoint);
-            particleRef.current.userData.scopeOuter[scope] = outer;
+            userData.scopeOuter[scope] = outer
+            particleRef.current.setUserData(userData);
             //if (scope == 1 && outer) particleRef.current.userData.color = "black";
         });
 
@@ -272,7 +276,7 @@ const useJoints = (
     // Could maintain a list of "detached" particles at the CompoundEntity level (can filter for center calc)
     // Adding an entity to a CompoundEntity will also be a challenge e.g. array sizes change
     //   What needs to change ? 
-    //     entityCount, entityParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
+    //     entityCount, entitiesParticlesRefsRef, flattenedParticleRefs, entityPositions, jointsData, 
     //     entitiesRegisteredRef, particlesRegisteredRef, newJoints
     //   Zustand might be able to store refs when we useRef but not sure that has advantages
     //   Data structures that require remounting could be in Zustand
@@ -291,7 +295,7 @@ const useJoints = (
             if (frameStateRef.current !== "init" && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
-                const entityRef = getEntityRefs(randomIndexFrom);
+                const entityRef = entityRefs(randomIndexFrom);
                 const userData = entityRef.current.getUserData();
                 const entityUniqueIndex = userData.uniqueIndex;
                 const entityJointIndexes = getNodeProperty(entityUniqueIndex, joints);

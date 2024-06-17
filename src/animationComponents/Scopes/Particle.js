@@ -4,27 +4,29 @@ import { Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider } from '@react-three/rapier';
 import _ from 'lodash';
-import { getColor } from './utils.js';
+import { getColor, calculateCircleArea } from './utils.js';
 import useTreeStore from './useTreeStore';
 
-// The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPosition, radius, config, ...props }, ref) => {
+// Should we maintian node.userData syned with ParticleRigidBody userData ?
+// Coud store userData only in node but would slow data access when rendering the instanced mesh of particles
+// At leasst keep uniqueIndex aligned with id
 
-    const internalRef = useRef(); // because we forwardRef and want to use the ref locally too
+// The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
+const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, config, ...props }, ref) => {
+
     useImperativeHandle(ref, () => internalRef.current);
 
     const isDebug = props.debug || config.debug;
-    const configColor = config.colors[scope];
-    const color = useMemo(() => getColor(configColor, props.color));
     const [colliderRadius, setColliderRadius] = useState(radius);
-    const registeredRef = useRef(false);
     const [initialize, setInitialize] = useState(true);
-    const index = scope ? indexArray[scope - 1] : 0;
     const {
         updateNode,
         getNode,
     } = useTreeStore(); 
     const node = getNode(id);
+    const internalRef = node.ref; // because we forwardRef and want to use the ref locally too
+    const configColor = config.colors[node.depth];
+    const color = useMemo(() => getColor(configColor, props.color));
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -68,19 +70,18 @@ const Particle = React.memo(React.forwardRef(({ id, indexArray, scope, initialPo
         }
     });
 
-    useEffect(() => {
-        // Don't need registeredRef as sensitive to internalRef
-        if (props.registerParticlesFn && internalRef.current && !registeredRef.current) {
-            props.registerParticlesFn(index, [internalRef.current], radius);
-            registeredRef.current = true;
-        }
-    }, [props.registerParticlesFn, internalRef]);
-
     // Set the initial userData, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && internalRef.current) {
-            internalRef.current.setUserData({ color: color, uniqueIndex: id });
-            updateNode(id, {isParticle: true})
+            internalRef.current.setUserData({ color: color, uniqueIndex: id, radius: radius });
+            updateNode(id, {isParticle: true});
+            const rootNode = getNode("root");
+            if (!rootNode.particleRadius) {
+                updateNode("root", {
+                    particleRadiusRef: radius,
+                    particleAreaRef: calculateCircleArea(radius),
+                })
+            }
             setInitialize(false);
         }
     }, [internalRef]);

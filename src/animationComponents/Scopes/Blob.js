@@ -114,33 +114,36 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
 
         let blobOuterUniqueIndexes = [];
         let flattenedIndexes = [];
-        for (let i = 0; i < flattenedParticleRefs.current.length; ++i) {
-            const scopeOuter = flattenedParticleRefs.current[i].current.userData.scopeOuter;
-            let outer = scopeOuter[scope];
-            if (outer) {
-                for (let j = Object.keys(scopeOuter).length - 1;j > scope; j--) {
-                    if (!scopeOuter[j.toString()]) {
-                        outer = false;
-                        break;
+        for (let i = 0; i < flattenedParticleRefs.length; ++i) {
+            const scopeOuter = flattenedParticleRefs[i].current.getUserData().scopeOuter;
+            if (scopeOuter) {
+                let outer = scopeOuter[scope];
+                if (outer) {
+                    for (let j = Object.keys(scopeOuter).length - 1;j > scope; j--) {
+                        if (!scopeOuter[j.toString()]) {
+                            outer = false;
+                            break;
+                        }
                     }
                 }
-            }
-            if (outer) {
-                const uniqueIndex = flattenedParticleRefs.current[i].current.userData.uniqueIndex;
-                blobOuterUniqueIndexes.push(uniqueIndex);
-                flattenedIndexes.push(i);
+                if (outer) {
+                    const uniqueIndex = flattenedParticleRefs[i].current.getUserData().uniqueIndex;
+                    blobOuterUniqueIndexes.push(uniqueIndex);
+                    flattenedIndexes.push(i);
+                }
             }
         }
 
         if (!blobOuterUniqueIndexes.length) {
-            console.error("blobOuterUniqueIndexes is empty!", id, flattenedParticleRefs.current.length);
+            console.error("blobOuterUniqueIndexes is empty!", id, flattenedParticleRefs.length);
         }
 
         let blobIndexes;
         if (lastCompoundEntity) {
             blobIndexes = blobOuterUniqueIndexes;
         } else {
-            const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes);
+            // buildOrderedIndexes can return null if there are no blobOuterUniqueIndexes
+            const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIndexes) || [];
             if (!orderedIndexes.length) console.error("orderedIndexes is empty!", id);
             //blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
             blobIndexes = orderedIndexes;
@@ -171,9 +174,9 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
 
         // Probably don't need anything specai lfor this because we have nodes for th eparticles
         if (lastCompoundEntity) {
-            for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
+            for (let i = 0; i < flattenedParticleRefs.length; i++) {
                 // Could add config option to show particles
-                flattenedParticleRefs.current[i].current.userData.visible = node.visibleParticles;
+                flattenedParticleRefs[i].current.getUserData().visible = node.visibleParticles;
             }
         }
 
@@ -181,16 +184,18 @@ const Blob = ({ id, indexArray, scope, flattenedParticleRefs, lastCompoundEntity
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
-                const pos = flattenedParticleRefs.current[flattenedIndex].current.translation();
+                const pos = flattenedParticleRefs[flattenedIndex].current.translation();
                 worldVector.set(pos.x, pos.y, pos.z);
                 positiion.copy(worldToLocalFn(worldVector))
                 return positiion;
             });
 
-            const geometry = points_to_geometry(blobPoints);
-            blobRef.current.geometry.dispose();
-            blobRef.current.geometry = geometry;
-            blobRef.current.visible = node.visible;
+            if (blobPoints.length) {
+                const geometry = points_to_geometry(blobPoints);
+                blobRef.current.geometry.dispose();
+                blobRef.current.geometry = geometry;
+                blobRef.current.visible = node.visible;
+            }
 
         } else {
             blobRef.current.visible = false;

@@ -23,15 +23,15 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
             const currentQuaternion = new THREE.Quaternion();
             const invisibleScale = new THREE.Vector3(0.001, 0.001, 0.001);
 
-            for (let i = 0; i < flattenedParticleRefs.current.length; i++) {
+            for (let i = 0; i < flattenedParticleRefs.length; i++) {
                 const instanceMatrix = new THREE.Matrix4();
                 mesh.getMatrixAt(i, instanceMatrix);
                 instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
 
-                const pos = flattenedParticleRefs.current[i].current.translation();
-                const scale = flattenedParticleRefs.current[i].current.userData.scale || 1;
+                const pos = flattenedParticleRefs[i].current.translation();
+                const scale = flattenedParticleRefs[i].current.getUserData().scale || 1;
                 userScale.set(scale, scale, scale);
-                const color = flattenedParticleRefs.current[i].current.userData.color || 'red';
+                const color = flattenedParticleRefs[i].current.getUserData().color || 'red';
                 userColor.set(color);
 
                 if (!currentPos.equals(pos)) {
@@ -44,7 +44,7 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
                     matrixChanged = true;
                 }
 
-                const visible = flattenedParticleRefs.current[i].current.userData.visible || false;
+                const visible = flattenedParticleRefs[i].current.getUserData().visible || false;
                 if (!visible) {
                     currentScale.copy(invisibleScale);
                     matrixChanged = true;
@@ -88,23 +88,23 @@ const InstancedParticles = React.forwardRef(({ id, flattenedParticleRefs }, ref)
         event.stopPropagation();
         const instanceId = event.instanceId;
         if (instanceId !== undefined) {
-            const userData = flattenedParticleRefs.current[instanceId].current.userData;
+            const userData = flattenedParticleRefs[instanceId].current.getUserData();
             const currentScale = userData.scale;
             // Maybe we should have a function on the particle that allows for scaling
-            console.log("handlePointerDown", id, instanceId, userData, flattenedParticleRefs.current[instanceId].current);
+            console.log("handlePointerDown", id, instanceId, userData, flattenedParticleRefs[instanceId]);
             if (currentScale && currentScale != 1) {
-                flattenedParticleRefs.current[instanceId].current.userData.scale = 1.0;
+                flattenedParticleRefs[instanceId].current.getUserData().scale = 1.0;
             } else {
-                flattenedParticleRefs.current[instanceId].current.userData.scale = 2.0;
+                flattenedParticleRefs[instanceId].current.getUserData().scale = 2.0;
             }
-            flattenedParticleRefs.current[instanceId].current.userData.color = 'pink';
+            flattenedParticleRefs[instanceId].current.getUserData().color = 'pink';
         }
     };
 
     return (
         <instancedMesh
             ref={instancedMeshRef}
-            args={[null, null, flattenedParticleRefs.current.length]}
+            args={[null, null, flattenedParticleRefs.length]}
             onClick={handlePointerDown}
         >
             <circleGeometry args={[particleRadiusRef, 16]} />

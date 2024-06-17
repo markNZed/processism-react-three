@@ -11,7 +11,6 @@ import InstancedParticles from './InstancedParticles';
 import Blob from './Blob';
 import Relations from './Relations';
 import useLimitedLog from '../../hooks/useLimitedLog';
-import useParticlesRegistration from './useParticlesRegistration';
 import useRandomRelations from './useRandomRelations';
 import useJoints from './useJoints';
 import useImpulses from './useImpulses';
@@ -41,6 +40,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         getAllpropertyLookups,
         getPropertyAll,
         getProperty,
+        getAllParticleRefs,
     } = useTreeStore(); 
 
     const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
@@ -138,7 +138,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     const index = scope ? indexArray[scope - 1] : 0;
 
-       /*
+    //chainRef is broken - we bild a chain at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
+
+    const [flattenedParticleRefs, setFlattenedParticleRefs] = useState([]);
+    const [particleCount, setParticleCount] = useState(0); 
+
+    /*
     // Up to here converting to useTreeStore
     const node = {
                 id: nodeId,
@@ -152,35 +157,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 visible: false,
             };
     */
-    //chainRef is broken - we bild a chain at the CompoundEntity not a global chianRef e.g. no multiple joints to other scopes
-
-    //Sould be moved into ZuStand ?
-    // Each particle could store the array of CompoundEntiites that includes it
-    // Could "refresh" this explicitly - no when adding every node (too slow)
-    // Each CompoundEntity could maintain a list of all lower entities - the tree could do this ?
-    // That would also cover entityParticlesRefsRef
-    // Maybe a store for "global" e.g. particleRadiusRef "system"
-    //   Could just write into node["root"] 
-    //     moved particleRadiusRef and particleAreaRef
-    // What does it mean when a particle is registered ? When internalRef is valid e.. rididBodyReady (isParticle can be this)
-    // From the Particle can we know the ancestors and then simply push the particles ?
-    // node has the parentId - recurse up ? 
-    // Could build only when we need it ?
-    const {
-        registerParticlesFn,
-        // An array of entityCount length that stores the particle refs associated with each entity
-        //Sould be moved into ZuStand
-        entityParticlesRefsRef,
-        // A simple array with all the refs
-        flattenedParticleRefs,
-        particleCount,
-        areAllParticlesRegistered
-    } = useParticlesRegistration(props, index, scope, id, config);
 
     // Relying on order of args is not good with such large numbres of args
     //Sould be moved into ZuStand for jointRefsRef, particleRadiusRef
     // Replace scope for depth
-    const { jointsData, initializeJoints } = useJoints(frameStateRef, id, config, internalRef, entityPositions, scope, entityParticlesRefsRef, children, node);
+    const { jointsData, initializeJoints } = useJoints(frameStateRef, id, config, internalRef, entityPositions, scope, children, node);
 
     const { entityImpulses, impulseRef, applyInitialImpulses, calculateImpulses } = useImpulses(
         id,
@@ -192,6 +173,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
         children,
         frameStateRef,
     );
+
+    const areAllParticlesRegistered = () => {
+        getAllParticleRefs(node.id).forEach((ref) => {
+            if (!ref.current) return false;
+        });
+        return true;
+    };
 
     // Find center of this CompoundEntity (using the centers of the entities at the lower scope)
     const calculateCenter = () => {
@@ -214,8 +202,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
 
     useEffect(() => {
         if (initializePhysics && !initializedPhysics) {
+            const allParticles = getAllParticleRefs(node.id);
+            setFlattenedParticleRefs(allParticles);
+            setParticleCount(allParticles.length);
             // Maybe use a variable instead of getNode so we can update and not sync node
-            updateNode(id, {joints: initializeJoints(flattenedParticleRefs, initialPosition)});
+            updateNode(id, {joints: initializeJoints(allParticles, initialPosition)});
             node = getNode(id);
             frameStateRef.current = "initialImpulse";
             // Need to set state to trigger re-rendering of this component
@@ -231,10 +222,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                 // Use a state to trigger the initializeJoints as this may take longer than a frame
                 if (!initializePhysics && areAllParticlesRegistered()) setInitializePhysics(true);
                 break;
+                // Maybe we should wait for all entities to be registered - so state machines are syned
             // Should move this into useImpulses
             case "initialImpulse":
                 if (scope == 0) console.log("getAllpropertyLookups", getAllpropertyLookups(), "getAllNodes", getAllNodes());
-                if (config.initialImpulse) {
+                if (config.initialImpulse && flattenedParticleRefs) {
                     applyInitialImpulses(flattenedParticleRefs);
                 }
                 frameStateRef.current = "findCenter";
@@ -276,16 +268,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", indexArray = 
                         initialPosition={entityPositions[i].toArray()}
                         radius={entityRadius}
                         color={color}
-                        scope={scope + 1}
                         indexArray={[...indexArray, i]}
                         ref={entity.ref}
-                        registerParticlesFn={registerParticlesFn}
                         debug={isDebug}
                         config={config}
                     />
                 ))}
 
-                {frameStateRef.current !== "init" && (
+                {particleCount && (
                     <Blob
                         id={`${id}`}
                         indexArray={indexArray}

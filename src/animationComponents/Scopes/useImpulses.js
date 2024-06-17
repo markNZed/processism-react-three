@@ -63,7 +63,7 @@ const useImpulses = (
         ));
         entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
-                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(flattenedParticleRefs.current.length);
+                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(flattenedParticleRefs.length);
                 entity.current.addImpulse(perEntityImpulse);
             }
         });
