@@ -1,27 +1,24 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useScopeStore from './useScopeStore';
 import useEntityStore from './useEntityStore';
 
-const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
-    const prevParentVisibleRef = useRef(true);
+const Blob = ({ particleRefs, color, node }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const {
-        updateNode,
-        getNode,
-        propagateValue,
-    } = useEntityStore(); 
-    const chainRef = useRef(node.chain);
-    const { setScope, getScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
-    const scopeNode = getScope(node.depth);
+    const updateNode = useEntityStore.getState().updateNode;
+    const getNode = useEntityStore.getState().getNode; // Direct access to the state outside of React's render flow
+    const propagateValue = useEntityStore.getState().propagateValue
+    const getScope = useScopeStore(useCallback((state) => state.getScope, []));
+    const chainRef = node.chainRef;
+    const scope = getScope(node.depth);
     const worldToLocalFn = node.ref.current.worldToLocal;
     const id = node.id;
 
     // Helper function to recursively build the ordered list
-    // Returns null if a chain is dangling
+    // Returns null if a chainRef is dangling
     function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueIndex = null, visited = new Set()) {
         if (uniqueIndex === null) {
             uniqueIndex = blobOuterUniqueIndexes[0];
@@ -75,7 +72,7 @@ const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
                 // If the joint was not created at this depth then skip
                 for (let j = 0; j < linkedIndexes.length; j++) {
                     const jointIndex = `${idx}-${linkedIndexes[j]}`;
-                    if (scopeNode.joints.includes(jointIndex)) {
+                    if (scope.joints.includes(jointIndex)) {
                         onChain = true;
                         break;
                     }
@@ -139,7 +136,7 @@ const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
         }
 
         let blobIndexes;
-        if (lastCompoundEntity) {
+        if (node.lastCompoundEntity) {
             blobIndexes = blobOuterUniqueIndexes;
         } else {
             // buildOrderedIndexes can return null if there are no blobOuterUniqueIndexes
@@ -160,20 +157,12 @@ const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
 
     },[]);
 
-    const points_to_geometry = points => {
-        const curve = new THREE.CatmullRomCurve3(points, true)
-        const ten_fold_points = curve.getPoints(points.length * 10)
-        const shape = new THREE.Shape(ten_fold_points)
-        const shape_geometry = new THREE.ShapeGeometry(shape)
-        return shape_geometry
-    }
-
     useFrame(() => {
 
         if (!blobData.current) return;
 
-        // Probably don't need anything specai lfor this because we have nodes for th eparticles
-        if (lastCompoundEntity) {
+        // Probably don't need anything special for this because we have nodes for the particles
+        if (node.lastCompoundEntity) {
             for (let i = 0; i < particleRefs.length; i++) {
                 // Could add config option to show particles
                 particleRefs[i].current.getUserData().visible = node.visibleParticles;
@@ -203,51 +192,40 @@ const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
 
     });
 
-    const handleOnClick = (event) => {
-        //console.log("handleOnClick", "event:", event, "node.visible:", node.visible, "depth:", node.depth)
-        // If a higher blob is visible then ignore
-        // Walk up the tree but this is wrong as it also need to go down the branch
+    const handleOnClick = useCallback((event, node) => {
         let ancestorId = node.parentId;
         for (let i = node.depth - 1; i >= 0; i--) {
-            const ancestorNode = getNode(ancestorId) ;
+            const ancestorNode = getNode(ancestorId);
             if (ancestorNode.visible) return;
-            ancestorId = ancestorNode.parentId
+            ancestorId = ancestorNode.parentId;
         }
-        // Stop the event from bubbling up
         event.stopPropagation();
-        // Alternate visibility
-        const updateNodeValue = {};
-        updateNodeValue["visible"] = !node.visible;
-        if (lastCompoundEntity) updateNodeValue["visibleParticles"] = node.visible
+        const updateNodeValue = { visible: !node.visible };
+        if (node.lastCompoundEntity) updateNodeValue.visibleParticles = node.visible;
         if (node.visible) {
-            // The children need to become visible
             node.childrenIds.forEach(childId => {
-                updateNode(childId, {visible: true});
+                updateNode(childId, { visible: true });
             });
         } else {
-            // All the children should become invisible (could be many scopes below)
-            // This is very slow
             node.childrenIds.forEach(childId => {
-                propagateValue(childId, "visible", false)
+                propagateValue(childId, "visible", false);
             });
         }
         updateNode(id, updateNodeValue);
-    }
-    
-    const handleOnContextMenu = (event) => {
-        // Stop the event from bubbling up
+    }, []);
+
+    const handleOnContextMenu = useCallback((event) => {
         event.stopPropagation();
-        //console.log("handleOnContextMenu", "event:", event, "node.visible:", node.visible, "depth:", node.depth);
-        updateNode("root", {visible: true});
+        updateNode("root", { visible: true });
         const rootNode = getNode("root");
         rootNode.childrenIds.forEach(childId => {
-            propagateValue(childId, "visible", false)
+            propagateValue(childId, "visible", false);
         });
-    }
+    }, []);
     
     return (
         <mesh ref={blobRef}
-            onClick={(event) => handleOnClick(event)}
+            onClick={(event) => handleOnClick(event, node)}
             onContextMenu={(event) => handleOnContextMenu(event)}>
             <meshBasicMaterial color={color} />
         </mesh>
@@ -255,3 +233,15 @@ const Blob = ({ particleRefs, lastCompoundEntity, color, node }) => {
 };
 
 export default Blob;
+
+// Outside of component to avoid recreation on render
+ 
+const points_to_geometry = points => {
+    const curve = new THREE.CatmullRomCurve3(points, true)
+    //const ten_fold_points = curve.getPoints(points.length * 10)
+    //const shape = new THREE.Shape(ten_fold_points)
+    const oneToOnePoints = curve.getPoints(points.length)
+    const shape = new THREE.Shape(oneToOnePoints)
+    const shape_geometry = new THREE.ShapeGeometry(shape)
+    return shape_geometry
+}

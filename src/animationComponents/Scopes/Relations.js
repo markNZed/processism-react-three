@@ -1,27 +1,54 @@
-import React, { useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useRef, useState, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import useRelationStore from './useRelationStore';
+import useEntityStore from './useEntityStore';
 
-function Relations({ internalRef, config, depth }) {
+function LineWidthChecker() {
+    const { gl } = useThree();
+  
+    useEffect(() => {
+      if (gl && gl.getContext) {
+        // Three.js WebGLRenderer exposes the rendering context via `getContext()`
+        const context = gl.getContext();
+        // Check if the context supports querying parameters directly
+        if (context && context.getParameter) {
+          const lineWidthRange = context.getParameter(context.ALIASED_LINE_WIDTH_RANGE);
+          console.log('Supported line width range:', lineWidthRange);
+        } else {
+          console.log('WebGL context does not support getParameter');
+        }
+      }
+    }, [gl]); // Depend on gl to ensure it's available
+  
+    return null; // This component does not render anything
+}
+
+function Relations({internalRef}) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
-    const lineWidth = (config.entityCounts.length - depth);
-    const material = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: lineWidth });
     const [linesUpdate, setLinesUpdate] = useState(0);
     const linesRef = useRef({});
     const newLinesRef = useRef({});
-    const { setRelation, getRelation, getAllRelations, addRelation, removeRelation, clearRelation, clearAllRelations } = useRelationStore();
+    const getNode = useEntityStore.getState().getNode;
+    const getPropertyAllKeys = useEntityStore.getState().getPropertyAllKeys;
+    const maxDepth = getPropertyAllKeys('depth').length;
+    const getAllRelations = useRelationStore.getState().getAllRelations;
 
     useFrame(() => {
         let update = false;
         // Create new lines (only if relation is new)
-        Object.keys(getAllRelations()).forEach(fromId => {
-            Object.keys(getRelation(fromId)).forEach(toId => {
+        const allRelations = getAllRelations();
+
+        Object.keys(allRelations).forEach(fromId => {
+            Object.keys(allRelations[fromId]).forEach(toId => {
                 if (linesRef.current[fromId] && linesRef.current[fromId][toId]) return;
                 const geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(numPoints * 3);
                 geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const fromNode = getNode(fromId)
+                const lineWidth = (maxDepth - fromNode.depth) + 1;
+                const material = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: lineWidth * 1.0 });
                 const line = new THREE.Line(geometry, material);
                 if (!linesRef.current[fromId]) linesRef.current[fromId] = {};
                 linesRef.current[fromId][toId] = { ref: React.createRef(), line };
@@ -30,22 +57,29 @@ function Relations({ internalRef, config, depth }) {
             });
         });
 
-        if (update) setLinesUpdate(prev => prev + 1);
+        if (update) {
+            setLinesUpdate(prev => prev + 1);
+            if (Node.id == "root") console.log("Total relation count", Object.keys(allRelations).length);
+        }
 
         Object.keys(linesRef.current).forEach(fromId => {
             Object.keys(linesRef.current[fromId]).forEach(toId => {
                 // Remove lineRef for relations that no longer exist
-                if (!getRelation(fromId)) {
+                const relationFrom = allRelations[fromId];
+                const relationFromTo = allRelations[fromId][toId];
+                if (!relationFrom) {
                     delete linesRef.current[fromId];
                     return;
-                } else if (!getRelation(fromId, toId)) {
+                } else if (!relationFromTo) {
                     delete linesRef.current[fromId][toId];
                     return;
                 }
                 const { ref, line } = linesRef.current[fromId][toId];
                 if (ref.current) {
-                    const startPoint = internalRef.current.worldToLocal(getRelation(fromId, toId)[0].current.getCenter());
-                    const endPoint = internalRef.current.worldToLocal(getRelation(fromId, toId)[1].current.getCenter());
+                    const fromNode = getNode(fromId);
+                    const toNode = getNode(toId);
+                    const startPoint = internalRef.current.worldToLocal(fromNode.ref.current.getCenter());
+                    const endPoint = internalRef.current.worldToLocal(toNode.ref.current.getCenter());
                     const start = new THREE.Vector3(startPoint.x, startPoint.y, startPoint.z);
                     const end = new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z);
                     const distance = start.distanceTo(end);
@@ -115,6 +149,7 @@ function Relations({ internalRef, config, depth }) {
                     )}
                 </group>
             )}
+            {/*<LineWidthChecker />*/}
         </>
     );
 }

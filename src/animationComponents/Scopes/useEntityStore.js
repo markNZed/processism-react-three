@@ -1,5 +1,7 @@
+import React from 'react';
 import { create } from 'zustand';
 import uniqueIdGenerator from './uniqueIdGenerator';
+import { devtools } from 'zustand/middleware';
 
 /**
  * Zustand Tree Store
@@ -53,23 +55,31 @@ import uniqueIdGenerator from './uniqueIdGenerator';
 const nodeTemplate = {
     lastCompoundEntity: false,
     isParticle: false,
-    ref: null,
     joints: [],
-    particles: [],
-    relations: [],
-    chain: {},
+    particles: [], // Not yet initialized
     visible: false,
     parentId: null,
+    chainRef: (() => { // Shared by all nodes
+        const ref = React.createRef();
+        ref.current = {};  // Initialize .current with an empty object
+        return ref;
+    })(),
 };
 
-const ignorePropertyLookup = ['id', 'childrenIds', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef', 'particleCount'];
+const ignorePropertyLookup = ['id', 'childrenIds', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef', 'particleCount', 'chainRef', 'relationsRef'];
 
 // Function to create a new node with given properties and childrenIds.
 const createNode = (id = null, properties = {}, childrenIds = []) => ({
     ...nodeTemplate,
     id: id || uniqueIdGenerator.getNextId(),
-    ...properties,
+    ref: React.createRef(),
     childrenIds,
+    relationsRef: (() => {
+        const ref = React.createRef();
+        ref.current = [];  // Initialize .current with an empty object
+        return ref;
+    })(),
+    ...properties,
 });
 
 // Helper function to remove a node from its parent's childrenIds array.
@@ -117,6 +127,8 @@ const useEntityStore = create((set, get) => ({
         return nodes[nodeId];
     },
 
+    selectNodeById: (id) => (state) => state.nodes[id],
+
     getAllNodes: () => get().nodes,
 
     getAllpropertyLookups: () => get().propertyLookups,
@@ -137,6 +149,22 @@ const useEntityStore = create((set, get) => ({
         return node[property];
     },
 
+    // Function to get all nodes with isParticle set to true.
+    getAllParticleRefs: (id = 'root') => {
+        const particles = [];
+        const nodes = get().nodes;
+        const traverse = (node) => {
+            if (node.isParticle) {
+                particles.push(node.ref);
+            }
+            if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                node.childrenIds.forEach(childId => traverse(nodes[childId]));
+            }
+        };
+        traverse(nodes[id]);
+        return particles;
+    },
+
     // Function to add a new node to the tree.
     addNode: (parentId, node, id = null) => {
         let newNodeId;
@@ -149,7 +177,7 @@ const useEntityStore = create((set, get) => ({
             }
 
             const nodeDepth = (parentNode.depth || 0) + 1;
-            const newNode = { ...nodeTemplate, ...node, id: id || uniqueIdGenerator.getNextId(), depth: nodeDepth, childrenIds: node.childrenIds || [] };
+            const newNode = createNode(id, { ...node, depth: nodeDepth }, node.childrenIds || []);
             newNodeId = newNode.id;
             state.nodeCount++;
 
@@ -331,22 +359,6 @@ const useEntityStore = create((set, get) => ({
         traverse(nodes[id]);
     },
 
-    // Function to get all nodes with isParticle set to true.
-    getAllParticleRefs: (id = 'root') => {
-        const particles = [];
-        const nodes = get().nodes;
-        const traverse = (node) => {
-            if (node.isParticle) {
-                particles.push(node.ref);
-            }
-            if (node.childrenIds && Array.isArray(node.childrenIds)) {
-                node.childrenIds.forEach(childId => traverse(nodes[childId]));
-            }
-        };
-        traverse(nodes[id]);
-        return particles;
-    },
-
     // Function to copy a subtree to a new parent node.
     copySubtree: (nodeId, newParentId) => set(state => {
         const nodes = { ...state.nodes };
@@ -402,7 +414,6 @@ const useEntityStore = create((set, get) => ({
 
         return { nodes };
     }),
-
 
 }));
 

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useEntityStore from './useEntityStore';
@@ -6,29 +6,29 @@ import useScopeStore from './useScopeStore';
 import useJointStore from './useJointStore';
 
 const useJoints = (
-    frameState,
+    initialized,
     entityPositions,
     node,
     entityNodes,
 ) => {
 
     const { world, rapier } = useRapier();
-    const {
-        updateNode,
-        getNode,
-        getNodeProperty,
-        getAllParticleRefs,
-    } = useEntityStore(); 
+    // Be careful not to have this sensitive to updates to nodes
+    // Direct access to the state outside of React's render flow
+    const updateNode = useEntityStore.getState().updateNode;
+    const getNodeProperty = useEntityStore.getState().getNodeProperty;
+    const getAllParticleRefs = useEntityStore.getState().getAllParticleRefs;
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
-    const { setScope, getScope, updateScope, addScope, removeScope, clearScope, clearAllScopes } = useScopeStore();
-    const { setJoint, getJoint, addJoint, removeJoint: removeJointStore, clearJoint, clearAllJoints } = useJointStore();
-    const scopeNode = getScope(node.depth);
+    const updateScope = useScopeStore.getState().updateScope;
+    const getJoint = useJointStore.getState().getJoint;
+    const addJoint = useJointStore.getState().addJoint;
+    const addJoints = useJointStore.getState().addJoints;
+    const removeJointStore = useJointStore.getState().removeJoint;
     const id = node.id;
     const scope = node.depth;
     const config = node.config;
     const internalRef = node.ref;
-
-    const chainRef = useRef(node.chain);
+    const chainRef = node.chainRef;
 
     const entityRefs = entityNodes.map(entity => entity.ref);
 
@@ -62,7 +62,7 @@ const useJoints = (
         return generateJointsData(entityPositions);
     }, [entityPositions]);
 
-    const createJoint = (a, b) => {
+    const createJoint = (a, b, batch=false) => {
         const aUserData = a.ref.userData || a.ref.getUserData();
         const bUserData = b.ref.userData || b.ref.getUserData();
         const jointRefsRefIndex = `${aUserData.uniqueIndex}-${bUserData.uniqueIndex}`;
@@ -74,16 +74,18 @@ const useJoints = (
             b.ref,
             true
         );
-        addJoint(jointRefsRefIndex, jointRef);
-        addJoint(jointRefsRefIndexReverse, jointRef);
-        updateNode(aUserData.uniqueIndex, p => ({
-            joints: p.joints.includes(jointRefsRefIndex) ? p.joints : [...p.joints, jointRefsRefIndex]
-        }));
-        updateScope(scope, p => ({
-            joints: [...p.joints, jointRefsRefIndex, jointRefsRefIndexReverse]
-        }));
+        if (!batch) {
+            addJoint(jointRefsRefIndex, jointRef);
+            addJoint(jointRefsRefIndexReverse, jointRef);
+            updateNode(aUserData.uniqueIndex, p => ({
+                joints: p.joints.includes(jointRefsRefIndex) ? p.joints : [...p.joints, jointRefsRefIndex]
+            }));
+            updateScope(scope, p => ({
+                joints: [...p.joints, jointRefsRefIndex, jointRefsRefIndexReverse]
+            }));
+        }
         //console.log("createJoint", id, jointRefsRefIndex, jointRef);
-        return jointRef;
+        return [jointRefsRefIndex, jointRefsRefIndexReverse, jointRef];
     };
 
     const removeJoint = (jointKey) => {
@@ -204,11 +206,10 @@ const useJoints = (
                 },
             };
         });
-        updateNode(id, {chain: chainRef.current});
         return allocateJoints;
     };
 
-    const initializeJoints = (particleRefs, initialPosition) => {
+    const initializeJoints = useCallback((particleRefs, initialPosition) => {
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
         const entitiesParticlesRefs = [];
@@ -217,21 +218,20 @@ const useJoints = (
         });
 
         const newJoints = allocateJointsToParticles(entitiesParticlesRefs, jointsData, internalRef);
-        newJoints.forEach((particles, i) => {
+        // Prepare the updates first by aggregating them into a single array
+        const allNewJoints = newJoints.reduce((acc, particles) => {
             const aIndex = particles.a.ref.current.userData.uniqueIndex;
             const bIndex = particles.b.ref.current.userData.uniqueIndex;
             const jointIndex = `${aIndex}-${bIndex}`;
             const jointIndexReverse = `${bIndex}-${aIndex}`;
-            updateScope(scope, p => ({
-                joints: [...p.joints, jointIndex, jointIndexReverse]
-            }));
-            updateNode(aIndex, p => ({
-                joints: p.joints.includes(jointIndex) ? p.joints : [...p.joints, jointIndex]
-            }));
-            updateNode(bIndex, p => ({
-                joints: p.joints.includes(jointIndex) ? p.joints : [...p.joints, jointIndex]
-            }));
-        });
+            // Add both the joint index and its reverse to the accumulator
+            return [...acc, jointIndex, jointIndexReverse];
+        }, []);
+
+        // Perform the update in one go
+        updateScope(scope, p => ({
+            joints: [...p.joints, ...allNewJoints]
+        }));
 
         // Distance to the first joint
         // We place the joints first because they will not align with the perimeter of the scope
@@ -252,6 +252,7 @@ const useJoints = (
         });
 
         // Create the joints
+        const createJointResults = []
         newJoints.forEach((particles) => {
             //const { offset1, offset2 } = calculateJointOffsets(particles.a.ref.current, particles.b.ref.current, particleRadiusRef);
             // Offset needs to be in local coordinates - should be OK for 
@@ -263,11 +264,16 @@ const useJoints = (
                 ref: particles.b.ref.current,
                 offset: particles.b.offset,
             }
-            createJoint(a, b);
+            createJointResults.push(createJoint(a, b, true));
         });
-
-        return newJoints;
-    };
+        addJoints(createJointResults); // Because batch operation
+        const jointIndexes = createJointResults.map((id1, id2, ref) => {
+            return id1;
+        })
+        updateNode(id, p => ({
+            joints: jointIndexes
+        }));
+    }, [jointsData, particleRadiusRef]);
 
     // Experimenting on how to migrate an entity
     // Start with single particle
@@ -291,7 +297,7 @@ const useJoints = (
         const randomDuration = 1000; //Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
             // With "Scope-3" this is at scope 1 so userData.uniqueIndex is e.g. "Scope-3-5" not a Particle index
-            if (frameState !== "init" && id == "Scope-8-3") {
+            if (initialized && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
                 const entityRef = entityRefs(randomIndexFrom);

@@ -6,6 +6,7 @@ const useScopeStore = create((set, get) => ({
     scope: { ...state.scope, [id]: objs },
   })),
   getScope: (id) => get().scope[id] || [],
+  getScopeCount: (id) => get().scope[id]?.length || 0,
   addScope: (id, obj) => set(state => {
     const existingObjs = state.scope[id] || [];
     // Check if an object with the same id is already in the array

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useImperativeHandle, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useImperativeHandle, useState, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
@@ -23,7 +23,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
         updateNode,
         getNode,
     } = useEntityStore(); 
-    const node = getNode(id);
+    const node = useEntityStore(useCallback((state) => state.nodes[id], [id]));
     const internalRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
     const color = useMemo(() => getColor(configColor, props.color));
@@ -73,8 +73,9 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
     // Set the initial userData, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && internalRef.current) {
-            internalRef.current.setUserData({ color: color, uniqueIndex: id, radius: radius });
-            updateNode(id, {isParticle: true});
+            //console.log(`Initialize particle ${id} begin`)
+            internalRef.current.setUserData({ color: color, uniqueIndex: id });
+            //updateNode(id, {isParticle: true});
             const rootNode = getNode("root");
             if (!rootNode.particleRadius) {
                 updateNode("root", {
@@ -83,8 +84,11 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 })
             }
             setInitialize(false);
+            //console.log(`Initialize particle ${id} end`)
         }
     }, [internalRef]);
+
+    //console.log("Particle rendering");
 
     return (
         <>

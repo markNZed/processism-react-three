@@ -7,7 +7,7 @@ const useAnimateImpulses = (
     particleCount,
     node,
     entityNodes,
-    frameState,
+    initialized,
     initialPositionVector,
     particleRefs,
 ) => {
@@ -15,9 +15,7 @@ const useAnimateImpulses = (
     const impulseRef = useRef();
     const config = node.config;
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (node.depth + 1);
-    const {
-        getNodeProperty,
-    } = useEntityStore();
+    const getNodeProperty = useEntityStore.getState().getNodeProperty;
     const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
     const id = node.id;
     const internalRef = node.ref;
@@ -83,7 +81,7 @@ const useAnimateImpulses = (
 
     // Impulse on every frame
     useFrame(() => {
-        if (frameState !== 'init') {
+        if (initialized) {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
                 const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);
@@ -99,7 +97,7 @@ const useAnimateImpulses = (
         // State machine allows for computation to be distributed across frames, reducing load on the physics engine
         switch (impulseStateRef.current) {
             case "init":
-                if (frameState !== "init") impulseStateRef.current = "initialImpulse";
+                if (initialized) impulseStateRef.current = "initialImpulse";
                 break;
                 // Maybe we should wait for all entities to be registered - so state machines are syned
             // Should move this into useAnimateImpulses
@@ -107,23 +105,16 @@ const useAnimateImpulses = (
                 if (config.initialImpulse && particleRefs) {
                     applyInitialImpulses(particleRefs);
                 }
-                impulseStateRef.current = "calcEntityImpulses";
+                impulseStateRef.current = "impulse";
                 break
-            case "findCenter":
+            case "impulse":
                 prevCenterRef.current = node.depth == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = internalRef.current.getCenter();
                 if (centerRef.current && prevCenterRef.current) {
-                    impulseStateRef.current = "calcEntityImpulses";
+                    // Could calculate velocity and direction here
+                    calculateImpulses(centerRef, prevCenterRef);
+                    entityImpulses(prevCenterRef.current, impulseRef.current);
                 }
-                break;
-            case "calcEntityImpulses":
-                // Could calculate velocity and direction here
-                calculateImpulses(centerRef, prevCenterRef);
-                impulseStateRef.current = "entityImpulses";
-                break;
-            case "entityImpulses":
-                entityImpulses(prevCenterRef.current, impulseRef.current);
-                impulseStateRef.current = "findCenter";
                 break;
             default:
                 console.error("Unexpected state", id, impulseStateRef.current)

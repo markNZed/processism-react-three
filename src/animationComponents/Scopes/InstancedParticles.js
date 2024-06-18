@@ -5,9 +5,7 @@ import useEntityStore from './useEntityStore';
 
 const InstancedParticles = React.forwardRef(({ id, particleRefs }, ref) => {
     const instancedMeshRef = useRef();
-    const {
-        getNodeProperty,
-    } = useEntityStore();
+    const getNodeProperty = useEntityStore.getState().getNodeProperty;
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
 
     useFrame(() => {
@@ -44,7 +42,7 @@ const InstancedParticles = React.forwardRef(({ id, particleRefs }, ref) => {
                     matrixChanged = true;
                 }
 
-                const visible = particleRefs[i].current.getUserData().visible || false;
+                const visible = particleRefs[i].current.getUserData().visible;
                 if (!visible) {
                     currentScale.copy(invisibleScale);
                     matrixChanged = true;

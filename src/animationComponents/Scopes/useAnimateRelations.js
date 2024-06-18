@@ -2,65 +2,77 @@ import { useEffect } from 'react';
 import useEntityStore from './useEntityStore';
 import useRelationStore from './useRelationStore';
 
-function useAnimateRelations(config, frameState, entityCount, node, entityNodes) {
+function useAnimateRelations(initialized, node, entityNodes) {
 
-    const { getNode, getPropertyAllKeys, } = useEntityStore(); 
-    const { setRelation, getAllRelations, removeRelations } = useRelationStore();
-
-    const entityRefs = entityNodes.map(entity => entity.ref);
+    const getNode = useEntityStore.getState().getNode;
+    const getPropertyAllKeys = useEntityStore.getState().getPropertyAllKeys;
+    const setRelation = useRelationStore.getState().setRelation;
+    const removeRelations = useRelationStore.getState().removeRelations;
+    const entityCount = node.childrenIds.length;
+    const config = node.config;
+    const maxDepth = getPropertyAllKeys('depth').length;
 
     useEffect(() => {
-        // Generate a random number between 1000 and 10000 which determines the duration of relations
-        const randomDuration = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
+        if (!config.showRelations || !initialized) return;
+        // Generate a random number between 500 and 5000 which determines the duration of relations
+        const minDuration = 500;
+        const maxDuration = 5000
+        const randomDuration = Math.floor(Math.random() * (maxDuration - minDuration + 1)) + minDuration;
         const interval = setInterval(() => {
-            if (config.showRelations && frameState !== "init") {
-                const maxDepth = getPropertyAllKeys('depth').length;
-                console.log("maxDepth", maxDepth)
-                const relationCount = Math.ceil(entityCount * 0.2);
-                let relationFound = 0;
-                const allKeys = Object.keys(getAllRelations);
+            node.childrenIds.forEach((fromId, i) => {
+                const fromNode = entityNodes[i];
+                if (fromNode.isParticle) {
+                    // Only a small fraction of Particles have relations
+                    if (Math.random() < 0.99) {
+                        return;
+                    }
+                }
+                //console.log("maxDepth", maxDepth)
+                const maxRelationCount = Math.ceil(entityCount * 0.2);
+                // We do this outside of the React render cycle 
+                const relationsStore = useRelationStore.getState();
+                let relationCount = fromNode.relationsRef.current.length || 0;
+                const nodeRelations = relationsStore.getRelation(fromId);
+                const allKeys = Object.keys(nodeRelations);
                 // Randomly delete keys so we remove relations (and create space for new ones)
+                // Track removed keys for updating the ref
+                let removedKeys = [];
                 allKeys.forEach(key => {
                     if (Math.random() < 0.25) {
                         removeRelations(key);
+                        removedKeys.push(key);
                     }
                 });
-                // Update relationFound after removing relations
-                // We could maintain a count in the Store
-                relationFound = Object.keys(getAllRelations).length;
-                while (relationFound < relationCount) {
+                fromNode.relationsRef.current = fromNode.relationsRef.current.filter(toId => !removedKeys.includes(toId));
+                relationCount = fromNode.relationsRef.current.length;
+                while (relationCount < maxRelationCount) {
 
-                    // Randomly select an entity from this CompoundEntity
-                    const randomIndexFrom = Math.floor(Math.random() * entityCount);
-                    const entityRefFrom = entityRefs[randomIndexFrom];
-                    const userDataFrom = entityRefFrom.current.getUserData() || {};
-                    const fromId = userDataFrom.uniqueIndex;
+                    let toId;
 
                     // Randomly select an entity which entityRefFrom will go to
                     let entityRefTo;
                     // Some of the time we want to select an entity outside of this CompoundEntity
                     if (Math.random() < 0.2) {
-                        let randomPath = [];
                         // Most of the time we want to select an entity inside this CompoundEntity
                         
-                        const maxDistanceUp = node.depth;
+                        const maxDistanceUp = fromNode.depth;
                         let destinationNode;
-                        let destinationNodeId = node.id;
+                        let destinationNodeId = fromId;
                         // This is the distance to hop "up" - max of 2
                         let hopUp = 0;
                         let rollOfDice = Math.random();
                         if (rollOfDice < 0.8) {
                             hopUp = 0;
                         } else if (rollOfDice < 0.9 && maxDistanceUp) {
-                            destinationNodeId = node.parentId;
+                            destinationNodeId = fromNode.parentId;
                             hopUp = 1;
                         } else if (maxDistanceUp > 1) {
-                            const parentNode = getNode(node.parentId);
+                            const parentNode = getNode(fromNode.parentId);
                             destinationNodeId = parentNode. parentId;
                             hopUp = 2;
                         }
                         destinationNode = getNode(destinationNodeId);
-                        const maxDistanceDown = maxDepth - node.depth + hopUp;
+                        const maxDistanceDown = maxDepth - fromNode.depth + hopUp;
                         // This is the distance to hop "down" - max of 2
                         let hopDown = 0;
                         rollOfDice = Math.random();
@@ -80,34 +92,34 @@ function useAnimateRelations(config, frameState, entityCount, node, entityNodes)
                                 destinationNodeId = childNode.id;
                             }
                             hopDown = 2;
-                            console.log("hopDown", hopDown, "destinationNodeId", destinationNodeId, "randomIndex", randomIndex, "childNode", childNode)
                         }
+                        // Special case for root, maybe we should just call this 0 
+                        if (destinationNodeId === 0) destinationNodeId = "root";
                         destinationNode = getNode(destinationNodeId);
                         entityRefTo = destinationNode.ref;
+                        toId = destinationNodeId;
                     } else {
-                        let randomIndexTo = Math.floor(Math.random() * entityCount);
-                        entityRefTo = entityRefs[randomIndexTo];
+                        // Preference is a relation with a sibling
+                        let randomIndexTo = Math.floor(Math.random() * node.childrenIds.length);
+                        toId = node.childrenIds[randomIndexTo];
+                        entityRefTo = entityNodes[randomIndexTo]
                     }
-
-                    const userDataTo = entityRefTo.current.getUserData() || {};
-                    const toId = userDataTo.uniqueIndex;
 
                     // Avoid selecting the same entity for from and to 
                     if (fromId === toId) continue;
 
-                    const randomIndexFromRelations = userDataFrom.relations || [];
-                    entityRefFrom.current.setUserData({ ...userDataFrom, relations: [...randomIndexFromRelations, entityRefTo] });
+                    setRelation(fromId, toId, [fromNode.ref, entityRefTo]);
+                    fromNode.relationsRef.current.push(toId);
 
-                    setRelation(fromId, toId, [entityRefFrom, entityRefTo]);
+                    relationCount++;
 
-                    relationFound++;
                 }
-            }
+            });
         }, randomDuration);
         return () => {
             clearInterval(interval); // Cleanup interval on component unmount
         };
-    }, [config.showRelations, frameState, entityCount]);
+    }, [config.showRelations, initialized, entityCount]);
 }
 
 export default useAnimateRelations;

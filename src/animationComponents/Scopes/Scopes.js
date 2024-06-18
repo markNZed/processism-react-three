@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import withAnimationState from '../../withAnimationState';
 import { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from '@react-three/rapier';
@@ -7,6 +7,8 @@ import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import useEntityStore from './useEntityStore';
+import * as utils from './utils';
+import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
 /* Overview:
  A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
@@ -29,7 +31,9 @@ import useEntityStore from './useEntityStore';
  a CompoundEntity will instantiate multiple CompoundEntity to a certain depth (length of config.entityCounts array)
  the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
 */
-const Scopes = React.forwardRef((props, ref) => {
+
+// Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
+const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
 
     const pausePhysics = useStore((state) => state.pausePhysics);
 
@@ -37,26 +41,19 @@ const Scopes = React.forwardRef((props, ref) => {
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const {
-        addNode,
-        updateNode,
-        getNode,
-        moveNode,
-        deleteNode,
-        getNodesByPropertyAndDepth,
-        flattenTree,
-        traverseTreeDFS,
-        copySubtree,
-    } = useEntityStore(); 
-
+    // Avoid changes in store causing rerender
+    // Direct access to the state outside of React's render flow
+    const addNode = useEntityStore.getState().addNode;
+    const updateNode = useEntityStore.getState().updateNode;
+    const getNode = useEntityStore.getState().getNode;
     // Leva controls
     // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
     // Using state here is a problemn for the functions
     // The onChange in scope0 etc here breaks things
     const [controlsConfig, setControlsConfig] = useState({
         scopeCount: { value: 3, step: 1, },
-        radius: { value: props.radius || 10, min: 1, max: 20 },
-        impulsePerParticle: { value: 0.5, min: 0.001, max: 10, step: 0.001, label: "Impulse per Particle" },
+        radius: { value: radius || 10, min: 1, max: 20 },
+        impulsePerParticle: { value: 2, min: 0.001, max: 10, step: 0.001, label: "Impulse per Particle" },
         overshootScaling: { value: 1, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
@@ -75,7 +72,7 @@ const Scopes = React.forwardRef((props, ref) => {
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
         debug: false,
-        colors: [props.color || null, getRandomColorFn, null],
+        colors: [color || null, utils.getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,
         overshootScaling: controls.overshootScaling,
         attractorScaling: controls.attractorScaling,
@@ -100,7 +97,7 @@ const Scopes = React.forwardRef((props, ref) => {
 
     const { step } = useRapier();
     const framesPerStep = 1; // Update every framesPerStep frames
-    const fixedDelta = framesPerStep / 30; //fps
+    const fixedDelta = framesPerStep / 60; //fps
     const framesPerStepCount = useRef(0);
     const startTimeRef = useRef(0);
     const durations = useRef([]); // Store the last 100 durations
@@ -174,12 +171,12 @@ const Scopes = React.forwardRef((props, ref) => {
         }
     }, [controls.scopeCount]);
 
-    // Need to resert physics when we reset the scopes
+    // Need to reset physics when we reset the scopes
     useFrame(() => {
         framesPerStepCount.current++;
         if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
-        // Should replace props.isAnimating with pausePhysics
-        if (framesPerStepCount.current == 0 && props.isAnimating && !pausePhysics) {
+        // Should replace isAnimating with pausePhysics
+        if (framesPerStepCount.current == 0 && isAnimating && !pausePhysics) {
             step(fixedDelta);
         }
     });
@@ -222,7 +219,6 @@ const Scopes = React.forwardRef((props, ref) => {
             const node = {
                 lastCompoundEntity: restCounts.length === 1,
                 isParticle: restCounts.length === 0,
-                ref: React.createRef(),
                 parentId: parentId,
             };
             const newId = addNode(parentId, node);    
@@ -241,6 +237,7 @@ const Scopes = React.forwardRef((props, ref) => {
     // Initialization the tree store, do not have a UI for this yet
     useEffect(() => {
         if (remountConfigState.entityCounts) {
+            console.log("remountConfigState.entityCounts begin", config, remountConfigState, controls)
             const newConfig = { ...config, ...remountConfigState };
             const entityCountsStr = remountConfigState.entityCounts.toString();
             const rootNode = getNode("root");
@@ -249,13 +246,30 @@ const Scopes = React.forwardRef((props, ref) => {
                 updateNode("root", {entityCountsStr, ref: internalRef, visible: true});
                 updateNodesConfigRecursively(newConfig);
                 setTreeReady(true)
+                console.log("updateNodesConfigRecursively")
             } else if (JSON.stringify(rootNode.config) !== JSON.stringify(newConfig))  {
                 updateNodesConfigRecursively(newConfig);
+                console.log("updateNodesConfigRecursively")
             }
+            console.log("remountConfigState.entityCounts end")
         }
-    }, [config, remountConfigState]);
+    }, [controls, remountConfigState]);
 
-    // Pass in radius so we can calculate new radius for next scope an pass in same way to CompoundEntity
+    useEffect(() => {
+        if (treeReady) {
+            const entityCountsStr = remountConfigState.entityCounts.toString();
+            console.log("Scope treeReady", treeReady, entityCountsStr)
+        }
+    }, [treeReady]);
+
+    useWhyDidYouUpdate(`Scopes`, {radius, color, isAnimating, controls});
+
+    console.log("Scopes rendering", treeReady, remountConfigState)
+
+    // Pass in radius so we can pass on new radius for child CompoundEntity
+    // Pass in initialPosition to avoid issues with prop being reinitialized with default value
+    // Which might be an issue with useMemo?
+
     return (
         <>
             {treeReady && (
@@ -263,6 +277,7 @@ const Scopes = React.forwardRef((props, ref) => {
                     key={JSON.stringify(remountConfigState)}
                     ref={internalRef}
                     radius={remountConfigState.radius}
+                    initialPosition={[0, 0, 0]}
                 />
             )}
         </>
@@ -270,13 +285,3 @@ const Scopes = React.forwardRef((props, ref) => {
 });
 
 export default withAnimationState(Scopes);
-
-const getRandomColorFn = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    //console.log("Color: ", color);
-    return color;
-};
