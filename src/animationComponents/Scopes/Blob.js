@@ -3,105 +3,65 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
 
+/**
+ * Recursively builds the ordered list of indexes.
+ * @param {Object} chainRef - Reference object containing the current state of chains.
+ * @param {Array} blobOuterUniqueIds - Array of unique IDs representing the outer blob.
+ * @param {string|null} [uniqueId=null] - The current unique ID to process.
+ * @param {Set} [visited=new Set()] - A set of visited unique IDs to prevent infinite loops.
+ * @returns {Array|null} Ordered list of indexes or null if a chainRef is dangling.
+ */
+function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
+    // Initialize uniqueId with the first element of blobOuterUniqueIds if null
+    if (uniqueId === null) {
+        uniqueId = blobOuterUniqueIds[0];
+    }
+
+    // Guard clause to prevent infinite loops
+    if (visited.has(uniqueId)) return null;
+    
+    visited.add(uniqueId);
+    
+    // Guard clause to check if uniqueId is in blobOuterUniqueIds
+    if (!blobOuterUniqueIds.includes(uniqueId)) return null;
+    
+    const result = [uniqueId];
+    const linkedIndexes = chainRef.current[uniqueId];
+    
+    // Check if there are any joints (nodes with more than 2 links)
+    let foundJoint = false;
+    for (let linkedIndex of linkedIndexes) {
+        if (chainRef.current[linkedIndex].length > 2) {
+            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndex, visited);
+            if (recursiveResult) {
+                foundJoint = true;
+                result.push(...recursiveResult);
+            }
+        }
+    }
+    
+    // If no joints were found, continue with the normal linked indexes
+    if (!foundJoint) {
+        for (let linkedIndex of linkedIndexes) {
+            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndex, visited);
+            if (recursiveResult) {
+                result.push(...recursiveResult);
+            }
+        }
+    }
+    
+    return result;
+}
+
 const Blob = ({ color, node }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const updateNode = useStoreEntity.getState().updateNode;
-    const getNode = useStoreEntity.getState().getNode; // Direct access to the state outside of React's render flow
-    const propagateValue = useStoreEntity.getState().propagateValue
-    const chainRef = node.chainRef;
+    const { updateNode, getNode, propagateValue } = useStoreEntity.getState();
+    const { chainRef, id, particlesRef: { current: particles } } = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
-    const id = node.id;
-    const particles = node.particlesRef.current;
 
-    // Helper function to recursively build the ordered list
-    // Returns null if a chainRef is dangling
-    function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
-        if (uniqueId === null) {
-            uniqueId = blobOuterUniqueIds[0];
-        }
-        const result = [];
-        // Prevent infinite loops
-        if (visited.has(uniqueId)) return null;
-        visited.add(uniqueId);
-        if (blobOuterUniqueIds.includes(uniqueId)) {
-            result.push(uniqueId)
-        } else {
-            // chain is dangling (not looping)
-            return null;
-        }
-        const linkedIndexes = chainRef.current[uniqueId];
-        let foundJoint = false
-        // Joints have more than 2 links
-        if (linkedIndexes.length > 2) {
-            for (let i = 0; i < linkedIndexes.length; i++) {
-                if (chainRef.current[linkedIndexes[i]].length > 2) {
-                    const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndexes[i], visited);
-                    if (recursiveResult) {
-                        foundJoint = true;
-                        result.push(...recursiveResult);
-                    }
-                }
-            }
-        }
-        if (!foundJoint) {
-            for (let i = 0; i < linkedIndexes.length; i++) {
-                const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndexes[i], visited)
-                if (recursiveResult) {
-                    result.push(...recursiveResult);
-                    // recursiveResult is not null but it may be dangling further along the chain
-                }
-            }
-        }
-        return result;
-    }
-
-    function filterMiddleIndexes(chainRef, indexes) {
-        const parentNode = getNode(node.parentId);
-        const jointIndexes = [];
-        // Find all indexes from the provided list that are joints i.e. more than 2 links
-        for (let i = 0; i < indexes.length; i++) {
-            const idx = indexes[i];
-            if (chainRef.current[idx].length > 2) {
-                // Check it is a link on this depth
-                const linkedIndexes = chainRef.current[idx];
-                let onChain = true;
-                onChain = false;
-                // If the joint was not created at this depth then skip
-                // Get all the joints for the paret node
-                for (let j = 0; j < linkedIndexes.length; j++) {
-                    const jointIndex = `${idx}-${linkedIndexes[j]}`;
-                    if (parentNode.jointsRef.current.includes(jointIndex)) {
-                        onChain = true;
-                        break;
-                    }
-                }
-                if (onChain) jointIndexes.push(i);
-            }
-        }
-        const middleIndexes = [];
-        // Find indexes that are in the middle between joints
-        for (let i = 1; i < jointIndexes.length; i++) {
-            // Calculate the middle index
-            const midIndex = Math.floor((jointIndexes[i - 1] + jointIndexes[i]) / 2);
-            // Avoid duplicating joints
-            if (!jointIndexes.includes(midIndex)) {
-                //middleIndexes.push(indexes[jointIndexes[i - 1]]);
-                middleIndexes.push(indexes[midIndex]);
-            }
-        }
-        // Calculate the middle position between the first and last link with wraparound
-        const firstJoint = jointIndexes[0];
-        const lastJoint = jointIndexes[jointIndexes.length - 1];
-        const indexesLength = indexes.length;
-        const distance = (indexesLength - lastJoint + firstJoint);
-        const middle = (lastJoint + Math.floor(distance / 2)) % indexes.length;
-        //middleIndexes.push(indexes[lastJoint]);
-        middleIndexes.push(indexes[middle]);
-        return middleIndexes;
-    }
-
+    // This only runs once upon mounting to build the blobData which acts as a cache for objects
     useEffect(() => {
 
         blobData.current = {
@@ -192,36 +152,9 @@ const Blob = ({ color, node }) => {
 
     });
 
-    const handleOnClick = useCallback((event, node) => {
-        let ancestorId = node.parentId;
-        for (let i = node.depth - 1; i >= 0; i--) {
-            const ancestorNode = getNode(ancestorId);
-            if (ancestorNode.visible) return;
-            ancestorId = ancestorNode.parentId;
-        }
-        event.stopPropagation();
-        const updateNodeValue = { visible: !node.visible };
-        if (node.lastCompoundEntity) updateNodeValue.visibleParticles = node.visible;
-        if (node.visible) {
-            node.childrenIds.forEach(childId => {
-                updateNode(childId, { visible: true });
-            });
-        } else {
-            node.childrenIds.forEach(childId => {
-                propagateValue(childId, "visible", false);
-            });
-        }
-        updateNode(id, updateNodeValue);
-    }, []);
+    const handleOnClick = handleOnClickFn(getNode, updateNode, propagateValue, id);
 
-    const handleOnContextMenu = useCallback((event) => {
-        event.stopPropagation();
-        updateNode("root", { visible: true });
-        const rootNode = getNode("root");
-        rootNode.childrenIds.forEach(childId => {
-            propagateValue(childId, "visible", false);
-        });
-    }, []);
+    const handleOnContextMenu = handleOnContextMenuFn(updateNode, getNode, propagateValue);
     
     return (
         <mesh ref={blobRef}
@@ -244,4 +177,39 @@ const points_to_geometry = points => {
     const shape = new THREE.Shape(oneToOnePoints)
     const shape_geometry = new THREE.ShapeGeometry(shape)
     return shape_geometry
+}
+
+function handleOnContextMenuFn(updateNode, getNode, propagateValue) {
+    return useCallback((event) => {
+        event.stopPropagation();
+        updateNode("root", { visible: true });
+        const rootNode = getNode("root");
+        rootNode.childrenIds.forEach(childId => {
+            propagateValue(childId, "visible", false);
+        });
+    }, []);
+}
+
+function handleOnClickFn(getNode, updateNode, propagateValue, id) {
+    return useCallback((event, node) => {
+        let ancestorId = node.parentId;
+        for (let i = node.depth - 1; i >= 0; i--) {
+            const ancestorNode = getNode(ancestorId);
+            if (ancestorNode.visible) return;
+            ancestorId = ancestorNode.parentId;
+        }
+        event.stopPropagation();
+        const updateNodeValue = { visible: !node.visible };
+        if (node.lastCompoundEntity) updateNodeValue.visibleParticles = node.visible;
+        if (node.visible) {
+            node.childrenIds.forEach(childId => {
+                updateNode(childId, { visible: true });
+            });
+        } else {
+            node.childrenIds.forEach(childId => {
+                propagateValue(childId, "visible", false);
+            });
+        }
+        updateNode(id, updateNodeValue);
+    }, []);
 }
