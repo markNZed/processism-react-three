@@ -16,7 +16,6 @@ import useAnimateJoints from './useAnimateJoints';
 import useJoints from './useJoints';
 import DebugRender from './DebugRender';
 import useStoreEntity from './useStoreEntity';
-import useStoreScope from './useStoreScope';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
 
@@ -28,7 +27,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const directGetNode = useStoreEntity.getState().getNode;
     const directUpdateNode = useStoreEntity.getState().updateNode;
     const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
-    const directAddScope = useStoreScope.getState().addScope;
 
     // Select so we are only sensitive to changes of this node. useCallback avoids recreating the selector on each render.
     const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
@@ -66,7 +64,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     useEffect(() => {
         // Each CompoundEntity at this scope will attempt to add and only one will succeed
-        directAddScope(node.depth, {joints: []});
         directUpdateNode(id, {initialPosition});
         if (node.depth == 0) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
     }, []);

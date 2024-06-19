@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
-import useStoreScope from './useStoreScope';
 import useStoreJoint from './useStoreJoint';
 import * as utilsJoints from './utilsJoints.js';
 
@@ -9,15 +8,11 @@ import * as utilsJoints from './utilsJoints.js';
 
 const useJoints = () => {
 
-    //if (!initialized) return () => null;
-
     const { world, rapier } = useRapier();
     // Be careful not to have this sensitive to updates to nodes
     // Direct access to the state outside of React's render flow
-    const directUpdateNode = useStoreEntity.getState().updateNode;
     const directGetNodeProperty = useStoreEntity.getState().getNodeProperty;
     const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
-    const directUpdateScope = useStoreScope.getState().updateScope;
     const directAddJoints = useStoreJoint.getState().addJoints;
     const particleRadiusRef = directGetNodeProperty('root', 'particleRadiusRef');
 
@@ -89,7 +84,6 @@ const useJoints = () => {
     };
 
     const initializeJoints = (node, entityPositions) => {
-        const id = node.id;
         const scope = node.depth;
         const nodeRef = node.ref;
         const chainRef = node.chainRef;
@@ -106,11 +100,6 @@ const useJoints = () => {
             // Add both the joint index and its reverse to the accumulator
             return [...acc, jointIndex, jointIndexReverse];
         }, []);
-
-        // Perform the update in one go
-        directUpdateScope(scope, p => ({
-            joints: [...p.joints, ...allNewJoints]
-        }));
 
         // Distance to the first joint
         // We place the joints first because they will not align with the perimeter of the scope

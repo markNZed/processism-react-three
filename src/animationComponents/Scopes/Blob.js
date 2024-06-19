@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import useStoreScope from './useStoreScope';
 import useStoreEntity from './useStoreEntity';
 
 const Blob = ({ color, node }) => {
@@ -11,9 +10,7 @@ const Blob = ({ color, node }) => {
     const updateNode = useStoreEntity.getState().updateNode;
     const getNode = useStoreEntity.getState().getNode; // Direct access to the state outside of React's render flow
     const propagateValue = useStoreEntity.getState().propagateValue
-    const getScope = useStoreScope(useCallback((state) => state.getScope, []));
     const chainRef = node.chainRef;
-    const scope = getScope(node.depth);
     const worldToLocalFn = node.ref.current.worldToLocal;
     const id = node.id;
     const particles = node.particlesRef.current;
@@ -61,6 +58,7 @@ const Blob = ({ color, node }) => {
     }
 
     function filterMiddleIndexes(chainRef, indexes) {
+        const parentNode = getNode(node.parentId);
         const jointIndexes = [];
         // Find all indexes from the provided list that are joints i.e. more than 2 links
         for (let i = 0; i < indexes.length; i++) {
@@ -71,9 +69,10 @@ const Blob = ({ color, node }) => {
                 let onChain = true;
                 onChain = false;
                 // If the joint was not created at this depth then skip
+                // Get all the joints for the paret node
                 for (let j = 0; j < linkedIndexes.length; j++) {
                     const jointIndex = `${idx}-${linkedIndexes[j]}`;
-                    if (scope.joints.includes(jointIndex)) {
+                    if (parentNode.jointsRef.current.includes(jointIndex)) {
                         onChain = true;
                         break;
                     }

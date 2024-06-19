@@ -1,16 +1,12 @@
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
-import useStoreScope from './useStoreScope';
 import useStoreJoint from './useStoreJoint';
 
 // Should follow a CRUD pattern for joints (missing R & U)
 
 // Be careful not to have this sensitive to updates to nodes
 // Direct access to the state outside of React's render flow
-const updateNode = useStoreEntity.getState().updateNode;
 const getNode = useStoreEntity.getState().getNode;
-const getNodeProperty = useStoreEntity.getState().getNodeProperty;
-const updateScope = useStoreScope.getState().updateScope;
 const getJoint = useStoreJoint.getState().getJoint;
 const addJoint = useStoreJoint.getState().addJoint;
 const deleteJointStore = useStoreJoint.getState().deleteJoint;
@@ -36,9 +32,6 @@ export const createJoint = (world, rapier, a, b, scope, batch=false) => {
         const bNode = getNode(bUserData.uniqueId);
         const bNodeJoints = bNode.jointsRef.current;
         bNode.jointsRef.current = bNodeJoints.includes(jointRefsRefIndex) ? bNodeJoints : bNode.jointsRef.current.push(jointRefsRefIndex);
-        updateScope(scope, p => ({
-            joints: [...p.joints, jointRefsRefIndex, jointRefsRefIndexReverse]
-        }));
     }
     //console.log("createJoint", id, jointRefsRefIndex, jointRef);
     return [jointRefsRefIndex, jointRefsRefIndexReverse, jointRef];
@@ -46,17 +39,10 @@ export const createJoint = (world, rapier, a, b, scope, batch=false) => {
 
 export const deleteJoint = (world, jointKey, scope) => {
     const jointRef = getJoint(jointKey);
-    const body1 = jointRef.current.body1();
-    const body2 = jointRef.current.body2();
     const aNode = getNode(aUserData.uniqueId);
     aNode.jointsRef.current = aNode.jointsRef.current.filter(obj => obj !== jointKey);
     const bNode = getNode(bUserData.uniqueId);
     bNode.jointsRef.current = bNode.jointsRef.current.filter(obj => obj !== jointKey);
-    const jointIndex = `${body1.userData.uniqueId}-${body2.userData.uniqueId}`;
-    const jointIndexReverse = `${body2.userData.uniqueId}-${body1.userData.uniqueId}`;
-    updateScope(scope, p => ({
-        joints: p.joints.filter(joint => joint !== jointIndex && joint !== jointIndexReverse)
-    }));
     if (jointRef.current) {
         const joint = jointRef.current;
         jointRef.current = undefined;
