@@ -14,7 +14,7 @@ const useStoreJoint = create((set, get) => ({
     return { ...state.joints, ...batchJoints};
   }),
   getJoint: (id) => get().joints[id],
-  removeJoint: (id) => set(state => ({
+  deleteJoint: (id) => set(state => ({
     joints: Object.fromEntries(Object.entries(state.joints).filter(([key]) => key !== id))
   })),
   clearAllJoints: () => set({ joints: {} }),

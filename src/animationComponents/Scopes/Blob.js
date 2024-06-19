@@ -113,12 +113,12 @@ const Blob = ({ color, node }) => {
         let blobOuterUniqueIdes = [];
         let flattenedIndexes = [];
         for (let i = 0; i < particles.length; ++i) {
-            const scopeOuter = particles[i].current.getUserData().scopeOuter;
-            if (scopeOuter) {
-                let outer = scopeOuter[node.depth];
+            const outerChain = particles[i].current.getUserData().outerChain;
+            if (outerChain) {
+                let outer = outerChain[node.depth];
                 if (outer) {
-                    for (let j = Object.keys(scopeOuter).length - 1;j > node.depth; j--) {
-                        if (!scopeOuter[j.toString()]) {
+                    for (let j = Object.keys(outerChain).length - 1;j > node.depth; j--) {
+                        if (!outerChain[j.toString()]) {
                             outer = false;
                             break;
                         }

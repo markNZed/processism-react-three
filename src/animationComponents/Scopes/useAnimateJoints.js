@@ -31,11 +31,6 @@ const useAnimateJoints = (
     //   What needs to change ? 
     //     entityCount, entitiesParticlesRefsRef, particleRefs, entityPositions, jointsData, 
     //     entitiesRegisteredRef, particlesRegisteredRef, newJoints
-    //   Zustand might be able to store refs when we useRef but not sure that has advantages
-    //   Data structures that require remounting could be in Zustand
-    //   The entityid could be a unique id that is generated from a singleton rather than ordered.
-    //   Work on dynamic change of entityCounts from GUI
-    //     When config changes it should impact all Components as it is a prop
     // Could have a "move" entity command that is similar to getEntityRefFn so from anywhere we can call
     // moveEntityFn and it would find the entity and detach it then find the destination and attach it
 
@@ -51,7 +46,8 @@ const useAnimateJoints = (
                 const entityRef = entityRefs(randomIndexFrom);
                 const userData = entityRef.current.getUserData();
                 const entityUniqueId = userData.uniqueId;
-                const entityJointIndexes = getNodeProperty(entityUniqueId, joints);
+                const jointsRef = getNodeProperty(entityUniqueId, `jointsRef`);
+                const entityJointIndexes = jointsRef.current;
                 let replacementEntity;
                 let closestId;
                 let closestDistance = Infinity;
@@ -107,23 +103,23 @@ const useAnimateJoints = (
                     const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadiusRef);
                     // Offset needs to be in local coordinates - should be OK for 
                     const a = {
-                        ref: body1,
+                        ref: {current: body1},
                         offset: offset1,
                     }
                     const b = {
-                        ref: body2,
+                        ref: {current: body2},
                         offset: offset2,
                     }
                     jointsToCreate.push([a, b]);
                 });
                 const scope = getNodeProperty(closestId, 'depth');
                 entityJointIndexes.forEach((jointKey) => {
-                    utilsJoints.removeJoint(world, jointKey, scope);
-                    console.log("removeJoint", jointKey);
+                    utilsJoints.deleteJoint(world, jointKey, scope);
+                    console.log("deleteJoint", jointKey);
                 });
                 jointsToCreate.forEach(([a, b]) => {
-                    a.ref.userData.color = 'orange';
-                    b.ref.userData.color = 'orange';
+                    a.ref.current.userData.color = 'orange';
+                    b.ref.current.userData.color = 'orange';
                     utilsJoints.createJoint(world, rapier, a, b, scope);
                 })
             }

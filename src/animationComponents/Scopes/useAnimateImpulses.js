@@ -2,6 +2,7 @@ import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
+import { vec3 } from '@react-three/rapier';
 
 const useAnimateImpulses = (
     initialized,
@@ -21,7 +22,7 @@ const useAnimateImpulses = (
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
     const prevCenterRef = useRef(new THREE.Vector3());
-    const initialPositionVector = useMemo(() => new THREE.Vector3(...initialPosition), []);
+    const initialPositionVector = useMemo(() => vec3(...initialPosition), []);
 
     const entityRefsArray = entityNodes.map(entity => entity.ref);
 

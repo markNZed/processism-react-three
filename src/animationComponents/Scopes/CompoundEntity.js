@@ -163,7 +163,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         radius={radius}
                         color={localColor}
                         initialPosition={initialPosition}
-                        newJointsRef={node.joints}
+                        newJointsRef={node.jointsRef}
                         index={index || 0}
                         internalRef={internalRef}
                         isDebug={isDebug}

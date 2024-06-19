@@ -101,3 +101,5 @@ Impulses broken, Particles remain visible
 
 Could vary the rigidity of joints to get more organic forms at last CompoundEntity
 
+Particle detaching is probably broken
+

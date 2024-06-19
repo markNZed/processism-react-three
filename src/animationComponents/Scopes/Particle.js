@@ -44,7 +44,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 const newRadius = relativeScale * colliderRadius
                 setColliderRadius(newRadius);
                 nodeRef.current.setUserData(userData)
-                node.joints.forEach((jointIndex) => {
+                node.jointsRef.current.forEach((jointIndex) => {
                     const joint = props.jointRefsRef.current[jointIndex].current;
                     if (joint.body1().userData.uniqueId == id) {
                         const a1 = joint.anchor1();

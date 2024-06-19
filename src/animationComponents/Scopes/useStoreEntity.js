@@ -55,7 +55,6 @@ import { devtools } from 'zustand/middleware';
 const nodeTemplate = {
     lastCompoundEntity: false,
     isParticle: false,
-    joints: [], // Should be jointsRef ?
     visible: false,
     parentId: null,
     chainRef: (() => { // Shared by all nodes
@@ -80,6 +79,11 @@ const createNode = (id = null, properties = {}, childrenIds = []) => ({
         return ref;
     })(),
     particlesRef: (() => {
+        const ref = React.createRef();
+        ref.current = [];  // Initialize .current with an empty object
+        return ref;
+    })(),
+    jointsRef: (() => {
         const ref = React.createRef();
         ref.current = [];  // Initialize .current with an empty object
         return ref;

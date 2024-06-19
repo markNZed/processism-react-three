@@ -14,56 +14,38 @@ const useJoints = () => {
     const { world, rapier } = useRapier();
     // Be careful not to have this sensitive to updates to nodes
     // Direct access to the state outside of React's render flow
-    const updateNode = useStoreEntity.getState().updateNode;
-    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
-    const getAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
-    const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
-    const updateScope = useStoreScope.getState().updateScope;
-    const addJoints = useStoreJoint.getState().addJoints;
+    const directUpdateNode = useStoreEntity.getState().updateNode;
+    const directGetNodeProperty = useStoreEntity.getState().getNodeProperty;
+    const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
+    const directUpdateScope = useStoreScope.getState().updateScope;
+    const directAddJoints = useStoreJoint.getState().addJoints;
+    const particleRadiusRef = directGetNodeProperty('root', 'particleRadiusRef');
 
-    const allocateJointsToParticles = (entitiesParticlesRefs, jointsData, internalRef, chainRef) => {
+    const allocateJointsToParticles = (node, chainRef, entityPositions) => {
+        const nodeRef = node.ref;
         const worldPosition = new THREE.Vector3();
-        internalRef.current.getWorldPosition(worldPosition);
+        nodeRef.current.getWorldPosition(worldPosition);
         const particleWorldPosition = new THREE.Vector3();
 
-        const allocateJoints = jointsData.map((jointData, i) => {
+        const entitiesParticlesRefs = [];
+        node.childrenIds.forEach(childId => {
+            entitiesParticlesRefs.push(directGetAllParticleRefs(childId))
+        });
 
-            function findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, excludedEntityIndex) {
-                let minDistance = Infinity;
-                let closestParticleIndex = -1;
-                let closestParticlePosition = new THREE.Vector3();
-                let particleEntityIndex = -1;
-                let closestParticleRef;
+        const jointsData = generateJointsData(entityPositions);
 
-                entitiesParticlesRefs.forEach((entityRefs, entityIndex) => {
-                    if (entityIndex === excludedEntityIndex) return;
-                    entityRefs.forEach((particleRef, j) => {
-                        const pos = particleRef.current.current.translation();
-                        particleWorldPosition.set(pos.x, pos.y, pos.z);
-                        const distance = particleWorldPosition.distanceTo(new THREE.Vector3(
-                            jointData.position.x + worldPosition.x,
-                            jointData.position.y + worldPosition.y,
-                            jointData.position.z + worldPosition.z
-                        ));
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            closestParticleIndex = j;
-                            closestParticlePosition.copy(particleWorldPosition);
-                            particleEntityIndex = entityIndex;
-                            closestParticleRef = particleRef.current;
-                        }
-                    });
-                });
+        const allocatedJoints = jointsData.map((jointData, i) => {
 
-                return { minDistance, closestParticleIndex, closestParticlePosition, particleEntityIndex, closestParticleRef };
-            }
+            // The data is organized into entities to ensure the second closet particle is in a different entity
+            // Would be good to not need the data structure din this way
+            // Could loop over entities instead of entitiesParticlesRefs ?
 
-            const resultA = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, null);
+            const resultA = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, null, particleWorldPosition);
             const closestParticleAPosition = resultA.closestParticlePosition;
             const particleAEntityIndex = resultA.particleEntityIndex;
             const closestParticleARef = resultA.closestParticleRef;
 
-            const resultB = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, particleAEntityIndex);
+            const resultB = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, particleAEntityIndex, particleWorldPosition);
             const closestParticleBPosition = resultB.closestParticlePosition;
             const closestParticleBRef = resultB.closestParticleRef;
 
@@ -103,23 +85,18 @@ const useJoints = () => {
                 },
             };
         });
-        return allocateJoints;
+        return allocatedJoints;
     };
 
     const initializeJoints = (node, entityPositions) => {
         const id = node.id;
         const scope = node.depth;
-        const internalRef = node.ref;
+        const nodeRef = node.ref;
         const chainRef = node.chainRef;
         const centerRef = new THREE.Vector3();
-        centerRef.current = internalRef.current.localToWorld(vec3(node.initialPosition));
-        const entitiesParticlesRefs = [];
-        node.childrenIds.forEach(childId => {
-            entitiesParticlesRefs.push(getAllParticleRefs(childId))
-        });
-        const jointsData = generateJointsData(entityPositions);
+        centerRef.current = nodeRef.current.localToWorld(vec3(node.initialPosition));
 
-        const newJoints = allocateJointsToParticles(entitiesParticlesRefs, jointsData, internalRef, chainRef);
+        const newJoints = allocateJointsToParticles(node, chainRef, entityPositions);
         // Prepare the updates first by aggregating them into a single array
         const allNewJoints = newJoints.reduce((acc, particles) => {
             const aIndex = particles.a.ref.current.userData.uniqueId;
@@ -131,7 +108,7 @@ const useJoints = () => {
         }, []);
 
         // Perform the update in one go
-        updateScope(scope, p => ({
+        directUpdateScope(scope, p => ({
             joints: [...p.joints, ...allNewJoints]
         }));
 
@@ -146,35 +123,33 @@ const useJoints = () => {
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);
             const userData = particleRef.current.getUserData();
-            if (!userData.scopeOuter) userData.scopeOuter = {};
+            if (!userData.outerChain) userData.outerChain = {};
             let outer = distanceToCenter >= (distanceToFirstJoint);
-            userData.scopeOuter[scope] = outer
+            userData.outerChain[scope] = outer
             particleRef.current.setUserData(userData);
+            // To debug the chains of particles
             //if (scope == 1 && outer) particleRef.current.userData.color = "black";
         });
 
         // Create the joints
         const createJointResults = []
         newJoints.forEach((particles) => {
-            //const { offset1, offset2 } = calculateJointOffsets(particles.a.ref.current, particles.b.ref.current, particleRadiusRef);
             // Offset needs to be in local coordinates - should be OK for 
             const a = {
-                ref: particles.a.ref.current,
+                ref: particles.a.ref,
                 offset: particles.a.offset,
             }
             const b = {
-                ref: particles.b.ref.current,
+                ref: particles.b.ref,
                 offset: particles.b.offset,
             }
             createJointResults.push(utilsJoints.createJoint(world, rapier, a, b, node.depth, true));
         });
-        addJoints(createJointResults); // Because batch operation
+        directAddJoints(createJointResults); // Because batch operation
         const jointIndexes = createJointResults.map((id1, id2, ref) => {
             return id1;
         })
-        updateNode(id, p => ({
-            joints: jointIndexes
-        }));
+        node.jointsRef.current = jointIndexes;
     };
 
     return initializeJoints;
@@ -207,3 +182,33 @@ const generateJointsData = (positions) => {
     });
     return jointsData;
 };
+
+function findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, excludedEntityIndex, particleWorldPosition) {
+    let minDistance = Infinity;
+    let closestParticleIndex = -1;
+    let closestParticlePosition = new THREE.Vector3();
+    let particleEntityIndex = -1;
+    let closestParticleRef;
+
+    entitiesParticlesRefs.forEach((entityRefs, entityIndex) => {
+        if (entityIndex === excludedEntityIndex) return;
+        entityRefs.forEach((particleRef, j) => {
+            const pos = particleRef.current.current.translation();
+            particleWorldPosition.set(pos.x, pos.y, pos.z);
+            const distance = particleWorldPosition.distanceTo(new THREE.Vector3(
+                jointData.position.x + worldPosition.x,
+                jointData.position.y + worldPosition.y,
+                jointData.position.z + worldPosition.z
+            ));
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestParticleIndex = j;
+                closestParticlePosition.copy(particleWorldPosition);
+                particleEntityIndex = entityIndex;
+                closestParticleRef = particleRef.current;
+            }
+        });
+    });
+
+    return { minDistance, closestParticleIndex, closestParticlePosition, particleEntityIndex, closestParticleRef };
+}
