@@ -2,14 +2,13 @@ import { useEffect } from 'react';
 import useStoreEntity from './useStoreEntity';
 import useStoreRelation from './useStoreRelation';
 
-function useAnimateRelations(initialized, node, entityNodes) {
+function useAnimateRelations(initialized, node, entityNodes, config) {
 
     const getNode = useStoreEntity.getState().getNode;
     const getPropertyAllKeys = useStoreEntity.getState().getPropertyAllKeys;
     const setRelation = useStoreRelation.getState().setRelation;
     const removeRelations = useStoreRelation.getState().removeRelations;
     const entityCount = node.childrenIds.length;
-    const config = node.config;
     const maxDepth = getPropertyAllKeys('depth').length;
 
     useEffect(() => {

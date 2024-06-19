@@ -8,10 +8,10 @@ const useAnimateImpulses = (
     node,
     entityNodes,
     initialPosition,
+    config,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
-    const config = node.config;
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (node.depth + 1);
     const getNodeProperty = useStoreEntity.getState().getNodeProperty;
     const particleAreaRef = getNodeProperty('root', 'particleAreaRef');

@@ -11,30 +11,32 @@ import InstancedParticles from './InstancedParticles';
 import Blob from './Blob';
 import Relations from './Relations';
 import useAnimateRelations from './useAnimateRelations';
-import useJoints from './useJoints';
 import useAnimateImpulses from './useAnimateImpulses';
+import useAnimateJoints from './useAnimateJoints';
+import useJoints from './useJoints';
 import DebugRender from './DebugRender';
 import useStoreEntity from './useStoreEntity';
 import useStoreScope from './useStoreScope';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPosition = [0, 0, 0], radius, debug, color, index }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
     // Direct access to the state outside of React's render flow
-    const directGetNode = useStoreEntity.getState().getNode;  
+    const directGetNode = useStoreEntity.getState().getNode;
+    const directUpdateNode = useStoreEntity.getState().updateNode;
     const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
     const directAddScope = useStoreScope.getState().addScope;
 
     // Select so we are only sensitive to changes of this node. useCallback avoids recreating the selector on each render.
     const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
-    const isDebug = node.debug || debug || node.config.debug;
+    const isDebug = node.debug || debug || config.debug;
     const entityCount = node.childrenIds.length;
     const entityNodes = useMemo(() => node.childrenIds.map(childId => directGetNode(childId)), [node.childrenIds]);
     // Store the color in a a state so it is consistent across renders (when defined by a function)
-    const configColor = node.config.colors[node.depth];
+    const configColor = config.colors[node.depth];
     const localColor = useMemo(() => utils.getColor(configColor, color), [configColor, color]);
     // At the deepest scope we will instantiate Particles instead of CompoundEntity
     const Entity = node.lastCompoundEntity ? Particle : CompoundEntity;    
@@ -55,13 +57,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
     
-    const { initializeJoints } = useJoints(isPhysicsReady(), entityPositions, node, entityNodes);
-    useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition);
-    useAnimateRelations(isPhysicsReady(), node, entityNodes);
+    // Joints could be a component but we want initializeJoints
+    const initializeJoints = useJoints();
+
+    useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition, config);
+    useAnimateRelations(isPhysicsReady(), node, entityNodes, config);
+    useAnimateJoints(isPhysicsReady(), node, entityNodes, config);
 
     useEffect(() => {
         // Each CompoundEntity at this scope will attempt to add and only one will succeed
         directAddScope(node.depth, {joints: []});
+        directUpdateNode(id, {initialPosition});
         if (node.depth == 0) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
     }, []);
 
@@ -71,7 +77,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
             const allParticleRefs = directGetAllParticleRefs(id);
             node.particlesRef.current = allParticleRefs;
             // We need node.particlesRef in initializeJoints
-            initializeJoints(allParticleRefs, initialPosition);
+            initializeJoints(node, entityPositions);
             setPhysicsState("ready");
         }
     }, [physicsState]);
@@ -114,7 +120,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
                         color={localColor}
                         ref={entity.ref}
                         debug={isDebug}
-                        config={node.config}
+                        config={config}
                         index={`${i}`}
                     />
                 ))}

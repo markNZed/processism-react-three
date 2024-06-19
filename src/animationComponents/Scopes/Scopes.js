@@ -226,29 +226,16 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
         }
     }
 
-    function updateNodesConfigRecursively(config, id = "root") {
-        const node = getNode(id);
-        updateNode(id, {config});
-        node.childrenIds.forEach((childId) => {
-            updateNodesConfigRecursively(config, childId);
-        });
-    }
-
     // Initialization the tree store, do not have a UI for this yet
     useEffect(() => {
         if (remountConfigState.entityCounts) {
             console.log("remountConfigState.entityCounts begin", config, remountConfigState, controls)
-            const newConfig = { ...config, ...remountConfigState };
             const entityCountsStr = remountConfigState.entityCounts.toString();
             const rootNode = getNode("root");
             if (rootNode.entityCountsStr !== entityCountsStr)   {
                 addNodesRecursively(remountConfigState.entityCounts);
                 updateNode("root", {entityCountsStr, ref: internalRef, visible: true});
-                updateNodesConfigRecursively(newConfig);
                 setTreeReady(true)
-                console.log("updateNodesConfigRecursively")
-            } else if (JSON.stringify(rootNode.config) !== JSON.stringify(newConfig))  {
-                updateNodesConfigRecursively(newConfig);
                 console.log("updateNodesConfigRecursively")
             }
             console.log("remountConfigState.entityCounts end")
@@ -278,6 +265,8 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
                     ref={internalRef}
                     radius={remountConfigState.radius}
                     initialPosition={[0, 0, 0]}
+                    config={{ ...config, ...remountConfigState }}
+                    id="root"
                 />
             )}
         </>

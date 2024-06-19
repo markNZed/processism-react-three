@@ -63,9 +63,10 @@ const nodeTemplate = {
         ref.current = {};  // Initialize .current with an empty object
         return ref;
     })(),
+    initialPosition: null,
 };
 
-const ignorePropertyLookup = ['id', 'childrenIds', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef', 'particleCount', 'chainRef', 'relationsRef'];
+const ignorePropertyLookup = ['id', 'childrenIds', 'ref', 'parentId', 'config', 'particleAreaRef', 'particleRadiusRef', 'particleCount', 'chainRef', 'relationsRef', 'initialPosition'];
 
 // Function to create a new node with given properties and childrenIds.
 const createNode = (id = null, properties = {}, childrenIds = []) => ({
