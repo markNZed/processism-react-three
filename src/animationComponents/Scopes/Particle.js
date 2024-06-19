@@ -9,33 +9,32 @@ import useStoreEntity from './useStoreEntity';
 
 // Should we maintian node.userData syned with ParticleRigidBody userData ?
 // Coud store userData only in node but would slow data access when rendering the instanced mesh of particles
-// At leasst keep uniqueIndex aligned with id
+// At leasst keep uniqueId aligned with id
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
 const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, config, ...props }, ref) => {
 
-    useImperativeHandle(ref, () => internalRef.current);
+    useImperativeHandle(ref, () => nodeRef.current);
 
     const isDebug = props.debug || config.debug;
     const [colliderRadius, setColliderRadius] = useState(radius);
     const [initialize, setInitialize] = useState(true);
-    const {
-        updateNode,
-        getNode,
-    } = useStoreEntity(); 
+    // Direct access to the state outside of React's render flow
+    const directUpdateNode = useStoreEntity.getState().updateNode;
+    const directGetNode = useStoreEntity.getState().getNode; 
     const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
-    const internalRef = node.ref; // because we forwardRef and want to use the ref locally too
+    const nodeRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
     const color = useMemo(() => getColor(configColor, props.color));
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
-        if (internalRef.current) {
-            if (internalRef.current.applyImpulses) {
-                internalRef.current.applyImpulses();
+        if (nodeRef.current) {
+            if (nodeRef.current.applyImpulses) {
+                nodeRef.current.applyImpulses();
             }
             //
-            const userData = internalRef.current.getUserData();
+            const userData = nodeRef.current.getUserData();
             // Could adjust scale over multiple frames
             if (userData?.scale !== userData?.rigidScale) {
                 let relativeScale = userData.scale;
@@ -44,10 +43,10 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 }
                 const newRadius = relativeScale * colliderRadius
                 setColliderRadius(newRadius);
-                internalRef.current.setUserData(userData)
+                nodeRef.current.setUserData(userData)
                 node.joints.forEach((jointIndex) => {
                     const joint = props.jointRefsRef.current[jointIndex].current;
-                    if (joint.body1().userData.uniqueIndex == id) {
+                    if (joint.body1().userData.uniqueId == id) {
                         const a1 = joint.anchor1();
                         joint.setAnchor1({
                             x: a1.x * relativeScale,
@@ -55,7 +54,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                             z: a1.z * relativeScale,
                         })
                     }
-                    if (joint.body2().userData.uniqueIndex == id) {
+                    if (joint.body2().userData.uniqueId == id) {
                         const a2 = joint.anchor2();
                         joint.setAnchor2({
                             x: a2.x * relativeScale,
@@ -65,20 +64,20 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                     }
                 })
                 userData.rigidScale = userData.scale;
-                internalRef.current.setUserData(userData);
+                nodeRef.current.setUserData(userData);
             }
         }
     });
 
     // Set the initial userData, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
-        if (initialize && internalRef.current) {
+        if (initialize && nodeRef.current) {
             //console.log(`Initialize particle ${id} begin`)
-            internalRef.current.setUserData({ color: color, uniqueIndex: id });
+            nodeRef.current.setUserData({ color: color, uniqueId: id });
             //updateNode(id, {isParticle: true});
-            const rootNode = getNode("root");
+            const rootNode = directGetNode("root");
             if (!rootNode.particleRadius) {
-                updateNode("root", {
+                directUpdateNode("root", {
                     particleRadiusRef: radius,
                     particleAreaRef: calculateCircleArea(radius),
                 })
@@ -86,14 +85,14 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             setInitialize(false);
             //console.log(`Initialize particle ${id} end`)
         }
-    }, [internalRef]);
+    }, [nodeRef]);
 
     //console.log("Particle rendering");
 
     return (
         <>
             <ParticleRigidBody
-                ref={internalRef}
+                ref={nodeRef}
                 position={initialPosition}
                 type={"dynamic"}
                 colliders={false}

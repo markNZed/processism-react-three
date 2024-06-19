@@ -93,8 +93,6 @@ function useAnimateRelations(initialized, node, entityNodes) {
                             }
                             hopDown = 2;
                         }
-                        // Special case for root, maybe we should just call this 0 
-                        if (destinationNodeId === 0) destinationNodeId = "root";
                         destinationNode = getNode(destinationNodeId);
                         entityRefTo = destinationNode.ref;
                         toId = destinationNodeId;

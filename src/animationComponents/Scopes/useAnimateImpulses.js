@@ -1,15 +1,13 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
 
 const useAnimateImpulses = (
-    particleCount,
     node,
     entityNodes,
     initialized,
-    initialPositionVector,
-    particleRefs,
+    initialPosition,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
@@ -23,12 +21,14 @@ const useAnimateImpulses = (
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
     const prevCenterRef = useRef(new THREE.Vector3());
+    const initialPositionVector = useMemo(() => new THREE.Vector3(...initialPosition), []);
 
     const entityRefsArray = entityNodes.map(entity => entity.ref);
 
     const entityImpulses = (center, impulseIn) => {
         const impulse = impulseIn.clone();
         impulse.multiplyScalar(1 / entityRefsArray.length);
+        const particlesCount = node.particlesRef.current.length;
         entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
                 const entityCenter = entity.current.getCenter();
@@ -39,12 +39,12 @@ const useAnimateImpulses = (
                     directionToCenter.negate().normalize();
                     if (impulse.length() == 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount / entityRefsArray.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount / entityRefsArray.length);
                     }
                     const overshoot = displacement.length() - config.maxDisplacement;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount / entityRefsArray.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount / entityRefsArray.length);
                         impulse.multiplyScalar(config.overshootScaling);
                     }
                     if (config.attractorScaling) {
@@ -58,7 +58,7 @@ const useAnimateImpulses = (
         });
     };
 
-    const applyInitialImpulses = (particleRefs) => {
+    const applyInitialImpulses = () => {
         const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, () => new THREE.Vector3(
             (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
             (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
@@ -66,7 +66,8 @@ const useAnimateImpulses = (
         ));
         entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
-                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(particleRefs.length);
+                const particlesCount = node.particlesRef.current.length;
+                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(particlesCount);
                 entity.current.addImpulse(perEntityImpulse);
             }
         });
@@ -76,7 +77,8 @@ const useAnimateImpulses = (
         const displacement = centerRef.current.clone();
         displacement.sub(prevCenterRef.current);
         const impulseDirection = displacement.normalize();
-        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef * particleCount);
+        const particlesCount = node.particlesRef.current.length;
+        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount);
     };
 
     // Impulse on every frame
@@ -102,8 +104,8 @@ const useAnimateImpulses = (
                 // Maybe we should wait for all entities to be registered - so state machines are syned
             // Should move this into useAnimateImpulses
             case "initialImpulse":
-                if (config.initialImpulse && particleRefs) {
-                    applyInitialImpulses(particleRefs);
+                if (config.initialImpulse) {
+                    applyInitialImpulses();
                 }
                 impulseStateRef.current = "impulse";
                 break

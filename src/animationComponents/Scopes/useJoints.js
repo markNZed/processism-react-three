@@ -65,8 +65,8 @@ const useJoints = (
     const createJoint = (a, b, batch=false) => {
         const aUserData = a.ref.userData || a.ref.getUserData();
         const bUserData = b.ref.userData || b.ref.getUserData();
-        const jointRefsRefIndex = `${aUserData.uniqueIndex}-${bUserData.uniqueIndex}`;
-        const jointRefsRefIndexReverse = `${bUserData.uniqueIndex}-${aUserData.uniqueIndex}`;
+        const jointRefsRefIndex = `${aUserData.uniqueId}-${bUserData.uniqueId}`;
+        const jointRefsRefIndexReverse = `${bUserData.uniqueId}-${aUserData.uniqueId}`;
         const jointRef = { current: null }; // Create a plain object to hold the reference
         jointRef.current = world.createImpulseJoint(
             rapier.JointData.spherical(a.offset, b.offset),
@@ -77,7 +77,7 @@ const useJoints = (
         if (!batch) {
             addJoint(jointRefsRefIndex, jointRef);
             addJoint(jointRefsRefIndexReverse, jointRef);
-            updateNode(aUserData.uniqueIndex, p => ({
+            updateNode(aUserData.uniqueId, p => ({
                 joints: p.joints.includes(jointRefsRefIndex) ? p.joints : [...p.joints, jointRefsRefIndex]
             }));
             updateScope(scope, p => ({
@@ -92,14 +92,14 @@ const useJoints = (
         const jointRef = getJoint(jointKey);
         const body1 = jointRef.current.body1();
         const body2 = jointRef.current.body2();
-        let body1Joints = getNodeProperty(body1.userData.uniqueIndex, joints);
-        let body2Joints = getNodeProperty(body2.userData.uniqueIndex, joints);
+        let body1Joints = getNodeProperty(body1.userData.uniqueId, joints);
+        let body2Joints = getNodeProperty(body2.userData.uniqueId, joints);
         body1Joints = body1Joints.filter(obj => obj !== jointKey);
         body2Joints = body2Joints.filter(obj => obj !== jointKey);
-        updateNode(body1.userData.uniqueIndex, {joints: body1Joints});
-        updateNode(body2.userData.uniqueIndex, {joints: body2Joints});
-        const jointIndex = `${body1.userData.uniqueIndex}-${body2.userData.uniqueIndex}`;
-        const jointIndexReverse = `${body2.userData.uniqueIndex}-${body1.userData.uniqueIndex}`;
+        updateNode(body1.userData.uniqueId, {joints: body1Joints});
+        updateNode(body2.userData.uniqueId, {joints: body2Joints});
+        const jointIndex = `${body1.userData.uniqueId}-${body2.userData.uniqueId}`;
+        const jointIndexReverse = `${body2.userData.uniqueId}-${body1.userData.uniqueId}`;
         updateScope(scope, p => ({
             joints: p.joints.filter(joint => joint !== jointIndex && joint !== jointIndexReverse)
         }));
@@ -177,22 +177,22 @@ const useJoints = (
             const offsetA = direction.clone().multiplyScalar(particleRadiusRef);
             const offsetB = direction.clone().multiplyScalar(-particleRadiusRef);
 
-            const uniqueIndexA = closestParticleARef.current.userData.uniqueIndex;
-            const uniqueIndexB = closestParticleBRef.current.userData.uniqueIndex;
+            const uniqueIdA = closestParticleARef.current.userData.uniqueId;
+            const uniqueIdB = closestParticleBRef.current.userData.uniqueId;
 
-            if (chainRef.current[uniqueIndexA]) {
-                if (!chainRef.current[uniqueIndexA].includes(uniqueIndexB)) {
-                    chainRef.current[uniqueIndexA].push(uniqueIndexB);
+            if (chainRef.current[uniqueIdA]) {
+                if (!chainRef.current[uniqueIdA].includes(uniqueIdB)) {
+                    chainRef.current[uniqueIdA].push(uniqueIdB);
                 }
             } else {
-                chainRef.current[uniqueIndexA] = [uniqueIndexB];
+                chainRef.current[uniqueIdA] = [uniqueIdB];
             }
-            if (chainRef.current[uniqueIndexB]) {
-                if (!chainRef.current[uniqueIndexB].includes(uniqueIndexA)) {
-                    chainRef.current[uniqueIndexB].push(uniqueIndexA);
+            if (chainRef.current[uniqueIdB]) {
+                if (!chainRef.current[uniqueIdB].includes(uniqueIdA)) {
+                    chainRef.current[uniqueIdB].push(uniqueIdA);
                 }
             } else {
-                chainRef.current[uniqueIndexB] = [uniqueIndexA];
+                chainRef.current[uniqueIdB] = [uniqueIdA];
             }
 
             return {
@@ -209,7 +209,7 @@ const useJoints = (
         return allocateJoints;
     };
 
-    const initializeJoints = useCallback((particleRefs, initialPosition) => {
+    const initializeJoints = useCallback((initialPosition) => {
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
         const entitiesParticlesRefs = [];
@@ -220,8 +220,8 @@ const useJoints = (
         const newJoints = allocateJointsToParticles(entitiesParticlesRefs, jointsData, internalRef);
         // Prepare the updates first by aggregating them into a single array
         const allNewJoints = newJoints.reduce((acc, particles) => {
-            const aIndex = particles.a.ref.current.userData.uniqueIndex;
-            const bIndex = particles.b.ref.current.userData.uniqueIndex;
+            const aIndex = particles.a.ref.current.userData.uniqueId;
+            const bIndex = particles.b.ref.current.userData.uniqueId;
             const jointIndex = `${aIndex}-${bIndex}`;
             const jointIndexReverse = `${bIndex}-${aIndex}`;
             // Add both the joint index and its reverse to the accumulator
@@ -239,7 +239,7 @@ const useJoints = (
         const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
         const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef;
 
-        particleRefs.forEach(particleRef => {
+        node.particlesRef.current.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);
@@ -296,13 +296,13 @@ const useJoints = (
         // Generate a random number between 1000 and 10000 which determines the duration of relations
         const randomDuration = 1000; //Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
-            // With "Scope-3" this is at scope 1 so userData.uniqueIndex is e.g. "Scope-3-5" not a Particle index
+            // With "Scope-3" this is at scope 1 so userData.uniqueId is e.g. "Scope-3-5" not a Particle index
             if (initialized && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
                 const entityRef = entityRefs(randomIndexFrom);
                 const userData = entityRef.current.getUserData();
-                const entityUniqueIndex = userData.uniqueIndex;
+                const entityUniqueIndex = userData.uniqueId;
                 const entityJointIndexes = getNodeProperty(entityUniqueIndex, joints);
                 let replacementEntity;
                 let closestIndex;
@@ -319,7 +319,7 @@ const useJoints = (
                     // Entity needs to store parent entity in userData ?
                     // Find the entity which is closest to the center of this CompoundEntity
                     function replaceEntity(body, entityUniqueIndex) {
-                        if (body.userData.uniqueIndex === entityUniqueIndex) return false;
+                        if (body.userData.uniqueId === entityUniqueIndex) return false;
                         const pos = body.translation();
                         particleWorldPosition.set(pos.x, pos.y, pos.z);
                         const distance = particleWorldPosition.distanceTo(particleWorldPosition);
@@ -332,11 +332,11 @@ const useJoints = (
                     }
                     if (replaceEntity(body1, entityUniqueIndex)) {
                         replacementEntity = body1;
-                        closestIndex = body1.userData.uniqueIndex;
+                        closestIndex = body1.userData.uniqueId;
                     }
                     if (replaceEntity(body2, entityUniqueIndex)) {
                         replacementEntity = body2;
-                        closestIndex = body2.userData.uniqueIndex;
+                        closestIndex = body2.userData.uniqueId;
                     }
                     //console.log("Joint anchors", jointKey, a1, body1, a2, body2);
                 });
@@ -346,12 +346,12 @@ const useJoints = (
                     const jointRef = getJoint(jointKey);
                     let body1 = jointRef.current.body1();
                     let body2 = jointRef.current.body2();
-                    if (replacementEntity.userData.uniqueIndex == body1.userData.uniqueIndex) return;
-                    if (replacementEntity.userData.uniqueIndex == body2.userData.uniqueIndex) return;
-                    if (body1.userData.uniqueIndex === entityUniqueIndex) {
+                    if (replacementEntity.userData.uniqueId == body1.userData.uniqueId) return;
+                    if (replacementEntity.userData.uniqueId == body2.userData.uniqueId) return;
+                    if (body1.userData.uniqueId === entityUniqueIndex) {
                         body1 = replacementEntity;
                     }
-                    if (body2.userData.uniqueIndex === entityUniqueIndex) {
+                    if (body2.userData.uniqueId === entityUniqueIndex) {
                         body2 = replacementEntity;
                     }
                     // Can't just copy the offset, need to recalculate them. Create a function for this ?

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import useStoreScope from './useStoreScope';
 import useStoreEntity from './useStoreEntity';
 
-const Blob = ({ particleRefs, color, node }) => {
+const Blob = ({ color, node }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
@@ -16,24 +16,25 @@ const Blob = ({ particleRefs, color, node }) => {
     const scope = getScope(node.depth);
     const worldToLocalFn = node.ref.current.worldToLocal;
     const id = node.id;
+    const particles = node.particlesRef.current;
 
     // Helper function to recursively build the ordered list
     // Returns null if a chainRef is dangling
-    function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueIndex = null, visited = new Set()) {
-        if (uniqueIndex === null) {
-            uniqueIndex = blobOuterUniqueIndexes[0];
+    function buildOrderedIndexes(chainRef, blobOuterUniqueIndexes, uniqueId = null, visited = new Set()) {
+        if (uniqueId === null) {
+            uniqueId = blobOuterUniqueIndexes[0];
         }
         const result = [];
         // Prevent infinite loops
-        if (visited.has(uniqueIndex)) return null;
-        visited.add(uniqueIndex);
-        if (blobOuterUniqueIndexes.includes(uniqueIndex)) {
-            result.push(uniqueIndex)
+        if (visited.has(uniqueId)) return null;
+        visited.add(uniqueId);
+        if (blobOuterUniqueIndexes.includes(uniqueId)) {
+            result.push(uniqueId)
         } else {
             // chain is dangling (not looping)
             return null;
         }
-        const linkedIndexes = chainRef.current[uniqueIndex];
+        const linkedIndexes = chainRef.current[uniqueId];
         let foundJoint = false
         // Joints have more than 2 links
         if (linkedIndexes.length > 2) {
@@ -111,8 +112,8 @@ const Blob = ({ particleRefs, color, node }) => {
 
         let blobOuterUniqueIndexes = [];
         let flattenedIndexes = [];
-        for (let i = 0; i < particleRefs.length; ++i) {
-            const scopeOuter = particleRefs[i].current.getUserData().scopeOuter;
+        for (let i = 0; i < particles.length; ++i) {
+            const scopeOuter = particles[i].current.getUserData().scopeOuter;
             if (scopeOuter) {
                 let outer = scopeOuter[node.depth];
                 if (outer) {
@@ -124,15 +125,15 @@ const Blob = ({ particleRefs, color, node }) => {
                     }
                 }
                 if (outer) {
-                    const uniqueIndex = particleRefs[i].current.getUserData().uniqueIndex;
-                    blobOuterUniqueIndexes.push(uniqueIndex);
+                    const uniqueId = particles[i].current.getUserData().uniqueId;
+                    blobOuterUniqueIndexes.push(uniqueId);
                     flattenedIndexes.push(i);
                 }
             }
         }
 
         if (!blobOuterUniqueIndexes.length) {
-            console.error("blobOuterUniqueIndexes is empty!", id, particleRefs.length);
+            console.error("blobOuterUniqueIndexes is empty!", id, particles.length);
         }
 
         let blobIndexes;
@@ -163,9 +164,9 @@ const Blob = ({ particleRefs, color, node }) => {
 
         // Probably don't need anything special for this because we have nodes for the particles
         if (node.lastCompoundEntity) {
-            for (let i = 0; i < particleRefs.length; i++) {
+            for (let i = 0; i < particles.length; i++) {
                 // Could add config option to show particles
-                particleRefs[i].current.getUserData().visible = node.visibleParticles;
+                particles[i].current.getUserData().visible = node.visibleParticles;
             }
         }
 
@@ -173,7 +174,7 @@ const Blob = ({ particleRefs, color, node }) => {
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
-                const pos = particleRefs[flattenedIndex].current.translation();
+                const pos = particles[flattenedIndex].current.translation();
                 worldVector.set(pos.x, pos.y, pos.z);
                 positiion.copy(worldToLocalFn(worldVector))
                 return positiion;
