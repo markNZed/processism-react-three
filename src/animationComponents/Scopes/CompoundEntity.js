@@ -24,8 +24,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
     useImperativeHandle(ref, () => internalRef.current);
 
     // Direct access to the state outside of React's render flow
-    const directGetNode = useStoreEntity.getState().getNode; 
-    const directUpdateNode = useStoreEntity.getState().updateNode; 
+    const directGetNode = useStoreEntity.getState().getNode;  
     const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
     const directAddScope = useStoreScope.getState().addScope;
 
@@ -47,51 +46,50 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
     const frameStateRef = useRef("init");
     // Need to store the userData so we can re-render and not lose the changes to userData
     const localUserDataRef = useRef({ uniqueId: id });
-    const [initializePhysics, setInitializePhysics] = useState(false);
-    const [initializedPhysics, setInitializedPhysics] = useState(false); 
+    const [physicsState, setPhysicsState] = useState("waiting");
+    // Define a function to encapsulate the condition
+    const isPhysicsReady = () => physicsState === "ready";
 
     useEffect(() => {
-        // Each entity at this scope will attempt to add and one will succeed
+        // Each CompoundEntity at this scope will attempt to add and only one will succeed
         directAddScope(node.depth, {joints: []});
+
+        if (node.depth == 0) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
     }, []);
 
-    // Logging/debug
-    useEffect(() => {
-        if (node.depth == 0 && true) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
-    }, []);
-
-    useAnimateRelations(initializedPhysics, node, entityNodes);
+    useAnimateRelations(isPhysicsReady(), node, entityNodes);
 
     // Layout to avoid Particle overlap (which can cause extreme forces in Rapier)
     const entityPositions = useMemo(() => {
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
 
-    const { jointsData, initializeJoints } = useJoints(initializedPhysics, entityPositions, node, entityNodes);
+    const { initializeJoints } = useJoints(isPhysicsReady(), entityPositions, node, entityNodes);
 
-    useAnimateImpulses(node, entityNodes, initializedPhysics, initialPosition);
+    useAnimateImpulses(node, entityNodes, isPhysicsReady(), initialPosition);
 
+    // Maybe physicsState does not need to be useState (it will cause rendering upon change)
     useEffect(() => {
-        if (initializePhysics) {
+        if (physicsState === "initialize") {
             const allParticleRefs = directGetAllParticleRefs(id);
             node.particlesRef.current = allParticleRefs;
-            initializeJoints(initialPosition);
-            setInitializedPhysics(true);
+            // We need node.particlesRef in initializeJoints
+            initializeJoints(allParticleRefs, initialPosition);
+            setPhysicsState("ready");
         }
-    }, [initializePhysics]);
+    }, [physicsState]);
 
-    // frameState as useState in useFrame is probably not a good idea - would cause re-rendering when set in switch
     useFrame(() => {
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
-                // useEffect to run initializeJoints as this may take longer than a frame
-                if (!initializePhysics) {
+                // useEffect to call initializeJoints because it may take longer than a frame
+                if (physicsState === "waiting") {
                     // We can assume that all the Particles are ready (refs are set because of the component hierarchy) 
-                    setInitializePhysics(true);
+                    setPhysicsState("initialize");
                 }
-                if (initializedPhysics) {
-                    if (id == "root") console.log("initializedPhysics", id, useStoreEntity.getState());
+                if (isPhysicsReady()) {
+                    if (id == "root") console.log("physics ready", id, useStoreEntity.getState());
                     frameStateRef.current = "findCenter";
                 }
                 break;
@@ -123,7 +121,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
                         index={`${i}`}
                     />
                 ))}
-                {initializedPhysics && (
+                {isPhysicsReady() && (
                     <>
                         
                         <Blob
@@ -162,7 +160,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
                         radius={radius}
                         color={localColor}
                         initialPosition={initialPosition}
-                        jointsData={jointsData}
                         newJointsRef={node.joints}
                         index={index || 0}
                         internalRef={internalRef}

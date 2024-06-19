@@ -209,7 +209,7 @@ const useJoints = (
         return allocateJoints;
     };
 
-    const initializeJoints = useCallback((initialPosition) => {
+    const initializeJoints = useCallback((allParticleRefs, initialPosition) => {
         const centerRef = new THREE.Vector3();
         centerRef.current = internalRef.current.localToWorld(vec3(initialPosition));
         const entitiesParticlesRefs = [];
@@ -239,7 +239,7 @@ const useJoints = (
         const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
         const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef;
 
-        node.particlesRef.current.forEach(particleRef => {
+        allParticleRefs.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);

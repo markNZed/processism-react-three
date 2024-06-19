@@ -4,7 +4,6 @@ import { Circle } from '..';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import useStore from '../../useStore';
-import useStoreJoint from './useStoreJoint';
 
 const localJointPosition = (groupRef, particle) => {
     const worldPosition = particle.ref.current.translation();
@@ -19,7 +18,7 @@ const localJointPosition = (groupRef, particle) => {
     return [localVector.x, localVector.y, localVector.z];
 };
 
-const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJointsRef, index, internalRef, isDebug, centerRef }) => {
+const DebugRender = ({ id, radius, color, initialPosition, newJointsRef, index, internalRef, isDebug, centerRef }) => {
     const getComponentRef = useStore((state) => state.getComponentRef);
 
     useEffect(() => {
@@ -67,13 +66,6 @@ const DebugRender = ({ id, radius, color, initialPosition, jointsData, newJoints
                         material-color="green"
                     />
                 </React.Fragment>
-            ))}
-            {jointsData.map((data, i) => (
-                <CircleDrei
-                    key={`${id}.${i}`}
-                    args={[0.1, 16]}
-                    position={[data.position.x, data.position.y, 0.3]}
-                />
             ))}
             <Text
                 position={[initialPosition[0], initialPosition[1], 0.1]}
