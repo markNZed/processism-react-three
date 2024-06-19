@@ -17,15 +17,15 @@ const Blob = ({ color, node }) => {
 
     // Helper function to recursively build the ordered list
     // Returns null if a chainRef is dangling
-    function buildOrderedIndexes(chainRef, blobOuterUniqueIdes, uniqueId = null, visited = new Set()) {
+    function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
         if (uniqueId === null) {
-            uniqueId = blobOuterUniqueIdes[0];
+            uniqueId = blobOuterUniqueIds[0];
         }
         const result = [];
         // Prevent infinite loops
         if (visited.has(uniqueId)) return null;
         visited.add(uniqueId);
-        if (blobOuterUniqueIdes.includes(uniqueId)) {
+        if (blobOuterUniqueIds.includes(uniqueId)) {
             result.push(uniqueId)
         } else {
             // chain is dangling (not looping)
@@ -37,7 +37,7 @@ const Blob = ({ color, node }) => {
         if (linkedIndexes.length > 2) {
             for (let i = 0; i < linkedIndexes.length; i++) {
                 if (chainRef.current[linkedIndexes[i]].length > 2) {
-                    const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIdes, linkedIndexes[i], visited);
+                    const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndexes[i], visited);
                     if (recursiveResult) {
                         foundJoint = true;
                         result.push(...recursiveResult);
@@ -47,7 +47,7 @@ const Blob = ({ color, node }) => {
         }
         if (!foundJoint) {
             for (let i = 0; i < linkedIndexes.length; i++) {
-                const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIdes, linkedIndexes[i], visited)
+                const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndexes[i], visited)
                 if (recursiveResult) {
                     result.push(...recursiveResult);
                     // recursiveResult is not null but it may be dangling further along the chain
@@ -109,7 +109,7 @@ const Blob = ({ color, node }) => {
             flattenedIndexes: [],
         }
 
-        let blobOuterUniqueIdes = [];
+        let blobOuterUniqueIds = [];
         let flattenedIndexes = [];
         for (let i = 0; i < particles.length; ++i) {
             const outerChain = particles[i].current.getUserData().outerChain;
@@ -125,22 +125,22 @@ const Blob = ({ color, node }) => {
                 }
                 if (outer) {
                     const uniqueId = particles[i].current.getUserData().uniqueId;
-                    blobOuterUniqueIdes.push(uniqueId);
+                    blobOuterUniqueIds.push(uniqueId);
                     flattenedIndexes.push(i);
                 }
             }
         }
 
-        if (!blobOuterUniqueIdes.length) {
-            console.error("blobOuterUniqueIdes is empty!", id, particles.length);
+        if (!blobOuterUniqueIds.length) {
+            console.error("blobOuterUniqueIds is empty!", id, particles.length);
         }
 
         let blobIndexes;
         if (node.lastCompoundEntity) {
-            blobIndexes = blobOuterUniqueIdes;
+            blobIndexes = blobOuterUniqueIds;
         } else {
-            // buildOrderedIndexes can return null if there are no blobOuterUniqueIdes
-            const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIdes) || [];
+            // buildOrderedIndexes can return null if there are no blobOuterUniqueIds
+            const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIds) || [];
             if (!orderedIndexes.length) console.error("orderedIndexes is empty!", id);
             //blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
             blobIndexes = orderedIndexes;
@@ -148,7 +148,7 @@ const Blob = ({ color, node }) => {
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
-            const indexInOuter = blobOuterUniqueIdes.indexOf(blobIndexes[i]);
+            const indexInOuter = blobOuterUniqueIds.indexOf(blobIndexes[i]);
             const flattenedIndex = flattenedIndexes[indexInOuter];
             blobData.current.flattenedIndexes.push(flattenedIndex);
         }
