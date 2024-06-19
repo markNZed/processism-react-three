@@ -4,9 +4,9 @@ import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
 
 const useAnimateImpulses = (
+    initialized,
     node,
     entityNodes,
-    initialized,
     initialPosition,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity

@@ -50,23 +50,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
     // Define a function to encapsulate the condition
     const isPhysicsReady = () => physicsState === "ready";
 
-    useEffect(() => {
-        // Each CompoundEntity at this scope will attempt to add and only one will succeed
-        directAddScope(node.depth, {joints: []});
-
-        if (node.depth == 0) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
-    }, []);
-
-    useAnimateRelations(isPhysicsReady(), node, entityNodes);
-
     // Layout to avoid Particle overlap (which can cause extreme forces in Rapier)
     const entityPositions = useMemo(() => {
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
-
+    
     const { initializeJoints } = useJoints(isPhysicsReady(), entityPositions, node, entityNodes);
+    useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition);
+    useAnimateRelations(isPhysicsReady(), node, entityNodes);
 
-    useAnimateImpulses(node, entityNodes, isPhysicsReady(), initialPosition);
+    useEffect(() => {
+        // Each CompoundEntity at this scope will attempt to add and only one will succeed
+        directAddScope(node.depth, {joints: []});
+        if (node.depth == 0) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
+    }, []);
 
     // Maybe physicsState does not need to be useState (it will cause rendering upon change)
     useEffect(() => {
