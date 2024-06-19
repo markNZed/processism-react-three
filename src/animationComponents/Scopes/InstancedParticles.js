@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import useEntityStore from './useEntityStore';
+import useStoreEntity from './useStoreEntity';
 
 const InstancedParticles = React.forwardRef(({ id, particleRefs }, ref) => {
     const instancedMeshRef = useRef();
-    const getNodeProperty = useEntityStore.getState().getNodeProperty;
+    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
 
     useFrame(() => {

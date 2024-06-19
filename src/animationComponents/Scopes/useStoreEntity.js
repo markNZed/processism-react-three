@@ -17,10 +17,10 @@ import { devtools } from 'zustand/middleware';
  * 
  * ### Basic Usage:
  * ```javascript
- * import useEntityStore from './path-to-store';
+ * import useStoreEntity from './path-to-store';
  * 
  * // Access the store
- * const store = useEntityStore();
+ * const store = useStoreEntity();
  * 
  * // Add a new node
  * store.addNode('root', { id: 'node1', name: 'Node 1' });
@@ -113,7 +113,7 @@ const updatePropertyLookups = (node, propertyLookups) => {
     return updatedLookups;
 };
 
-const useEntityStore = create((set, get) => ({
+const useStoreEntity = create((set, get) => ({
     // Initial state with a root node.
     nodes: {
         root: createNode('root', { depth: 0 }, []),
@@ -418,4 +418,4 @@ const useEntityStore = create((set, get) => ({
 }));
 
 
-export default useEntityStore;
+export default useStoreEntity;

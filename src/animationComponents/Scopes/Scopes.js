@@ -6,7 +6,7 @@ import { useControls } from 'leva'
 import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
-import useEntityStore from './useEntityStore';
+import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
@@ -43,9 +43,9 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
 
     // Avoid changes in store causing rerender
     // Direct access to the state outside of React's render flow
-    const addNode = useEntityStore.getState().addNode;
-    const updateNode = useEntityStore.getState().updateNode;
-    const getNode = useEntityStore.getState().getNode;
+    const addNode = useStoreEntity.getState().addNode;
+    const updateNode = useStoreEntity.getState().updateNode;
+    const getNode = useStoreEntity.getState().getNode;
     // Leva controls
     // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
     // Using state here is a problemn for the functions

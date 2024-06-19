@@ -1,17 +1,17 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import useScopeStore from './useScopeStore';
-import useEntityStore from './useEntityStore';
+import useStoreScope from './useStoreScope';
+import useStoreEntity from './useStoreEntity';
 
 const Blob = ({ particleRefs, color, node }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const updateNode = useEntityStore.getState().updateNode;
-    const getNode = useEntityStore.getState().getNode; // Direct access to the state outside of React's render flow
-    const propagateValue = useEntityStore.getState().propagateValue
-    const getScope = useScopeStore(useCallback((state) => state.getScope, []));
+    const updateNode = useStoreEntity.getState().updateNode;
+    const getNode = useStoreEntity.getState().getNode; // Direct access to the state outside of React's render flow
+    const propagateValue = useStoreEntity.getState().propagateValue
+    const getScope = useStoreScope(useCallback((state) => state.getScope, []));
     const chainRef = node.chainRef;
     const scope = getScope(node.depth);
     const worldToLocalFn = node.ref.current.worldToLocal;

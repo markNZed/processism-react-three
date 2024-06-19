@@ -5,7 +5,7 @@ import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider } from '@react-three/rapier';
 import _ from 'lodash';
 import { getColor, calculateCircleArea } from './utils.js';
-import useEntityStore from './useEntityStore';
+import useStoreEntity from './useStoreEntity';
 
 // Should we maintian node.userData syned with ParticleRigidBody userData ?
 // Coud store userData only in node but would slow data access when rendering the instanced mesh of particles
@@ -22,8 +22,8 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
     const {
         updateNode,
         getNode,
-    } = useEntityStore(); 
-    const node = useEntityStore(useCallback((state) => state.nodes[id], [id]));
+    } = useStoreEntity(); 
+    const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
     const internalRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
     const color = useMemo(() => getColor(configColor, props.color));

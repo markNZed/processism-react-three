@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-const useJointStore = create((set, get) => ({
+const useStoreJoint = create((set, get) => ({
   joints: {},
   addJoint: (id, ref) => set(state => ({
     joints: { ...state.joints, [id]: ref },
@@ -20,4 +20,4 @@ const useJointStore = create((set, get) => ({
   clearAllJoints: () => set({ joints: {} }),
 }));
 
-export default useJointStore;
+export default useStoreJoint;

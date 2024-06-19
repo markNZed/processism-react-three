@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-const useRelationStore = create((set, get) => ({
+const useStoreRelation = create((set, get) => ({
   relation: {},
 
   setRelation: (from, to, objs) => set(state => ({
@@ -91,4 +91,4 @@ const useRelationStore = create((set, get) => ({
   clearAllRelations: () => set({ relation: {} }),
 }));
 
-export default useRelationStore;
+export default useStoreRelation;

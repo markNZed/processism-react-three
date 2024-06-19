@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-const useScopeStore = create((set, get) => ({
+const useStoreScope = create((set, get) => ({
   scope: {},
   setScope: (id, objs) => set(state => ({
     scope: { ...state.scope, [id]: objs },
@@ -49,4 +49,4 @@ const useScopeStore = create((set, get) => ({
   clearAllScopes: () => set({ scope: {} }),
 }));
 
-export default useScopeStore;
+export default useStoreScope;

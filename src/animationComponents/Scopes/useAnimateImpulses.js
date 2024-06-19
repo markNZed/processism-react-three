@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import useEntityStore from './useEntityStore';
+import useStoreEntity from './useStoreEntity';
 
 const useAnimateImpulses = (
     particleCount,
@@ -15,7 +15,7 @@ const useAnimateImpulses = (
     const impulseRef = useRef();
     const config = node.config;
     const impulsePerParticle = (config.impulsePerParticle || 0.02) * (node.depth + 1);
-    const getNodeProperty = useEntityStore.getState().getNodeProperty;
+    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
     const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
     const id = node.id;
     const internalRef = node.ref;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import useEntityStore from './useEntityStore';
+import useStoreEntity from './useStoreEntity';
 
 const EntityStoreDemo = () => {
   const {
@@ -12,7 +12,7 @@ const EntityStoreDemo = () => {
     flattenTree,
     traverseTreeDFS,
     copySubtree,
-  } = useEntityStore();
+  } = useStoreEntity();
 
   const [testResults, setTestResults] = useState([]);
   const [newNodeId, setNewNodeId] = useState('');
@@ -51,7 +51,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const updatedNodes = useEntityStore.getState().nodes;
+      const updatedNodes = useStoreEntity.getState().nodes;
       if (updatedNodes['node3'] && updatedNodes['node3'].name === 'Updated Node 3') {
         results.push('Test 2 Passed: Node updated successfully.');
       } else {
@@ -64,7 +64,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const movedNodes = useEntityStore.getState().nodes;
+      const movedNodes = useStoreEntity.getState().nodes;
       if (movedNodes['node2'] && movedNodes['node2'].childrenIds.includes('node3')) {
         results.push('Test 3 Passed: Node moved successfully.');
       } else {
@@ -77,7 +77,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const nodesAfterDelete = useEntityStore.getState().nodes;
+      const nodesAfterDelete = useStoreEntity.getState().nodes;
       if (!nodesAfterDelete['node3']) {
         results.push('Test 4 Passed: Node deleted successfully.');
       } else {
@@ -96,7 +96,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const copiedNodes = useEntityStore.getState().nodes;
+      const copiedNodes = useStoreEntity.getState().nodes;
       if (copiedNodes['node2'] && copiedNodes['node2'].childrenIds.some(childId => copiedNodes[childId]?.name === 'Node 4')) {
         results.push('Test 5 Passed: Subtree copied successfully.');
       } else {

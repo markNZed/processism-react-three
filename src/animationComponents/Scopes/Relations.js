@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import useRelationStore from './useRelationStore';
-import useEntityStore from './useEntityStore';
+import useStoreRelation from './useStoreRelation';
+import useStoreEntity from './useStoreEntity';
 
 function LineWidthChecker() {
     const { gl } = useThree();
@@ -30,10 +30,10 @@ function Relations({internalRef}) {
     const [linesUpdate, setLinesUpdate] = useState(0);
     const linesRef = useRef({});
     const newLinesRef = useRef({});
-    const getNode = useEntityStore.getState().getNode;
-    const getPropertyAllKeys = useEntityStore.getState().getPropertyAllKeys;
+    const getNode = useStoreEntity.getState().getNode;
+    const getPropertyAllKeys = useStoreEntity.getState().getPropertyAllKeys;
     const maxDepth = getPropertyAllKeys('depth').length;
-    const getAllRelations = useRelationStore.getState().getAllRelations;
+    const getAllRelations = useStoreRelation.getState().getAllRelations;
 
     useFrame(() => {
         let update = false;

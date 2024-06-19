@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import useEntityStore from './useEntityStore';
-import useRelationStore from './useRelationStore';
+import useStoreEntity from './useStoreEntity';
+import useStoreRelation from './useStoreRelation';
 
 function useAnimateRelations(initialized, node, entityNodes) {
 
-    const getNode = useEntityStore.getState().getNode;
-    const getPropertyAllKeys = useEntityStore.getState().getPropertyAllKeys;
-    const setRelation = useRelationStore.getState().setRelation;
-    const removeRelations = useRelationStore.getState().removeRelations;
+    const getNode = useStoreEntity.getState().getNode;
+    const getPropertyAllKeys = useStoreEntity.getState().getPropertyAllKeys;
+    const setRelation = useStoreRelation.getState().setRelation;
+    const removeRelations = useStoreRelation.getState().removeRelations;
     const entityCount = node.childrenIds.length;
     const config = node.config;
     const maxDepth = getPropertyAllKeys('depth').length;
@@ -30,7 +30,7 @@ function useAnimateRelations(initialized, node, entityNodes) {
                 //console.log("maxDepth", maxDepth)
                 const maxRelationCount = Math.ceil(entityCount * 0.2);
                 // We do this outside of the React render cycle 
-                const relationsStore = useRelationStore.getState();
+                const relationsStore = useStoreRelation.getState();
                 let relationCount = fromNode.relationsRef.current.length || 0;
                 const nodeRelations = relationsStore.getRelation(fromId);
                 const allKeys = Object.keys(nodeRelations);

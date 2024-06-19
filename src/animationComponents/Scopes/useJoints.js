@@ -1,9 +1,9 @@
 import { useRef, useEffect, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
-import useEntityStore from './useEntityStore';
-import useScopeStore from './useScopeStore';
-import useJointStore from './useJointStore';
+import useStoreEntity from './useStoreEntity';
+import useStoreScope from './useStoreScope';
+import useStoreJoint from './useStoreJoint';
 
 const useJoints = (
     initialized,
@@ -15,15 +15,15 @@ const useJoints = (
     const { world, rapier } = useRapier();
     // Be careful not to have this sensitive to updates to nodes
     // Direct access to the state outside of React's render flow
-    const updateNode = useEntityStore.getState().updateNode;
-    const getNodeProperty = useEntityStore.getState().getNodeProperty;
-    const getAllParticleRefs = useEntityStore.getState().getAllParticleRefs;
+    const updateNode = useStoreEntity.getState().updateNode;
+    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
+    const getAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
     const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
-    const updateScope = useScopeStore.getState().updateScope;
-    const getJoint = useJointStore.getState().getJoint;
-    const addJoint = useJointStore.getState().addJoint;
-    const addJoints = useJointStore.getState().addJoints;
-    const removeJointStore = useJointStore.getState().removeJoint;
+    const updateScope = useStoreScope.getState().updateScope;
+    const getJoint = useStoreJoint.getState().getJoint;
+    const addJoint = useStoreJoint.getState().addJoint;
+    const addJoints = useStoreJoint.getState().addJoints;
+    const removeJointStore = useStoreJoint.getState().removeJoint;
     const id = node.id;
     const scope = node.depth;
     const config = node.config;

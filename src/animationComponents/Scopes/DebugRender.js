@@ -4,7 +4,7 @@ import { Circle } from '..';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import useStore from '../../useStore';
-import useJointStore from './useJointStore';
+import useStoreJoint from './useStoreJoint';
 
 const localJointPosition = (groupRef, particle) => {
     const worldPosition = particle.ref.current.translation();

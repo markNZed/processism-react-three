@@ -14,9 +14,8 @@ import useAnimateRelations from './useAnimateRelations';
 import useJoints from './useJoints';
 import useAnimateImpulses from './useAnimateImpulses';
 import DebugRender from './DebugRender';
-import useEntityStore from './useEntityStore';
-import useScopeStore from './useScopeStore';
-import { useShallow } from 'zustand/react/shallow';
+import useStoreEntity from './useStoreEntity';
+import useStoreScope from './useStoreScope';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
 
@@ -26,12 +25,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const updateNode = useEntityStore(useCallback((state) => state.updateNode, []));
-    const getNode = useEntityStore.getState().getNode; // Direct access to the state outside of React's render flow
-    const getAllParticleRefs = useEntityStore.getState().getAllParticleRefs; //
-    const addScope = useScopeStore.getState().addScope; // Direct access to the state outside of React's render flow
+    // Direct access to the state outside of React's render flow
+    const getNode = useStoreEntity.getState().getNode; 
+    const getAllParticleRefs = useStoreEntity.getState().getAllParticleRefs; //
+    const addScope = useStoreScope.getState().addScope; // Direct access to the state outside of React's render flow
 
-    const node = useEntityStore(useCallback((state) => state.nodes[id], [id]));
+    const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
     const isDebug = node.debug || debug || node.config.debug;
     const entityCount = node.childrenIds.length;
     const entityNodes = useMemo(() => node.childrenIds.map(childId => getNode(childId)), [node.childrenIds]);
@@ -70,8 +69,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
     const entityPositions = useMemo(() => {
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
-
-    //chainRef is broken ? - we build a chain at the CompoundEntity not a global chainRef e.g. no multiple joints to other scopes
 
     const { jointsData, initializeJoints } = useJoints(initializedPhysics, entityPositions, node, entityNodes);
 
@@ -185,7 +182,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id = "root", initialPositi
                         isDebug={isDebug}
                         centerRef={centerRef}
                     />
-)}
+            )}
             </CompoundEntityGroup>
             {isDebug && (
                 <Text
