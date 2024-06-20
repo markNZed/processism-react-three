@@ -121,7 +121,7 @@ const Blob = ({ color, node }) => {
 
         if (!blobData.current) return;
 
-        // Probably don't need anything special for this because we have nodes for the particles
+        // We have nodes for the particles
         if (node.lastCompoundEntity) {
             for (let i = 0; i < particles.length; i++) {
                 // Could add config option to show particles
@@ -201,6 +201,7 @@ function handleOnClickFn(getNode, updateNode, propagateValue, id) {
         event.stopPropagation();
         const updateNodeValue = { visible: !node.visible };
         if (node.lastCompoundEntity) updateNodeValue.visibleParticles = node.visible;
+        // If the node is about to become invisible
         if (node.visible) {
             node.childrenIds.forEach(childId => {
                 updateNode(childId, { visible: true });

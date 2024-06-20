@@ -41,14 +41,12 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
                     matrixChanged = true;
                 }
 
-                if (!currentScale.equals(userScale)) {
-                    currentScale.copy(userScale);
-                    matrixChanged = true;
-                }
-
                 const visible = particles[i].current.getUserData().visible;
                 if (!visible) {
                     currentScale.copy(invisibleScale);
+                    matrixChanged = true;
+                } else if (!currentScale.equals(userScale)) {
+                    currentScale.copy(userScale);
                     matrixChanged = true;
                 }
 
