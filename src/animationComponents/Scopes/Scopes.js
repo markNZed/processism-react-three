@@ -17,8 +17,9 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
  This shows the concept of emergent entities 
  Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
 
- requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
- Each frame has 16.67 milliseconds for all the rendering and updates to occur.
+ The useStoreEntity has a node for each entity/Particle node.ref is a pointer to the Three group in the 
+ case of a CompoundEntity and a Rapier RigidBody in the case of a Particle.
+
 */
 
 /* Ideas:
@@ -28,10 +29,8 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 */
 
 /*
- This is the Component that gets exported and is instantiated in the scene
- There is a recursive structure under Scopes where
- a CompoundEntity will instantiate multiple CompoundEntity to a certain depth (length of config.entityCounts array)
- the deepest scope instantiates Particle which are rigid body circles controlled by rapier physics engine
+ requestAnimationFrame aims to achieve a refresh rate of 60 frames per second (FPS). 
+ Each frame has 16.67 milliseconds for all the rendering and updates to occur.
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
@@ -55,12 +54,12 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
     const [controlsConfig, setControlsConfig] = useState({
         scopeCount: { value: 3, step: 1, },
         radius: { value: radius || 10, min: 1, max: 20 },
-        impulsePerParticle: { value: 10, min: 0.1, max: 100, step: 0.1, label: "Impulse per Particle" },
-        overshootScaling: { value: 10, min: 1, max: 100, step: 1, label: "Overshoot Scaling" },
+        impulsePerParticle: { value: 2, min: 0.1, max: 10, step: 0.1, label: "Impulse per Particle" },
+        overshootScaling: { value: 1, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
         attractorScaling: { value: [0, -0.8, -0.1], label: "Attractor Scaling" },
-        initialScaling: { value: 0.1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
+        initialScaling: { value: 1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
         initialImpulse: { value: true, label: "Initial Impulse" },
         showRelations: { value: false, label: "Show Relations" },
         detach: { value: false, label: "Detach Experiment" },
@@ -75,7 +74,7 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
     const config = {
         debug: false,
         colors: [color || null, utils.getRandomColorFn, null],
-        impulsePerParticle: controls.impulsePerParticle / 100,
+        impulsePerParticle: controls.impulsePerParticle / 1000,
         overshootScaling: controls.overshootScaling,
         attractorScaling: controls.attractorScaling,
         maxDisplacementScaling: controls.maxDisplacementScaling,
@@ -240,7 +239,7 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
             const rootNode = getNode("root");
             if (rootNode.entityCountsStr !== entityCountsStr)   {
                 addNodesRecursively(remountConfigState.entityCounts);
-                updateNode("root", {entityCountsStr, ref: internalRef, visible: true});
+                updateNode("root", {entityCountsStr, ref: internalRef});
                 setTreeReady(true)
                 console.log("updateNodesConfigRecursively")
             }

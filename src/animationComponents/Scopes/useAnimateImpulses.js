@@ -50,9 +50,9 @@ const useAnimateImpulses = (
                         impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount / entityRefsArray.length);
                         impulse.multiplyScalar(config.overshootScaling);
                     }
-                    if (config.attractorScaling) {
-                        const directionToCenter = config.attractorScaling > 0 ? displacement.negate().normalize() : displacement.normalize();
-                        directionToCenter.multiplyScalar(impulse.length() * Math.abs(config.attractorScaling));
+                    if (false && config.attractorScaling[node.depth]) {
+                        const directionToCenter = config.attractorScaling[node.depth] > 0 ? displacement.negate().normalize() : displacement.normalize();
+                        directionToCenter.multiplyScalar(impulse.length() * Math.abs(config.attractorScaling[node.depth]));
                         impulse.add(directionToCenter);
                     }
                     entity.current.addImpulse(impulse);
@@ -94,7 +94,7 @@ const useAnimateImpulses = (
                 // Maybe we should wait for all entities to be registered - so state machines are syned
             // Should move this into useAnimateImpulses
             case "initialImpulse":
-                if (config.initialImpulse) {
+                if (config.initialImpulse && node.depth == 1) {
                     applyInitialImpulses();
                 }
                 impulseStateRef.current = "impulse";
@@ -114,7 +114,7 @@ const useAnimateImpulses = (
                 break;
         }
 
-        if (initialized) {
+        if (false && initialized) {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
                 const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);

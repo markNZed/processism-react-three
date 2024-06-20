@@ -62,8 +62,12 @@ const ParticleRigidBody = forwardRef(({ children, registerRef, ...props }, ref) 
                 return null;
             }
         },
-        setUserData: (userData) => {
-            internalRef.current.userData = userData;
+        setUserData: (update) => {
+            if (typeof update === 'function') {
+                internalRef.current.userData = update(internalRef.current.userData);
+            } else {
+                internalRef.current.userData = update;
+            }
         },
     }), [internalRef, impulseRef, centerRef, centerWorldRef, props]);
 

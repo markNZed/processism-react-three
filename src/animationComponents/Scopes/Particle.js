@@ -32,43 +32,42 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
-        if (nodeRef.current) {
-            if (nodeRef.current.applyImpulses) {
-                nodeRef.current.applyImpulses();
+        if (!nodeRef.current) return;
+        if (nodeRef.current.applyImpulses) {
+            nodeRef.current.applyImpulses();
+        }
+        //
+        const userData = nodeRef.current.getUserData();
+        // Could adjust scale over multiple frames
+        if (userData?.scale !== userData?.rigidScale) {
+            let relativeScale = userData.scale;
+            if (userData.rigidScale) {
+                relativeScale = userData.scale / userData.rigidScale;
             }
-            //
-            const userData = nodeRef.current.getUserData();
-            // Could adjust scale over multiple frames
-            if (userData?.scale !== userData?.rigidScale) {
-                let relativeScale = userData.scale;
-                if (userData.rigidScale) {
-                    relativeScale = userData.scale / userData.rigidScale;
+            const newRadius = relativeScale * colliderRadius
+            setColliderRadius(newRadius);
+            nodeRef.current.setUserData(userData)
+            node.jointsRef.current.forEach((jointIndex) => {
+                const joint = props.jointRefsRef.current[jointIndex].current;
+                if (joint.body1().userData.uniqueId == id) {
+                    const a1 = joint.anchor1();
+                    joint.setAnchor1({
+                        x: a1.x * relativeScale,
+                        y: a1.y * relativeScale,
+                        z: a1.z * relativeScale,
+                    })
                 }
-                const newRadius = relativeScale * colliderRadius
-                setColliderRadius(newRadius);
-                nodeRef.current.setUserData(userData)
-                node.jointsRef.current.forEach((jointIndex) => {
-                    const joint = props.jointRefsRef.current[jointIndex].current;
-                    if (joint.body1().userData.uniqueId == id) {
-                        const a1 = joint.anchor1();
-                        joint.setAnchor1({
-                            x: a1.x * relativeScale,
-                            y: a1.y * relativeScale,
-                            z: a1.z * relativeScale,
-                        })
-                    }
-                    if (joint.body2().userData.uniqueId == id) {
-                        const a2 = joint.anchor2();
-                        joint.setAnchor2({
-                            x: a2.x * relativeScale,
-                            y: a2.y * relativeScale,
-                            z: a2.z * relativeScale,
-                        })
-                    }
-                })
-                userData.rigidScale = userData.scale;
-                nodeRef.current.setUserData(userData);
-            }
+                if (joint.body2().userData.uniqueId == id) {
+                    const a2 = joint.anchor2();
+                    joint.setAnchor2({
+                        x: a2.x * relativeScale,
+                        y: a2.y * relativeScale,
+                        z: a2.z * relativeScale,
+                    })
+                }
+            })
+            userData.rigidScale = userData.scale;
+            nodeRef.current.setUserData(userData);
         }
     });
 

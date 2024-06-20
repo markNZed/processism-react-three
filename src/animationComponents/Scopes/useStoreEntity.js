@@ -55,7 +55,6 @@ import { devtools } from 'zustand/middleware';
 const nodeTemplate = {
     lastCompoundEntity: false,
     isParticle: false,
-    visible: false,
     parentId: null,
     chainRef: (() => { // Shared by all nodes
         const ref = React.createRef();
@@ -431,6 +430,22 @@ const useStoreEntity = create((set, get) => ({
 
         return { nodes };
     }),
+
+    propagateUserDataValue: (nodeId, property, value) => set(state => {
+        const nodes = { ...state.nodes };
+
+        const updateSubtree = (currentId) => {
+            nodes[currentId]['ref'].setUserData(p => ({ ...p, [property]: value }));
+            if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
+                nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
+            }
+        };
+
+        updateSubtree(nodeId);
+
+        return { nodes };
+    }),
+
 
 }));
 

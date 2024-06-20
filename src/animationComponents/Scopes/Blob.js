@@ -3,57 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
 
-/**
- * Recursively builds the ordered list of indexes.
- * @param {Object} chainRef - Reference object containing the current state of chains.
- * @param {Array} blobOuterUniqueIds - Array of unique IDs representing the outer blob.
- * @param {string|null} [uniqueId=null] - The current unique ID to process.
- * @param {Set} [visited=new Set()] - A set of visited unique IDs to prevent infinite loops.
- * @returns {Array|null} Ordered list of indexes or null if a chainRef is dangling.
- */
-function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
-    // Initialize uniqueId with the first element of blobOuterUniqueIds if null
-    if (uniqueId === null) {
-        uniqueId = blobOuterUniqueIds[0];
-    }
-
-    // Guard clause to prevent infinite loops
-    if (visited.has(uniqueId)) return null;
-    
-    visited.add(uniqueId);
-    
-    // Guard clause to check if uniqueId is in blobOuterUniqueIds
-    if (!blobOuterUniqueIds.includes(uniqueId)) return null;
-    
-    const result = [uniqueId];
-    const linkedIndexes = chainRef.current[uniqueId];
-    
-    // Check if there are any joints (nodes with more than 2 links)
-    let foundJoint = false;
-    for (let linkedIndex of linkedIndexes) {
-        if (chainRef.current[linkedIndex].length > 2) {
-            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
-            if (recursiveResult) {
-                foundJoint = true;
-                result.push(...recursiveResult);
-            }
-        }
-    }
-    
-    // If no joints were found, continue with the normal linked indexes
-    if (!foundJoint) {
-        for (let linkedIndex of linkedIndexes) {
-            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
-            if (recursiveResult) {
-                result.push(...recursiveResult);
-            }
-        }
-    }
-    
-    return result;
-}
-
-const Blob = ({ color, node, centerRef }) => {
+const Blob = ({ color, node, centerRef, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
@@ -122,7 +72,7 @@ const Blob = ({ color, node, centerRef }) => {
 
         if (!blobData.current) return;
 
-        if (node.visible) {
+        if (node.ref.current.getUserData().visible) {
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
@@ -136,7 +86,7 @@ const Blob = ({ color, node, centerRef }) => {
                 const geometry = points_to_geometry(blobPoints, particleRadiusRef, centerRef);
                 blobRef.current.geometry.dispose();
                 blobRef.current.geometry = geometry;
-                blobRef.current.visible = node.visible;
+                blobRef.current.visible = true;
             }
 
         } else {
@@ -156,31 +106,31 @@ const Blob = ({ color, node, centerRef }) => {
             let ancestorId = node.parentId;
             for (let i = node.depth - 1; i >= 0; i--) {
                 const ancestorNode = getNode(ancestorId);
-                if (ancestorNode.visible) return;
+                if (ancestorNode.ref.current.getUserData().visible) return;
                 ancestorId = ancestorNode.parentId;
             }
             event.stopPropagation();
             // If the node is about to become invisible
-            if (node.visible) {
-                node.childrenIds.forEach(childId => {
-                    updateNode(childId, { visible: true });
+            if (node.ref.current.getUserData().visible) {
+                entityNodes.forEach(nodeEntity => {
+                    nodeEntity.ref.current.setUserData(p => ({ ...p, visible: true }));
                 });
                 if (node.lastCompoundEntity) {
                     node.particlesRef.current.forEach((particleRef) => {
-                        particleRef.current.getUserData().visible = true;
+                        particleRef.current.setUserData(p => ({ ...p, visible: true }));
                     });
                 }
-                updateNode(node.id, { visible: false });
+                node.ref.current.setUserData(p => ({ ...p, visible: false }));
             } else {
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
-                updateNode(node.id, { visible: true });
+                node.ref.current.setUserData(p => ({ ...p, visible: true }));
                 setTimeout(() => {
-                    node.childrenIds.forEach(childId => {
-                        propagateValue(childId, "visible", false);
+                    entityNodes.forEach(nodeEntity => {
+                        nodeEntity.ref.current.setUserData(p => ({ ...p, visible: false }));
                     });
                     node.particlesRef.current.forEach((particleRef) => {
-                        particleRef.current.getUserData().visible = false;
+                        particleRef.current.setUserData(p => ({ ...p, visible: false }));
                     });
                 }, 0); // Introduce a slight delay
             }
@@ -236,49 +186,60 @@ const points_to_geometry = (points, particleRadiusRef = 0, centerRef) => {
 function handleOnContextMenuFn(updateNode, getNode, propagateValue) {
     return (event) => {
         event.stopPropagation();
-        updateNode("root", { visible: true });
         const rootNode = getNode("root");
+        rootnode.ref.current.setUserData(p => ({ ...p, visible: true }));
         rootNode.childrenIds.forEach(childId => {
-            propagateValue(childId, "visible", false);
+            propagateUserDataValue(childId, "visible", false);
         });
     };
 }
 
-function handleOnClickFn(node, getNode, updateNode, propagateValue) {
-    return (event) => {
-        if (event.shiftKey) {
-            return;
-        }
-        let ancestorId = node.parentId;
-        for (let i = node.depth - 1; i >= 0; i--) {
-            const ancestorNode = getNode(ancestorId);
-            if (ancestorNode.visible) return;
-            ancestorId = ancestorNode.parentId;
-        }
-        event.stopPropagation();
-        // If the node is about to become invisible
-        if (node.visible) {
-            node.childrenIds.forEach(childId => {
-                updateNode(childId, { visible: true });
-            });
-            if (node.lastCompoundEntity) {
-                node.particlesRef.current.forEach((particleRef) => {
-                    particleRef.current.getUserData().visible = true;
-                });
+/**
+ * Recursively builds the ordered list of indexes.
+ * @param {Object} chainRef - Reference object containing the current state of chains.
+ * @param {Array} blobOuterUniqueIds - Array of unique IDs representing the outer blob.
+ * @param {string|null} [uniqueId=null] - The current unique ID to process.
+ * @param {Set} [visited=new Set()] - A set of visited unique IDs to prevent infinite loops.
+ * @returns {Array|null} Ordered list of indexes or null if a chainRef is dangling.
+ */
+function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
+    // Initialize uniqueId with the first element of blobOuterUniqueIds if null
+    if (uniqueId === null) {
+        uniqueId = blobOuterUniqueIds[0];
+    }
+
+    // Guard clause to prevent infinite loops
+    if (visited.has(uniqueId)) return null;
+    
+    visited.add(uniqueId);
+    
+    // Guard clause to check if uniqueId is in blobOuterUniqueIds
+    if (!blobOuterUniqueIds.includes(uniqueId)) return null;
+    
+    const result = [uniqueId];
+    const linkedIndexes = chainRef.current[uniqueId];
+    
+    // Check if there are any joints (nodes with more than 2 links)
+    let foundJoint = false;
+    for (let linkedIndex of linkedIndexes) {
+        if (chainRef.current[linkedIndex].length > 2) {
+            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
+            if (recursiveResult) {
+                foundJoint = true;
+                result.push(...recursiveResult);
             }
-            updateNode(node.id, { visible: false });
-        } else {
-            // The order of tnheh blob rendering means everything will disappear
-            // causing a "flashing" effect
-            updateNode(node.id, { visible: true });
-            setTimeout(() => {
-                node.childrenIds.forEach(childId => {
-                    propagateValue(childId, "visible", false);
-                });
-                node.particlesRef.current.forEach((particleRef) => {
-                    particleRef.current.getUserData().visible = false;
-                });
-            }, 0); // Introduce a slight delay
         }
-    };
+    }
+    
+    // If no joints were found, continue with the normal linked indexes
+    if (!foundJoint) {
+        for (let linkedIndex of linkedIndexes) {
+            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
+            if (recursiveResult) {
+                result.push(...recursiveResult);
+            }
+        }
+    }
+    
+    return result;
 }

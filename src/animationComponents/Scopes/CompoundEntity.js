@@ -89,7 +89,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     setPhysicsState("initialize");
                 }
                 if (isPhysicsReady()) {
-                    if (id == "root") console.log("physics ready", id, useStoreEntity.getState());
+                    if (id == "root") {
+                        console.log("physics ready", id, useStoreEntity.getState(), nodeRef);
+                        nodeRef.current.setUserData(p => ({ ...p, visible: true }));
+                    }
                     frameStateRef.current = "findCenter";
                 }
                 break;
@@ -128,6 +131,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             color={localColor}
                             node={node}
                             centerRef={centerRef}
+                            entityNodes={entityNodes}
                         />
                         {node.depth === 0 && (
                             <>
