@@ -20,8 +20,8 @@ import useStoreEntity from './useStoreEntity';
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
-    const internalRef = useRef();
-    useImperativeHandle(ref, () => internalRef.current);
+    const nodeRef = useRef();
+    useImperativeHandle(ref, () => nodeRef.current);
 
     // Direct access to the state outside of React's render flow
     const directGetNode = useStoreEntity.getState().getNode;
@@ -97,7 +97,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case "findCenter":
                 calculateCenter(entityNodes, centerRef);
                 // could use ZuStand to avoid needing extensions to group e.g. setCenter
-                internalRef.current.setCenter(centerRef.current);
+                nodeRef.current.setCenter(centerRef.current);
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)
@@ -107,7 +107,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     return (
         <>
-            <CompoundEntityGroup ref={internalRef} position={initialPosition} userData={localUserDataRef.current}>
+            <CompoundEntityGroup ref={nodeRef} position={initialPosition} userData={localUserDataRef.current}>
                 {entityNodes.map((entity, i) => (
                     <Entity
                         key={`${id}-${i}`}
@@ -127,6 +127,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         <Blob
                             color={localColor}
                             node={node}
+                            centerRef={centerRef}
                         />
                         {node.depth === 0 && (
                             <>
@@ -136,7 +137,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                 />
                                 <Relations 
                                     id={`${id}`} 
-                                    internalRef={internalRef}
+                                    nodeRef={nodeRef}
                                 />
                             </>
                         )}
@@ -162,7 +163,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         initialPosition={initialPosition}
                         newJointsRef={node.jointsRef}
                         index={index || 0}
-                        internalRef={internalRef}
+                        nodeRef={nodeRef}
                         isDebug={isDebug}
                         centerRef={centerRef}
                     />

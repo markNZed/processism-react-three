@@ -5,6 +5,8 @@ import * as THREE from 'three';
 const ParticleRigidBody = forwardRef((props, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
+    const centerRef = useRef(new THREE.Vector3());
+
 
     useImperativeHandle(ref, () => ({
         get current() {
@@ -26,9 +28,11 @@ const ParticleRigidBody = forwardRef((props, ref) => {
             }
         },
         getCenter: () => {
-            if (internalRef?.current?.translation) {
+            if (internalRef.current) {
                 const pos = internalRef.current.translation(); // world position
-                return new THREE.Vector3(pos.x, pos.y, pos.z);
+                centerRef.current.set(pos.x, pos.y, pos.z)
+                props.worldToLocal(centerRef.current);
+                return centerRef.current;
             } else {
                 return null;
             }

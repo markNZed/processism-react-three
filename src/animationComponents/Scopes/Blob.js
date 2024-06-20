@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
@@ -53,13 +53,14 @@ function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visi
     return result;
 }
 
-const Blob = ({ color, node }) => {
+const Blob = ({ color, node, centerRef }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { updateNode, getNode, propagateValue } = useStoreEntity.getState();
+    const { updateNode, getNode, propagateValue, getNodeProperty } = useStoreEntity.getState();
     const { chainRef, id, particlesRef: { current: particles } } = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
+    const particleRadiusRef = useMemo(() => getNodeProperty('root', 'particleRadiusRef'), []);
 
     // This only runs once upon mounting to build the blobData which acts as a cache for objects
     useEffect(() => {
@@ -113,21 +114,11 @@ const Blob = ({ color, node }) => {
             blobData.current.flattenedIndexes.push(flattenedIndex);
         }
 
-        updateNode(id, {visible: node.depth == 0})
-
     },[]);
 
     useFrame(() => {
 
         if (!blobData.current) return;
-
-        // We have nodes for the particles
-        if (node.lastCompoundEntity) {
-            for (let i = 0; i < particles.length; i++) {
-                // Could add config option to show particles
-                particles[i].current.getUserData().visible = node.visibleParticles;
-            }
-        }
 
         if (node.visible) {
 
@@ -140,7 +131,7 @@ const Blob = ({ color, node }) => {
             });
 
             if (blobPoints.length) {
-                const geometry = points_to_geometry(blobPoints);
+                const geometry = points_to_geometry(blobPoints, particleRadiusRef, centerRef);
                 blobRef.current.geometry.dispose();
                 blobRef.current.geometry = geometry;
                 blobRef.current.visible = node.visible;
@@ -152,13 +143,13 @@ const Blob = ({ color, node }) => {
 
     });
 
-    const handleOnClick = handleOnClickFn(getNode, updateNode, propagateValue, id);
+    const handleOnClick = handleOnClickFn(node, getNode, updateNode, propagateValue);
 
     const handleOnContextMenu = handleOnContextMenuFn(updateNode, getNode, propagateValue);
     
     return (
         <mesh ref={blobRef}
-            onClick={(event) => handleOnClick(event, node)}
+            onClick={(event) => handleOnClick(event)}
             onContextMenu={(event) => handleOnContextMenu(event)}>
             <meshBasicMaterial color={color} />
         </mesh>
@@ -169,29 +160,45 @@ export default Blob;
 
 // Outside of component to avoid recreation on render
  
-const points_to_geometry = points => {
-    const curve = new THREE.CatmullRomCurve3(points, true)
-    //const ten_fold_points = curve.getPoints(points.length * 10)
-    //const shape = new THREE.Shape(ten_fold_points)
-    const oneToOnePoints = curve.getPoints(points.length)
-    const shape = new THREE.Shape(oneToOnePoints)
-    const shape_geometry = new THREE.ShapeGeometry(shape)
-    return shape_geometry
-}
+const points_to_geometry = (points, particleRadiusRef = 0, centerRef) => {
+    const expandPointsFromCenter = (points, distance, center) => {
+        return points.map(point => {
+            const direction = new THREE.Vector3().subVectors(point, center).normalize();
+            return new THREE.Vector3(
+                point.x + direction.x * distance,
+                point.y + direction.y * distance,
+                point.z + direction.z * distance
+            );
+        });
+    };
+
+    // Ensure centerRef is a Vector3
+    const center = centerRef.current;
+
+    // Offset the points before creating the curve
+    const expandedPoints = expandPointsFromCenter(points, particleRadiusRef, center);
+
+    const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
+    const oneToOnePoints = curve.getPoints(expandedPoints.length);
+    const shape = new THREE.Shape(oneToOnePoints);
+    const shape_geometry = new THREE.ShapeGeometry(shape);
+
+    return shape_geometry;
+};
 
 function handleOnContextMenuFn(updateNode, getNode, propagateValue) {
-    return useCallback((event) => {
+    return (event) => {
         event.stopPropagation();
         updateNode("root", { visible: true });
         const rootNode = getNode("root");
         rootNode.childrenIds.forEach(childId => {
             propagateValue(childId, "visible", false);
         });
-    }, []);
+    };
 }
 
-function handleOnClickFn(getNode, updateNode, propagateValue, id) {
-    return useCallback((event, node) => {
+function handleOnClickFn(node, getNode, updateNode, propagateValue) {
+    return (event) => {
         let ancestorId = node.parentId;
         for (let i = node.depth - 1; i >= 0; i--) {
             const ancestorNode = getNode(ancestorId);
@@ -199,18 +206,25 @@ function handleOnClickFn(getNode, updateNode, propagateValue, id) {
             ancestorId = ancestorNode.parentId;
         }
         event.stopPropagation();
-        const updateNodeValue = { visible: !node.visible };
-        if (node.lastCompoundEntity) updateNodeValue.visibleParticles = node.visible;
         // If the node is about to become invisible
         if (node.visible) {
             node.childrenIds.forEach(childId => {
                 updateNode(childId, { visible: true });
             });
+            if (node.lastCompoundEntity) {
+                node.particlesRef.current.forEach((particleRef) => {
+                    particleRef.current.getUserData().visible = true;
+                });
+            }
         } else {
+            // Maybe visible should only be stored in userData
             node.childrenIds.forEach(childId => {
                 propagateValue(childId, "visible", false);
             });
+            node.particlesRef.current.forEach((particleRef) => {
+                particleRef.current.getUserData().visible = false;
+            });
         }
-        updateNode(id, updateNodeValue);
-    }, []);
+        updateNode(node.id, { visible: !node.visible });
+    };
 }

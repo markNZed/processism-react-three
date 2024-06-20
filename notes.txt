@@ -97,9 +97,10 @@ Initialization is too slow
 Use node instead of CompoundEntityGroup for impulse, center, position., userData (same with RigidBody)
 use vec3
 
-Impulses broken, Particles remain visible
+Impulses broken
 
 Could vary the rigidity of joints to get more organic forms at last CompoundEntity
 
 Particle detaching is probably broken
 
+node.ref -> node.entityRef ?

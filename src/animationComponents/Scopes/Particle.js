@@ -26,6 +26,9 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
     const nodeRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
     const color = useMemo(() => getColor(configColor, props.color));
+    const parentNode = useMemo(() => directGetNode(node.parentId), [node.parentId]);
+    const parentNodeRef = parentNode.ref
+    const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -102,6 +105,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
+                worldToLocal={worldToLocal}
             >
                 <BallCollider args={[colliderRadius]} />
             </ParticleRigidBody>
