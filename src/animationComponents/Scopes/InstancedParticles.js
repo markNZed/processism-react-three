@@ -8,13 +8,10 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const directGetNodeProperty = useStoreEntity.getState().getNodeProperty;
-    const particleRadiusRef = directGetNodeProperty('root', 'particleRadiusRef');
-    // Because we know InstancedParticles is called from the root node
+    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
+    const particleRadius = getNodeProperty('root', 'particleRadius');
     const particles = node.particlesRef.current;
     const userColor = new THREE.Color();
-    let colorChanged = false;
-    let matrixChanged = false;
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();
     const currentScale = new THREE.Vector3();
@@ -25,6 +22,8 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
     useFrame(() => {
         if (!internalRef.current) return;
         const mesh = internalRef.current;
+        let matrixChanged = false;
+        let colorChanged = false;
 
         particles.forEach((particleRef, i) => {
             const particle = particleRef.current;
@@ -69,7 +68,6 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
                 mesh.setColorAt(i, userColor);
                 colorChanged = true;
             }
-
         });
 
         if (matrixChanged) {
@@ -81,23 +79,15 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
         }
     });
 
-    // Should use entity instead of particle as per relations 
     const handlePointerDown = (event) => {
-        // Require shift to differntiate from click in Blob
         if (!event.shiftKey) return;
         const instanceId = event.instanceId;
         if (instanceId === undefined) return;
         event.stopPropagation();
         const userData = particles[instanceId].current.getUserData();
         const currentScale = userData.scale;
-        // Maybe we should have a function on the particle that allows for scaling
-        console.log("handlePointerDown", id, instanceId, userData, particles[instanceId]);
-        if (currentScale && currentScale != 1) {
-            particles[instanceId].current.getUserData().scale = 1.0;
-        } else {
-            particles[instanceId].current.getUserData().scale = 2.0;
-        }
-        particles[instanceId].current.getUserData().color = 'pink';
+        userData.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
+        userData.color = 'pink';
     };
 
     return (
@@ -106,7 +96,7 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
             args={[null, null, particles.length]}
             onPointerUp={handlePointerDown}
         >
-            <circleGeometry args={[particleRadiusRef, 16]} />
+            <circleGeometry args={[particleRadius, 16]} />
             <meshStandardMaterial />
         </instancedMesh>
     );

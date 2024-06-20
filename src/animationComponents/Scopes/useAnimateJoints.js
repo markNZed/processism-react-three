@@ -17,7 +17,7 @@ const useAnimateJoints = (
     const { world, rapier } = useRapier();
     // Direct access to the state outside of React's render flow
     const getNodeProperty = useStoreEntity.getState().getNodeProperty;
-    const particleRadiusRef = getNodeProperty('root', 'particleRadiusRef');
+    const particleRadius = getNodeProperty('root', 'particleRadius');
     const getJoint = useStoreJoint.getState().getJoint;
     const id = node.id;
     const internalRef = node.ref;
@@ -100,7 +100,7 @@ const useAnimateJoints = (
                     }
                     // Can't just copy the offset, need to recalculate them. Create a function for this ?
                     // The radius of the replacement may not be the same...
-                    const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadiusRef);
+                    const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadius);
                     // Offset needs to be in local coordinates - should be OK for 
                     const a = {
                         ref: {current: body1},

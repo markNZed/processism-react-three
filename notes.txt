@@ -109,3 +109,5 @@ node.ref -> node.entityRef ?
 impulses sould all be relative to world position (e.g. center)
 
 attractor is disabled
+
+Use opacity

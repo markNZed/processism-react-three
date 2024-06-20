@@ -7,10 +7,10 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { updateNode, getNode, propagateValue, getNodeProperty } = useStoreEntity.getState();
+    const { getNode, propagateUserDataValue, getNodeProperty } = useStoreEntity.getState();
     const { chainRef, id, particlesRef: { current: particles } } = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
-    const particleRadiusRef = useMemo(() => getNodeProperty('root', 'particleRadiusRef'), []);
+    const particleRadius = useMemo(() => getNodeProperty('root', 'particleRadius'), []);
     const [pressStart, setPressStart] = useState(0);
     const longPressThreshold = 500; // Time in milliseconds to distinguish a long press
 
@@ -83,7 +83,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
             });
 
             if (blobPoints.length) {
-                const geometry = points_to_geometry(blobPoints, particleRadiusRef, centerRef);
+                const geometry = points_to_geometry(blobPoints, particleRadius, centerRef);
                 blobRef.current.geometry.dispose();
                 blobRef.current.geometry = geometry;
                 blobRef.current.visible = true;
@@ -96,9 +96,11 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
     });
 
     const handleOnClick = (event) => {
+        console.log("Blob handleOnClick", event);
         if (event.shiftKey) {
             return;
         }
+        if (event.button !== 0) return;  // ignore two finger tap
         
         const pressDuration = Date.now() - pressStart;
 
@@ -115,11 +117,6 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
                 entityNodes.forEach(nodeEntity => {
                     nodeEntity.ref.current.setUserData(p => ({ ...p, visible: true }));
                 });
-                if (node.lastCompoundEntity) {
-                    node.particlesRef.current.forEach((particleRef) => {
-                        particleRef.current.setUserData(p => ({ ...p, visible: true }));
-                    });
-                }
                 node.ref.current.setUserData(p => ({ ...p, visible: false }));
             } else {
                 // The order of the blob rendering means everything will disappear
@@ -127,19 +124,18 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
                 node.ref.current.setUserData(p => ({ ...p, visible: true }));
                 setTimeout(() => {
                     entityNodes.forEach(nodeEntity => {
-                        nodeEntity.ref.current.setUserData(p => ({ ...p, visible: false }));
+                        propagateUserDataValue(nodeEntity.id, 'visible', false);
                     });
-                    node.particlesRef.current.forEach((particleRef) => {
-                        particleRef.current.setUserData(p => ({ ...p, visible: false }));
-                    });
-                }, 0); // Introduce a slight delay
+                }, 0); // Introduce a slight delay to avoid flashing
             }
         }
     };
 
-    const handleOnContextMenu = handleOnContextMenuFn(updateNode, getNode, propagateValue);
+    const handleOnContextMenu = handleOnContextMenuFn(getNode, propagateUserDataValue);
 
-    const handlePointerDown = () => {
+    const handlePointerDown = (event) => {
+        console.log("Blob handlePointerDown", event);
+        if (event.button !== 0) return; // ignore two finger tap
         setPressStart(Date.now());
     };
     
@@ -157,7 +153,7 @@ export default Blob;
 
 // Outside of component to avoid recreation on render
  
-const points_to_geometry = (points, particleRadiusRef = 0, centerRef) => {
+const points_to_geometry = (points, particleRadius = 0, centerRef) => {
     const expandPointsFromCenter = (points, distance, center) => {
         return points.map(point => {
             const direction = new THREE.Vector3().subVectors(point, center).normalize();
@@ -173,7 +169,7 @@ const points_to_geometry = (points, particleRadiusRef = 0, centerRef) => {
     const center = centerRef.current;
 
     // Offset the points before creating the curve
-    const expandedPoints = expandPointsFromCenter(points, particleRadiusRef, center);
+    const expandedPoints = expandPointsFromCenter(points, particleRadius, center);
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
     const oneToOnePoints = curve.getPoints(expandedPoints.length);
@@ -183,14 +179,17 @@ const points_to_geometry = (points, particleRadiusRef = 0, centerRef) => {
     return shape_geometry;
 };
 
-function handleOnContextMenuFn(updateNode, getNode, propagateValue) {
+function handleOnContextMenuFn(getNode, propagateUserDataValue) {
     return (event) => {
+        console.log("Blob handleOnContextMenuFn", event);
         event.stopPropagation();
         const rootNode = getNode("root");
-        rootnode.ref.current.setUserData(p => ({ ...p, visible: true }));
-        rootNode.childrenIds.forEach(childId => {
-            propagateUserDataValue(childId, "visible", false);
-        });
+        rootNode.ref.current.setUserData(p => ({ ...p, visible: true }));
+        setTimeout(() => {
+            rootNode.childrenIds.forEach(childId => {
+                propagateUserDataValue(childId, 'visible', false);
+            });
+        }, 0); // Introduce a slight delay to avoid flashing
     };
 }
 

@@ -80,8 +80,8 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             const rootNode = directGetNode("root");
             if (!rootNode.particleRadius) {
                 directUpdateNode("root", {
-                    particleRadiusRef: radius,
-                    particleAreaRef: calculateCircleArea(radius),
+                    particleRadius: radius,
+                    particleArea: calculateCircleArea(radius),
                 })
             }
             setInitialize(false);

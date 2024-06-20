@@ -15,7 +15,7 @@ const useAnimateImpulses = (
     const impulseRef = useRef();
     const impulsePerParticle = (config.impulsePerParticle || 0.02);
     const getNodeProperty = useStoreEntity.getState().getNodeProperty;
-    const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
+    const particleArea = getNodeProperty('root', 'particleArea');
     const id = node.id;
     const internalRef = node.ref;
     const impulseStateRef = useRef('init');
@@ -42,12 +42,12 @@ const useAnimateImpulses = (
                     directionToCenter.negate().normalize();
                     if (impulse.length() == 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount / entityRefsArray.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleArea * particlesCount / entityRefsArray.length);
                     }
                     const overshoot = displacement.length() - config.maxDisplacement;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
-                        impulse.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount / entityRefsArray.length);
+                        impulse.multiplyScalar(impulsePerParticle * particleArea * particlesCount / entityRefsArray.length);
                         impulse.multiplyScalar(config.overshootScaling);
                     }
                     if (false && config.attractorScaling[node.depth]) {
@@ -82,7 +82,7 @@ const useAnimateImpulses = (
             impulseDirection = randomDirectionVector;
         }
         const particlesCount = node.particlesRef.current.length;
-        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount);
+        impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleArea * particlesCount);
     });
 
     useFrame(() => {

@@ -14,7 +14,7 @@ const useJoints = () => {
     const directGetNodeProperty = useStoreEntity.getState().getNodeProperty;
     const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
     const directAddJoints = useStoreJoint.getState().addJoints;
-    const particleRadiusRef = directGetNodeProperty('root', 'particleRadiusRef');
+    const particleRadius = directGetNodeProperty('root', 'particleRadius');
 
     const allocateJointsToParticles = (node, chainRef, entityPositions) => {
         const nodeRef = node.ref;
@@ -48,8 +48,8 @@ const useJoints = () => {
                 .subVectors(closestParticleBPosition, closestParticleAPosition)
                 .normalize();
 
-            const offsetA = direction.clone().multiplyScalar(particleRadiusRef);
-            const offsetB = direction.clone().multiplyScalar(-particleRadiusRef);
+            const offsetA = direction.clone().multiplyScalar(particleRadius);
+            const offsetB = direction.clone().multiplyScalar(-particleRadius);
 
             const uniqueIdA = closestParticleARef.current.userData.uniqueId;
             const uniqueIdB = closestParticleBRef.current.userData.uniqueId;
@@ -105,7 +105,7 @@ const useJoints = () => {
         // We place the joints first because they will not align with the perimeter of the scope
         const jointPosition = newJoints[0].a.ref.translation();
         const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
-        const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadiusRef;
+        const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadius;
 
         node.particlesRef.current.forEach(particleRef => {
             const particlePosition = particleRef.current.translation();
