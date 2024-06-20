@@ -199,6 +199,9 @@ function handleOnContextMenuFn(updateNode, getNode, propagateValue) {
 
 function handleOnClickFn(node, getNode, updateNode, propagateValue) {
     return (event) => {
+        if (event.shiftKey) {
+            return;
+        }
         let ancestorId = node.parentId;
         for (let i = node.depth - 1; i >= 0; i--) {
             const ancestorNode = getNode(ancestorId);
