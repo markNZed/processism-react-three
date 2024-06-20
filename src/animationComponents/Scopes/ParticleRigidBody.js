@@ -1,15 +1,15 @@
-import React, { forwardRef, useRef, useImperativeHandle, useEffect } from 'react';
+import React, { forwardRef, useRef, useImperativeHandle, useEffect, useMemo } from 'react';
 import { RigidBody as RapierRigidBody } from '@react-three/rapier';
+import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
-const ParticleRigidBody = forwardRef((props, ref) => {
+const ParticleRigidBody = forwardRef(({ children, registerRef, ...props }, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
     const centerWorldRef = useRef(new THREE.Vector3());
 
-
-    useImperativeHandle(ref, () => ({
+    const handle = useMemo(() => ({
         get current() {
             return internalRef.current;
         },
@@ -31,9 +31,9 @@ const ParticleRigidBody = forwardRef((props, ref) => {
         getCenter: () => {
             if (internalRef.current) {
                 const pos = internalRef.current.translation(); // world position
-                centerRef.current.set(pos.x, pos.y, pos.z)
+                centerRef.current.set(pos.x, pos.y, pos.z);
                 props.worldToLocal(centerRef.current);
-                return centerRef.current;
+                return centerRef.current.clone();
             } else {
                 return null;
             }
@@ -41,8 +41,8 @@ const ParticleRigidBody = forwardRef((props, ref) => {
         getCenterWorld: () => {
             if (internalRef.current) {
                 const pos = internalRef.current.translation(); // world position
-                centerWorldRef.current.set(pos.x, pos.y, pos.z)
-                return centerWorldRef.current;
+                centerWorldRef.current.set(pos.x, pos.y, pos.z);
+                return centerWorldRef.current.clone();
             } else {
                 return null;
             }
@@ -65,19 +65,28 @@ const ParticleRigidBody = forwardRef((props, ref) => {
         setUserData: (userData) => {
             internalRef.current.userData = userData;
         },
-    }));
+    }), [internalRef, impulseRef, centerRef, centerWorldRef, props]);
+
+    useImperativeHandle(ref, () => handle, [handle]);
 
     useEffect(() => {
-        if (props.registerRef) {
-            props.registerRef(internalRef.current);
+        if (registerRef) {
+            registerRef(internalRef.current);
         }
-    }, [props.registerRef]);
+    }, [registerRef]);
 
     return (
         <RapierRigidBody ref={internalRef} {...props}>
-            {props.children}
+            {children}
         </RapierRigidBody>
     );
 });
+
+ParticleRigidBody.propTypes = {
+    children: PropTypes.node,
+    registerRef: PropTypes.func,
+    worldToLocal: PropTypes.func.isRequired,
+    // Add other prop types if needed
+};
 
 export default ParticleRigidBody;
