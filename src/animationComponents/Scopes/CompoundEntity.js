@@ -135,10 +135,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                     id={`${id}`}
                                     node={node}
                                 />
-                                <Relations 
-                                    id={`${id}`} 
-                                    nodeRef={nodeRef}
-                                />
+                                {config.showRelations && (
+                                    <Relations 
+                                        id={`${id}`} 
+                                        nodeRef={nodeRef}
+                                    />
+                                )}
                             </>
                         )}
                     

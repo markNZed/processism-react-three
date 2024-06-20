@@ -14,8 +14,10 @@ const SceneManager = (isAnimating) => {
 
   useEffect(() => {
     // Update the key whenever the scene reloads
-    setKey((prevKey) => prevKey + 1)
-    setReloadScene(false)
+    if (reloadScene) {
+      setKey((prevKey) => prevKey + 1)
+      setReloadScene(false)
+    }
   }, [reloadScene])
 
   useEffect(() => {

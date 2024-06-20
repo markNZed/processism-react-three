@@ -7,6 +7,8 @@ import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import useStoreEntity from './useStoreEntity';
+import useStoreRelation from './useStoreRelation';
+import useStoreJoint from './useStoreJoint';
 import * as utils from './utils';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
@@ -53,12 +55,12 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
     const [controlsConfig, setControlsConfig] = useState({
         scopeCount: { value: 3, step: 1, },
         radius: { value: radius || 10, min: 1, max: 20 },
-        impulsePerParticle: { value: 2, min: 0.001, max: 10, step: 0.001, label: "Impulse per Particle" },
-        overshootScaling: { value: 1, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
+        impulsePerParticle: { value: 10, min: 0.1, max: 100, step: 0.1, label: "Impulse per Particle" },
+        overshootScaling: { value: 10, min: 1, max: 100, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
         attractorScaling: { value: [0, -0.8, -0.1], label: "Attractor Scaling" },
-        initialScaling: { value: 0.5, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
+        initialScaling: { value: 0.1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
         initialImpulse: { value: true, label: "Initial Impulse" },
         showRelations: { value: false, label: "Show Relations" },
         detach: { value: false, label: "Detach Experiment" },
@@ -73,7 +75,7 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
     const config = {
         debug: false,
         colors: [color || null, utils.getRandomColorFn, null],
-        impulsePerParticle: controls.impulsePerParticle / 1000,
+        impulsePerParticle: controls.impulsePerParticle / 100,
         overshootScaling: controls.overshootScaling,
         attractorScaling: controls.attractorScaling,
         maxDisplacementScaling: controls.maxDisplacementScaling,
@@ -208,6 +210,10 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
     // Initialization logging/debug
     useEffect(() => {
         console.log("Scopes mounting");
+        // Blow away the stores
+        useStoreEntity.getState().reset();
+        useStoreRelation.getState().reset();
+        useStoreJoint.getState().reset();
     }, []);
       
     function addNodesRecursively(entityCounts, parentId = "root") {

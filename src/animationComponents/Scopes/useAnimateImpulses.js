@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
@@ -13,7 +13,7 @@ const useAnimateImpulses = (
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
-    const impulsePerParticle = (config.impulsePerParticle || 0.02) * (node.depth + 1);
+    const impulsePerParticle = (config.impulsePerParticle || 0.02);
     const getNodeProperty = useStoreEntity.getState().getNodeProperty;
     const particleAreaRef = getNodeProperty('root', 'particleAreaRef');
     const id = node.id;
@@ -23,13 +23,15 @@ const useAnimateImpulses = (
     const centerRef = useRef(new THREE.Vector3());
     const prevCenterRef = useRef(new THREE.Vector3());
     const initialPositionVector = useMemo(() => vec3(...initialPosition), []);
+    const EPSILON = 1e-10;
+    const particlesCount = node.particlesRef.current.length;
+    const randomDirectionVector = randomDirection();
 
     const entityRefsArray = entityNodes.map(entity => entity.ref);
 
-    const entityImpulses = (center, impulseIn) => {
+    const entityImpulses = useCallback((center, impulseIn) => {
         const impulse = impulseIn.clone();
         impulse.multiplyScalar(1 / entityRefsArray.length);
-        const particlesCount = node.particlesRef.current.length;
         entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
                 const entityCenter = entity.current.getCenter();
@@ -57,43 +59,30 @@ const useAnimateImpulses = (
                 }
             }
         });
-    };
+    });
 
-    const applyInitialImpulses = () => {
-        const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, () => new THREE.Vector3(
-            (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
-            (Math.random() - 0.5) * impulsePerParticle * config.initialScaling,
-            0
-        ));
+    const applyInitialImpulses = useCallback(() => {
+        const initialImpulseVectors = Array.from({ length: entityRefsArray.length }, randomDirection);
+        const scaling = impulsePerParticle * config.initialScaling * particlesCount
         entityRefsArray.forEach((entity, i) => {
             if (entity.current) {
-                const particlesCount = node.particlesRef.current.length;
-                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(particlesCount);
+                const perEntityImpulse = initialImpulseVectors[i].multiplyScalar(scaling);
                 entity.current.addImpulse(perEntityImpulse);
             }
         });
-    };
+    });
 
-    const calculateImpulses = (centerRef, prevCenterRef) => {
+    const calculateImpulses = useCallback((centerRef, prevCenterRef) => {
         const displacement = centerRef.current.clone();
         displacement.sub(prevCenterRef.current);
-        const impulseDirection = displacement.normalize();
+        let impulseDirection;
+        if (displacement.lengthSq() > EPSILON) {
+            impulseDirection = displacement.normalize();
+        } else {
+            impulseDirection = randomDirectionVector;
+        }
         const particlesCount = node.particlesRef.current.length;
         impulseRef.current = impulseDirection.multiplyScalar(impulsePerParticle * particleAreaRef * particlesCount);
-    };
-
-    // Impulse on every frame
-    useFrame(() => {
-        if (initialized) {
-            const impulse = internalRef.current.getImpulse();
-            if (impulse.length() > 0) {
-                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);
-                entityRefsArray.forEach((entity) => {
-                    entity.current.addImpulse(perEntityImpulse);
-                });
-                internalRef.current.setImpulse(new THREE.Vector3());
-            }
-        }
     });
 
     useFrame(() => {
@@ -114,6 +103,7 @@ const useAnimateImpulses = (
                 prevCenterRef.current = node.depth == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = internalRef.current.getCenter();
                 if (centerRef.current && prevCenterRef.current) {
+                    //if (node.id == "root") console.log("Root impulse", impulseRef.current)
                     // Could calculate velocity and direction here
                     calculateImpulses(centerRef, prevCenterRef);
                     entityImpulses(prevCenterRef.current, impulseRef.current);
@@ -124,8 +114,27 @@ const useAnimateImpulses = (
                 break;
         }
 
+        if (initialized) {
+            const impulse = internalRef.current.getImpulse();
+            if (impulse.length() > 0) {
+                const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);
+                entityRefsArray.forEach((entity) => {
+                    entity.current.addImpulse(perEntityImpulse);
+                });
+                internalRef.current.setImpulse(new THREE.Vector3());
+            }
+        }
+
     });
 
 };
 
 export default useAnimateImpulses;
+
+const randomDirection = () => {
+    return new THREE.Vector3(
+        (Math.random() - 0.5),
+        (Math.random() - 0.5),
+        0
+    );
+};

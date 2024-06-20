@@ -2,6 +2,9 @@ import { create } from 'zustand';
 
 const useStoreJoint = create((set, get) => ({
   joints: {},
+  reset: () => set({
+    joints: {}
+  }),
   addJoint: (id, ref) => set(state => ({
     joints: { ...state.joints, [id]: ref },
   })),

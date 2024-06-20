@@ -146,6 +146,10 @@ const Blob = ({ color, node, centerRef }) => {
     });
 
     const handleOnClick = (event) => {
+        if (event.shiftKey) {
+            return;
+        }
+        
         const pressDuration = Date.now() - pressStart;
 
         if (pressDuration < longPressThreshold) {

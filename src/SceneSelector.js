@@ -8,7 +8,7 @@ const SceneSelector = () => {
   const clearAllAnimationStates = useStore((state) => state.clearAllAnimationStates)
 
   const initializeScene = (sceneName) => {
-    clearAllAnimationStates() // Clear all animation states
+    clearAllAnimationStates()
     setCurrentScene(sceneName) // Set the current scene
     setReloadScene(true)
   }
@@ -24,7 +24,7 @@ const SceneSelector = () => {
       <button onClick={() => initializeScene('SceneTwo')}>Go to Scene Two</button>
       <button onClick={() => initializeScene('SceneThree')}>Go to Scene Three</button>
       */}
-      <button onClick={() => initializeScene('SceneThree')}>Restart</button>
+      <button onClick={() => initializeScene('SceneThree')}>Reload</button>
     </div>
   )
 }

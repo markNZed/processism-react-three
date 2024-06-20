@@ -131,6 +131,14 @@ const useStoreEntity = create((set, get) => ({
     propertyLookups: {},
     nodeCount: 0,
 
+    reset: () => set({
+        nodes: {
+          root: createNode('root', { depth: 0 }, []),
+        },
+        propertyLookups: {},
+        nodeCount: 0,
+    }),
+
     getNode: (nodeId) => {
         const nodes = get().nodes;
         return nodes[nodeId];

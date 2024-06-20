@@ -1,13 +1,17 @@
 import { create } from 'zustand';
 
 const useStoreRelation = create((set, get) => ({
-  relation: {},
+  relations: {},
+
+  reset: () => set({
+    relations: {}
+  }),
 
   setRelation: (from, to, objs) => set(state => ({
-    relation: { 
-      ...state.relation, 
+    relations: { 
+      ...state.relations, 
       [from]: { 
-        ...state.relation[from],
+        ...state.relations[from],
         [to]: objs 
       },
     },
@@ -15,22 +19,22 @@ const useStoreRelation = create((set, get) => ({
 
   getRelation: (from, to = null) => {
     if (to) {
-      return get().relation[from]?.[to] || [];
+      return get().relations[from]?.[to] || [];
     } else {
-      return get().relation[from] || {};
+      return get().relations[from] || {};
     }
   },
 
-  getRelations: (from) => (get().relation[from] || {}),
+  getRelations: (from) => (get().relations[from] || {}),
 
-  getAllRelations: () => (get().relation || {}),
+  getAllRelations: () => (get().relations || {}),
 
   addRelation: (from, to, objs) => set(state => {
-    const existingFrom = state.relation[from] || {};
+    const existingFrom = state.relations[from] || {};
     const existingTo = existingFrom[to] || [];
     return {
-      relation: { 
-        ...state.relation, 
+      relations: { 
+        ...state.relations, 
         [from]: { 
           ...existingFrom, 
           [to]: [...existingTo, ...objs] 
@@ -40,7 +44,7 @@ const useStoreRelation = create((set, get) => ({
   }),
 
   updateRelation: (from, to, update) => set(state => {
-    const existingTo = state.relation[from]?.[to] || [];
+    const existingTo = state.relations[from]?.[to] || [];
     const updatedTo = existingTo.map(existingObj => {
       if (existingObj.id === update.id) {
         if (typeof update === 'function') {
@@ -51,10 +55,10 @@ const useStoreRelation = create((set, get) => ({
       return existingObj;
     });
     return {
-      relation: { 
-        ...state.relation, 
+      relations: { 
+        ...state.relations, 
         [from]: { 
-          ...state.relation[from], 
+          ...state.relations[from], 
           [to]: updatedTo 
         },
       },
@@ -62,33 +66,33 @@ const useStoreRelation = create((set, get) => ({
   }),
 
   removeRelation: (from, to) => set(state => {
-    if (state.relation[from]) {
-      delete state.relation[from][to]
+    if (state.relations[from]) {
+      delete state.relations[from][to]
     }
     return {
-      relation: {
-        ...state.relation,
-        [from]: state.relation[from],
+      relations: {
+        ...state.relations,
+        [from]: state.relations[from],
       },
     };
   }),
 
   removeRelations: (from) => set(state => {
     return {
-      relation: {
-        ...state.relation,
+      relations: {
+        ...state.relations,
         [from]: {},
       },
     };
   }),
 
   clearRelation: (from, to) => set(state => {
-    if (!state.relation[from]) return state;
-    const { [to]: _, ...newFrom } = state.relation[from];
-    return { relation: { ...state.relation, [from]: newFrom } };
+    if (!state.relations[from]) return state;
+    const { [to]: _, ...newFrom } = state.relations[from];
+    return { relations: { ...state.relations, [from]: newFrom } };
   }),
 
-  clearAllRelations: () => set({ relation: {} }),
+  clearAllRelations: () => set({ relations: {} }),
 }));
 
 export default useStoreRelation;
