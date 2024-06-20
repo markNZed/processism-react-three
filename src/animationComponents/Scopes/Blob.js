@@ -217,7 +217,6 @@ function handleOnClickFn(node, getNode, updateNode, propagateValue) {
                 });
             }
         } else {
-            // Maybe visible should only be stored in userData
             node.childrenIds.forEach(childId => {
                 propagateValue(childId, "visible", false);
             });

@@ -104,3 +104,7 @@ Could vary the rigidity of joints to get more organic forms at last CompoundEnti
 Particle detaching is probably broken
 
 node.ref -> node.entityRef ?
+// Maybe visible should only be stored only in userData
+
+impulses sould all be relative to world position (e.g. center)
+Blob ignore clicks with shift

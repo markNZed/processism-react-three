@@ -4,27 +4,7 @@ import * as THREE from 'three';
 import useStoreRelation from './useStoreRelation';
 import useStoreEntity from './useStoreEntity';
 
-function LineWidthChecker() {
-    const { gl } = useThree();
-  
-    useEffect(() => {
-      if (gl && gl.getContext) {
-        // Three.js WebGLRenderer exposes the rendering context via `getContext()`
-        const context = gl.getContext();
-        // Check if the context supports querying parameters directly
-        if (context && context.getParameter) {
-          const lineWidthRange = context.getParameter(context.ALIASED_LINE_WIDTH_RANGE);
-          console.log('Supported line width range:', lineWidthRange);
-        } else {
-          console.log('WebGL context does not support getParameter');
-        }
-      }
-    }, [gl]); // Depend on gl to ensure it's available
-  
-    return null; // This component does not render anything
-}
-
-function Relations({internalRef}) {
+function Relations({nodeRef}) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
     const [linesUpdate, setLinesUpdate] = useState(0);
@@ -78,8 +58,8 @@ function Relations({internalRef}) {
                 if (ref.current) {
                     const fromNode = getNode(fromId);
                     const toNode = getNode(toId);
-                    const startPoint = internalRef.current.worldToLocal(fromNode.ref.current.getCenter());
-                    const endPoint = internalRef.current.worldToLocal(toNode.ref.current.getCenter());
+                    const startPoint = nodeRef.current.worldToLocal(fromNode.ref.current.getCenterWorld());
+                    const endPoint = nodeRef.current.worldToLocal(toNode.ref.current.getCenterWorld());
                     const start = new THREE.Vector3(startPoint.x, startPoint.y, startPoint.z);
                     const end = new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z);
                     const distance = start.distanceTo(end);

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
-    const centerRef = useRef();
+    const centerRef = useRef(new THREE.Vector3());
 
     useImperativeHandle(ref, () => ({
         get current() {
@@ -27,10 +27,14 @@ const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) =
             }
         },
         setCenter: (center) => {
-            if (!centerRef.current) {
-                centerRef.current = new THREE.Vector3()
-            }
             return centerRef.current.copy(center);
+        },
+        getCenterWorld: () => {
+            if (centerRef.current) {
+                return internalRef.current.localToWorld(centerRef.current.clone());
+            } else {
+                return null;
+            }
         },
         worldToLocal: (vector) => {
             return internalRef.current.worldToLocal(vector);

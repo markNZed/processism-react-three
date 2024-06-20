@@ -6,6 +6,7 @@ const ParticleRigidBody = forwardRef((props, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
+    const centerWorldRef = useRef(new THREE.Vector3());
 
 
     useImperativeHandle(ref, () => ({
@@ -37,10 +38,19 @@ const ParticleRigidBody = forwardRef((props, ref) => {
                 return null;
             }
         },
+        getCenterWorld: () => {
+            if (internalRef.current) {
+                const pos = internalRef.current.translation(); // world position
+                centerWorldRef.current.set(pos.x, pos.y, pos.z)
+                return centerWorldRef.current;
+            } else {
+                return null;
+            }
+        },
         translation: () => {
             if (internalRef.current) {
                 return internalRef.current.translation();
-            } else {
+            } else { 
                 return null;
             }
         },
