@@ -11,7 +11,7 @@ import useStoreEntity from './useStoreEntity';
  * @param {Set} [visited=new Set()] - A set of visited unique IDs to prevent infinite loops.
  * @returns {Array|null} Ordered list of indexes or null if a chainRef is dangling.
  */
-function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
+function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
     // Initialize uniqueId with the first element of blobOuterUniqueIds if null
     if (uniqueId === null) {
         uniqueId = blobOuterUniqueIds[0];
@@ -32,7 +32,7 @@ function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visi
     let foundJoint = false;
     for (let linkedIndex of linkedIndexes) {
         if (chainRef.current[linkedIndex].length > 2) {
-            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndex, visited);
+            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
             if (recursiveResult) {
                 foundJoint = true;
                 result.push(...recursiveResult);
@@ -43,7 +43,7 @@ function buildOrderedIndexes(chainRef, blobOuterUniqueIds, uniqueId = null, visi
     // If no joints were found, continue with the normal linked indexes
     if (!foundJoint) {
         for (let linkedIndex of linkedIndexes) {
-            const recursiveResult = buildOrderedIndexes(chainRef, blobOuterUniqueIds, linkedIndex, visited);
+            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
             if (recursiveResult) {
                 result.push(...recursiveResult);
             }
@@ -100,11 +100,11 @@ const Blob = ({ color, node, centerRef }) => {
         if (node.lastCompoundEntity) {
             blobIndexes = blobOuterUniqueIds;
         } else {
-            // buildOrderedIndexes can return null if there are no blobOuterUniqueIds
-            const orderedIndexes = buildOrderedIndexes(chainRef, blobOuterUniqueIds) || [];
-            if (!orderedIndexes.length) console.error("orderedIndexes is empty!", id);
-            //blobIndexes = filterMiddleIndexes(chainRef, orderedIndexes);
-            blobIndexes = orderedIndexes;
+            // buildOrderedIds can return null if there are no blobOuterUniqueIds
+            const orderedIds = buildOrderedIds(chainRef, blobOuterUniqueIds) || [];
+            if (!orderedIds.length) console.error("orderedIds is empty!", id);
+            //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
+            blobIndexes = orderedIds;
         }
 
         for (let i = 0; i < blobIndexes.length; ++i) {
@@ -219,14 +219,19 @@ function handleOnClickFn(node, getNode, updateNode, propagateValue) {
                     particleRef.current.getUserData().visible = true;
                 });
             }
+            updateNode(node.id, { visible: false });
         } else {
-            node.childrenIds.forEach(childId => {
-                propagateValue(childId, "visible", false);
-            });
-            node.particlesRef.current.forEach((particleRef) => {
-                particleRef.current.getUserData().visible = false;
-            });
+            // The order of tnheh blob rendering means everything will disappear
+            // causing a "flashing" effect
+            updateNode(node.id, { visible: true });
+            setTimeout(() => {
+                node.childrenIds.forEach(childId => {
+                    propagateValue(childId, "visible", false);
+                });
+                node.particlesRef.current.forEach((particleRef) => {
+                    particleRef.current.getUserData().visible = false;
+                });
+            }, 0); // Introduce a slight delay
         }
-        updateNode(node.id, { visible: !node.visible });
     };
 }
