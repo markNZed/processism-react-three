@@ -96,7 +96,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
     });
 
     const handleOnClick = (event) => {
-        console.log("Blob handleOnClick", event);
+        //console.log("Blob handleOnClick", event);
         if (event.shiftKey) {
             return;
         }
@@ -134,7 +134,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
     const handleOnContextMenu = handleOnContextMenuFn(getNode, propagateUserDataValue);
 
     const handlePointerDown = (event) => {
-        console.log("Blob handlePointerDown", event);
+        //console.log("Blob handlePointerDown", event);
         if (event.button !== 0) return; // ignore two finger tap
         setPressStart(Date.now());
     };
@@ -181,7 +181,7 @@ const points_to_geometry = (points, particleRadius = 0, centerRef) => {
 
 function handleOnContextMenuFn(getNode, propagateUserDataValue) {
     return (event) => {
-        console.log("Blob handleOnContextMenuFn", event);
+        //console.log("Blob handleOnContextMenuFn", event);
         event.stopPropagation();
         const rootNode = getNode("root");
         rootNode.ref.current.setUserData(p => ({ ...p, visible: true }));

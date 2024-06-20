@@ -92,22 +92,17 @@ CompoundEntity -> Outer Particles (filtered set of nodes)
 CompoundEntity -> Joints (node property)
 Each node in tree has these properties and we need a "flat" view of the property
 
-Initialization is too slow
-
-Use node instead of CompoundEntityGroup for impulse, center, position., userData (same with RigidBody)
-use vec3
-
-Impulses broken
-
 Could vary the rigidity of joints to get more organic forms at last CompoundEntity
 
 Particle detaching is probably broken
 
 node.ref -> node.entityRef ?
-// Maybe visible should only be stored only in userData
 
-impulses sould all be relative to world position (e.g. center)
-
-attractor is disabled
+attractor broken, click on particle - needs shift
 
 Use opacity
+
+Do we need useStoreJoint?
+  entityStore has a ref (which is storing an array of arrays?)
+  maps a joind id/key to a ref
+Do we need useStoreRelation ?

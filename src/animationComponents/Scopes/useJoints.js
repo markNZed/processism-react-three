@@ -135,7 +135,7 @@ const useJoints = () => {
             createJointResults.push(utilsJoints.createJoint(world, rapier, a, b, node.depth, true));
         });
         directAddJoints(createJointResults); // Because batch operation
-        const jointIndexes = createJointResults.map((id1, id2, ref) => {
+        const jointIndexes = createJointResults.map(([id1, id2, ref]) => {
             return id1;
         })
         node.jointsRef.current = jointIndexes;

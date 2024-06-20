@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider } from '@react-three/rapier';
-import _ from 'lodash';
 import { getColor, calculateCircleArea } from './utils.js';
 import useStoreEntity from './useStoreEntity';
 
@@ -49,21 +48,17 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             nodeRef.current.setUserData(userData)
             node.jointsRef.current.forEach((jointIndex) => {
                 const joint = props.jointRefsRef.current[jointIndex].current;
-                if (joint.body1().userData.uniqueId == id) {
-                    const a1 = joint.anchor1();
-                    joint.setAnchor1({
-                        x: a1.x * relativeScale,
-                        y: a1.y * relativeScale,
-                        z: a1.z * relativeScale,
-                    })
+                const scaleAnchor = (anchor) => ({
+                    x: anchor.x * relativeScale,
+                    y: anchor.y * relativeScale,
+                    z: anchor.z * relativeScale,
+                });
+
+                if (joint.body1().userData.uniqueId === id) {
+                    joint.setAnchor1(scaleAnchor(joint.anchor1()));
                 }
-                if (joint.body2().userData.uniqueId == id) {
-                    const a2 = joint.anchor2();
-                    joint.setAnchor2({
-                        x: a2.x * relativeScale,
-                        y: a2.y * relativeScale,
-                        z: a2.z * relativeScale,
-                    })
+                if (joint.body2().userData.uniqueId === id) {
+                    joint.setAnchor2(scaleAnchor(joint.anchor2()));
                 }
             })
             userData.rigidScale = userData.scale;

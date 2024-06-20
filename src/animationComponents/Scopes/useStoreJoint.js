@@ -10,7 +10,7 @@ const useStoreJoint = create((set, get) => ({
   })),
   addJoints: (batch) => set(state => {
     const batchJoints = {};
-    batch.forEach((id1, id2, ref) => {
+    batch.forEach(([id1, id2, ref]) => {
       batchJoints[id1] = ref;
       batchJoints[id2] = ref;
     });

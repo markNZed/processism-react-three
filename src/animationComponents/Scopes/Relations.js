@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import React, { useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreRelation from './useStoreRelation';
 import useStoreEntity from './useStoreEntity';

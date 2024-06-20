@@ -17,15 +17,12 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
  This shows the concept of emergent entities 
  Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
 
- The useStoreEntity has a node for each entity/Particle node.ref is a pointer to the Three group in the 
- case of a CompoundEntity and a Rapier RigidBody in the case of a Particle.
+  The useStoreEntity has a node for each entity/Particle 
+     node.ref is a pointer to the Three group of a CompoundEntity or Rapier RigidBody of a Particle.
 
-*/
+  The useStoreJoint maps a unique joint id to the ref of the joint in Rapier
 
-/* Ideas:
- Could introduce a runtimeConfig that all CompoundEntity can update
- The Attractor does not support ref for updating position - this causes re-rendering
- Should it be possible to create/destroy particles ?
+  The useStoreRelation maps a the node id of the from node to an array to node id for each relation.
 */
 
 /*
@@ -62,6 +59,7 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
         initialScaling: { value: 1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
         initialImpulse: { value: true, label: "Initial Impulse" },
         showRelations: { value: false, label: "Show Relations" },
+        attractor: { value: false, label: "Enable attractor" },
         detach: { value: false, label: "Detach Experiment" },
         scope0: { value: 9, min: 1, max: 30, step: 1 },
         scope1: { value: 9, min: 1, max: 30, step: 1 },

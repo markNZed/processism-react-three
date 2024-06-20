@@ -3,7 +3,7 @@ import { RigidBody as RapierRigidBody } from '@react-three/rapier';
 import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
-const ParticleRigidBody = forwardRef(({ children, registerRef, ...props }, ref) => {
+const ParticleRigidBody = forwardRef(({ children, ...props }, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
@@ -71,13 +71,7 @@ const ParticleRigidBody = forwardRef(({ children, registerRef, ...props }, ref) 
         },
     }), [internalRef, impulseRef, centerRef, centerWorldRef, props]);
 
-    useImperativeHandle(ref, () => handle, [handle]);
-
-    useEffect(() => {
-        if (registerRef) {
-            registerRef(internalRef.current);
-        }
-    }, [registerRef]);
+    useImperativeHandle(ref, () => handle, [handle]);;
 
     return (
         <RapierRigidBody ref={internalRef} {...props}>
@@ -88,7 +82,6 @@ const ParticleRigidBody = forwardRef(({ children, registerRef, ...props }, ref) 
 
 ParticleRigidBody.propTypes = {
     children: PropTypes.node,
-    registerRef: PropTypes.func,
     worldToLocal: PropTypes.func.isRequired,
     // Add other prop types if needed
 };

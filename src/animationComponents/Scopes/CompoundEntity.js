@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
-import { Circle } from '..';
 import _ from 'lodash';
 import * as utils from './utils';
 import Particle from './Particle';
@@ -16,6 +15,8 @@ import useAnimateJoints from './useAnimateJoints';
 import useJoints from './useJoints';
 import DebugRender from './DebugRender';
 import useStoreEntity from './useStoreEntity';
+import useStoreJoint from './useStoreJoint';
+import useStoreRelation from './useStoreRelation';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
 
@@ -90,7 +91,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 }
                 if (isPhysicsReady()) {
                     if (id == "root") {
-                        console.log("physics ready", id, useStoreEntity.getState(), nodeRef);
+                        console.log("Physics ready", nodeRef);
+                        console.log("useStoreEntity", useStoreEntity.getState());
+                        console.log("useStoreJoint", useStoreJoint.getState());
+                        console.log("useStoreRelation", useStoreRelation.getState());
                         nodeRef.current.setUserData(p => ({ ...p, visible: true }));
                     }
                     frameStateRef.current = "findCenter";
@@ -150,16 +154,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     
                     </>
                 )}
-                
-                {/*}
-                <Circle
-                    id={`${id}.mounting`}
-                    initialState={{
-                        radius: 5,
-                        opacity: 1,
-                    }}
-                />
-                */}
                 
                 {isDebug && (
                     <DebugRender

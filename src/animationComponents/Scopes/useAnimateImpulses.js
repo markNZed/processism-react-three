@@ -50,9 +50,9 @@ const useAnimateImpulses = (
                         impulse.multiplyScalar(impulsePerParticle * particleArea * particlesCount / entityRefsArray.length);
                         impulse.multiplyScalar(config.overshootScaling);
                     }
-                    if (false && config.attractorScaling[node.depth]) {
+                    if (config.attractor && config.attractorScaling[node.depth]) {
                         const directionToCenter = config.attractorScaling[node.depth] > 0 ? displacement.negate().normalize() : displacement.normalize();
-                        directionToCenter.multiplyScalar(impulse.length() * Math.abs(config.attractorScaling[node.depth]));
+                        directionToCenter.multiplyScalar(impulsePerParticle * Math.abs(config.attractorScaling[node.depth]));
                         impulse.add(directionToCenter);
                     }
                     entity.current.addImpulse(impulse);
