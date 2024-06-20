@@ -1,4 +1,5 @@
-import React, { forwardRef, useRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useRef, useImperativeHandle, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
 const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) => {
@@ -6,7 +7,10 @@ const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) =
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
 
-    useImperativeHandle(ref, () => ({
+    // Convert position array to THREE.Vector3 instance
+    const verifiedPosition = useMemo(() => new THREE.Vector3(...position), [position]);
+
+    const handle = useMemo(() => ({
         get current() {
             return internalRef.current;
         },
@@ -55,13 +59,40 @@ const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) =
         setUserData: (userData) => {
             internalRef.current.userData = userData;
         },
-    }), [internalRef]);
+    }), [internalRef, impulseRef, centerRef]);
+
+    useImperativeHandle(ref, () => handle, [handle]);
 
     return (
-        <group ref={internalRef} position={position} userData={userData}>
+        <group ref={internalRef} position={verifiedPosition} userData={userData}>
             {children}
         </group>
     );
 });
+
+CompoundEntityGroup.propTypes = {
+    children: PropTypes.node,
+    position: PropTypes.arrayOf(
+        (propValue, key, componentName, location, propFullName) => {
+            if (typeof propValue[key] !== 'number') {
+                return new Error(
+                    `Invalid prop \`${propFullName}\` supplied to` +
+                    ` \`${componentName}\`. Validation failed. Expected a number at index ${key}.`
+                );
+            }
+            if (propValue.length !== 3) {
+                return new Error(
+                    `Invalid prop \`${propFullName}\` supplied to` +
+                    ` \`${componentName}\`. Validation failed. Expected an array of length 3.`
+                );
+            }
+        }
+    ).isRequired,
+    userData: PropTypes.object,
+};
+
+CompoundEntityGroup.defaultProps = {
+    userData: {},
+};
 
 export default CompoundEntityGroup;

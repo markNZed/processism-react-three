@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
@@ -61,6 +61,8 @@ const Blob = ({ color, node, centerRef }) => {
     const { chainRef, id, particlesRef: { current: particles } } = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const particleRadiusRef = useMemo(() => getNodeProperty('root', 'particleRadiusRef'), []);
+    const [pressStart, setPressStart] = useState(0);
+    const longPressThreshold = 500; // Time in milliseconds to distinguish a long press
 
     // This only runs once upon mounting to build the blobData which acts as a cache for objects
     useEffect(() => {
@@ -143,13 +145,54 @@ const Blob = ({ color, node, centerRef }) => {
 
     });
 
-    const handleOnClick = handleOnClickFn(node, getNode, updateNode, propagateValue);
+    const handleOnClick = (event) => {
+        const pressDuration = Date.now() - pressStart;
+
+        if (pressDuration < longPressThreshold) {
+            let ancestorId = node.parentId;
+            for (let i = node.depth - 1; i >= 0; i--) {
+                const ancestorNode = getNode(ancestorId);
+                if (ancestorNode.visible) return;
+                ancestorId = ancestorNode.parentId;
+            }
+            event.stopPropagation();
+            // If the node is about to become invisible
+            if (node.visible) {
+                node.childrenIds.forEach(childId => {
+                    updateNode(childId, { visible: true });
+                });
+                if (node.lastCompoundEntity) {
+                    node.particlesRef.current.forEach((particleRef) => {
+                        particleRef.current.getUserData().visible = true;
+                    });
+                }
+                updateNode(node.id, { visible: false });
+            } else {
+                // The order of the blob rendering means everything will disappear
+                // causing a "flashing" effect
+                updateNode(node.id, { visible: true });
+                setTimeout(() => {
+                    node.childrenIds.forEach(childId => {
+                        propagateValue(childId, "visible", false);
+                    });
+                    node.particlesRef.current.forEach((particleRef) => {
+                        particleRef.current.getUserData().visible = false;
+                    });
+                }, 0); // Introduce a slight delay
+            }
+        }
+    };
 
     const handleOnContextMenu = handleOnContextMenuFn(updateNode, getNode, propagateValue);
+
+    const handlePointerDown = () => {
+        setPressStart(Date.now());
+    };
     
     return (
         <mesh ref={blobRef}
-            onClick={(event) => handleOnClick(event)}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handleOnClick}
             onContextMenu={(event) => handleOnContextMenu(event)}>
             <meshBasicMaterial color={color} />
         </mesh>
