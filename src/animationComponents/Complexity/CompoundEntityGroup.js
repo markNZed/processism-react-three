@@ -2,10 +2,11 @@ import React, { forwardRef, useRef, useImperativeHandle, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
-const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) => {
+const CompoundEntityGroup = forwardRef(({ children, position, visualConfig }, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
+    const visualConfigRef = useRef({});
 
     // Convert position array to THREE.Vector3 instance
     const verifiedPosition = useMemo(() => new THREE.Vector3(...position), [position]);
@@ -49,18 +50,18 @@ const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) =
         getWorldPosition: (vector) => {
             return internalRef.current.getWorldPosition(vector);
         },
-        getUserData: () => {
-            if (internalRef.current) {
-                return internalRef.current.userData;
+        getVisualConfig: () => {
+            if (visualConfigRef.current) {
+                return visualConfigRef.current;
             } else {
                 return null;
             }
         },
-        setUserData: (update) => {
+        setVisualConfig: (update) => {
             if (typeof update === 'function') {
-                internalRef.current.userData = update(internalRef.current.userData);
+                visualConfigRef.current = update(visualConfigRef.current);
             } else {
-                internalRef.current.userData = update;
+                visualConfigRef.current = update;
             }
         },
     }), [internalRef, impulseRef, centerRef]);
@@ -68,7 +69,7 @@ const CompoundEntityGroup = forwardRef(({ children, position, userData }, ref) =
     useImperativeHandle(ref, () => handle, [handle]);
 
     return (
-        <group ref={internalRef} position={verifiedPosition} userData={userData}>
+        <group ref={internalRef} position={verifiedPosition}>
             {children}
         </group>
     );
@@ -92,11 +93,11 @@ CompoundEntityGroup.propTypes = {
             }
         }
     ).isRequired,
-    userData: PropTypes.object,
+    visualConfig: PropTypes.object,
 };
 
 CompoundEntityGroup.defaultProps = {
-    userData: {},
+    visualConfig: {},
 };
 
 export default CompoundEntityGroup;

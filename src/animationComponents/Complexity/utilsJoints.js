@@ -12,10 +12,10 @@ const addJoint = useStoreJoint.getState().addJoint;
 const deleteJointStore = useStoreJoint.getState().deleteJoint;
 
 export const createJoint = (world, rapier, a, b, scope, batch=false) => {
-    const aUserData = a.ref.current.userData || a.ref.getUserData();
-    const bUserData = b.ref.current.userData || b.ref.getUserData();
-    const jointRefsRefIndex = `${aUserData.uniqueId}-${bUserData.uniqueId}`;
-    const jointRefsRefIndexReverse = `${bUserData.uniqueId}-${aUserData.uniqueId}`;
+    const aVisualConfig = a.ref.getVisualConfig();
+    const bVisualConfig = b.ref.getVisualConfig();
+    const jointRefsRefIndex = `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`;
+    const jointRefsRefIndexReverse = `${bVisualConfig.uniqueId}-${aVisualConfig.uniqueId}`;
     const jointRef = { current: null }; // Create a plain object to hold the reference
     jointRef.current = world.createImpulseJoint(
         rapier.JointData.spherical(a.offset, b.offset),
@@ -26,10 +26,10 @@ export const createJoint = (world, rapier, a, b, scope, batch=false) => {
     if (!batch) {
         addJoint(jointRefsRefIndex, jointRef);
         addJoint(jointRefsRefIndexReverse, jointRef);
-        const aNode = getNode(aUserData.uniqueId);
+        const aNode = getNode(aVisualConfig.uniqueId);
         const aNodeJoints = aNode.jointsRef.current;
         aNode.jointsRef.current = aNodeJoints.includes(jointRefsRefIndex) ? aNodeJoints : aNode.jointsRef.current.push(jointRefsRefIndex);
-        const bNode = getNode(bUserData.uniqueId);
+        const bNode = getNode(bVisualConfig.uniqueId);
         const bNodeJoints = bNode.jointsRef.current;
         bNode.jointsRef.current = bNodeJoints.includes(jointRefsRefIndex) ? bNodeJoints : bNode.jointsRef.current.push(jointRefsRefIndex);
     }
@@ -39,9 +39,9 @@ export const createJoint = (world, rapier, a, b, scope, batch=false) => {
 
 export const deleteJoint = (world, jointKey, scope) => {
     const jointRef = getJoint(jointKey);
-    const aNode = getNode(aUserData.uniqueId);
+    const aNode = getNode(aVisualConfig.uniqueId);
     aNode.jointsRef.current = aNode.jointsRef.current.filter(obj => obj !== jointKey);
-    const bNode = getNode(bUserData.uniqueId);
+    const bNode = getNode(bVisualConfig.uniqueId);
     bNode.jointsRef.current = bNode.jointsRef.current.filter(obj => obj !== jointKey);
     if (jointRef.current) {
         const joint = jointRef.current;

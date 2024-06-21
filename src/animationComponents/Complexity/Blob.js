@@ -7,7 +7,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateUserDataValue, getNodeProperty } = useStoreEntity.getState();
+    const { getNode, propagateVisualConfigValue, getNodeProperty } = useStoreEntity.getState();
     const { chainRef, id, particlesRef: { current: particles } } = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const particleRadius = useMemo(() => getNodeProperty('root', 'particleRadius'), []);
@@ -25,7 +25,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         let blobOuterUniqueIds = [];
         let flattenedIndexes = [];
         for (let i = 0; i < particles.length; ++i) {
-            const outerChain = particles[i].current.getUserData().outerChain;
+            const outerChain = particles[i].current.getVisualConfig().outerChain;
             if (outerChain) {
                 let outer = outerChain[node.depth];
                 if (outer) {
@@ -37,7 +37,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
                     }
                 }
                 if (outer) {
-                    const uniqueId = particles[i].current.getUserData().uniqueId;
+                    const uniqueId = particles[i].current.getVisualConfig().uniqueId;
                     blobOuterUniqueIds.push(uniqueId);
                     flattenedIndexes.push(i);
                 }
@@ -72,7 +72,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
 
         if (!blobData.current) return;
 
-        if (node.ref.current.getUserData().visible) {
+        if (node.ref.current.getVisualConfig().visible) {
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
@@ -108,30 +108,30 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
             let ancestorId = node.parentId;
             for (let i = node.depth - 1; i >= 0; i--) {
                 const ancestorNode = getNode(ancestorId);
-                if (ancestorNode.ref.current.getUserData().visible) return;
+                if (ancestorNode.ref.current.getVisualConfig().visible) return;
                 ancestorId = ancestorNode.parentId;
             }
             event.stopPropagation();
             // If the node is about to become invisible
-            if (node.ref.current.getUserData().visible) {
+            if (node.ref.current.getVisualConfig().visible) {
                 entityNodes.forEach(nodeEntity => {
-                    nodeEntity.ref.current.setUserData(p => ({ ...p, visible: true }));
+                    nodeEntity.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
                 });
-                node.ref.current.setUserData(p => ({ ...p, visible: false }));
+                node.ref.current.setVisualConfig(p => ({ ...p, visible: false }));
             } else {
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
-                node.ref.current.setUserData(p => ({ ...p, visible: true }));
+                node.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
                 setTimeout(() => {
                     entityNodes.forEach(nodeEntity => {
-                        propagateUserDataValue(nodeEntity.id, 'visible', false);
+                        propagateVisualConfigValue(nodeEntity.id, 'visible', false);
                     });
                 }, 0); // Introduce a slight delay to avoid flashing
             }
         }
     };
 
-    const handleOnContextMenu = handleOnContextMenuFn(getNode, propagateUserDataValue);
+    const handleOnContextMenu = handleOnContextMenuFn(getNode, propagateVisualConfigValue);
 
     const handlePointerDown = (event) => {
         //console.log("Blob handlePointerDown", event);
@@ -179,15 +179,15 @@ const points_to_geometry = (points, particleRadius = 0, centerRef) => {
     return shape_geometry;
 };
 
-function handleOnContextMenuFn(getNode, propagateUserDataValue) {
+function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
     return (event) => {
         //console.log("Blob handleOnContextMenuFn", event);
         event.stopPropagation();
         const rootNode = getNode("root");
-        rootNode.ref.current.setUserData(p => ({ ...p, visible: true }));
+        rootNode.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
         setTimeout(() => {
             rootNode.childrenIds.forEach(childId => {
-                propagateUserDataValue(childId, 'visible', false);
+                propagateVisualConfigValue(childId, 'visible', false);
             });
         }, 0); // Introduce a slight delay to avoid flashing
     };

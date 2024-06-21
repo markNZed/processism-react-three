@@ -51,8 +51,8 @@ const useJoints = () => {
             const offsetA = direction.clone().multiplyScalar(particleRadius);
             const offsetB = direction.clone().multiplyScalar(-particleRadius);
 
-            const uniqueIdA = closestParticleARef.current.userData.uniqueId;
-            const uniqueIdB = closestParticleBRef.current.userData.uniqueId;
+            const uniqueIdA = closestParticleARef.getVisualConfig().uniqueId;
+            const uniqueIdB = closestParticleBRef.getVisualConfig().uniqueId;
 
             if (chainRef.current[uniqueIdA]) {
                 if (!chainRef.current[uniqueIdA].includes(uniqueIdB)) {
@@ -93,8 +93,8 @@ const useJoints = () => {
         const newJoints = allocateJointsToParticles(node, chainRef, entityPositions);
         // Prepare the updates first by aggregating them into a single array
         const allNewJoints = newJoints.reduce((acc, particles) => {
-            const aIndex = particles.a.ref.current.userData.uniqueId;
-            const bIndex = particles.b.ref.current.userData.uniqueId;
+            const aIndex = particles.a.ref.getVisualConfig().uniqueId;
+            const bIndex = particles.b.ref.getVisualConfig().uniqueId;
             const jointIndex = `${aIndex}-${bIndex}`;
             const jointIndexReverse = `${bIndex}-${aIndex}`;
             // Add both the joint index and its reverse to the accumulator
@@ -111,13 +111,13 @@ const useJoints = () => {
             const particlePosition = particleRef.current.translation();
             const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
             const distanceToCenter = centerRef.current.distanceTo(particleVector);
-            const userData = particleRef.current.getUserData();
-            if (!userData.outerChain) userData.outerChain = {};
+            const visualConfig = particleRef.current.getVisualConfig();
+            if (!visualConfig.outerChain) visualConfig.outerChain = {};
             let outer = distanceToCenter >= (distanceToFirstJoint);
-            userData.outerChain[scope] = outer
-            particleRef.current.setUserData(userData);
+            visualConfig.outerChain[scope] = outer
+            particleRef.current.setVisualConfig(visualConfig);
             // To debug the chains of particles
-            //if (scope == 1 && outer) particleRef.current.userData.color = "black";
+            //if (scope == 1 && outer) particleRef.current.getVisualConfig().color = "black";
         });
 
         // Create the joints

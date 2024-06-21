@@ -431,11 +431,11 @@ const useStoreEntity = create((set, get) => ({
         return { nodes };
     }),
 
-    propagateUserDataValue: (nodeId, property, value) => set(state => {
+    propagateVisualConfigValue: (nodeId, property, value) => set(state => {
         const nodes = { ...state.nodes };
 
         const updateSubtree = (currentId) => {
-            nodes[currentId]['ref']['current'].setUserData(p => ({ ...p, [property]: value }));
+            nodes[currentId]['ref']['current'].setVisualConfig(p => ({ ...p, [property]: value }));
             if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
                 nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
             }

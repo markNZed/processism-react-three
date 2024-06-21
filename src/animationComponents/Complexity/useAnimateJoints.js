@@ -39,13 +39,13 @@ const useAnimateJoints = (
         // Generate a random number between 1000 and 10000 which determines the duration of relations
         const randomDuration = 1000; //Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
-            // With "Scope-3" this is at scope 1 so userData.uniqueId is e.g. "Scope-3-5" not a Particle index
+            // With "Scope-3" this is at scope 1 so visualConfig.uniqueId is e.g. "Scope-3-5" not a Particle index
             if (initialized && id == "Scope-8-3") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 1; //Math.floor(Math.random() * entityCount);
                 const entityRef = entityRefs(randomIndexFrom);
-                const userData = entityRef.current.getUserData();
-                const entityUniqueId = userData.uniqueId;
+                const visualConfig = entityRef.current.getVisualConfig();
+                const entityUniqueId = visualConfig.uniqueId;
                 const jointsRef = getNodeProperty(entityUniqueId, `jointsRef`);
                 const entityJointIndexes = jointsRef.current;
                 let replacementEntity;
@@ -60,10 +60,10 @@ const useAnimateJoints = (
                     const jointRef = getJoint(jointKey);
                     const body1 = jointRef.current.body1();
                     const body2 = jointRef.current.body2();
-                    // Entity needs to store parent entity in userData ?
+                    // Entity needs to store parent entity in visualConfig ?
                     // Find the entity which is closest to the center of this CompoundEntity
                     function replaceEntity(body, entityUniqueId) {
-                        if (body.userData.uniqueId === entityUniqueId) return false;
+                        if (body.visualConfig.uniqueId === entityUniqueId) return false;
                         const pos = body.translation();
                         particleWorldPosition.set(pos.x, pos.y, pos.z);
                         const distance = particleWorldPosition.distanceTo(particleWorldPosition);
@@ -76,11 +76,11 @@ const useAnimateJoints = (
                     }
                     if (replaceEntity(body1, entityUniqueId)) {
                         replacementEntity = body1;
-                        closestId = body1.userData.uniqueId;
+                        closestId = body1.visualConfig.uniqueId;
                     }
                     if (replaceEntity(body2, entityUniqueId)) {
                         replacementEntity = body2;
-                        closestId = body2.userData.uniqueId;
+                        closestId = body2.visualConfig.uniqueId;
                     }
                     //console.log("Joint anchors", jointKey, a1, body1, a2, body2);
                 });
@@ -90,12 +90,12 @@ const useAnimateJoints = (
                     const jointRef = getJoint(jointKey);
                     let body1 = jointRef.current.body1();
                     let body2 = jointRef.current.body2();
-                    if (replacementEntity.userData.uniqueId == body1.userData.uniqueId) return;
-                    if (replacementEntity.userData.uniqueId == body2.userData.uniqueId) return;
-                    if (body1.userData.uniqueId === entityUniqueId) {
+                    if (replacementEntity.visualConfig.uniqueId == body1.visualConfig.uniqueId) return;
+                    if (replacementEntity.visualConfig.uniqueId == body2.visualConfig.uniqueId) return;
+                    if (body1.visualConfig.uniqueId === entityUniqueId) {
                         body1 = replacementEntity;
                     }
-                    if (body2.userData.uniqueId === entityUniqueId) {
+                    if (body2.visualConfig.uniqueId === entityUniqueId) {
                         body2 = replacementEntity;
                     }
                     // Can't just copy the offset, need to recalculate them. Create a function for this ?
@@ -118,8 +118,8 @@ const useAnimateJoints = (
                     console.log("deleteJoint", jointKey);
                 });
                 jointsToCreate.forEach(([a, b]) => {
-                    a.ref.current.userData.color = 'orange';
-                    b.ref.current.userData.color = 'orange';
+                    a.ref.current.getVisualConfig().color = 'orange';
+                    b.ref.current.getVisualConfig().color = 'orange';
                     utilsJoints.createJoint(world, rapier, a, b, scope);
                 })
             }

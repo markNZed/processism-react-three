@@ -13,12 +13,15 @@ import * as utils from './utils';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
 /* Overview:
- A set of Particle forms a CompoundEntity and a set of CompoundEntity forms a new CompoundEntity etc
- This shows the concept of emergent entities 
- Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
+  Animation framework intended to provide a visual language for representing complexity.
+  A set of particles form a CompoundEntity and a set of CompoundEntity form a new CompoundEntity etc
+  This represents the concept of emergent entities
+  Each CompoundEntity has joints that connect entity/Particle to form a "soft body"
 
-  The useStoreEntity has a node for each entity/Particle 
-     node.ref is a pointer to the Three group of a CompoundEntity or Rapier RigidBody of a Particle.
+  useStoreEntity has a node for each entity/Particle 
+    node.ref is a pointer to the Three group of a CompoundEntity or Rapier RigidBody of a Particle
+    node.ref.current.visualConfig holds information that impact the rendering
+      This is under the ref so we can access this information when dealing with Rapier particles
 
   The useStoreJoint maps a unique joint id to the ref of the joint in Rapier
 

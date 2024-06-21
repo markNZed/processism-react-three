@@ -32,9 +32,9 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
             instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
 
             const pos = particle.translation();
-            const scale = particle.getUserData().scale || 1;
+            const scale = particle.getVisualConfig().scale || 1;
             userScale.set(scale, scale, scale);
-            const color = particle.getUserData().color || 'red';
+            const color = particle.getVisualConfig().color || 'red';
             userColor.set(color);
 
             if (!currentPos.equals(pos)) {
@@ -42,7 +42,7 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
                 matrixChanged = true;
             }
 
-            const visible = particle.getUserData().visible;
+            const visible = particle.getVisualConfig().visible;
             if (!visible) {
                 currentScale.copy(invisibleScale);
                 matrixChanged = true;
@@ -84,10 +84,10 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
         const instanceId = event.instanceId;
         if (instanceId === undefined) return;
         event.stopPropagation();
-        const userData = particles[instanceId].current.getUserData();
-        const currentScale = userData.scale;
-        userData.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
-        userData.color = 'pink';
+        const visualConfig = particles[instanceId].current.getVisualConfig();
+        const currentScale = visualConfig.scale;
+        visualConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
+        visualConfig.color = 'pink';
     };
 
     return (

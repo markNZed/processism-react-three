@@ -45,8 +45,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const centerRef = useRef(new THREE.Vector3());
     // State machine that can distribute computation across frames
     const frameStateRef = useRef("init");
-    // Need to store the userData so we can re-render and not lose the changes to userData
-    const localUserDataRef = useRef({ uniqueId: id });
+    // Need to store the visualConfig so we can re-render and not lose the changes to visualConfig
+    const localVisualConfigRef = useRef({ uniqueId: id });
     const [physicsState, setPhysicsState] = useState("waiting");
     // Define a function to encapsulate the condition
     const isPhysicsReady = () => physicsState === "ready";
@@ -86,8 +86,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case "init":
                 // useEffect to call initializeJoints because it may take longer than a frame
                 if (physicsState === "waiting") {
-                    // We can assume that all the Particles are ready (refs are set because of the component hierarchy) 
-                    setPhysicsState("initialize");
+                    let particlesExist = true;
+                    directGetAllParticleRefs(id).forEach((particleRef) => {
+                        if (!particleRef.current) {
+                            particlesExist = false;
+                        }
+                    });
+                    if (particlesExist) setPhysicsState("initialize");
                 }
                 if (isPhysicsReady()) {
                     if (id == "root") {
@@ -95,7 +100,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         console.log("useStoreEntity", useStoreEntity.getState());
                         console.log("useStoreJoint", useStoreJoint.getState());
                         console.log("useStoreRelation", useStoreRelation.getState());
-                        nodeRef.current.setUserData(p => ({ ...p, visible: true }));
+                        nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                     }
                     frameStateRef.current = "findCenter";
                 }
@@ -114,7 +119,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     return (
         <>
-            <CompoundEntityGroup ref={nodeRef} position={initialPosition} userData={localUserDataRef.current}>
+            <CompoundEntityGroup ref={nodeRef} position={initialPosition} visualConfig={localVisualConfigRef.current}>
                 {entityNodes.map((entity, i) => (
                     <Entity
                         key={`${id}-${i}`}

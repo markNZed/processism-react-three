@@ -3,11 +3,12 @@ import { RigidBody as RapierRigidBody } from '@react-three/rapier';
 import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
-const ParticleRigidBody = forwardRef(({ children, ...props }, ref) => {
+const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
     const centerWorldRef = useRef(new THREE.Vector3());
+    const visualConfigRef = useRef({});
 
     const handle = useMemo(() => ({
         get current() {
@@ -32,7 +33,7 @@ const ParticleRigidBody = forwardRef(({ children, ...props }, ref) => {
             if (internalRef.current) {
                 const pos = internalRef.current.translation(); // world position
                 centerRef.current.set(pos.x, pos.y, pos.z);
-                props.worldToLocal(centerRef.current);
+                worldToLocal(centerRef.current);
                 return centerRef.current.clone();
             } else {
                 return null;
@@ -54,27 +55,26 @@ const ParticleRigidBody = forwardRef(({ children, ...props }, ref) => {
                 return null;
             }
         },
-        getUserData: () => {
-            if (internalRef.current) {
-                // Returning a reference not a deep copy because we had circular reference issues with deep copy
-                return internalRef.current.userData;
+        getVisualConfig: () => {
+            if (visualConfigRef.current) {
+                return visualConfigRef.current;
             } else {
                 return null;
             }
         },
-        setUserData: (update) => {
+        setVisualConfig: (update) => {
             if (typeof update === 'function') {
-                internalRef.current.userData = update(internalRef.current.userData);
+                visualConfigRef.current = update(visualConfigRef.current);
             } else {
-                internalRef.current.userData = update;
+                visualConfigRef.current = update;
             }
         },
-    }), [internalRef, impulseRef, centerRef, centerWorldRef, props]);
+    }), [internalRef, impulseRef, centerRef, centerWorldRef, children, worldToLocal ]);
 
     useImperativeHandle(ref, () => handle, [handle]);;
 
     return (
-        <RapierRigidBody ref={internalRef} {...props}>
+        <RapierRigidBody ref={internalRef} visualConfig={{id: id}} {...props} >
             {children}
         </RapierRigidBody>
     );
