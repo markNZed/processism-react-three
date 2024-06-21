@@ -42,11 +42,10 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
     // Avoid changes in store causing rerender
     // Direct access to the state outside of React's render flow
-    const addNode = useStoreEntity.getState().addNode;
-    const updateNode = useStoreEntity.getState().updateNode;
-    // Leva controls
+    const directAddNode = useStoreEntity.getState().addNode;
+    const directUpdateNode = useStoreEntity.getState().updateNode;
 
-    // Using state here is a problem using functions
+    // Leva controls
     const controlsConfig = {
         scopeCount: { value: 3, step: 1, },
         radius: { value: radius || 10, min: 1, max: 20 },
@@ -91,7 +90,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     const stepCount = useRef(0); // Counter to track the number of steps
     const lastStepEnd = useRef(0);
     const averageOver = 1000;
-    const [treeReady, setTreeReady] = useState(false);
+    const [storeEntityReady, setStoreEntityReady] = useState(false);
 
     useFrame(() => {
         framesPerStepCount.current++;
@@ -131,8 +130,8 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         useStoreEntity.getState().reset();
         useStoreJoint.getState().reset();
         addNodesRecursively(config.entityCounts);
-        updateNode("root", {ref: internalRef});
-        setTreeReady(true);
+        directUpdateNode("root", {ref: internalRef});
+        setStoreEntityReady(true);
     }, []);
       
     function addNodesRecursively(entityCounts, parentId = "root") {
@@ -146,12 +145,12 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
                 isParticle: restCounts.length === 0,
                 parentId: parentId,
             };
-            const newId = addNode(parentId, node);    
+            const newId = directAddNode(parentId, node);    
             addNodesRecursively(restCounts, newId);
         }
     }
 
-    console.log("Complexity rendering", treeReady, config)
+    console.log("Complexity rendering", storeEntityReady, config)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity
     // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
@@ -159,7 +158,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
     return (
         <>
-            {treeReady && (
+            {storeEntityReady && (
                 <CompoundEntity
                     id="root"
                     ref={internalRef}
