@@ -44,33 +44,30 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Direct access to the state outside of React's render flow
     const addNode = useStoreEntity.getState().addNode;
     const updateNode = useStoreEntity.getState().updateNode;
-    const getNode = useStoreEntity.getState().getNode;
     // Leva controls
-    // Some controls require remounting (e.g. scope0count) so make the CompoundEntity key dependent on these
-    // Using state here is a problemn for the functions
-    // The onChange in scope0 etc here breaks things
-    const [controlsConfig, setControlsConfig] = useState({
+
+    // Using state here is a problem using functions
+    const controlsConfig = {
         scopeCount: { value: 3, step: 1, },
         radius: { value: radius || 10, min: 1, max: 20 },
         impulsePerParticle: { value: 2, min: 0.1, max: 10, step: 0.1, label: "Impulse per Particle" },
         overshootScaling: { value: 1, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
-        attractorScaling: { value: [0, -0.8, -0.1], label: "Attractor Scaling" },
         initialScaling: { value: 1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
         initialImpulse: { value: true, label: "Initial Impulse" },
         showRelations: { value: false, label: "Show Relations" },
         attractor: { value: false, label: "Enable attractor" },
         detach: { value: false, label: "Detach Experiment" },
-        scope0: { value: 9, min: 1, max: 30, step: 1 },
-        scope1: { value: 9, min: 1, max: 30, step: 1 },
-        scope2: { value: 21, min: 1, max: 30, step: 1 },
-    });
+    };
 
-    const [controls] = useControls(() => controlsConfig, [controlsConfig]);
+    const [controls] = useControls(() => controlsConfig);
 
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
+        scopeCount: controls.scopeCount,
+        entityCounts: [9, 9, 21],
+        radius: controls.radius,
         debug: false,
         colors: [color || null, utils.getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,
@@ -85,16 +82,6 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         detach: controls.detach,
     };
 
-    // Configuration object for your simulation that needs to remount
-    const remountConfig = useRef({
-        scopeCount: controls.scopeCount,
-        entityCounts: [controls.scope0, controls.scope1, controls.scope2],
-        radius: controls.radius,
-    });
-
-    // Use a state for remountConfig to sync update with new key
-    const [remountConfigState, setRemountConfigState] = useState(JSON.parse(JSON.stringify(remountConfig.current)));
-
     const { step } = useRapier();
     const framesPerStep = 1; // Update every framesPerStep frames
     const fixedDelta = framesPerStep / 60; //fps
@@ -106,72 +93,6 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     const averageOver = 1000;
     const [treeReady, setTreeReady] = useState(false);
 
-    // Because this renders then remountConfig gets reset then entityCounts has an undefined value if we reduce te scope
-    useEffect(() => {
-        let change = false;
-        const updatedRemountConfig = { ...remountConfig.current };
-
-        Object.keys(remountConfig.current).forEach(key => {
-            if (key === 'entityCounts') {
-                const entityCounts = [];
-                for (let i = 0; i < controls.scopeCount; i++) {
-                    entityCounts.push(controls[`scope${i}`]);
-                }
-                if (!_.isEqual(entityCounts, remountConfig.current.entityCounts)) {
-                    updatedRemountConfig.entityCounts = entityCounts;
-                    change = true;
-                }
-            } else if (controls[key] !== remountConfig.current[key]) {
-                updatedRemountConfig[key] = controls[key];
-                change = true;
-            }
-        });
-
-        if (change) {
-            remountConfig.current = updatedRemountConfig;
-            setRemountConfigState(updatedRemountConfig);
-        }
-
-        console.log("useEffect controls", controls, "change", change, "remountConfig", remountConfig.current, "remountConfigState", remountConfigState);
-    }, [controls, controlsConfig]);
-
-    useEffect(() => {
-        console.log("remountConfigState", remountConfigState);
-    }, [remountConfigState]);
-
-    // When scopeCount changes setConfig then we refresh the controls so we can add to scopeCountsUI
-    useEffect(() => {
-        if (controls.scopeCount) {
-            // Delete all the scopeX entries
-            const controlsConfigCopy = JSON.parse(JSON.stringify(controlsConfig));
-            const scopeRegex = /^scope\d+/;
-            Object.keys(controlsConfigCopy).forEach(key => {
-                if (scopeRegex.test(key)) {
-                    delete controlsConfigCopy[key];
-                }
-            });
-            const defaultValue = 5;
-            let scopeCountsUI = {};
-            for (let i = 0; i < controls.scopeCount; i++) {
-                let defaultValueOverride = defaultValue;
-                if (controls[`scope${i}`]) {
-                    defaultValueOverride = controls[`scope${i}`];
-                }
-                scopeCountsUI[`scope${i}`] = {
-                    value: defaultValueOverride,
-                    min: 1,
-                    max: 30,
-                    step: 1,
-                };
-            }
-            const newControlsConfig = { ...scopeCountsUI, ...controlsConfigCopy };
-            console.log("setControlsConfig", "controls.scopeCount", controls.scopeCount, "remountConfig.current", "newControlsConfig", newControlsConfig);
-            // Update controlsConfig to trigger update of useControls
-            setControlsConfig(newControlsConfig);
-        }
-    }, [controls.scopeCount]);
-
-    // Need to reset physics when we reset the Complexity
     useFrame(() => {
         framesPerStepCount.current++;
         if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
@@ -193,8 +114,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         }
 
         stepCount.current++;
-        //console.log(`useAfterPhysicsStep: ${stepCount.current} ${framesPerStepCount.current} ${duration}`);
-
+ 
         if (stepCount.current >= averageOver) {
             const averageDuration = durations.current.reduce((a, b) => a + b, 0) / durations.current.length;
             console.log(`Average step duration over last 100 steps: ${averageDuration.toFixed(2)} ms`);
@@ -207,9 +127,12 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Initialization logging/debug
     useEffect(() => {
         console.log("Complexity mounting");
-        // Blow away the stores
+        // Blow away the storesremountConfigState
         useStoreEntity.getState().reset();
         useStoreJoint.getState().reset();
+        addNodesRecursively(config.entityCounts);
+        updateNode("root", {ref: internalRef});
+        setTreeReady(true);
     }, []);
       
     function addNodesRecursively(entityCounts, parentId = "root") {
@@ -228,47 +151,21 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         }
     }
 
-    // Initialization the tree store, do not have a UI for this yet
-    useEffect(() => {
-        if (remountConfigState.entityCounts) {
-            console.log("remountConfigState.entityCounts begin", config, remountConfigState, controls)
-            const entityCountsStr = remountConfigState.entityCounts.toString();
-            const rootNode = getNode("root");
-            if (rootNode.entityCountsStr !== entityCountsStr)   {
-                addNodesRecursively(remountConfigState.entityCounts);
-                updateNode("root", {entityCountsStr, ref: internalRef});
-                setTreeReady(true)
-                console.log("updateNodesConfigRecursively")
-            }
-            console.log("remountConfigState.entityCounts end")
-        }
-    }, [controls, remountConfigState]);
-
-    useEffect(() => {
-        if (treeReady) {
-            const entityCountsStr = remountConfigState.entityCounts.toString();
-            console.log("Scope treeReady", treeReady, entityCountsStr)
-        }
-    }, [treeReady]);
-
-    useWhyDidYouUpdate(`Complexity`, {radius, color, controls});
-
-    console.log("Complexity rendering", treeReady, remountConfigState)
+    console.log("Complexity rendering", treeReady, config)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity
-    // Pass in initialPosition to avoid issues with prop being reinitialized with default value
-    // Which might be an issue with useMemo?
+    // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
+    // which might be an issue with useMemo?
 
     return (
         <>
             {treeReady && (
                 <CompoundEntity
-                    key={JSON.stringify(remountConfigState)}
-                    ref={internalRef}
-                    radius={remountConfigState.radius}
-                    initialPosition={[0, 0, 0]}
-                    config={{ ...config, ...remountConfigState }}
                     id="root"
+                    ref={internalRef}
+                    radius={config.radius}
+                    initialPosition={[0, 0, 0]}
+                    config={config}
                 />
             )}
         </>
