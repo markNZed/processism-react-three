@@ -227,6 +227,10 @@ const useStoreEntity = create((set, get) => {
             };
         }),
 
+        getRelations: () => {
+            return get().relations;
+        },
+
         getNode: (nodeId) => {
             const nodes = get().nodes;
             return nodes[nodeId];

@@ -45,8 +45,8 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     const controlsConfig = {
         scopeCount: { value: 3, step: 1, },
         radius: { value: radius || 10, min: 1, max: 20 },
-        impulsePerParticle: { value: 2, min: 0.1, max: 10, step: 0.1, label: "Impulse per Particle" },
-        overshootScaling: { value: 1, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
+        impulsePerParticle: { value: 1.5, min: 0.1, max: 10, step: 0.1, label: "Impulse per Particle" },
+        overshootScaling: { value: 1.0, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
         initialScaling: { value: 1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
@@ -78,7 +78,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     };
 
     const { step } = useRapier();
-    const framesPerStep = 1; // Update every framesPerStep frames
+    const framesPerStep = 2; // Update every framesPerStep frames
     const fixedDelta = framesPerStep / 60; //fps
     const framesPerStepCount = useRef(0);
     const startTimeRef = useRef(0);

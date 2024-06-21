@@ -9,18 +9,18 @@ function Relations({node}) {
     const [linesUpdate, setLinesUpdate] = useState(0);
     const linesRef = useRef({});
     const newLinesRef = useRef({});
-    const getNode = useStoreEntity.getState().getNode;
+    const { getNode, getRelations } = useStoreEntity.getState();
     const getPropertyAllKeys = useStoreEntity.getState().getPropertyAllKeys;
     const maxDepth = getPropertyAllKeys('depth').length;
     const nodeRef = node.ref;
     // Access relationRefs and make the component re-render when it changes
-    const relations = useStoreEntity(state => state.relations);
+    //const relations = useStoreEntity(state => state.relations);
 
     useFrame(() => {
         let update = false;
         // Create new lines (only if relation is new)
 
-        console.log("relations", relations)
+        const relations = getRelations();
 
         Object.keys(relations).forEach(fromId => {
             relations[fromId].forEach(toId => {
@@ -41,7 +41,7 @@ function Relations({node}) {
 
         if (update) {
             setLinesUpdate(prev => prev + 1);
-            console.log("Total nodes initiating at least one relation", Object.keys(relations).length);
+            //console.log("Total nodes initiating at least one relation", Object.keys(relations).length);
         }
 
         Object.keys(linesRef.current).forEach(fromId => {

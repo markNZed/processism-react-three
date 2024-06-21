@@ -9,6 +9,7 @@ const useAnimateImpulses = (
     node,
     entityNodes,
     initialPosition,
+    radius,
     config,
 ) => {
     // Impulse that will be applied to Particles of this CompoundEntity
@@ -44,7 +45,7 @@ const useAnimateImpulses = (
                         impulse.copy(directionToCenter);
                         impulse.multiplyScalar(impulsePerParticle * particleArea * particlesCount / entityRefsArray.length);
                     }
-                    const overshoot = displacement.length() - config.maxDisplacement;
+                    const overshoot = displacement.length() - config.maxDisplacementScaling * radius;
                     if (overshoot > 0) {
                         impulse.copy(directionToCenter);
                         impulse.multiplyScalar(impulsePerParticle * particleArea * particlesCount / entityRefsArray.length);
@@ -55,7 +56,10 @@ const useAnimateImpulses = (
                         directionToCenter.multiplyScalar(impulsePerParticle * Math.abs(config.attractorScaling[node.depth]));
                         impulse.add(directionToCenter);
                     }
-                    entity.current.addImpulse(impulse);
+                    // For root we want to keep things in the view
+                    if (node.id !== "root" || overshoot > 0) {
+                        entity.current.addImpulse(impulse);
+                    }
                 }
             }
         });
@@ -97,24 +101,28 @@ const useAnimateImpulses = (
                 if (config.initialImpulse && node.depth == 1) {
                     applyInitialImpulses();
                 }
-                impulseStateRef.current = "impulse";
+                impulseStateRef.current = "calcImpulse";
                 break
-            case "impulse":
+            case "calcImpulse":
                 prevCenterRef.current = node.depth == 0 ? initialPositionVector : centerRef.current;
                 centerRef.current = internalRef.current.getCenter();
                 if (centerRef.current && prevCenterRef.current) {
                     //if (node.id == "root") console.log("Root impulse", impulseRef.current)
                     // Could calculate velocity and direction here
                     calculateImpulses(centerRef, prevCenterRef);
-                    entityImpulses(prevCenterRef.current, impulseRef.current);
+                    impulseStateRef.current = "impulse";
                 }
+                break;
+            case "impulse":
+                entityImpulses(prevCenterRef.current, impulseRef.current);
+                impulseStateRef.current = "calcImpulse";
                 break;
             default:
                 console.error("Unexpected state", id, impulseStateRef.current)
                 break;
         }
 
-        if (false && initialized) {
+        if (initialized && node.id != "root") {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
                 const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);

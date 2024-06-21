@@ -43,10 +43,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const centerRef = useRef(new THREE.Vector3());
     // State machine that can distribute computation across frames
     const frameStateRef = useRef("init");
-    // Need to store the visualConfig so we can re-render and not lose the changes to visualConfig
-    const localVisualConfigRef = useRef({ uniqueId: id });
     const [physicsState, setPhysicsState] = useState("waiting");
-    // Define a function to encapsulate the condition
+    // A function to encapsulate the condition
     const isPhysicsReady = () => physicsState === "ready";
 
     // Layout to avoid Particle overlap (which can cause extreme forces in Rapier)
@@ -54,25 +52,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         return generateEntityPositions(radius - entityRadius, entityCount);
     }, [radius, entityRadius, entityCount]);
     
-    // Joints could be a component but we want initializeJoints
     const {initializeJoints, deleteJoint, createJoint} = useJoints();
 
-    useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition, config);
+    useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition, radius, config);
     useAnimateRelations(isPhysicsReady(), node, entityNodes, config);
     useAnimateJoints(isPhysicsReady(), node, entityNodes, deleteJoint, createJoint, config);
 
     useEffect(() => {
-        // Each CompoundEntity at this scope will attempt to add and only one will succeed
         directUpdateNode(id, {initialPosition});
         if (node.depth == 0) console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
     }, []);
 
-    // Maybe physicsState does not need to be useState (it will cause rendering upon change)
     useEffect(() => {
         if (physicsState === "initialize") {
+            node.ref.current.setVisualConfig({ color: color, uniqueId: id, radius: radius });
             const allParticleRefs = directGetAllParticleRefs(id);
             node.particlesRef.current = allParticleRefs;
-            // We need node.particlesRef in initializeJoints
             initializeJoints(node, entityPositions);
             setPhysicsState("ready");
         }
@@ -101,10 +96,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     frameStateRef.current = "findCenter";
                 }
                 break;
-                // Maybe we should wait for all entities to be registered - so state machines are syned
             case "findCenter":
                 calculateCenter(entityNodes, centerRef);
-                // could use ZuStand to avoid needing extensions to group e.g. setCenter
                 nodeRef.current.setCenter(centerRef.current);
                 break;
             default:
@@ -115,7 +108,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     return (
         <>
-            <CompoundEntityGroup ref={nodeRef} position={initialPosition} visualConfig={localVisualConfigRef.current}>
+            <CompoundEntityGroup ref={nodeRef} position={initialPosition} >
                 {entityNodes.map((entity, i) => (
                     <Entity
                         key={`${id}-${i}`}

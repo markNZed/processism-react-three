@@ -45,3 +45,5 @@ Attractor broken?
 Use opacity for blobs 
 
 Next major step is to "grow" the structure instead of using a static layout. useStoreEntity to control the entities dynamically.
+
+Currently CompoundEntity calculate the position of the entities via generateEntityPositions using the entityRadius
