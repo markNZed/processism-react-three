@@ -135,8 +135,8 @@ const useStoreEntity = create((set, get) => {
         // Object to maintain lookups for node properties.
         propertyLookups: {},
         nodeCount: 0,
-        relationRefs: () => {
-            {root: rootNode.relationsRef}
+        relations:() => {
+            {root: []}
         },
 
         reset: () => set(() => {
@@ -144,8 +144,35 @@ const useStoreEntity = create((set, get) => {
                 nodes: {root: rootNode},
                 propertyLookups: {},
                 nodeCount: 0,
-                relationRefs: {root: rootNode.relationsRef},
+                relations: {root: []},
             }
+        }),
+
+        addRelation: (fromId, toId) => set(state => {
+            const relations = state.relations;
+            relations[fromId].push(toId);
+            const fromNode = state.nodes[fromId];
+            fromNode.relationsRef.current.push(toId);
+            return {
+                relations,
+                nodes: {...state.nodes, [fromId]: fromNode},
+            };
+        }),
+
+        deleteRelation: (fromId, toId = null) => set(state => {
+            const relations = state.relations;
+            const fromNode = state.nodes[fromId];
+            if (toId) {
+                relations[fromId] = relations[fromId].filter(id => id !== toId);
+                fromNode.relationsRef.current = fromNode.relationsRef.current.filter(id => id !== toId);
+            } else {
+                delete relations[fromId];
+                fromNode.relationsRef.current = [];
+            }
+            return {
+                relations,
+                nodes: {...state.nodes, [fromId]: fromNode},
+            };
         }),
 
         getNode: (nodeId) => {
@@ -217,7 +244,7 @@ const useStoreEntity = create((set, get) => {
                         },
                     },
                     propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
-                    relationRefs: {...state.relationRefs, [newNode.id]: newNode.relationsRef},
+                    relations: {...state.relations, [newNode.id]: []},
                 };
             });
             return newNodeId;
@@ -307,9 +334,7 @@ const useStoreEntity = create((set, get) => {
                     node.childrenIds.forEach(childId => deleteRecursively(childId));
                     delete nodes[nodeId];
                     state.nodeCount--;
-
-                    // Remove the node's relationsRef from relationRefs array
-                    delete state.relationRefs[nodeId];
+                    delete state.relations[nodeId];
                 }
             };
 

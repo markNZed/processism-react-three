@@ -9,7 +9,6 @@ import useStore from '../../useStore'
 import useStoreEntity from './useStoreEntity';
 import useStoreJoint from './useStoreJoint';
 import * as utils from './utils';
-import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
 /* Overview:
   Animation framework intended to provide a visual language for representing complexity.

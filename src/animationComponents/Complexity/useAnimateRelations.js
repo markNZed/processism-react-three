@@ -4,7 +4,7 @@ import useStoreEntity from './useStoreEntity';
 function useAnimateRelations(initialized, node, entityNodes, config) {
 
     const getNode = useStoreEntity.getState().getNode;
-    const getPropertyAllKeys = useStoreEntity.getState().getPropertyAllKeys;
+    const { getPropertyAllKeys, deleteRelation, addRelation } = useStoreEntity.getState();
     const entityCount = node.childrenIds.length;
     const maxDepth = getPropertyAllKeys('depth').length;
 
@@ -28,15 +28,12 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
                 // We do this outside of the React render cycle 
                 const nodeRelations = fromNode.relationsRef.current;
                 let relationCount = nodeRelations.length || 0;
-                // Randomly delete keys so we remove relations (and create space for new ones)
-                // Track removed keys for updating the ref
-                let removedToIds = [];
+                // Randomly delete relations
                 nodeRelations.forEach(toId => {
                     if (Math.random() < 0.25) {
-                        removedToIds.push(toId);
+                        deleteRelation(fromId, toId);
                     }
                 });
-                fromNode.relationsRef.current = fromNode.relationsRef.current.filter(toId => !removedToIds.includes(toId));
                 relationCount = fromNode.relationsRef.current.length;
                 while (relationCount < maxRelationCount) {
 
@@ -99,8 +96,8 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
                     // Avoid selecting the same entity for from and to 
                     if (fromId === toId) continue;
 
-                    fromNode.relationsRef.current.push(toId);
-
+                    
+                    addRelation(fromId, toId);
                     relationCount++;
 
                 }

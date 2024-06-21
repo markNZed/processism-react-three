@@ -103,3 +103,6 @@ Use opacity for blobs
 Next major step is to "grow" the structure instead of using a static layout. 
 
 useStoreEntity to control the entities dynamically
+
+For relations we could have an add/remove function in storeEntity that maintains this
+use the same pattern for Joints

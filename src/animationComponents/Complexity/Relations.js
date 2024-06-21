@@ -14,24 +14,16 @@ function Relations({node}) {
     const maxDepth = getPropertyAllKeys('depth').length;
     const nodeRef = node.ref;
     // Access relationRefs and make the component re-render when it changes
-    const relationRefs = useStoreEntity(state => state.relationRefs);
+    const relations = useStoreEntity(state => state.relations);
 
     useFrame(() => {
         let update = false;
         // Create new lines (only if relation is new)
 
-        const allRelations = (() => {
-            const relationsHash = {};
-            for (const [nodeId, ref] of Object.entries(relationRefs)) {
-                if (ref.current.length) relationsHash[nodeId] = ref.current;
-            }
-            return relationsHash;
-        })();
+        console.log("relations", relations)
 
-        console.log("allRelations", allRelations, "relationRefs", relationRefs)
-
-        Object.keys(allRelations).forEach(fromId => {
-            allRelations[fromId].forEach(toId => {
+        Object.keys(relations).forEach(fromId => {
+            relations[fromId].forEach(toId => {
                 if (linesRef.current[fromId] && linesRef.current[fromId][toId]) return;
                 const geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(numPoints * 3);
@@ -49,13 +41,13 @@ function Relations({node}) {
 
         if (update) {
             setLinesUpdate(prev => prev + 1);
-            console.log("Total nodes initiating at least one relation", Object.keys(allRelations).length);
+            console.log("Total nodes initiating at least one relation", Object.keys(relations).length);
         }
 
         Object.keys(linesRef.current).forEach(fromId => {
             Object.keys(linesRef.current[fromId]).forEach(toId => {
                 // Remove lineRef for relations that no longer exist
-                const relationFrom = allRelations[fromId];
+                const relationFrom = relations[fromId];
                 if (!relationFrom) {
                     delete linesRef.current[fromId];
                     return;
