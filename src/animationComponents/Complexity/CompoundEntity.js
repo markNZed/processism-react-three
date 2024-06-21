@@ -55,11 +55,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     }, [radius, entityRadius, entityCount]);
     
     // Joints could be a component but we want initializeJoints
-    const initializeJoints = useJoints();
+    const {initializeJoints, deleteJoint, createJoint} = useJoints();
 
     useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition, config);
     useAnimateRelations(isPhysicsReady(), node, entityNodes, config);
-    useAnimateJoints(isPhysicsReady(), node, entityNodes, config);
+    useAnimateJoints(isPhysicsReady(), node, entityNodes, deleteJoint, createJoint, config);
 
     useEffect(() => {
         // Each CompoundEntity at this scope will attempt to add and only one will succeed

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
-import * as utilsJoints from './utilsJoints.js';
 import { useRapier } from '@react-three/rapier';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
@@ -10,6 +9,8 @@ const useAnimateJoints = (
     initialized,
     node,
     entityNodes,
+    deleteJoint, 
+    createJoint,
     config,
 ) => {
 
@@ -110,15 +111,14 @@ const useAnimateJoints = (
                     }
                     jointsToCreate.push([a, b]);
                 });
-                const scope = getNodeProperty(closestId, 'depth');
                 entityJointIndexes.forEach((jointKey) => {
-                    utilsJoints.deleteJoint(world, jointKey);
+                    deleteJoint(world, jointKey);
                     console.log("deleteJoint", jointKey);
                 });
                 jointsToCreate.forEach(([a, b]) => {
                     a.ref.current.getVisualConfig().color = 'orange';
                     b.ref.current.getVisualConfig().color = 'orange';
-                    utilsJoints.createJoint(world, rapier, a, b);
+                    createJoint(world, rapier, a, b);
                 })
             }
             clearInterval(interval);
