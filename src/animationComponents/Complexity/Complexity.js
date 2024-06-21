@@ -7,7 +7,6 @@ import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import useStoreEntity from './useStoreEntity';
-import useStoreRelation from './useStoreRelation';
 import useStoreJoint from './useStoreJoint';
 import * as utils from './utils';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
@@ -24,8 +23,7 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
       This is under the ref so we can access this information when dealing with Rapier particles
 
   The useStoreJoint maps a unique joint id to the ref of the joint in Rapier
-
-  The useStoreRelation maps a the node id of the from node to an array to node id for each relation.
+    We want a joint store apart from useStoreEntity because a joint is associated with two entities
 */
 
 /*
@@ -211,7 +209,6 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         console.log("Complexity mounting");
         // Blow away the stores
         useStoreEntity.getState().reset();
-        useStoreRelation.getState().reset();
         useStoreJoint.getState().reset();
     }, []);
       

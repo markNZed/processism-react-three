@@ -64,31 +64,34 @@ const nodeTemplate = {
     initialPosition: null,
 };
 
-const ignorePropertyLookup = ['id', 'childrenIds', 'ref', 'parentId', 'config', 'particleArea', 'particleRadius', 'particleCount', 'chainRef', 'relationsRef', 'initialPosition'];
+const propertyLookupIncludes = ['depth', 'isParticle', 'relationsRef'];
 
 // Function to create a new node with given properties and childrenIds.
-const createNode = (id = null, properties = {}, childrenIds = []) => ({
-    ...nodeTemplate,
-    id: id || uniqueIdGenerator.getNextId(),
-    ref: React.createRef(),
-    childrenIds,
-    relationsRef: (() => {
-        const ref = React.createRef();
-        ref.current = [];  // Initialize .current with an empty object
-        return ref;
-    })(),
-    particlesRef: (() => {
-        const ref = React.createRef();
-        ref.current = [];  // Initialize .current with an empty object
-        return ref;
-    })(),
-    jointsRef: (() => {
-        const ref = React.createRef();
-        ref.current = [];  // Initialize .current with an empty object
-        return ref;
-    })(),
-    ...properties,
-});
+const createNode = (id = null, properties = {}, childrenIds = []) => {
+    const node = {
+        ...nodeTemplate,
+        id: id || uniqueIdGenerator.getNextId(),
+        ref: React.createRef(),
+        childrenIds,
+        relationsRef: (() => {
+            const ref = React.createRef();
+            ref.current = [];  // Initialize .current with an empty object
+            return ref;
+        })(),
+        particlesRef: (() => {
+            const ref = React.createRef();
+            ref.current = [];  // Initialize .current with an empty object
+            return ref;
+        })(),
+        jointsRef: (() => {
+            const ref = React.createRef();
+            ref.current = [];  // Initialize .current with an empty object
+            return ref;
+        })(),
+        ...properties,
+    };
+    return node;
+};
 
 // Helper function to remove a node from its parent's childrenIds array.
 const removeNodeFromParent = (nodes, nodeId) => {
@@ -105,7 +108,7 @@ const removeNodeFromParent = (nodes, nodeId) => {
 const updatePropertyLookups = (node, propertyLookups) => {
     const updatedLookups = { ...propertyLookups };
     Object.keys(node).forEach(prop => {
-        if (!ignorePropertyLookup.includes(prop)) {
+        if (propertyLookupIncludes.includes(prop)) {
             const values = Array.isArray(node[prop]) ? node[prop] : [node[prop]];
             values.forEach(value => {
                 if (!updatedLookups[prop]) {
@@ -121,333 +124,344 @@ const updatePropertyLookups = (node, propertyLookups) => {
     return updatedLookups;
 };
 
-const useStoreEntity = create((set, get) => ({
-    // Initial state with a root node.
-    nodes: {
-        root: createNode('root', { depth: 0 }, []),
-    },
-    // Object to maintain lookups for node properties.
-    propertyLookups: {},
-    nodeCount: 0,
+const useStoreEntity = create((set, get) => {
 
-    reset: () => set({
-        nodes: {
-          root: createNode('root', { depth: 0 }, []),
-        },
+    const rootNode = createNode('root', { depth: 0 }, []);
+
+    return {
+            
+        // Initial state with a root node.
+        nodes: {root: rootNode},
+        // Object to maintain lookups for node properties.
         propertyLookups: {},
         nodeCount: 0,
-    }),
+        relationRefs: () => {
+            {root: rootNode.relationsRef}
+        },
 
-    getNode: (nodeId) => {
-        const nodes = get().nodes;
-        return nodes[nodeId];
-    },
-
-    selectNodeById: (id) => (state) => state.nodes[id],
-
-    getAllNodes: () => get().nodes,
-
-    getAllpropertyLookups: () => get().propertyLookups,
-
-    getProperty: (prop, index) => {
-        const propertyLookup = get().propertyLookups[prop];
-        if (!propertyLookup) throw new Error(`Property ${prop} does not exist`);
-        return propertyLookup[index];
-    },
-
-    getPropertyAll: (prop) => get().propertyLookups[prop],
-
-    getPropertyAllKeys: (prop) => Object.keys(get().propertyLookups[prop]),
-
-    getNodeProperty: (nodeId, property) => {
-        const node = get().getNode(nodeId);
-        if (!node) throw new Error(`Node ${nodeId} does not exist`);
-        return node[property];
-    },
-
-    // Function to get all nodes with isParticle set to true.
-    getAllParticleRefs: (id = 'root') => {
-        const particles = [];
-        const nodes = get().nodes;
-        const traverse = (node) => {
-            if (node.isParticle) {
-                particles.push(node.ref);
+        reset: () => set(() => {
+            return {
+                nodes: {root: rootNode},
+                propertyLookups: {},
+                nodeCount: 0,
+                relationRefs: {root: rootNode.relationsRef},
             }
-            if (node.childrenIds && Array.isArray(node.childrenIds)) {
-                node.childrenIds.forEach(childId => traverse(nodes[childId]));
-            }
-        };
-        traverse(nodes[id]);
-        return particles;
-    },
+        }),
 
-    // Function to add a new node to the tree.
-    addNode: (parentId, node, id = null) => {
-        let newNodeId;
-        set(state => {
-            if (state.nodes[node.id]) throw new Error(`Node ID ${node.id} already exists`);
-            const parentNode = state.nodes[parentId];
-            if (!parentNode) {
-                //console.log("state.nodes", state.nodes)
-                throw new Error(`Parent node ${parentId} does not exist when creating node ${JSON.stringify(node)} with id ${id}`);
+        getNode: (nodeId) => {
+            const nodes = get().nodes;
+            return nodes[nodeId];
+        },
+
+        selectNodeById: (id) => (state) => state.nodes[id],
+
+        getAllNodes: () => get().nodes,
+
+        getAllpropertyLookups: () => get().propertyLookups,
+
+        getProperty: (prop, index) => {
+            const propertyLookup = get().propertyLookups[prop];
+            if (!propertyLookup) throw new Error(`Property ${prop} does not exist`);
+            return propertyLookup[index];
+        },
+
+        getPropertyAll: (prop) => get().propertyLookups[prop],
+
+        getPropertyAllKeys: (prop) => Object.keys(get().propertyLookups[prop]),
+
+        getNodeProperty: (nodeId, property) => {
+            const node = get().getNode(nodeId);
+            if (!node) throw new Error(`Node ${nodeId} does not exist`);
+            return node[property];
+        },
+
+        // Function to get all nodes with isParticle set to true.
+        getAllParticleRefs: (id = 'root') => {
+            const particles = [];
+            const nodes = get().nodes;
+            const traverse = (node) => {
+                if (node.isParticle) {
+                    particles.push(node.ref);
+                }
+                if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                    node.childrenIds.forEach(childId => traverse(nodes[childId]));
+                }
+            };
+            traverse(nodes[id]);
+            return particles;
+        },
+
+        // Function to add a new node to the tree.
+        addNode: (parentId, node, id = null) => {
+            let newNodeId;
+            set(state => {
+                if (state.nodes[node.id]) throw new Error(`Node ID ${node.id} already exists`);
+                const parentNode = state.nodes[parentId];
+                if (!parentNode) {
+                    //console.log("state.nodes", state.nodes)
+                    throw new Error(`Parent node ${parentId} does not exist when creating node ${JSON.stringify(node)} with id ${id}`);
+                }
+
+                const nodeDepth = (parentNode.depth || 0) + 1;
+                const newNode = createNode(id, { ...node, depth: nodeDepth }, node.childrenIds || []);
+                newNodeId = newNode.id;
+                state.nodeCount++;
+
+                return {
+                    nodes: {
+                        ...state.nodes,
+                        [newNode.id]: newNode,
+                        [parentId]: {
+                            ...parentNode,
+                            childrenIds: [...(parentNode.childrenIds || []), newNode.id],
+                        },
+                    },
+                    propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
+                    relationRefs: {...state.relationRefs, [newNode.id]: newNode.relationsRef},
+                };
+            });
+            return newNodeId;
+        },
+
+        // Function to update an existing node's properties.
+        updateNode: (id, updates) => set(state => {
+            const node = state.nodes[id];
+            if (!node) {
+                console.error(`Node ${id} does not exist`, id)
+                throw new Error(`Node ${id} does not exist`);
             }
 
-            const nodeDepth = (parentNode.depth || 0) + 1;
-            const newNode = createNode(id, { ...node, depth: nodeDepth }, node.childrenIds || []);
-            newNodeId = newNode.id;
-            state.nodeCount++;
+            // Allow updates to be a function similar to setState
+            const updatedProperties = typeof updates === 'function' ? updates(node) : updates;
+
+            // Update property lookups before applying changes
+            const updatedLookups = { ...state.propertyLookups };
+            Object.keys(updatedProperties).forEach(prop => {
+                if (propertyLookupIncludes.includes(prop)) {
+                    const oldValues = Array.isArray(node[prop]) ? node[prop] : node[prop] ? [node[prop]] : [];
+                    const newValues = Array.isArray(updatedProperties[prop]) ? updatedProperties[prop] : [updatedProperties[prop]];
+
+                    oldValues.forEach(value => {
+                        if (updatedLookups[prop] && updatedLookups[prop][value]) {
+                            updatedLookups[prop][value] = updatedLookups[prop][value].filter(
+                                nodeId => nodeId !== id
+                            );
+                            if (updatedLookups[prop][value].length === 0) {
+                                delete updatedLookups[prop][value];
+                            }
+                        }
+                    });
+
+                    newValues.forEach(value => {
+                        if (!updatedLookups[prop]) {
+                            updatedLookups[prop] = {};
+                        }
+                        if (!updatedLookups[prop][value]) {
+                            updatedLookups[prop][value] = [];
+                        }
+                        updatedLookups[prop][value].push(id);
+                    });
+                }
+            });
+
+            const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
 
             return {
                 nodes: {
                     ...state.nodes,
-                    [newNode.id]: newNode,
-                    [parentId]: {
-                        ...parentNode,
-                        childrenIds: [...(parentNode.childrenIds || []), newNode.id],
+                    [id]: {
+                        ...node,
+                        ...updatedProperties,
+                        depth: newDepth,
                     },
                 },
-                propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
+                propertyLookups: updatedLookups,
             };
-        });
-        return newNodeId;
-    },
+        }),
 
-    // Function to update an existing node's properties.
-    updateNode: (id, updates) => set(state => {
-        const node = state.nodes[id];
-        if (!node) {
-            console.error(`Node ${id} does not exist`, id)
-            throw new Error(`Node ${id} does not exist`);
-        }
 
-        // Allow updates to be a function similar to setState
-        const updatedProperties = typeof updates === 'function' ? updates(node) : updates;
+        // Function to delete a node from the tree.
+        deleteNode: (id) => set(state => {
+            const nodes = { ...state.nodes };
+            const propertyLookups = { ...state.propertyLookups };
 
-        // Update property lookups before applying changes
-        const updatedLookups = { ...state.propertyLookups };
-        Object.keys(updatedProperties).forEach(prop => {
-            if (!ignorePropertyLookup.includes(prop)) {
-                const oldValues = Array.isArray(node[prop]) ? node[prop] : node[prop] ? [node[prop]] : [];
-                const newValues = Array.isArray(updatedProperties[prop]) ? updatedProperties[prop] : [updatedProperties[prop]];
-
-                oldValues.forEach(value => {
-                    if (updatedLookups[prop] && updatedLookups[prop][value]) {
-                        updatedLookups[prop][value] = updatedLookups[prop][value].filter(
-                            nodeId => nodeId !== id
-                        );
-                        if (updatedLookups[prop][value].length === 0) {
-                            delete updatedLookups[prop][value];
+            const deleteRecursively = (nodeId) => {
+                const node = nodes[nodeId];
+                if (node) {
+                    // Remove node from property lookups
+                    Object.keys(node).forEach(prop => {
+                        if (propertyLookupIncludes.includes(prop) && propertyLookups[prop]) {
+                            const values = Array.isArray(node[prop]) ? node[prop] : [node[prop]];
+                            values.forEach(value => {
+                                propertyLookups[prop][value] = propertyLookups[prop][value].filter(
+                                    nId => nId !== nodeId
+                                );
+                                if (propertyLookups[prop][value].length === 0) {
+                                    delete propertyLookups[prop][value];
+                                }
+                            });
                         }
-                    }
-                });
+                    });
 
-                newValues.forEach(value => {
-                    if (!updatedLookups[prop]) {
-                        updatedLookups[prop] = {};
-                    }
-                    if (!updatedLookups[prop][value]) {
-                        updatedLookups[prop][value] = [];
-                    }
-                    updatedLookups[prop][value].push(id);
-                });
-            }
-        });
+                    // Recursively delete child nodes
+                    node.childrenIds.forEach(childId => deleteRecursively(childId));
+                    delete nodes[nodeId];
+                    state.nodeCount--;
 
-        const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
-
-        return {
-            nodes: {
-                ...state.nodes,
-                [id]: {
-                    ...node,
-                    ...updatedProperties,
-                    depth: newDepth,
-                },
-            },
-            propertyLookups: updatedLookups,
-        };
-    }),
-
-
-    // Function to delete a node from the tree.
-    deleteNode: (id) => set(state => {
-        const nodes = { ...state.nodes };
-        const propertyLookups = { ...state.propertyLookups };
-
-        const deleteRecursively = (nodeId) => {
-            const node = nodes[nodeId];
-            if (node) {
-                // Remove node from property lookups
-                Object.keys(node).forEach(prop => {
-                    if (!ignorePropertyLookup.includes(prop) && propertyLookups[prop]) {
-                        const values = Array.isArray(node[prop]) ? node[prop] : [node[prop]];
-                        values.forEach(value => {
-                            propertyLookups[prop][value] = propertyLookups[prop][value].filter(
-                                nId => nId !== nodeId
-                            );
-                            if (propertyLookups[prop][value].length === 0) {
-                                delete propertyLookups[prop][value];
-                            }
-                        });
-                    }
-                });
-
-                // Recursively delete child nodes
-                node.childrenIds.forEach(childId => deleteRecursively(childId));
-                delete nodes[nodeId];
-                state.nodeCount--;
-            }
-        };
-
-        deleteRecursively(id);
-        removeNodeFromParent(nodes, id);
-
-        return { nodes, propertyLookups };
-    }),
-
-    // Function to move a node to a new parent in the tree.
-    moveNode: (nodeId, newParentId) => set(state => {
-        const nodes = { ...state.nodes };
-        const nodeToMove = nodes[nodeId];
-        if (!nodeToMove) throw new Error(`Node ${nodeId} does not exist`);
-        const newParentNode = nodes[newParentId];
-        if (!newParentNode) throw new Error(`New parent node ${newParentId} does not exist`);
-
-        removeNodeFromParent(nodes, nodeId);
-        const newDepth = (newParentNode.depth || 0) + 1;
-
-        const updateDepthRecursively = (nId, depth) => {
-            nodes[nId].depth = depth;
-            nodes[nId].childrenIds.forEach(childId => updateDepthRecursively(childId, depth + 1));
-        };
-
-        updateDepthRecursively(nodeId, newDepth);
-
-        return {
-            nodes: {
-                ...nodes,
-                [newParentId]: {
-                    ...newParentNode,
-                    childrenIds: [...(newParentNode.childrenIds || []), nodeId],
-                },
-            },
-        };
-    }),
-
-
-    // Function to retrieve nodes by a specific property and depth.
-    getNodesByPropertyAndDepth: (property, value, depth) => {
-        const nodes = get().nodes;
-        const nodeIds = get().propertyLookups[property]?.[value] || [];
-        return nodeIds.filter(nodeId => nodes[nodeId].depth === depth);
-    },
-
-
-    // Function to flatten the tree into an array.
-    flattenTree: () => {
-        const nodes = get().nodes;
-        const result = [];
-        const stack = [nodes['root']];
-        while (stack.length) {
-            const node = stack.pop();
-            result.push(node);
-            if (node.childrenIds && Array.isArray(node.childrenIds)) {
-                node.childrenIds.forEach(childId => {
-                    const childNode = nodes[childId];
-                    if (childNode) {
-                        stack.push(childNode);
-                    }
-                });
-            }
-        }
-        return result;
-    },
-
-    // Function to traverse the tree using Depth-First Search (DFS).
-    traverseTreeDFS: (callback, id = 'root') => {
-        const nodes = get().nodes;
-        const traverse = (node) => {
-            callback(node);
-            if (node.childrenIds && Array.isArray(node.childrenIds)) {
-                node.childrenIds.forEach(childId => traverse(nodes[childId]));
-            }
-        };
-        traverse(nodes[id]);
-    },
-
-    // Function to copy a subtree to a new parent node.
-    copySubtree: (nodeId, newParentId) => set(state => {
-        const nodes = { ...state.nodes };
-        if (!nodes[nodeId]) throw new Error(`Node ${nodeId} does not exist`);
-        if (!nodes[newParentId]) throw new Error(`New parent node ${newParentId} does not exist`);
-
-        const generateUniqueId = (baseId) => {
-            let newId = `${baseId}_copy`;
-            let counter = 1;
-            while (nodes[newId]) {
-                newId = `${baseId}_copy_${counter}`;
-                counter++;
-            }
-            return newId;
-        };
-
-        const copyRecursively = (node, parentDepth) => {
-            const newNodeId = generateUniqueId(node.id);
-            const newDepth = parentDepth + 1;
-            const newNode = {
-                ...JSON.parse(JSON.stringify(node)), // Ensuring a deep copy of the node properties
-                id: newNodeId,
-                depth: newDepth,
-                childrenIds: [],
+                    // Remove the node's relationsRef from relationRefs array
+                    delete state.relationRefs[nodeId];
+                }
             };
-            newNode.childrenIds = node.childrenIds.map(childId => {
-                const copiedChild = copyRecursively(nodes[childId], newDepth);
-                return copiedChild.id;
-            });
-            nodes[newNode.id] = newNode;
-            state.nodeCount++;
-            return newNode;
-        };
 
-        const nodeToCopy = nodes[nodeId];
-        const newSubtree = copyRecursively(nodeToCopy, nodes[newParentId].depth || 0);
-        nodes[newParentId].childrenIds.push(newSubtree.id);
+            deleteRecursively(id);
+            removeNodeFromParent(nodes, id);
 
-        return { nodes };
-    }),
+            return { nodes, propertyLookups };
+        }),
 
-    propagateValue: (nodeId, property, value) => set(state => {
-        const nodes = { ...state.nodes };
+        // Function to move a node to a new parent in the tree.
+        moveNode: (nodeId, newParentId) => set(state => {
+            const nodes = { ...state.nodes };
+            const nodeToMove = nodes[nodeId];
+            if (!nodeToMove) throw new Error(`Node ${nodeId} does not exist`);
+            const newParentNode = nodes[newParentId];
+            if (!newParentNode) throw new Error(`New parent node ${newParentId} does not exist`);
 
-        const updateSubtree = (currentId) => {
-            nodes[currentId][property] = value;
-            if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
-                nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
+            removeNodeFromParent(nodes, nodeId);
+            const newDepth = (newParentNode.depth || 0) + 1;
+
+            const updateDepthRecursively = (nId, depth) => {
+                nodes[nId].depth = depth;
+                nodes[nId].childrenIds.forEach(childId => updateDepthRecursively(childId, depth + 1));
+            };
+
+            updateDepthRecursively(nodeId, newDepth);
+
+            return {
+                nodes: {
+                    ...nodes,
+                    [newParentId]: {
+                        ...newParentNode,
+                        childrenIds: [...(newParentNode.childrenIds || []), nodeId],
+                    },
+                },
+            };
+        }),
+
+
+        // Function to retrieve nodes by a specific property and depth.
+        getNodesByPropertyAndDepth: (property, value, depth) => {
+            const nodes = get().nodes;
+            const nodeIds = get().propertyLookups[property]?.[value] || [];
+            return nodeIds.filter(nodeId => nodes[nodeId].depth === depth);
+        },
+
+
+        // Function to flatten the tree into an array.
+        flattenTree: () => {
+            const nodes = get().nodes;
+            const result = [];
+            const stack = [nodes['root']];
+            while (stack.length) {
+                const node = stack.pop();
+                result.push(node);
+                if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                    node.childrenIds.forEach(childId => {
+                        const childNode = nodes[childId];
+                        if (childNode) {
+                            stack.push(childNode);
+                        }
+                    });
+                }
             }
-        };
+            return result;
+        },
 
-        updateSubtree(nodeId);
+        // Function to traverse the tree using Depth-First Search (DFS).
+        traverseTreeDFS: (callback, id = 'root') => {
+            const nodes = get().nodes;
+            const traverse = (node) => {
+                callback(node);
+                if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                    node.childrenIds.forEach(childId => traverse(nodes[childId]));
+                }
+            };
+            traverse(nodes[id]);
+        },
 
-        return { nodes };
-    }),
+        // Function to copy a subtree to a new parent node.
+        copySubtree: (nodeId, newParentId) => set(state => {
+            const nodes = { ...state.nodes };
+            if (!nodes[nodeId]) throw new Error(`Node ${nodeId} does not exist`);
+            if (!nodes[newParentId]) throw new Error(`New parent node ${newParentId} does not exist`);
 
-    propagateVisualConfigValue: (nodeId, property, value) => set(state => {
-        const nodes = { ...state.nodes };
+            const generateUniqueId = (baseId) => {
+                let newId = `${baseId}_copy`;
+                let counter = 1;
+                while (nodes[newId]) {
+                    newId = `${baseId}_copy_${counter}`;
+                    counter++;
+                }
+                return newId;
+            };
 
-        const updateSubtree = (currentId) => {
-            nodes[currentId]['ref']['current'].setVisualConfig(p => ({ ...p, [property]: value }));
-            if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
-                nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
-            }
-        };
+            const copyRecursively = (node, parentDepth) => {
+                const newNodeId = generateUniqueId(node.id);
+                const newDepth = parentDepth + 1;
+                const newNode = {
+                    ...JSON.parse(JSON.stringify(node)), // Ensuring a deep copy of the node properties
+                    id: newNodeId,
+                    depth: newDepth,
+                    childrenIds: [],
+                };
+                newNode.childrenIds = node.childrenIds.map(childId => {
+                    const copiedChild = copyRecursively(nodes[childId], newDepth);
+                    return copiedChild.id;
+                });
+                nodes[newNode.id] = newNode;
+                state.nodeCount++;
+                return newNode;
+            };
 
-        updateSubtree(nodeId);
+            const nodeToCopy = nodes[nodeId];
+            const newSubtree = copyRecursively(nodeToCopy, nodes[newParentId].depth || 0);
+            nodes[newParentId].childrenIds.push(newSubtree.id);
 
-        return { nodes };
-    }),
+            return { nodes };
+        }),
 
+        propagateValue: (nodeId, property, value) => set(state => {
+            const nodes = { ...state.nodes };
 
-}));
+            const updateSubtree = (currentId) => {
+                nodes[currentId][property] = value;
+                if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
+                    nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
+                }
+            };
+
+            updateSubtree(nodeId);
+
+            return { nodes };
+        }),
+
+        propagateVisualConfigValue: (nodeId, property, value) => set(state => {
+            const nodes = { ...state.nodes };
+
+            const updateSubtree = (currentId) => {
+                nodes[currentId]['ref']['current'].setVisualConfig(p => ({ ...p, [property]: value }));
+                if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
+                    nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
+                }
+            };
+
+            updateSubtree(nodeId);
+
+            return { nodes };
+        }),
+    };
+
+});
 
 
 export default useStoreEntity;

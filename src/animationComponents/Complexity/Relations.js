@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import useStoreRelation from './useStoreRelation';
 import useStoreEntity from './useStoreEntity';
 
-function Relations({nodeRef}) {
+function Relations({node}) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
     const [linesUpdate, setLinesUpdate] = useState(0);
@@ -13,15 +12,26 @@ function Relations({nodeRef}) {
     const getNode = useStoreEntity.getState().getNode;
     const getPropertyAllKeys = useStoreEntity.getState().getPropertyAllKeys;
     const maxDepth = getPropertyAllKeys('depth').length;
-    const getAllRelations = useStoreRelation.getState().getAllRelations;
+    const nodeRef = node.ref;
+    // Access relationRefs and make the component re-render when it changes
+    const relationRefs = useStoreEntity(state => state.relationRefs);
 
     useFrame(() => {
         let update = false;
         // Create new lines (only if relation is new)
-        const allRelations = getAllRelations();
+
+        const allRelations = (() => {
+            const relationsHash = {};
+            for (const [nodeId, ref] of Object.entries(relationRefs)) {
+                if (ref.current.length) relationsHash[nodeId] = ref.current;
+            }
+            return relationsHash;
+        })();
+
+        console.log("allRelations", allRelations, "relationRefs", relationRefs)
 
         Object.keys(allRelations).forEach(fromId => {
-            Object.keys(allRelations[fromId]).forEach(toId => {
+            allRelations[fromId].forEach(toId => {
                 if (linesRef.current[fromId] && linesRef.current[fromId][toId]) return;
                 const geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(numPoints * 3);
@@ -39,18 +49,17 @@ function Relations({nodeRef}) {
 
         if (update) {
             setLinesUpdate(prev => prev + 1);
-            if (Node.id == "root") console.log("Total relation count", Object.keys(allRelations).length);
+            console.log("Total nodes initiating at least one relation", Object.keys(allRelations).length);
         }
 
         Object.keys(linesRef.current).forEach(fromId => {
             Object.keys(linesRef.current[fromId]).forEach(toId => {
                 // Remove lineRef for relations that no longer exist
                 const relationFrom = allRelations[fromId];
-                const relationFromTo = allRelations[fromId][toId];
                 if (!relationFrom) {
                     delete linesRef.current[fromId];
                     return;
-                } else if (!relationFromTo) {
+                } else if (!relationFrom.includes(Number(toId))) {
                     delete linesRef.current[fromId][toId];
                     return;
                 }
