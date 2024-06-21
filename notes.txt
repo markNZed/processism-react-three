@@ -1,108 +1,47 @@
-Maybe manage RigidBodyRef in HOC and provide a position function that tries rigid then mesh
-Use React's useMemo and useCallback to memoize complex calculations and functions that don't need to be re-created on every render.
-Move to using Motion for Canvas and Camera control ?
 WDS_SOCKET_PORT=0 only in CodeSpace ?
 The AnimationMixer in Three.js provides a robust and flexible way to handle animations
 Entity-Component-System (ECS) is an architectural pattern often used in game development. Entity: A unique identifier representing an object. Component: Holds data attributes for an entity (e.g., position, velocity). System: Contains logic to process entities with specific components (e.g., movement, rendering).
 
-We are likely to hit performance issues so moving to 2D may be better e.g. pixi.js with planck-js This leaves an issue regarding how to have intersecting planes. plank-js seemed to run into issues with 1000s of objects. https://github.com/liabru/matter-js might be better ? https://github.com/liabru/matter-attractors
-
-Calling a Physics function through animation controller:
+Example of calling a Physics function through animation controller:
 [1, 'emergent1.Sphere1', { action: { name: 'applyImpulse', params: [{ x: 10, y: 5, z: 0 }] } }],
-
-Pass down a ref to runtimeConfig ?
 
 Below a certain scale joints could become fixed and merge into a single collider (capsule) the intermediate joints can be ignored
 Why can joints have large gaps appear due to forces
 
-The entities form a new internal boundary as well as an external boundary. Could argue that the internal boundary if "sheltered" from direct external influecne
+The entities form a new internal boundary as well as an external boundary. The internal boundary if "sheltered" from direct external influecne
 
 Top-down -> outside-in
+Bottom-up -> inside-out
 
 https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/
 
-To change the size of a Particle we can scale the instanced mesh and replace the collider in Rapier after moving the joints
-
-Process produce material change e.g .a document which embodies a history of process. The relatioinos are then indirect and uni-directional.
-
-Direction of relations
-
-Should relations be separate objects or properties in entities ? An abstraction of properties and interactions between entities
+Process produce material change e.g a document materializes a history of process.
 
 A relation is in one direction - in many cases there are two relations between two entities
 Before an entity can establish a relation there must be an interaction that enables the possibility
+Prior to each relation being established there is a history that establishes the "potential relation"
 
 Process can give rise to new entities
 
-Prior to each relation being established there is a history that establishes the "potential relation"
-
-From a CompoundEntity the entities of the entities can be classified as inner or outer. At the Particle level we can find joints. At the initial layout the distnace from the center can indicate inner vs outer.
-
 Migration - randomly choose the destination, like relations. Detach inward or outward.
-    Joints needs cleanup and comments
-    CompoundEntity has props particleJointsRef, jointRefs
-      particleJointsRef is using an index into jointRefs
-        jointRefs is set in Joint component
-        The index of jointRefs joints is coming from joints
-        Using particles.particleRefA ax,ay,az,bx,by,bz
 
-Should use ImpulseJointSet to manage all joints ?
+Introducing the concept of "meta" - attending to the dynamics of the system while interacting with it. Process can be seen as an abstraction in time. Essentialism tends to function in an all encompassing now. Concepts of meta (as emergent level? as self-referencing ?) and perspective
 
-Introduce the concept of meta - attending to the dynamics of the system while interacting with it. Process can be seen as an abstraction in time. Essentialism tends to function in an all encompassing now.
-
-Need to be able to slow down the simulation a lot, easily, to see what is going on with migration etc.
-
-Entities that transit other entities e.g. allowing for material causation
-
-Create an object that stores the scene structure and then methods for operating on the scene. The config should also operate on that object. Should be in Zustand to facilitate access.
-
-Use Zustand slices to manage different parts of the state separately.
-
-Concepts of meta (as emergent level? as self-referencing ?) and perspective
+Need to be able to slow down the simulation, easily, to see what is going on with migration etc. Add a speed config.
 
 Process = sequence of relations that repeat (locally, abstractly, metaphorically..)
 
+Entities that transit other entities e.g. allowing for material causation
+
 Emergent substrate - processing particles to form entities in another dimension e.g. processor constructs objects/relations. Particle can traverse the "plane" and form objects - no it is the plan that traverses the particles back-and-forth. A bit like Turing machine. Stream of particles could generate objects. Impredicative if the planes are arranged into a loop - this could be end-to-end trained ? Can inset LLM and fine-tune
 
-To avoid the blob from shrinking we could use the center point between the joint rather than the joint.
-
-The "middle" of joints is not workig at the abstraction of top
-
-Use Refs for High-Frequency Updates: 
-  Keep using refs for state that changes very frequently (e.g., impulses, frame state).
-Use Zustand for Less Frequent Updates: 
-  Use Zustand for state that changes less frequently and benefits from centralization (e.g., entity references, initialization flags).
-
-Use a central tree-like structure to configure the system. THe uniqueId needs to be a unique id and indexArray would be a lookup into the tree data structure. The entity subscribes to the tree in ZuStand and aligns it's state on changes. The tree can also noddte when a node has been updated and then the node can clear this down.
-
-Maybe the tree will need a lock so we can perform a sequence of operations.
-
-Maintain relations that can avoid searchingthe tree e.g.
-Particles, Joints, CompoundEntitiy, Relation, Blob (property of CompoundEntity), Scope
-Joint -> Particles (nodes)
-Joint-> Scope (node property)
-Joint -> CompoundEntities  (nodes)
-Particle -> Joints (node property)
-Particle -> CompoundEntities (nodes)
-Particle -> Relations (node property)
-Relation -> Entity (CompoundEntity or Particle) (nodes)
-CompoundEntity -> Relations
-CompoundEntity -> Particles (nodes)
-CompoundEntity -> Outer Particles (filtered set of nodes)
-CompoundEntity -> Joints (node property)
-Each node in tree has these properties and we need a "flat" view of the property
+Maybe the storeEntity will need a lock so we can perform transactions.
 
 Could vary the rigidity of joints to get more organic forms at last CompoundEntity
 
 Particle detaching is probably broken
+Attractor broken?
 
-attractor broken?
+Use opacity for blobs 
 
-Use opacity for blobs
-
-Next major step is to "grow" the structure instead of using a static layout. 
-
-useStoreEntity to control the entities dynamically
-
-For relations we could have an add/remove function in storeEntity that maintains this
-use the same pattern for Joints
+Next major step is to "grow" the structure instead of using a static layout. useStoreEntity to control the entities dynamically.
