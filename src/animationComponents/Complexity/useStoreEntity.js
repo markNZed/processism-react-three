@@ -138,6 +138,7 @@ const useStoreEntity = create((set, get) => {
         relations:() => {
             {root: []}
         },
+        relationCount: 0,
         joints:() => {
             {root: []}
         },
@@ -148,6 +149,7 @@ const useStoreEntity = create((set, get) => {
                 propertyLookups: {},
                 nodeCount: 0,
                 relations: {root: []},
+                relationCount: 0,
                 joints: {root: []},
             }
         }),
@@ -205,9 +207,11 @@ const useStoreEntity = create((set, get) => {
             relations[fromId].push(toId);
             const fromNode = state.nodes[fromId];
             fromNode.relationsRef.current.push(toId);
+            const relationCount = state.relationCount++;
             return {
                 relations,
                 nodes: {...state.nodes, [fromId]: fromNode},
+                relationCount,
             };
         }),
 
@@ -221,14 +225,20 @@ const useStoreEntity = create((set, get) => {
                 delete relations[fromId];
                 fromNode.relationsRef.current = [];
             }
+            const relationCount = state.relationCount--;
             return {
                 relations,
                 nodes: {...state.nodes, [fromId]: fromNode},
+                relationCount,
             };
         }),
 
         getRelations: () => {
             return get().relations;
+        },
+
+        getRelationCount: () => {
+            return get().relationCount;
         },
 
         getNode: (nodeId) => {

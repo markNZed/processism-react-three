@@ -46,4 +46,4 @@ Use opacity for blobs
 
 Next major step is to "grow" the structure instead of using a static layout. useStoreEntity to control the entities dynamically.
 
-Currently CompoundEntity calculate the position of the entities via generateEntityPositions using the entityRadius
+Currently CompoundEntity calculates the position of the entities via generateEntityPositions using the entityRadius. If it were to grow then it needs to decide where to place the new entity. We can modify the joint to "create" space for the new entity. We can waity for all particles to be registered before adding the next entity but that would make it hard to build a loop, so place all entities. The root can just place the entities equi-spaced then add joints. This should work. Then need another algorithm for modifying the number - add/delete one by one I guess.

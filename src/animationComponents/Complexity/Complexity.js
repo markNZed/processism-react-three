@@ -75,6 +75,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         initialImpulse: controls.initialImpulse,
         showRelations: controls.showRelations,
         detach: controls.detach,
+        maxRelations: 200,
     };
 
     const { step } = useRapier();
