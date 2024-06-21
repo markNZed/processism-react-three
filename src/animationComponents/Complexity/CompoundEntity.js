@@ -15,7 +15,6 @@ import useAnimateJoints from './useAnimateJoints';
 import useJoints from './useJoints';
 import DebugRender from './DebugRender';
 import useStoreEntity from './useStoreEntity';
-import useStoreJoint from './useStoreJoint';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
 
@@ -97,7 +96,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     if (id == "root") {
                         console.log("Physics ready", nodeRef);
                         console.log("useStoreEntity", useStoreEntity.getState());
-                        console.log("useStoreJoint", useStoreJoint.getState());
                         nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                     }
                     frameStateRef.current = "findCenter";

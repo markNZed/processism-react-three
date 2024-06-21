@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
-import useStoreJoint from './useStoreJoint';
 import * as utilsJoints from './utilsJoints.js';
 import { useRapier } from '@react-three/rapier';
 
@@ -16,9 +15,8 @@ const useAnimateJoints = (
 
     const { world, rapier } = useRapier();
     // Direct access to the state outside of React's render flow
-    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
+    const { getNodeProperty, getJoint } = useStoreEntity.getState();
     const particleRadius = getNodeProperty('root', 'particleRadius');
-    const getJoint = useStoreJoint.getState().getJoint;
     const id = node.id;
     const internalRef = node.ref;
     const entityRefs = entityNodes.map(entity => entity.ref);
@@ -114,13 +112,13 @@ const useAnimateJoints = (
                 });
                 const scope = getNodeProperty(closestId, 'depth');
                 entityJointIndexes.forEach((jointKey) => {
-                    utilsJoints.deleteJoint(world, jointKey, scope);
+                    utilsJoints.deleteJoint(world, jointKey);
                     console.log("deleteJoint", jointKey);
                 });
                 jointsToCreate.forEach(([a, b]) => {
                     a.ref.current.getVisualConfig().color = 'orange';
                     b.ref.current.getVisualConfig().color = 'orange';
-                    utilsJoints.createJoint(world, rapier, a, b, scope);
+                    utilsJoints.createJoint(world, rapier, a, b);
                 })
             }
             clearInterval(interval);

@@ -1,17 +1,13 @@
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
-import useStoreJoint from './useStoreJoint';
 
 // Should follow a CRUD pattern for joints (missing R & U)
 
 // Be careful not to have this sensitive to updates to nodes
 // Direct access to the state outside of React's render flow
-const getNode = useStoreEntity.getState().getNode;
-const getJoint = useStoreJoint.getState().getJoint;
-const addJoint = useStoreJoint.getState().addJoint;
-const deleteJointStore = useStoreJoint.getState().deleteJoint;
+const { getNode, getJoint, addJoint, storeDeleteJoint } = useStoreEntity.getState();
 
-export const createJoint = (world, rapier, a, b, scope, batch=false) => {
+export const createJoint = (world, rapier, a, b, batch=false) => {
     const aVisualConfig = a.ref.getVisualConfig();
     const bVisualConfig = b.ref.getVisualConfig();
     const jointRefsRefIndex = `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`;
@@ -34,22 +30,22 @@ export const createJoint = (world, rapier, a, b, scope, batch=false) => {
         bNode.jointsRef.current = bNodeJoints.includes(jointRefsRefIndex) ? bNodeJoints : bNode.jointsRef.current.push(jointRefsRefIndex);
     }
     //console.log("createJoint", id, jointRefsRefIndex, jointRef);
-    return [jointRefsRefIndex, jointRefsRefIndexReverse, jointRef];
+    return jointRef;
 };
 
-export const deleteJoint = (world, jointKey, scope) => {
+export const deleteJoint = (world, jointKey) => {
     const jointRef = getJoint(jointKey);
-    const aNode = getNode(aVisualConfig.uniqueId);
-    aNode.jointsRef.current = aNode.jointsRef.current.filter(obj => obj !== jointKey);
-    const bNode = getNode(bVisualConfig.uniqueId);
-    bNode.jointsRef.current = bNode.jointsRef.current.filter(obj => obj !== jointKey);
+    const body1 = jointRef.current.body1();
+    const body1Id = body1.getVisualConfig().uniqueId
+    const body2 = jointRef.current.body2();
+    const body2Id = body2.getVisualConfig().uniqueId
     if (jointRef.current) {
         const joint = jointRef.current;
         jointRef.current = undefined;
         if (world.getImpulseJoint(joint.handle)) {
             world.removeImpulseJoint(joint, true);
         }
-        deleteJointStore(jointKey);
+        storeDeleteJoint(body1Id, body2Id);
     }
 };
 

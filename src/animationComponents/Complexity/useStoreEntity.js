@@ -138,6 +138,9 @@ const useStoreEntity = create((set, get) => {
         relations:() => {
             {root: []}
         },
+        joints:() => {
+            {root: []}
+        },
 
         reset: () => set(() => {
             return {
@@ -145,8 +148,57 @@ const useStoreEntity = create((set, get) => {
                 propertyLookups: {},
                 nodeCount: 0,
                 relations: {root: []},
+                joints: {root: []},
             }
         }),
+
+        addJoint: (body1Id, body2Id, ref) => set(state => {
+            const joints = state.joints;
+            joints[`${body1Id}-${body2Id}`] = ref;
+            joints[`${body2Id}-${body1Id}`] = ref;
+            const body1Node = state.nodes[body1Id];
+            body1Node.jointsRef.current.push(`${body1Id}-${body2Id}`);
+            const body2Node = state.nodes[body2Id];
+            body2Node.jointsRef.current.push(`${body2Id}-${body1Id}`);
+            return {
+                joints,
+                nodes: {...state.nodes, [body1Id]: body1Node, [body2Id]: body2Node},
+            };
+        }),
+
+        addJoints: (jointsToAdd) => set(state => {
+            const joints = state.joints;
+            const nodes = state.nodes;
+            jointsToAdd.forEach(([body1Id, body2Id, ref]) => {
+                joints[`${body1Id}-${body2Id}`] = ref;
+                joints[`${body2Id}-${body1Id}`] = ref;
+                nodes[body1Id].jointsRef.current.push(`${body1Id}-${body2Id}`);
+                nodes[body2Id].jointsRef.current.push(`${body2Id}-${body1Id}`);
+            }); 
+            return {
+                joints,
+                nodes,
+            };
+        }),
+
+        deleteJoint: (body1Id, body2Id) => set(state => {
+            const joints = state.joints;
+            const body1Node = state.nodes[body1Id];
+            const body2Node = state.nodes[body2Id];
+            delete joints[`${body1Id}-${body2Id}`];
+            delete joints[`${body2Id}-${body1Id}`];
+            body1Node.jointsRef.current = body1Node.jointsRef.current.filter(id => id !== `${body1Id}-${body2Id}`);
+            body2Node.jointsRef.current = body2Node.jointsRef.current.filter(id => id !== `${body2Id}-${body1Id}`);
+            return {
+                joints,
+                nodes: {...state.nodes, [body1Id]: body1Node, [body2Id]: body2Node},
+            };
+        }),
+
+        getJoint: (jointId) => {
+            const joints = get().joints;
+            return joints[jointId];
+        },
 
         addRelation: (fromId, toId) => set(state => {
             const relations = state.relations;

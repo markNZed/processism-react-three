@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
-import useStoreJoint from './useStoreJoint';
 import * as utilsJoints from './utilsJoints.js';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
@@ -11,9 +10,9 @@ const useJoints = () => {
     const { world, rapier } = useRapier();
     // Be careful not to have this sensitive to updates to nodes
     // Direct access to the state outside of React's render flow
-    const directGetNodeProperty = useStoreEntity.getState().getNodeProperty;
-    const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
-    const directAddJoints = useStoreJoint.getState().addJoints;
+    const { getNodeProperty: directGetNodeProperty, 
+            addJoints: directAddJoints, 
+            getAllParticleRefs: directGetAllParticleRefs } = useStoreEntity.getState();
     const particleRadius = directGetNodeProperty('root', 'particleRadius');
 
     const allocateJointsToParticles = (node, chainRef, entityPositions) => {
@@ -132,13 +131,10 @@ const useJoints = () => {
                 ref: particles.b.ref,
                 offset: particles.b.offset,
             }
-            createJointResults.push(utilsJoints.createJoint(world, rapier, a, b, node.depth, true));
+            const jointRef = utilsJoints.createJoint(world, rapier, a, b, true)
+            createJointResults.push([particles.a.ref.getVisualConfig().uniqueId, particles.b.ref.getVisualConfig().uniqueId, jointRef]);
         });
         directAddJoints(createJointResults); // Because batch operation
-        const jointIndexes = createJointResults.map(([id1, id2, ref]) => {
-            return id1;
-        })
-        node.jointsRef.current = jointIndexes;
     };
 
     return initializeJoints;
