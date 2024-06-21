@@ -104,5 +104,14 @@ Use opacity
 
 Do we need useStoreJoint?
   entityStore has a ref (which is storing an array of arrays?)
-  maps a joind id/key to a ref
+  maps a joint id/key to a ref
 Do we need useStoreRelation ?
+  maps a from node id to an array of node ids
+  if we want to know the number of relations it helps
+  If it was not a ref then we could maintain the count in entityStore
+  Might be able to refactor this out - just store in node
+
+Next major step is to "grow" the structure instead of using a static layout. 
+
+useStoreEntity to control the entities dynamically
+userData -> behaviorConfig

@@ -31,7 +31,7 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
-const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
+const Complexity = React.forwardRef(({radius, color}, ref) => {
 
     const pausePhysics = useStore((state) => state.pausePhysics);
 
@@ -170,12 +170,11 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
         }
     }, [controls.scopeCount]);
 
-    // Need to reset physics when we reset the scopes
+    // Need to reset physics when we reset the Complexity
     useFrame(() => {
         framesPerStepCount.current++;
         if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
-        // Should replace isAnimating with pausePhysics
-        if (framesPerStepCount.current == 0 && isAnimating && !pausePhysics) {
+        if (framesPerStepCount.current == 0 && !pausePhysics) {
             step(fixedDelta);
         }
     });
@@ -206,7 +205,7 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
 
     // Initialization logging/debug
     useEffect(() => {
-        console.log("Scopes mounting");
+        console.log("Complexity mounting");
         // Blow away the stores
         useStoreEntity.getState().reset();
         useStoreRelation.getState().reset();
@@ -252,9 +251,9 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
         }
     }, [treeReady]);
 
-    useWhyDidYouUpdate(`Scopes`, {radius, color, isAnimating, controls});
+    useWhyDidYouUpdate(`Complexity`, {radius, color, controls});
 
-    console.log("Scopes rendering", treeReady, remountConfigState)
+    console.log("Complexity rendering", treeReady, remountConfigState)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity
     // Pass in initialPosition to avoid issues with prop being reinitialized with default value
@@ -276,4 +275,4 @@ const Scopes = React.forwardRef(({radius, color, isAnimating}, ref) => {
     );
 });
 
-export default withAnimationState(Scopes);
+export default withAnimationState(Complexity);

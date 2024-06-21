@@ -2,14 +2,14 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
 const useStore = create(devtools(subscribeWithSelector((set, get) => ({
-  currentScene: undefined, 
-  setCurrentScene: (currentScene) => set({ currentScene }), 
-  reloadScene: false, 
-  setReloadScene: (reloadScene) => set({ reloadScene }), 
-  usePhysics: false, 
-  setUsePhysics: (usePhysics) => set({ usePhysics }), 
-  pausePhysics: false, 
-  setPausePhysics: (usePhysics) => set({ usePhysics }), 
+  currentScene: undefined,
+  setCurrentScene: (currentScene) => set(() => ({ currentScene })),
+  reloadScene: false,
+  setReloadScene: (reloadScene) => set(() => ({ reloadScene })),
+  usePhysics: false,
+  setUsePhysics: (usePhysics) => set(() => ({ usePhysics })),
+  pausePhysics: false,
+  setPausePhysics: (pausePhysics) => set(() => ({ pausePhysics })),
   components: {},
   registerComponent: (id, ref) => set(state => {
     const sceneId = `${state.currentScene}.${id}`;

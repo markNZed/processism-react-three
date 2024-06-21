@@ -7,4 +7,4 @@ export { default as FatArrow } from './FatArrow';
 export { default as TargetText } from './TargetText';
 export { default as Camera } from './Camera';
 export { default as EmergentEntityNoBoundary } from './EmergentEntityNoBoundary';
-export * from './Scopes'; // Re-export all exports from Scopes/index.js
+export * from './Complexity'; // Re-export all exports from Complexity/index.js

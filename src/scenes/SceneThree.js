@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import Scene from './Scene';
-import { Camera, Scopes } from '../animationComponents';
+import { Camera, Complexity } from '../animationComponents';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
 import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
@@ -24,7 +23,7 @@ Instead of bottom-up: inside-out
  ****************************/
 
 
-function SceneThree({isAnimating}) {
+function SceneThree() {
 
     // Delay, animationComponent id, animationState
     const animationSequence = [
@@ -44,12 +43,12 @@ function SceneThree({isAnimating}) {
 
     //timestep defaults to 1 / 60 timeStep={"vary"} 
     // Physics allowSleep={true} ?
-    // Physics is paused so we can manually control the step from Scopes
+    // Physics is paused so we can manually control the step from Complexity
     // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
     // numSolverIterations={2} numAdditionalFrictionIterations={2}
 
     useEffect(() => {
-        console.log("SceneThree mounting isAnimating", isAnimating);
+        console.log("SceneThree mounting");
     }, []);
 
     return (
@@ -57,15 +56,14 @@ function SceneThree({isAnimating}) {
             <AnimationController animations={animationSequence} useStore={useStore}>
                 <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={false} >
                     <Perf position={"bottom-left"} minimal={true} colorBlind={true} antialias={true}/>
-                    <Scene>
+                    <>
 
-                        <Scopes
-                            id={"Scopes1"}
+                        <Complexity
+                            id={"complex"}
                             color={"blue"}
-                            isAnimating={isAnimating}
                         />
 
-                    </Scene>
+                    </>
                 </Physics>
             </AnimationController>
 

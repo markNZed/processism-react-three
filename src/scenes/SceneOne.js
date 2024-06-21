@@ -1,5 +1,4 @@
 import React from 'react';
-import Scene from './Scene';
 import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
@@ -55,7 +54,7 @@ function SceneOne() {
   return (
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
-            <Scene>
+            <>
 
                 <EmergentEntity
                     id="emergent1"
@@ -110,7 +109,7 @@ function SceneOne() {
                     offset={new THREE.Vector3(0, 3, -1.5)}
                 />
 
-            </Scene>
+            </>
         </AnimationController>
 
         <Camera

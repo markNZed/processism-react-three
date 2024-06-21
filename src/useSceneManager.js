@@ -4,7 +4,7 @@ import SceneOne from './scenes/SceneOne'
 import SceneTwo from './scenes/SceneTwo'
 import SceneThree from './scenes/SceneThree'
 
-const SceneManager = (isAnimating) => {
+const useSceneManager = () => {
   const currentScene = useStore((state) => state.currentScene)
   const reloadScene = useStore((state) => state.reloadScene)
   const setReloadScene = useStore((state) => state.setReloadScene)
@@ -21,7 +21,7 @@ const SceneManager = (isAnimating) => {
   }, [reloadScene])
 
   useEffect(() => {
-    console.log("SceneManager mounting");
+    console.log("useSceneManager mounting");
   }, []);
 
   useEffect(() => {
@@ -32,17 +32,17 @@ const SceneManager = (isAnimating) => {
 
     switch (currentScene) {
       case 'SceneOne':
-        sceneComponent = <SceneOne key={key} isAnimating={isAnimating}/>
+        sceneComponent = <SceneOne key={key} />
         isOrthographic = true
         setUsePhysics(false)
         break
       case 'SceneTwo':
-        sceneComponent = <SceneTwo key={key} isAnimating={isAnimating} />
+        sceneComponent = <SceneTwo key={key} />
         isOrthographic = true
         setUsePhysics(true)
         break
       case 'SceneThree':
-        sceneComponent = <SceneThree key={key} isAnimating={isAnimating} />
+        sceneComponent = <SceneThree key={key} />
         isOrthographic = true
         setUsePhysics(true)
         break
@@ -51,9 +51,9 @@ const SceneManager = (isAnimating) => {
     }
 
     setSceneInfo({ sceneComponent, isOrthographic })
-  }, [currentScene, setUsePhysics, isAnimating, key])
+  }, [currentScene, setUsePhysics, key])
 
   return { ...sceneInfo, key }
 }
 
-export default SceneManager
+export default useSceneManager

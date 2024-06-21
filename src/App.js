@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import SceneManager from './SceneManager';
+import useStore from './useStore'
+import useSceneManager from './useSceneManager';
 import SceneSelector from './SceneSelector';
 import { EntityStoreDemo } from './animationComponents';
 
@@ -34,11 +35,13 @@ function CameraAdjuster({ isOrthographic }) {
 }
 
 export default function App() {
-  const [isAnimating, setIsAnimating] = useState(true); // Animation state
-  const { sceneComponent, isOrthographic, key } = SceneManager(isAnimating);
+  // This is a bit convoluted. One issue is that the button needs to be outside of the <Canvas>
+  const { sceneComponent, isOrthographic, key } = useSceneManager();
+  const pausePhysics = useStore((state) => state.pausePhysics);
+  const setPausePhysics = useStore((state) => state.setPausePhysics);
   
   const toggleAnimation = () => {
-    setIsAnimating(!isAnimating); // Toggle animation state
+    setPausePhysics(!pausePhysics); // Toggle animation state
   };
 
   return (
@@ -49,7 +52,7 @@ export default function App() {
       )}
       <SceneSelector />
       <button onClick={toggleAnimation}>
-        {isAnimating ? 'Stop Animation' : 'Start Animation'}
+        {pausePhysics ? 'Play physics' : 'Pause physics'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}

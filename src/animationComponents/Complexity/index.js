@@ -1,2 +1,2 @@
-export { default as Scopes} from './Scopes';
+export { default as Complexity} from './Complexity';
 export { default as EntityStoreDemo} from './EntityStoreDemo';

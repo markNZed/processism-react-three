@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Scene from './Scene';
 import { Physics } from '@react-three/rapier';
 import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../animationComponents';
 import * as THREE from 'three';
@@ -54,7 +53,7 @@ function SceneTwo() {
     <>
         <AnimationController animations={animationSequence} useStore={useStore}>
             <Physics gravity={[0, 0, 0]}>
-                <Scene>
+                <>
                     <EmergentEntity
                         id="emergent1"
                         initialState={{
@@ -83,7 +82,7 @@ function SceneTwo() {
                         initialState={{ position: new THREE.Vector3(0, 0, 0), visible: true, text: "Accumulation", variant: 'hidden', scale: .3 }}
                         offset={new THREE.Vector3(0, 3, -1.5)}
                     />
-                </Scene>
+                </>
             </Physics>
         </AnimationController>
 
