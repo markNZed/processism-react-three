@@ -28,8 +28,6 @@ const useJoints = () => {
 
         const jointsData = generateJointsData(entityPositions);
 
-        console.log("jointsData", jointsData)
-
         const allocatedJoints = jointsData.map((jointData, i) => {
 
             // The data is organized into entities to ensure the second closet particle is in a different entity
@@ -195,6 +193,7 @@ export default useJoints;
 
 // Return the center point of all the joints
 const generateJointsData = (positions) => {
+    if (positions.length === 1) return [];
     const jointsData = positions.map((pos, i) => {
         let nextPos;
         if (i == positions.length - 1) {

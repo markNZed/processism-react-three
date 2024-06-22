@@ -60,10 +60,19 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
                 const currentColor = new THREE.Color();
                 mesh.getColorAt(i, currentColor);
             
-                if (!currentColor.equals(userColor)) {
+                // Tolerance because the conversion to floats causing mismatch
+                const tolerance = 0.001;
+                const diffR = Math.pow(currentColor.r - userColor.r, 2);
+                const diffG = Math.pow(currentColor.g - userColor.g, 2);
+                const diffB = Math.pow(currentColor.b - userColor.b, 2);
+
+            
+                const colorDifference = Math.sqrt(diffR + diffG + diffB);
+            
+                if (colorDifference > tolerance) {
                     mesh.setColorAt(i, userColor);
                     colorChanged = true;
-                }            
+                }
             } else {
                 mesh.setColorAt(i, userColor);
                 colorChanged = true;

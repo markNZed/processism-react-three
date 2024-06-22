@@ -48,7 +48,8 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
                         hopUp = 2;
                     }
                     const destinationNode = getNode(destinationNodeId);
-                    const maxDistanceDown = maxDepth - fromNode.depth + hopUp;
+                    // add 1 to depth because it starts at 0
+                    const maxDistanceDown = maxDepth - (destinationNode.depth + 1);
                     let hopDown = 0;
                     rollOfDice = Math.random();
                     if (rollOfDice < 0.8) {

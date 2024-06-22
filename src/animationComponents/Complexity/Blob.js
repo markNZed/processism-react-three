@@ -44,8 +44,14 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
             }
         }
 
-        if (!blobOuterUniqueIds.length) {
-            console.error("blobOuterUniqueIds is empty!", id, particles.length);
+        if (blobOuterUniqueIds.length < 3) {
+            console.error("blobOuterUniqueIds less than 3!", id, blobOuterUniqueIds.length, particles.length);
+            // Dealing with the case where there is only one particle
+            // Which means there will be no blob, so no way to click on the blob ansds show the particle
+            entityNodes[0].ref.current.setVisualConfig(p => ({ ...p, visible: true }));
+            if (particles.length == 2) {
+                entityNodes[1].ref.current.setVisualConfig(p => ({ ...p, visible: true }));
+            }
         }
 
         let blobIndexes;

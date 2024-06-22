@@ -82,7 +82,6 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 })
             }
             setInitialize(false);
-            console.log(`Initialize particle ${id}`, initialPosition, radius)
         }
     }, [nodeRef]);
 
@@ -102,6 +101,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
                 worldToLocal={worldToLocal}
+                id={id}
             >
                 <BallCollider args={[colliderRadius]} />
             </ParticleRigidBody>

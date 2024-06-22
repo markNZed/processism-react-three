@@ -57,9 +57,7 @@ const useAnimateImpulses = (
                         impulse.add(directionToCenter);
                     }
                     // For root we want to keep things in the view
-                    if (node.id !== "root" || overshoot > 0) {
-                        entity.current.addImpulse(impulse);
-                    }
+                    entity.current.addImpulse(impulse);
                 }
             }
         });
@@ -98,7 +96,7 @@ const useAnimateImpulses = (
                 // Maybe we should wait for all entities to be registered - so state machines are syned
             // Should move this into useAnimateImpulses
             case "initialImpulse":
-                if (config.initialImpulse && node.depth == 1) {
+                if (config.initialImpulse) {
                     applyInitialImpulses();
                 }
                 impulseStateRef.current = "calcImpulse";
@@ -122,7 +120,7 @@ const useAnimateImpulses = (
                 break;
         }
 
-        if (initialized && node.id != "root") {
+        if (initialized) {
             const impulse = internalRef.current.getImpulse();
             if (impulse.length() > 0) {
                 const perEntityImpulse = internalRef.current.getImpulse().multiplyScalar(1 / entityRefsArray.length);

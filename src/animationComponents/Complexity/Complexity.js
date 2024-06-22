@@ -42,11 +42,10 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
     // Leva controls
     const controlsConfig = {
-        scopeCount: { value: 3, step: 1, },
         radius: { value: radius || 10, min: 1, max: 20 },
-        impulsePerParticle: { value: 1.5, min: 0.1, max: 10, step: 0.1, label: "Impulse per Particle" },
+        impulsePerParticle: { value: 1.5, min: 0.1, max: 20, step: 0.1, label: "Impulse per Particle" },
         overshootScaling: { value: 1.0, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
-        maxDisplacementScaling: { value: 1, min: 0.1, max: 2, step: 0.1, label: "Max Displacement Scaling" },
+        maxDisplacementScaling: { value: 1, min: 0.1, max: 3, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
         initialScaling: { value: 1, min: 0.001, max: 10, step: 0.1, label: "Initial Scaling" },
         initialImpulse: { value: true, label: "Initial Impulse" },
@@ -60,8 +59,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
         debug: false,
-        scopeCount: controls.scopeCount,
-        entityCounts: [9],
+        entityCounts: [9, 9, 21],
         radius: controls.radius,
         colors: [color || null, utils.getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,
