@@ -126,7 +126,7 @@ const updatePropertyLookups = (node, propertyLookups) => {
 
 const useStoreEntity = create((set, get) => {
 
-    const rootNode = createNode('root', { depth: 0 }, []);
+    const rootNode = createNode('root', { depth: 0, parentId: null }, []);
 
     return {
             
@@ -135,9 +135,7 @@ const useStoreEntity = create((set, get) => {
         // Object to maintain lookups for node properties.
         propertyLookups: {},
         nodeCount: 0,
-        relations:() => {
-            {root: []}
-        },
+        relations:() => {},
         relationCount: 0,
         joints:() => {
             {root: []}
@@ -148,7 +146,7 @@ const useStoreEntity = create((set, get) => {
                 nodes: {root: rootNode},
                 propertyLookups: {},
                 nodeCount: 0,
-                relations: {root: []},
+                relations: {},
                 relationCount: 0,
                 joints: {root: []},
             }
@@ -204,6 +202,7 @@ const useStoreEntity = create((set, get) => {
 
         addRelation: (fromId, toId) => set(state => {
             const relations = state.relations;
+            if (!relations[fromId]) relations[fromId] = [];
             relations[fromId].push(toId);
             const fromNode = state.nodes[fromId];
             fromNode.relationsRef.current.push(toId);
@@ -285,7 +284,7 @@ const useStoreEntity = create((set, get) => {
         },
 
         // Function to add a new node to the tree.
-        addNode: (parentId, node, id = null) => {
+        addNode: (parentId, node = {}, id = null) => {
             let newNodeId;
             set(state => {
                 if (state.nodes[node.id]) throw new Error(`Node ID ${node.id} already exists`);
@@ -296,7 +295,7 @@ const useStoreEntity = create((set, get) => {
                 }
 
                 const nodeDepth = (parentNode.depth || 0) + 1;
-                const newNode = createNode(id, { ...node, depth: nodeDepth }, node.childrenIds || []);
+                const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId }, node.childrenIds || []);
                 newNodeId = newNode.id;
                 state.nodeCount++;
 
@@ -310,7 +309,6 @@ const useStoreEntity = create((set, get) => {
                         },
                     },
                     propertyLookups: updatePropertyLookups(newNode, state.propertyLookups),
-                    relations: {...state.relations, [newNode.id]: []},
                 };
             });
             return newNodeId;

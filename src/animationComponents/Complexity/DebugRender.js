@@ -18,18 +18,18 @@ const localJointPosition = (groupRef, particle) => {
     return [localVector.x, localVector.y, localVector.z];
 };
 
-const DebugRender = ({ id, radius, color, initialPosition, newJointsRef, index, internalRef, isDebug, centerRef }) => {
+const DebugRender = ({ id, radius, color, initialPosition, newJointsRef, index, nodeRef, isDebug, centerRef }) => {
     const getComponentRef = useStore((state) => state.getComponentRef);
 
     useEffect(() => {
         if (isDebug) {
             const circleCenterRef = getComponentRef(`${id}.CircleCenter`);
-            if (circleCenterRef && circleCenterRef.current && internalRef.current && centerRef.current) {
-                const localCenter = internalRef.current.worldToLocal(centerRef.current.clone());
+            if (circleCenterRef && circleCenterRef.current && nodeRef.current && centerRef.current) {
+                const localCenter = nodeRef.current.worldToLocal(centerRef.current.clone());
                 circleCenterRef.current.position.copy(localCenter);
             }
         }
-    }, [isDebug, getComponentRef, id, internalRef, centerRef]);
+    }, [isDebug, getComponentRef, id, nodeRef, centerRef]);
 
     if (!isDebug) return null
 
@@ -56,13 +56,13 @@ const DebugRender = ({ id, radius, color, initialPosition, newJointsRef, index, 
                     <CircleDrei
                         key={`${id}.${i}.a`}
                         args={[0.1, 8]}
-                        position={localJointPosition(internalRef, particles.a)}
+                        position={localJointPosition(nodeRef, particles.a)}
                         material-color="red"
                     />
                     <CircleDrei
                         key={`${id}.${i}.b`}
                         args={[0.1, 8]}
-                        position={localJointPosition(internalRef, particles.b)}
+                        position={localJointPosition(nodeRef, particles.b)}
                         material-color="green"
                     />
                 </React.Fragment>

@@ -28,6 +28,8 @@ const useJoints = () => {
 
         const jointsData = generateJointsData(entityPositions);
 
+        console.log("jointsData", jointsData)
+
         const allocatedJoints = jointsData.map((jointData, i) => {
 
             // The data is organized into entities to ensure the second closet particle is in a different entity
@@ -90,6 +92,13 @@ const useJoints = () => {
         centerRef.current = nodeRef.current.localToWorld(vec3(node.initialPosition));
 
         const newJoints = allocateJointsToParticles(node, chainRef, entityPositions);
+
+        if (!newJoints.length) {
+            // Happens if there is just one entity
+            console.warn("No newJoints in initializeJoints");
+            return;
+        }
+
         // Prepare the updates first by aggregating them into a single array
         const allNewJoints = newJoints.reduce((acc, particles) => {
             const aIndex = particles.a.ref.getVisualConfig().uniqueId;

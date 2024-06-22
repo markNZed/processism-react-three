@@ -38,8 +38,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
     // Avoid changes in store causing rerender
     // Direct access to the state outside of React's render flow
-    const directAddNode = useStoreEntity.getState().addNode;
-    const directUpdateNode = useStoreEntity.getState().updateNode;
+    const {addNode: directAddNode, updateNode: directUpdateNode, getNode: directGetNode } = useStoreEntity.getState();
 
     // Leva controls
     const controlsConfig = {
@@ -60,10 +59,10 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
-        scopeCount: controls.scopeCount,
-        entityCounts: [9, 9, 21],
-        radius: controls.radius,
         debug: false,
+        scopeCount: controls.scopeCount,
+        entityCounts: [9],
+        radius: controls.radius,
         colors: [color || null, utils.getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,
         overshootScaling: controls.overshootScaling,
@@ -119,33 +118,33 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
         lastStepEnd.current = endTime;
     });
+      
+    function addNodesRecursively(entityCounts, node) {
+        const [currentCount, ...restCounts] = entityCounts;
+        const nodeUpdate = {
+            lastCompoundEntity: entityCounts.length === 1,
+            isParticle: entityCounts.length === 0,
+        };        
+        directUpdateNode(node.id, {...node, ...nodeUpdate});
+        for (let i = 0; i < currentCount; i++) {
+            const newId = directAddNode(node.id);
+            const newNode = directGetNode(newId);
+            addNodesRecursively(restCounts, newNode);
+        }
+    }
 
     // Initialization logging/debug
     useEffect(() => {
         console.log("Complexity mounting");
         // Blow away the storesremountConfigState
         useStoreEntity.getState().reset();
-        addNodesRecursively(config.entityCounts);
+        const rootNode = directGetNode("root");
+        addNodesRecursively(config.entityCounts, rootNode);
         directUpdateNode("root", {ref: internalRef});
         setStoreEntityReady(true);
+        console.log("Nodes after initialization", useStoreEntity.getState().getAllNodes());
     }, []);
-      
-    function addNodesRecursively(entityCounts, parentId = "root") {
-        if (entityCounts.length === 0) {
-            return;
-        }
-        const [currentCount, ...restCounts] = entityCounts;
-        for (let i = 0; i < currentCount; i++) {
-            const node = {
-                lastCompoundEntity: restCounts.length === 1,
-                isParticle: restCounts.length === 0,
-                parentId: parentId,
-            };
-            const newId = directAddNode(parentId, node);    
-            addNodesRecursively(restCounts, newId);
-        }
-    }
-
+    
     console.log("Complexity rendering", storeEntityReady, config)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity

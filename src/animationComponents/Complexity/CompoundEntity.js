@@ -69,6 +69,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const allParticleRefs = directGetAllParticleRefs(id);
             node.particlesRef.current = allParticleRefs;
             initializeJoints(node, entityPositions);
+            console.log("entityPositions", entityPositions)
             setPhysicsState("ready");
         }
     }, [physicsState]);

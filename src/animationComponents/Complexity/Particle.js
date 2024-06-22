@@ -82,7 +82,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 })
             }
             setInitialize(false);
-            //console.log(`Initialize particle ${id} end`)
+            console.log(`Initialize particle ${id}`, initialPosition, radius)
         }
     }, [nodeRef]);
 
