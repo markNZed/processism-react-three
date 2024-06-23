@@ -6,15 +6,14 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
     const { getNode, getPropertyAllKeys, deleteRelation, addRelation, getRelationCount } = useStoreEntity.getState();
     const entityCount = node.childrenIds.length;
     const maxDepth = getPropertyAllKeys('depth').length;
-    const intervalRef = useRef(null); // Ref to store interval ID
+    const intervalRef = useRef(null);
 
     const handleRelations = useCallback(() => {
         const currentTotalRelations = getRelationCount();
-        if (currentTotalRelations > config.maxRelations) return;
 
         node.childrenIds.forEach((fromId, i) => {
             const fromNode = entityNodes[i];
-            if (fromNode.isParticle && Math.random() < 0.99) return;
+            if (entityNodes[i].childrenIds.length === 0 && Math.random() < 0.98) return;
 
             const maxRelationCount = Math.ceil(entityCount * 0.2);
             const nodeRelations = fromNode.relationsRef.current;
@@ -27,7 +26,10 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
                 }
             });
 
-            relationCount = fromNode.relationsRef.current.length;
+            // After deleting some of the relations
+            if (currentTotalRelations > config.maxRelations) return;
+
+            relationCount = nodeRelations.length;
 
             while (relationCount < maxRelationCount) {
                 let toId;
@@ -48,13 +50,12 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
                         hopUp = 2;
                     }
                     const destinationNode = getNode(destinationNodeId);
-                    // add 1 to depth because it starts at 0
-                    const maxDistanceDown = maxDepth - (destinationNode.depth + 1);
+                    const maxDistanceDown = maxDepth - (destinationNode.depth);
                     let hopDown = 0;
                     rollOfDice = Math.random();
                     if (rollOfDice < 0.8) {
                         hopDown = 0;
-                    } else if (rollOfDice < 0.9 && maxDistanceDown) {
+                    } else if (rollOfDice < 0.9 && maxDistanceDown > 0) {
                         const randomIndex = Math.floor(Math.random() * destinationNode.childrenIds.length);
                         destinationNodeId = destinationNode.childrenIds[randomIndex];
                         hopDown = 1;

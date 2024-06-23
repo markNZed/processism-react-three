@@ -54,16 +54,13 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
             }
         }
 
-        let blobIndexes;
-        if (node.lastCompoundEntity) {
-            blobIndexes = blobOuterUniqueIds;
-        } else {
-            // buildOrderedIds can return null if there are no blobOuterUniqueIds
-            const orderedIds = buildOrderedIds(chainRef, blobOuterUniqueIds) || [];
-            if (!orderedIds.length) console.error("orderedIds is empty!", id);
-            //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
-            blobIndexes = orderedIds;
-        }
+        // buildOrderedIds can return null if there are no blobOuterUniqueIds
+        const orderedIds = buildOrderedIds(chainRef, blobOuterUniqueIds) || [];
+        if (!orderedIds.length) console.error("orderedIds is empty!", id);
+        //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
+        const blobIndexes = orderedIds;
+
+        //console.log("Blob", id, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
@@ -207,44 +204,46 @@ function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
  * @param {Set} [visited=new Set()] - A set of visited unique IDs to prevent infinite loops.
  * @returns {Array|null} Ordered list of indexes or null if a chainRef is dangling.
  */
+
+// We use a chain of aprticles and it is possible that this excludes "points" e.g. three points can be on the outer and
+// all have links, so the outer chain can "exclude" one of the points. Ideally we would not exclude points like this,
+// It is visible in a [3,3,3] entity configuration
+
+// visited should be specific to a "search" of the chain
+
 function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
+    let initial = false;
     // Initialize uniqueId with the first element of blobOuterUniqueIds if null
     if (uniqueId === null) {
         uniqueId = blobOuterUniqueIds[0];
+        initial = true;
     }
 
     // Guard clause to prevent infinite loops
     if (visited.has(uniqueId)) return null;
     
-    visited.add(uniqueId);
-    
     // Guard clause to check if uniqueId is in blobOuterUniqueIds
     if (!blobOuterUniqueIds.includes(uniqueId)) return null;
+
+    // Do not add the initial index so we get a full loop
+    if (!initial) visited.add(uniqueId);
     
     const result = [uniqueId];
-    const linkedIndexes = chainRef.current[uniqueId];
+    const linkedIndexes = chainRef.current[uniqueId] || [];
     
-    // Check if there are any joints (nodes with more than 2 links)
-    let foundJoint = false;
+    // Search for the longest loop
+    let foundChain = [];
     for (let linkedIndex of linkedIndexes) {
-        if (chainRef.current[linkedIndex].length > 2) {
-            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
-            if (recursiveResult) {
-                foundJoint = true;
-                result.push(...recursiveResult);
-            }
+        const clonedVisited = new Set([...visited]);
+        const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited);
+        if (recursiveResult) {
+            if (recursiveResult.length > foundChain.length) foundChain = recursiveResult;
         }
+        visited.add(linkedIndex);
     }
-    
-    // If no joints were found, continue with the normal linked indexes
-    if (!foundJoint) {
-        for (let linkedIndex of linkedIndexes) {
-            const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, visited);
-            if (recursiveResult) {
-                result.push(...recursiveResult);
-            }
-        }
-    }
+    linkedIndexes.forEach((id) => {visited.add(id)});
+    foundChain.forEach((id) => {visited.add(id)});
+    result.push(...foundChain);
     
     return result;
 }

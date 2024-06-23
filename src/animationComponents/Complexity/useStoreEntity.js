@@ -2,6 +2,7 @@ import React from 'react';
 import { create } from 'zustand';
 import uniqueIdGenerator from './uniqueIdGenerator';
 import { devtools } from 'zustand/middleware';
+import * as utils from './utils';
 
 /**
  * Zustand Tree Store
@@ -53,7 +54,6 @@ import { devtools } from 'zustand/middleware';
 // Should distinguish operations that can change nodeCount
 
 const nodeTemplate = {
-    lastCompoundEntity: false,
     isParticle: false,
     parentId: null,
     chainRef: (() => { // Shared by all nodes
@@ -64,7 +64,7 @@ const nodeTemplate = {
     initialPosition: null,
 };
 
-const propertyLookupIncludes = ['depth', 'isParticle', 'relationsRef'];
+const propertyLookupIncludes = ['depth', 'isParticle'];
 
 // Function to create a new node with given properties and childrenIds.
 const createNode = (id = null, properties = {}, childrenIds = []) => {
@@ -135,11 +135,10 @@ const useStoreEntity = create((set, get) => {
         // Object to maintain lookups for node properties.
         propertyLookups: {},
         nodeCount: 0,
-        relations:() => {},
+        relations: {},
         relationCount: 0,
-        joints:() => {
-            {root: []}
-        },
+        joints: {},
+        jointCount: 0,
 
         reset: () => set(() => {
             return {
@@ -148,34 +147,41 @@ const useStoreEntity = create((set, get) => {
                 nodeCount: 0,
                 relations: {},
                 relationCount: 0,
-                joints: {root: []},
+                joints: {},
+                jointCount: 0,
             }
         }),
 
         addJoint: (body1Id, body2Id, ref) => set(state => {
             const joints = state.joints;
-            joints[`${body1Id}-${body2Id}`] = ref;
-            joints[`${body2Id}-${body1Id}`] = ref;
-            const body1Node = state.nodes[body1Id];
-            body1Node.jointsRef.current.push(`${body1Id}-${body2Id}`);
-            const body2Node = state.nodes[body2Id];
-            body2Node.jointsRef.current.push(`${body2Id}-${body1Id}`);
+            const jointId = utils.jointId(body1Id, body12d);
+            joints[jointId] = ref;
+            const nodes = state.nodes;
+            nodes[body1Id].jointsRef.current.push(jointId);
+            nodes[body2Id].jointsRef.current.push(jointId);
+            const jointCount = state.jointCount + 1;
+            //console.log("addJoint", jointId, jointCount)
             return {
+                jointCount,
                 joints,
-                nodes: {...state.nodes, [body1Id]: body1Node, [body2Id]: body2Node},
+                nodes,
             };
         }),
 
         addJoints: (jointsToAdd) => set(state => {
             const joints = state.joints;
             const nodes = state.nodes;
+            let jointCount = state.jointCount;
             jointsToAdd.forEach(([body1Id, body2Id, ref]) => {
-                joints[`${body1Id}-${body2Id}`] = ref;
-                joints[`${body2Id}-${body1Id}`] = ref;
-                nodes[body1Id].jointsRef.current.push(`${body1Id}-${body2Id}`);
-                nodes[body2Id].jointsRef.current.push(`${body2Id}-${body1Id}`);
+                const jointId = utils.jointId(body1Id, body2Id);
+                joints[jointId] = ref;
+                nodes[body1Id].jointsRef.current.push(jointId);
+                nodes[body2Id].jointsRef.current.push(jointId);
+                jointCount++;
+                //console.log("addJoints", jointId, jointCount)
             }); 
             return {
+                jointCount,
                 joints,
                 nodes,
             };
@@ -183,17 +189,24 @@ const useStoreEntity = create((set, get) => {
 
         deleteJoint: (body1Id, body2Id) => set(state => {
             const joints = state.joints;
+            const jointId = utils.jointId(body1Id, body2Id);
             const body1Node = state.nodes[body1Id];
             const body2Node = state.nodes[body2Id];
-            delete joints[`${body1Id}-${body2Id}`];
-            delete joints[`${body2Id}-${body1Id}`];
-            body1Node.jointsRef.current = body1Node.jointsRef.current.filter(id => id !== `${body1Id}-${body2Id}`);
-            body2Node.jointsRef.current = body2Node.jointsRef.current.filter(id => id !== `${body2Id}-${body1Id}`);
+            delete joints[jointId];
+            body1Node.jointsRef.current = body1Node.jointsRef.current.filter(id => id !== jointId);
+            body2Node.jointsRef.current = body2Node.jointsRef.current.filter(id => id !== jointId);
+            const jointCount = state.jointCount - 1;
             return {
+                jointCount,
                 joints,
                 nodes: {...state.nodes, [body1Id]: body1Node, [body2Id]: body2Node},
             };
         }),
+
+        deleteJointId: (jointId) => {
+            const [body1Id, body2Id] = utils.jointIdToNodeIds(jointId);
+            get().deleteJoint(body1Id, body2Id);
+        },
 
         getJoint: (jointId) => {
             const joints = get().joints;
@@ -206,7 +219,7 @@ const useStoreEntity = create((set, get) => {
             relations[fromId].push(toId);
             const fromNode = state.nodes[fromId];
             fromNode.relationsRef.current.push(toId);
-            const relationCount = state.relationCount++;
+            const relationCount = state.relationCount + 1;
             return {
                 relations,
                 nodes: {...state.nodes, [fromId]: fromNode},
@@ -224,7 +237,7 @@ const useStoreEntity = create((set, get) => {
                 delete relations[fromId];
                 fromNode.relationsRef.current = [];
             }
-            const relationCount = state.relationCount--;
+            const relationCount = state.relationCount - 1;
             return {
                 relations,
                 nodes: {...state.nodes, [fromId]: fromNode},
@@ -239,6 +252,11 @@ const useStoreEntity = create((set, get) => {
         getRelationCount: () => {
             return get().relationCount;
         },
+
+        getNodeCount: () => {
+            return get().nodeCount;
+        },
+
 
         getNode: (nodeId) => {
             const nodes = get().nodes;
@@ -538,9 +556,12 @@ const useStoreEntity = create((set, get) => {
             const nodes = { ...state.nodes };
 
             const updateSubtree = (currentId) => {
-                nodes[currentId]['ref']['current'].setVisualConfig(p => ({ ...p, [property]: value }));
-                if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
-                    nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
+                // If a node has not appeared yet then the ref will be null
+                if (nodes[currentId]['ref']['current']) {
+                    nodes[currentId]['ref']['current'].setVisualConfig(p => ({ ...p, [property]: value }));
+                    if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
+                        nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
+                    }
                 }
             };
 

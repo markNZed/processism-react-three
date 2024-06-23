@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Camera, Complexity } from '../animationComponents';
-import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
-import useStore from '../useStore'; // Adjust import path as necessary
+import { AnimationController } from '../AnimationController';
+import useStore from '../useStore';
 import { Environment, OrbitControls } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import { Perf } from 'r3f-perf'

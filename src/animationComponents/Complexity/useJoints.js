@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
 const { getNode, getJoint, addJoint, storeDeleteJoint } = useStoreEntity.getState();
+import * as utils from './utils';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
 
@@ -49,6 +50,10 @@ const useJoints = () => {
 
             const offsetA = direction.clone().multiplyScalar(particleRadius);
             const offsetB = direction.clone().multiplyScalar(-particleRadius);
+
+            if (!closestParticleARef) {
+                console.log("!closestParticleARef", node)
+            }
 
             const uniqueIdA = closestParticleARef.getVisualConfig().uniqueId;
             const uniqueIdB = closestParticleBRef.getVisualConfig().uniqueId;
@@ -101,10 +106,8 @@ const useJoints = () => {
         const allNewJoints = newJoints.reduce((acc, particles) => {
             const aIndex = particles.a.ref.getVisualConfig().uniqueId;
             const bIndex = particles.b.ref.getVisualConfig().uniqueId;
-            const jointIndex = `${aIndex}-${bIndex}`;
-            const jointIndexReverse = `${bIndex}-${aIndex}`;
-            // Add both the joint index and its reverse to the accumulator
-            return [...acc, jointIndex, jointIndexReverse];
+            const jointId = utils.jointId(aIndex, bIndex);
+            return [...acc, jointId];
         }, []);
 
         // Distance to the first joint
@@ -123,7 +126,7 @@ const useJoints = () => {
             visualConfig.outerChain[scope] = outer
             particleRef.current.setVisualConfig(visualConfig);
             // To debug the chains of particles
-            //if (scope == 1 && outer) particleRef.current.getVisualConfig().color = "black";
+            //if (scope == 0 && outer) particleRef.current.getVisualConfig().color = "black";
         });
 
         // Create the joints
@@ -138,17 +141,15 @@ const useJoints = () => {
                 ref: particles.b.ref,
                 offset: particles.b.offset,
             }
-            const jointRef = createJoint(world, rapier, a, b, true)
+            const jointRef = createJoint(a, b, true)
             createJointResults.push([particles.a.ref.getVisualConfig().uniqueId, particles.b.ref.getVisualConfig().uniqueId, jointRef]);
         });
         directAddJoints(createJointResults); // Because batch operation
     };
 
-    const createJoint = (world, rapier, a, b, batch=false) => {
+    const createJoint = (a, b, batch=false) => {
         const aVisualConfig = a.ref.getVisualConfig();
         const bVisualConfig = b.ref.getVisualConfig();
-        const jointRefsRefIndex = `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`;
-        const jointRefsRefIndexReverse = `${bVisualConfig.uniqueId}-${aVisualConfig.uniqueId}`;
         const jointRef = { current: null }; // Create a plain object to hold the reference
         jointRef.current = world.createImpulseJoint(
             rapier.JointData.spherical(a.offset, b.offset),
@@ -157,20 +158,12 @@ const useJoints = () => {
             true
         );
         if (!batch) {
-            addJoint(jointRefsRefIndex, jointRef);
-            addJoint(jointRefsRefIndexReverse, jointRef);
-            const aNode = getNode(aVisualConfig.uniqueId);
-            const aNodeJoints = aNode.jointsRef.current;
-            aNode.jointsRef.current = aNodeJoints.includes(jointRefsRefIndex) ? aNodeJoints : aNode.jointsRef.current.push(jointRefsRefIndex);
-            const bNode = getNode(bVisualConfig.uniqueId);
-            const bNodeJoints = bNode.jointsRef.current;
-            bNode.jointsRef.current = bNodeJoints.includes(jointRefsRefIndex) ? bNodeJoints : bNode.jointsRef.current.push(jointRefsRefIndex);
+            addJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
         }
-        //console.log("createJoint", id, jointRefsRefIndex, jointRef);
         return jointRef;
     };
     
-    const deleteJoint = (world, jointKey) => {
+    const deleteJoint = (jointKey) => {
         const jointRef = getJoint(jointKey);
         const body1 = jointRef.current.body1();
         const body1Id = body1.getVisualConfig().uniqueId

@@ -47,6 +47,9 @@ const CompoundEntityGroup = forwardRef(({ children, position, visualConfig }, re
         localToWorld: (vector) => {
             return internalRef.current.localToWorld(vector);
         },
+        translation: (vector) => {
+            return internalRef.current.localToWorld(centerRef.current.clone());
+        },
         getWorldPosition: (vector) => {
             return internalRef.current.getWorldPosition(vector);
         },

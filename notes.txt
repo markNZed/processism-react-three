@@ -46,6 +46,28 @@ Use opacity for blobs
 
 Next major step is to "grow" the structure instead of using a static layout. useStoreEntity to control the entities dynamically.
 
-Currently CompoundEntity calculates the position of the entities via generateEntityPositions using the entityRadius. If it were to grow then it needs to decide where to place the new entity. We can modify the joint to "create" space for the new entity. We can waity for all particles to be registered before adding the next entity but that would make it hard to build a loop, so place all entities. The root can just place the entities equi-spaced then add joints. This should work. Then need another algorithm for modifying the number - add/delete one by one I guess.
+Currently CompoundEntity calculates the position of the entities via generateEntityPositions using the entityRadius. If it were to grow then it needs to decide where to place the new entity. We can modify the joint to "create" space for the new entity. Deal with special cases of 1,2, 3 entities anf from there is should be a general pattern (e.g. randomly select a child with only 2 joints and add new entity on random side after expanding joint). Perhaps need to use Particle until all the children are created then transform into CompoundEntity to "grow" next level.
 
 Maybe stop scaling particle impulse with area ?
+
+As a blob expands we could hide the relations that were going to/from it
+
+It will not get past init because it is waiting for all particles to be initialised. Maybe don't init in Complexity?
+
+Could automate lastCompoundEntity in storeEntity
+
+Physics debug could be config option
+
+isParticle could maintain a particle array rather than using isParticle
+
+CompoundEntity -> EntityCompound
+
+Because CompoundEntity can become Particle we do not know when we have the full tree ready.
+
+Each CompoundEntity is also a particle. When the particle becomes a CompoundEntity the parent holds the first particle.  The joint remains particle.
+
+chainRef should be a distinct entry ?
+
+CompoundEntity -> Node or Entity or Accumulaton (could be an accumulation of 1)
+
+Joint should probably store [id1, id2, ref]

@@ -118,12 +118,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     });
       
     function addNodesRecursively(entityCounts, node) {
-        const [currentCount, ...restCounts] = entityCounts;
-        const nodeUpdate = {
-            lastCompoundEntity: entityCounts.length === 1,
-            isParticle: entityCounts.length === 0,
-        };        
-        directUpdateNode(node.id, {...node, ...nodeUpdate});
+        const [currentCount, ...restCounts] = entityCounts;      
         for (let i = 0; i < currentCount; i++) {
             const newId = directAddNode(node.id);
             const newNode = directGetNode(newId);

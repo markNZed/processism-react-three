@@ -55,8 +55,8 @@ const useAnimateJoints = (
                 internalRef.current.getWorldPosition(worldPosition);
                 // Vector3 to be used for particle world position
                 const particleWorldPosition = new THREE.Vector3();
-                entityJointIndexes.forEach((jointKey) => {
-                    const jointRef = getJoint(jointKey);
+                entityJointIndexes.forEach((jointId) => {
+                    const jointRef = getJoint(jointId);
                     const body1 = jointRef.current.body1();
                     const body2 = jointRef.current.body2();
                     // Entity needs to store parent entity in visualConfig ?
@@ -81,12 +81,12 @@ const useAnimateJoints = (
                         replacementEntity = body2;
                         closestId = body2.visualConfig.uniqueId;
                     }
-                    //console.log("Joint anchors", jointKey, a1, body1, a2, body2);
+                    //console.log("Joint anchors", jointId, a1, body1, a2, body2);
                 });
                 console.log("Detach a random entity", id, entityUniqueId, entityRef, "closestId", closestId, "replacementEntity", replacementEntity);
                 const jointsToCreate = [];
-                entityJointIndexes.forEach((jointKey) => {
-                    const jointRef = getJoint(jointKey);
+                entityJointIndexes.forEach((jointId) => {
+                    const jointRef = getJoint(jointId);
                     let body1 = jointRef.current.body1();
                     let body2 = jointRef.current.body2();
                     if (replacementEntity.visualConfig.uniqueId == body1.visualConfig.uniqueId) return;
@@ -111,14 +111,14 @@ const useAnimateJoints = (
                     }
                     jointsToCreate.push([a, b]);
                 });
-                entityJointIndexes.forEach((jointKey) => {
-                    deleteJoint(world, jointKey);
-                    console.log("deleteJoint", jointKey);
+                entityJointIndexes.forEach((jointId) => {
+                    deleteJoint(jointId);
+                    console.log("deleteJoint", jointId);
                 });
                 jointsToCreate.forEach(([a, b]) => {
                     a.ref.current.getVisualConfig().color = 'orange';
                     b.ref.current.getVisualConfig().color = 'orange';
-                    createJoint(world, rapier, a, b);
+                    createJoint(a, b);
                 })
             }
             clearInterval(interval);

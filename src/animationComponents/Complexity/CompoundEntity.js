@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useImperativeHandle, useState, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Tube } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
 import _ from 'lodash';
 import * as utils from './utils';
 import Particle from './Particle';
-import InstancedParticles from './InstancedParticles';
+import ParticlesInstance from './ParticlesInstance';
 import Blob from './Blob';
 import Relations from './Relations';
 import useAnimateRelations from './useAnimateRelations';
@@ -15,6 +15,8 @@ import useAnimateJoints from './useAnimateJoints';
 import useJoints from './useJoints';
 import DebugRender from './DebugRender';
 import useStoreEntity from './useStoreEntity';
+import useStore from './../../useStore';
+import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
 
@@ -23,9 +25,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     useImperativeHandle(ref, () => nodeRef.current);
 
     // Direct access to the state outside of React's render flow
-    const directGetNode = useStoreEntity.getState().getNode;
-    const directUpdateNode = useStoreEntity.getState().updateNode;
-    const directGetAllParticleRefs = useStoreEntity.getState().getAllParticleRefs;
+    const { 
+        getNode: directGetNode, 
+        updateNode: directUpdateNode, 
+        getAllParticleRefs: directGetAllParticleRefs,
+        deleteJointId: directDeleteJointId,
+    } = useStoreEntity.getState();
+    const setPausePhysics = useStore((state) => state.setPausePhysics);
+    const pausePhysics = useStore((state) => state.pausePhysics);
 
     // Select so we are only sensitive to changes of this node. useCallback avoids recreating the selector on each render.
     const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
@@ -34,11 +41,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const entityNodes = useMemo(() => node.childrenIds.map(childId => directGetNode(childId)), [node.childrenIds]);
     // Store the color in a a state so it is consistent across renders (when defined by a function)
     const configColor = config.colors[node.depth];
-    const localColor = useMemo(() => utils.getColor(configColor, color), [configColor, color]);
-    // At the deepest scope we will instantiate Particles instead of CompoundEntity
-    const Entity = node.lastCompoundEntity ? Particle : CompoundEntity;    
+    const localColor = useMemo(() => utils.getColor(configColor, color), [configColor, color]);    
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
-    const entityRadius = useMemo(() => Math.min((radius * Math.PI / (entityCount + Math.PI)), radius / 2) * 0.99, [radius, entityCount]);
+    const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.99, [radius, entityCount]);
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
     // State machine that can distribute computation across frames
@@ -49,7 +54,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     // Layout to avoid Particle overlap (which can cause extreme forces in Rapier)
     const entityPositions = useMemo(() => {
-        return generateEntityPositions(radius - entityRadius, entityCount);
+        return generateEntityPositions(radius - entityRadius, entityCount, initialPosition);
     }, [radius, entityRadius, entityCount]);
     
     const {initializeJoints, deleteJoint, createJoint} = useJoints();
@@ -70,22 +75,28 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             node.particlesRef.current = allParticleRefs;
             initializeJoints(node, entityPositions);
             setPhysicsState("ready");
+            //if (!pausePhysics) setPausePhysics(true);
         }
     }, [physicsState]);
 
     useFrame(() => {
+        if (entityCount === 0) return;
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
                 // useEffect to call initializeJoints because it may take longer than a frame
                 if (physicsState === "waiting") {
-                    let particlesExist = true;
-                    directGetAllParticleRefs(id).forEach((particleRef) => {
-                        if (!particleRef.current) {
-                            particlesExist = false;
-                        }
-                    });
-                    if (particlesExist) setPhysicsState("initialize");
+                    const allParticleRefs = directGetAllParticleRefs(id);
+                    if (allParticleRefs.length) {
+                        //console.log("allParticleRefs.length", id, allParticleRefs.length)
+                        let particlesExist = true;
+                        allParticleRefs.forEach((particleRef) => {
+                            if (!particleRef.current) {
+                                particlesExist = false;
+                            }
+                        });
+                        if (particlesExist) setPhysicsState("initialize");
+                    }
                 }
                 if (isPhysicsReady()) {
                     if (id == "root") {
@@ -97,6 +108,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 }
                 break;
             case "findCenter":
+                //if (!pausePhysics) setPausePhysics(true);
                 calculateCenter(entityNodes, centerRef);
                 nodeRef.current.setCenter(centerRef.current);
                 break;
@@ -106,25 +118,31 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     });
 
+    //console.log("CompoundEntity rendering", id)
+    //useWhyDidYouUpdate("CompoundEntity", {id, initialPosition, radius, debug, color, index, config} );
+
     return (
-        <>
+        <group>
             <CompoundEntityGroup ref={nodeRef} position={initialPosition} >
-                {entityNodes.map((entity, i) => (
-                    <Entity
-                        key={`${id}-${i}`}
-                        id={`${entity.id}`}
-                        initialPosition={entityPositions[i].toArray()}
-                        radius={entityRadius}
-                        color={localColor}
-                        ref={entity.ref}
-                        debug={isDebug}
-                        config={config}
-                        index={`${i}`}
-                    />
-                ))}
+                {entityNodes.map((entity, i) => {
+                    let Entity = CompoundEntity;
+                    if (entity.childrenIds.length === 0) Entity = Particle
+                    return (
+                        <Entity
+                            key={`${id}-${i}`}
+                            id={`${entity.id}`}
+                            initialPosition={entityPositions[i].toArray()}
+                            radius={entityRadius}
+                            color={localColor}
+                            ref={entity.ref}
+                            debug={isDebug}
+                            config={config}
+                            index={`${i}`}
+                        />
+                    )
+                })}
                 {isPhysicsReady() && (
-                    <>
-                        
+                    <group>
                         <Blob
                             color={localColor}
                             node={node}
@@ -132,8 +150,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             entityNodes={entityNodes}
                         />
                         {node.depth === 0 && (
-                            <>
-                                <InstancedParticles
+                            <group>
+                                <ParticlesInstance
                                     id={`${id}`}
                                     node={node}
                                 />
@@ -143,12 +161,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                         node={node}
                                     />
                                 )}
-                            </>
+                            </group>
                         )}
-                    
-                    </>
+                    </group>
                 )}
-                
                 {isDebug && (
                     <DebugRender
                         id={id}
@@ -161,7 +177,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         isDebug={isDebug}
                         centerRef={centerRef}
                     />
-            )}
+                )}
             </CompoundEntityGroup>
             {isDebug && (
                 <Text
@@ -173,8 +189,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 >
                     {index || 0}
                 </Text>
-            )}
-        </>
+            )}  
+        </group>
     );
 
 }));
@@ -183,16 +199,19 @@ export default CompoundEntity;
 
 // Function declarations outside the Component to reduce computation during rendering
 // Distribute entities within the perimeter
-const generateEntityPositions = (radius, count) => {
-    const positions = []
-    const angleStep = (2 * Math.PI) / count
+const generateEntityPositions = (radius, count, initialPoint) => {
+    const positions = [];
+    const angleStep = (2 * Math.PI) / count;
+    const initialAngle = Math.atan2(initialPoint[1], initialPoint[0]); // Calculate the angle of the initial point
+
     for (let i = 0; i < count; i++) {
-        const angle = i * angleStep
-        const x = radius * Math.cos(angle)
-        const y = radius * Math.sin(angle)
-        positions.push(new THREE.Vector3(x, y, 0))
+        const angle = initialAngle + (i * angleStep);
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        positions.push(new THREE.Vector3(x, y, 0));
     }
-    return positions
+
+    return positions;
 }
 
 // Find center of this CompoundEntity (using the centers of the entities at the lower scope)

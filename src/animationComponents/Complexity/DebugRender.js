@@ -6,6 +6,14 @@ import * as THREE from 'three';
 import useStore from '../../useStore';
 
 const localJointPosition = (groupRef, particle) => {
+    if (!particle) {
+        console.error("particle.ref missing");
+        return [0,0,0];
+    }
+    if (!groupRef.current) {
+        console.error("groupRef.current missing");
+        return [0,0,0];
+    }
     const worldPosition = particle.ref.current.translation();
     const xOffset = particle.offset.x;
     const yOffset = particle.offset.y;

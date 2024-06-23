@@ -32,3 +32,14 @@ export const getRandomColorFn = () => {
     }
     return color;
 };
+
+export const jointId = (id1, id2) => {
+    return id1 < id2 ? `${id1}-${id2}` : `${id2}-${id1}`;
+}
+
+export const jointIdToNodeIds = (jointId) => {
+    let parts = jointId.split('-');
+    const body1Id = parts[0];
+    const body2Id = parts[1];
+    return [body1Id, body2Id];
+}

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
 
-const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
 
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
@@ -42,7 +42,7 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
                 matrixChanged = true;
             }
 
-            const visible = particle.getVisualConfig().visible;
+            const visible = particle.getVisualConfig().visible //|| true;
             if (!visible) {
                 currentScale.copy(invisibleScale);
                 matrixChanged = true;
@@ -111,4 +111,4 @@ const InstancedParticles = React.forwardRef(({ id, node }, ref) => {
     );
 });
 
-export default InstancedParticles;
+export default ParticlesInstance;

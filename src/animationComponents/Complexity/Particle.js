@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider } from '@react-three/rapier';
-import { getColor, calculateCircleArea } from './utils.js';
 import useStoreEntity from './useStoreEntity';
+import * as utils from './utils';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
 // Coud store visualConfig only in node but would slow data access when rendering the instanced mesh of particles
@@ -19,12 +19,11 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
     const [colliderRadius, setColliderRadius] = useState(radius);
     const [initialize, setInitialize] = useState(true);
     // Direct access to the state outside of React's render flow
-    const directUpdateNode = useStoreEntity.getState().updateNode;
-    const directGetNode = useStoreEntity.getState().getNode; 
+    const { updateNode: directUpdateNode, getNode: directGetNode, getJoint: directGetJoint }  = useStoreEntity.getState();
     const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
     const nodeRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
-    const color = useMemo(() => getColor(configColor, props.color));
+    const color = useMemo(() => utils.getColor(configColor, props.color));
     const parentNode = useMemo(() => directGetNode(node.parentId), [node.parentId]);
     const parentNodeRef = parentNode.ref
     // So we can get the particle position relative to the parent's position
@@ -48,18 +47,18 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             const newRadius = relativeScale * colliderRadius
             setColliderRadius(newRadius);
             nodeRef.current.setVisualConfig(visualConfig)
-            node.jointsRef.current.forEach((jointIndex) => {
-                const joint = props.jointRefsRef.current[jointIndex].current;
+            node.jointsRef.current.forEach((jointId) => {
+                const joint = directGetJoint(jointId).current;
+                const [body1Id, body2Id] = utils.jointIdToNodeIds(jointId);
                 const scaleAnchor = (anchor) => ({
                     x: anchor.x * relativeScale,
                     y: anchor.y * relativeScale,
                     z: anchor.z * relativeScale,
                 });
-
-                if (joint.body1().visualConfig.uniqueId === id) {
+                if (body1Id === id) {
                     joint.setAnchor1(scaleAnchor(joint.anchor1()));
                 }
-                if (joint.body2().visualConfig.uniqueId === id) {
+                if (body2Id === id) {
                     joint.setAnchor2(scaleAnchor(joint.anchor2()));
                 }
             })
@@ -71,14 +70,13 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
     // Set the initial visualConfig, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && nodeRef.current) {
-            //console.log(`Initialize particle ${id} begin`)
             nodeRef.current.setVisualConfig({ color: color, uniqueId: id });
-            //updateNode(id, {isParticle: true});
+            directUpdateNode(id, {isParticle: true});
             const rootNode = directGetNode("root");
             if (!rootNode.particleRadius) {
                 directUpdateNode("root", {
                     particleRadius: radius,
-                    particleArea: calculateCircleArea(radius),
+                    particleArea: utils.calculateCircleArea(radius),
                 })
             }
             setInitialize(false);
@@ -92,10 +90,10 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             <ParticleRigidBody
                 ref={nodeRef}
                 position={initialPosition}
-                type={"dynamic"}
+                type={"dynamic"} // "kinematicVelocity" "fixed"
                 colliders={false}
-                linearDamping={0.5}
-                angularDamping={0.5}
+                linearDamping={1}
+                angularDamping={1}
                 enabledTranslations={[true, true, false]}
                 enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}
