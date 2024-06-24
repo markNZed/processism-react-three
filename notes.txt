@@ -71,3 +71,11 @@ chainRef should be a distinct entry ?
 CompoundEntity -> Node or Entity or Accumulaton (could be an accumulation of 1)
 
 Joint should probably store [id1, id2, ref]
+
+Creating a node for each particle creates dealys for th emounting of the React components, so we do not mount the lowest level as a CompoundEntity.
+
+Eventually a CompoundEntity could become a Particle or vice-verca. In this case we would need to copy the properties ?
+
+useAnimateComplexity to start with [9] then move to [9,9] etc Could move the particle down or maybe just the joints. useAnimateComplexity would operate on storeEntity. use it from complexity, wait until Particles are present and then x seconds.
+
+If CompoundEntities are of different sizes then the outer algorithm will break.

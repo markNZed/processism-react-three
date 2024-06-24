@@ -8,6 +8,7 @@ import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
+import useAnimateComplexity from './useAnimateComplexity';
 
 /* Overview:
   Animation framework intended to provide a visual language for representing complexity.
@@ -35,10 +36,6 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Using forwardRef and need to access the ref from inside this component too
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
-
-    // Avoid changes in store causing rerender
-    // Direct access to the state outside of React's render flow
-    const {addNode: directAddNode, updateNode: directUpdateNode, getNode: directGetNode } = useStoreEntity.getState();
 
     // Leva controls
     const controlsConfig = {
@@ -84,7 +81,6 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     const stepCount = useRef(0); // Counter to track the number of steps
     const lastStepEnd = useRef(0);
     const averageOver = 1000;
-    const [storeEntityReady, setStoreEntityReady] = useState(false);
 
     useFrame(() => {
         framesPerStepCount.current++;
@@ -116,27 +112,8 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
 
         lastStepEnd.current = endTime;
     });
-      
-    function addNodesRecursively(entityCounts, node) {
-        const [currentCount, ...restCounts] = entityCounts;      
-        for (let i = 0; i < currentCount; i++) {
-            const newId = directAddNode(node.id);
-            const newNode = directGetNode(newId);
-            addNodesRecursively(restCounts, newNode);
-        }
-    }
 
-    // Initialization logging/debug
-    useEffect(() => {
-        console.log("Complexity mounting");
-        // Blow away the storesremountConfigState
-        useStoreEntity.getState().reset();
-        const rootNode = directGetNode("root");
-        addNodesRecursively(config.entityCounts, rootNode);
-        directUpdateNode("root", {ref: internalRef});
-        setStoreEntityReady(true);
-        console.log("Nodes after initialization", useStoreEntity.getState().getAllNodes());
-    }, []);
+    const {storeEntityReady} = useAnimateComplexity(config, internalRef);
     
     console.log("Complexity rendering", storeEntityReady, config)
 

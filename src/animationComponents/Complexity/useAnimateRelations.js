@@ -13,6 +13,8 @@ function useAnimateRelations(initialized, node, entityNodes, config) {
 
         node.childrenIds.forEach((fromId, i) => {
             const fromNode = entityNodes[i];
+            // Checking isParticle does not work because that is set from Particle after entityNodes is loaded
+            // So we do not see the change. Could make isParticle a ref.
             if (entityNodes[i].childrenIds.length === 0 && Math.random() < 0.98) return;
 
             const maxRelationCount = Math.ceil(entityCount * 0.2);

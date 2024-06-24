@@ -60,7 +60,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
         const blobIndexes = orderedIds;
 
-        //console.log("Blob", id, blobOuterUniqueIds, blobIndexes)
+        console.log("Blob", id, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
@@ -211,12 +211,13 @@ function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
 
 // visited should be specific to a "search" of the chain
 
-function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set()) {
+function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null) {
     let initial = false;
     // Initialize uniqueId with the first element of blobOuterUniqueIds if null
     if (uniqueId === null) {
         uniqueId = blobOuterUniqueIds[0];
         initial = true;
+        firstId = uniqueId;
     }
 
     // Guard clause to prevent infinite loops
@@ -225,8 +226,7 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
     // Guard clause to check if uniqueId is in blobOuterUniqueIds
     if (!blobOuterUniqueIds.includes(uniqueId)) return null;
 
-    // Do not add the initial index so we get a full loop
-    if (!initial) visited.add(uniqueId);
+    visited.add(uniqueId);
     
     const result = [uniqueId];
     const linkedIndexes = chainRef.current[uniqueId] || [];
@@ -235,9 +235,11 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
     let foundChain = [];
     for (let linkedIndex of linkedIndexes) {
         const clonedVisited = new Set([...visited]);
-        const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited);
+        const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId);
         if (recursiveResult) {
-            if (recursiveResult.length > foundChain.length) foundChain = recursiveResult;
+            const lastIndexes = chainRef.current[recursiveResult[recursiveResult.length - 1]];
+            // A loop will include a link back to firstId
+            if (lastIndexes.includes(firstId) && recursiveResult.length > foundChain.length) foundChain = recursiveResult;
         }
         visited.add(linkedIndex);
     }
