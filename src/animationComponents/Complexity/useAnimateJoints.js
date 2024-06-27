@@ -102,24 +102,16 @@ const useAnimateJoints = (
                     // The radius of the replacement may not be the same...
                     const { offset1, offset2 } = utils.calculateJointOffsets(body1, body2, particleRadius);
                     // Offset needs to be in local coordinates - should be OK for 
-                    const a = {
-                        ref: {current: body1},
-                        offset: offset1,
-                    }
-                    const b = {
-                        ref: {current: body2},
-                        offset: offset2,
-                    }
-                    jointsToCreate.push([a, b]);
+                    jointsToCreate.push([body1, offset1, body2, offset2]);
                 });
                 entityJointIndexes.forEach((jointId) => {
                     deleteJoint(jointId);
                     console.log("deleteJoint", jointId);
                 });
-                jointsToCreate.forEach(([a, b]) => {
-                    a.ref.current.getVisualConfig().color = 'orange';
-                    b.ref.current.getVisualConfig().color = 'orange';
-                    createJoint(a.ref.current, a.offset, b.ref.current, b.offset);
+                jointsToCreate.forEach(([body1, offset1, body2,offset2]) => {
+                    body1.getVisualConfig().color = 'orange';
+                    body2.getVisualConfig().color = 'orange';
+                    createJoint(body1, offset1, body2,offset2);
                 })
             }
             clearInterval(interval);

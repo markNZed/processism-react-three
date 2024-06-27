@@ -76,16 +76,7 @@ const useJoints = () => {
                 chainRef.current[uniqueIdB] = [uniqueIdA];
             }
 
-            return {
-                a: {
-                    ref: closestParticleARef,
-                    offset: offsetA
-                },
-                b: {
-                    ref: closestParticleBRef,
-                    offset: offsetB
-                },
-            };
+            return [closestParticleARef, offsetA, closestParticleBRef, offsetB];
         });
         return allocatedJoints;
     };
@@ -104,14 +95,6 @@ const useJoints = () => {
             console.warn("No newJoints in initializeJoints");
             return;
         }
-
-        // Prepare the updates first by aggregating them into a single array
-        const allNewJoints = newJoints.reduce((acc, particles) => {
-            const aIndex = particles.a.ref.getVisualConfig().uniqueId;
-            const bIndex = particles.b.ref.getVisualConfig().uniqueId;
-            const jointId = utils.jointId(aIndex, bIndex);
-            return [...acc, jointId];
-        }, []);
 
         // Distance to the first joint
         // We place the joints first because they will not align with the perimeter of the scope
@@ -134,9 +117,9 @@ const useJoints = () => {
 
         // Create the joints
         const createJointResults = []
-        newJoints.forEach((particles) => {
-            const jointRef = createJoint(particles.a.ref, particles.a.offset, particles.b.ref, particles.b.offset, true)
-            createJointResults.push([particles.a.ref.getVisualConfig().uniqueId, particles.b.ref.getVisualConfig().uniqueId, jointRef]);
+        newJoints.forEach(([body1Ref, offset1, body2Ref, offset2]) => {
+            const jointRef = createJoint(body1Ref, offset1, body2Ref, offset2, true)
+            createJointResults.push([body1Ref.getVisualConfig().uniqueId, body2Ref.getVisualConfig().uniqueId, jointRef]);
         });
         directAddJoints(createJointResults); // Because batch operation
     };

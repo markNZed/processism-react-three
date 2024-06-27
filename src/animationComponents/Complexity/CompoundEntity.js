@@ -220,14 +220,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 if (!body1Ref?.current || !body2Ref?.current) return;
                 // Should deal with different radius
                 const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius);
-                const a = {
-                    ref: body1Ref,
-                    offset: offset1,
-                }
-                const b = {
-                    ref: body2Ref,
-                    offset: offset2 ,
-                }
                 createJoint(body1Ref, offset1, body2Ref, offset2);
                 activeJointsStackRef.current.push(utils.jointId(node1.id, node2.id));
                 instantiatedJoints.push(i);   
@@ -293,20 +285,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         console.log("anchor2 after", anchor2, rotation2, node2.id);
                 }
 
-                    {
-
-                        const a = {
-                            ref: body1Ref,
-                            offset: anchor1 // offset1,
-                        }
-                        const b = {
-                            ref: entityReplace.ref.current,
-                            offset: anchor2 //offset2 ,
-                        }
-                        console.log("createJoint", id, utils.jointId(node1.id, entityReplace.id));
-                        createJoint(body1Ref, anchor1, entityReplace.ref.current, anchor2);
-                        activeJointsStackRef.current.push(utils.jointId(node1.id, entityReplace.id));
-                    }
+                    console.log("createJoint", id, utils.jointId(node1.id, entityReplace.id));
+                    createJoint(body1Ref, anchor1, entityReplace.ref.current, anchor2);
+                    activeJointsStackRef.current.push(utils.jointId(node1.id, entityReplace.id));
 
                     if (newPosition) {   
                         // We want to use the particle position for the offsets
@@ -335,23 +316,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
                     }
 
-                    {
+                    console.log("createJoint", id, utils.jointId(node2.id, entityReplace.id));
+                    createJoint(entityReplace.ref.current, anchor1, body2Ref, anchor2);
+                    activeJointsStackRef.current.push(utils.jointId(node2.id, entityReplace.id));
 
-                        const a = {
-                            ref: entityReplace.ref.current,
-                            offset: anchor1,
-                        }
-                        const b = {
-                            ref: body2Ref,
-                            offset: anchor2,
-                        }
-
-                        console.log("createJoint", id, utils.jointId(node2.id, entityReplace.id));
-                        createJoint(entityReplace.ref.current, anchor1, body2Ref, anchor2);
-                        activeJointsStackRef.current.push(utils.jointId(node2.id, entityReplace.id));
-                    }
-
-            
                 // Deleting the joint causes an impulse on the Particles
                 deleteJoint(oldestJointId);
                 activeJointsStackRef.current.shift();
