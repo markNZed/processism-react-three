@@ -154,8 +154,8 @@ const useStoreEntity = create((set, get) => {
 
         addJoint: (body1Id, body2Id, ref) => set(state => {
             const joints = state.joints;
-            const jointId = utils.jointId(body1Id, body12d);
-            joints[jointId] = ref;
+            const jointId = utils.jointId(body1Id, body2Id);
+            joints[jointId] = [ref, body1Id, body2Id]; // Store the order the joint was created in (important for offset)
             const nodes = state.nodes;
             nodes[body1Id].jointsRef.current.push(jointId);
             nodes[body2Id].jointsRef.current.push(jointId);
@@ -323,6 +323,7 @@ const useStoreEntity = create((set, get) => {
                         [newNode.id]: newNode,
                         [parentId]: {
                             ...parentNode,
+                            isParticle: false,
                             childrenIds: [...(parentNode.childrenIds || []), newNode.id],
                         },
                     },

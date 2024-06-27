@@ -10,7 +10,6 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
 
     const getNodeProperty = useStoreEntity.getState().getNodeProperty;
     const particleRadius = getNodeProperty('root', 'particleRadius');
-    const particles = node.particlesRef.current;
     const userColor = new THREE.Color();
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();
@@ -25,8 +24,9 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
         let matrixChanged = false;
         let colorChanged = false;
 
-        particles.forEach((particleRef, i) => {
+        node.particlesRef.current.forEach((particleRef, i) => {
             const particle = particleRef.current;
+            if (!particle || !particle.current) return;
         
             mesh.getMatrixAt(i, instanceMatrix);
             instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
@@ -42,7 +42,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
                 matrixChanged = true;
             }
 
-            const visible = particle.getVisualConfig().visible //|| true;
+            const visible = particle.getVisualConfig().visible || true;
             if (!visible) {
                 currentScale.copy(invisibleScale);
                 matrixChanged = true;
@@ -93,7 +93,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
         const instanceId = event.instanceId;
         if (instanceId === undefined) return;
         event.stopPropagation();
-        const visualConfig = particles[instanceId].current.getVisualConfig();
+        const visualConfig = node.particlesRef.current[instanceId].current.getVisualConfig();
         const currentScale = visualConfig.scale;
         visualConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
         visualConfig.color = 'pink';
@@ -102,7 +102,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
     return (
         <instancedMesh
             ref={internalRef}
-            args={[null, null, particles.length]}
+            args={[null, null, node.particlesRef.current.length]}
             onPointerUp={handlePointerDown}
         >
             <circleGeometry args={[particleRadius, 16]} />

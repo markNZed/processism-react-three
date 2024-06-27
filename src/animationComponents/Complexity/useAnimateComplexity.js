@@ -7,7 +7,7 @@ function useAnimateComplexity(config, internalRef) {
     // Avoid changes in store causing rerender
     // Direct access to the state outside of React's render flow
     const {addNode: directAddNode, updateNode: directUpdateNode, getNode: directGetNode } = useStoreEntity.getState();
-    const [started, setStarted] = useState(false);
+    const startedRef = useRef(false);
 
 
     function addNodesRecursively(entityCounts, node) {
@@ -19,30 +19,40 @@ function useAnimateComplexity(config, internalRef) {
         }
     }
 
-    // Initialization logging/debug
+    /*
+      How do we grow the joints. Slowly add particles.
+      1st particle in the center
+
+    */
     useEffect(() => {
-        if (started) return;
+        console.log("useAnimateComplexity", config, startedRef.current);
+        if (startedRef.current) return;
         if (!config.entityCounts) return;
-        console.log("useAnimateComplexity", config.entityCounts);
-        setStarted(true);
+        startedRef.current = true;
+    
         // Blow away the storesremountConfigState
         useStoreEntity.getState().reset();
         const rootNode = directGetNode("root");
-        addNodesRecursively([config.entityCounts[0]], rootNode);
-        directUpdateNode("root", {ref: internalRef});
+        addNodesRecursively([4], rootNode);
+        //addNodesRecursively([config.entityCounts[0]], rootNode);
+        // addNodesRecursively(config.entityCounts, rootNode);
+        directUpdateNode("root", { ref: internalRef });
         setStoreEntityReady(true);
         console.log("Nodes after initialization", useStoreEntity.getState().getAllNodes());
 
+        return
+    
         const delay = 1000; // Delay in milliseconds (1000ms = 1s)
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             // Add more nodes here
             const rootNode = directGetNode("root");
             const depth1Node = directGetNode(rootNode.childrenIds[0]);
             addNodesRecursively([config.entityCounts[1]], depth1Node); // Example of adding more nodes
             console.log("Nodes after adding more nodes", useStoreEntity.getState().getAllNodes());
         }, delay);
-
+    
     }, [config]);
+    
 
     return {storeEntityReady}
 }

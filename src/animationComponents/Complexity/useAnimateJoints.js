@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
 import { useRapier } from '@react-three/rapier';
+import * as utils from './utils';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
 
@@ -56,7 +57,7 @@ const useAnimateJoints = (
                 // Vector3 to be used for particle world position
                 const particleWorldPosition = new THREE.Vector3();
                 entityJointIndexes.forEach((jointId) => {
-                    const jointRef = getJoint(jointId);
+                    const [jointRef, body1Id, body2Id] = getJoint(jointId);
                     const body1 = jointRef.current.body1();
                     const body2 = jointRef.current.body2();
                     // Entity needs to store parent entity in visualConfig ?
@@ -86,7 +87,7 @@ const useAnimateJoints = (
                 console.log("Detach a random entity", id, entityUniqueId, entityRef, "closestId", closestId, "replacementEntity", replacementEntity);
                 const jointsToCreate = [];
                 entityJointIndexes.forEach((jointId) => {
-                    const jointRef = getJoint(jointId);
+                    const [jointRef, body1Id, body2Id] = getJoint(jointId);
                     let body1 = jointRef.current.body1();
                     let body2 = jointRef.current.body2();
                     if (replacementEntity.visualConfig.uniqueId == body1.visualConfig.uniqueId) return;
@@ -99,7 +100,7 @@ const useAnimateJoints = (
                     }
                     // Can't just copy the offset, need to recalculate them. Create a function for this ?
                     // The radius of the replacement may not be the same...
-                    const { offset1, offset2 } = calculateJointOffsets(body1, body2, particleRadius);
+                    const { offset1, offset2 } = utils.calculateJointOffsets(body1, body2, particleRadius);
                     // Offset needs to be in local coordinates - should be OK for 
                     const a = {
                         ref: {current: body1},

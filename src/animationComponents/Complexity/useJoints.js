@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { useRapier, vec3 } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
-const { getNode, getJoint, addJoint, storeDeleteJoint } = useStoreEntity.getState();
 import * as utils from './utils';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
@@ -12,7 +11,11 @@ const useJoints = () => {
     // Be careful not to have this sensitive to updates to nodes
     // Direct access to the state outside of React's render flow
     const { getNodeProperty: directGetNodeProperty, 
+            getJoint: directGetJoint,
             addJoints: directAddJoints, 
+            addJoint: directAddJoint, 
+            deleteJoint: storeDeleteJoint,
+            getNode: directGetNode,
             getAllParticleRefs: directGetAllParticleRefs } = useStoreEntity.getState();
     const particleRadius = directGetNodeProperty('root', 'particleRadius');
 
@@ -158,17 +161,15 @@ const useJoints = () => {
             true
         );
         if (!batch) {
-            addJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
+            console.log("directAddJoint", a, b, aVisualConfig.uniqueId, bVisualConfig.uniqueId)
+            directAddJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
         }
         return jointRef;
     };
     
     const deleteJoint = (jointKey) => {
-        const jointRef = getJoint(jointKey);
-        const body1 = jointRef.current.body1();
-        const body1Id = body1.getVisualConfig().uniqueId
-        const body2 = jointRef.current.body2();
-        const body2Id = body2.getVisualConfig().uniqueId
+        //console.log("deleteJoint", jointKey)
+        const [jointRef, body1Id, body2Id] = directGetJoint(jointKey);
         if (jointRef.current) {
             const joint = jointRef.current;
             jointRef.current = undefined;
@@ -240,14 +241,3 @@ function findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, ex
 
     return { minDistance, closestParticleIndex, closestParticlePosition, particleEntityIndex, closestParticleRef };
 }
-
-const calculateJointOffsets = (body1, body2, particleRadius) => {
-    const body1position = body1.translation();
-    const body2position = body2.translation();
-    const direction = new THREE.Vector3()
-        .subVectors(body1position, body2position)
-        .normalize();
-    const offset1 = direction.clone().multiplyScalar(-particleRadius);
-    const offset2 = direction.clone().multiplyScalar(particleRadius);
-    return { offset1, offset2 };
-};

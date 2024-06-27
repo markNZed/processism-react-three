@@ -11,6 +11,13 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   pausePhysics: false,
   setPausePhysics: (pausePhysics) => set(() => ({ pausePhysics })),
   components: {},
+  // Allows for calls like: setOption('pausePhysics', (prev) => !prev);
+  setOption: (key, value) => set((state) => ({
+    ...state,
+    [key]: typeof value === 'function' ? value(state[key]) : value,
+  })),
+  // Generic getter
+  getOption: (key) => get()[key],
   registerComponent: (id, ref) => set(state => {
     const sceneId = `${state.currentScene}.${id}`;
     if (state.components[sceneId]) {

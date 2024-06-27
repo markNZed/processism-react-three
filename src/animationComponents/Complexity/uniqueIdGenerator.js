@@ -10,7 +10,8 @@ class UniqueIdGenerator {
   
     getNextId() {
       this.currentId += 1;
-      return this.currentId;
+      // Do not want to assume id is always a valid number
+      return String(this.currentId);
     }
   }
   

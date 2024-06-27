@@ -54,7 +54,7 @@ function SceneThree() {
     return (
         <>
             <AnimationController animations={animationSequence} useStore={useStore}>
-                <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={false} >
+                <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={true} >
                     <Perf position={"bottom-left"} minimal={true} colorBlind={true} antialias={true}/>
                     <>
 

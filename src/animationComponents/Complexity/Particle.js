@@ -48,8 +48,8 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             setColliderRadius(newRadius);
             nodeRef.current.setVisualConfig(visualConfig)
             node.jointsRef.current.forEach((jointId) => {
-                const joint = directGetJoint(jointId).current;
-                const [body1Id, body2Id] = utils.jointIdToNodeIds(jointId);
+                const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+                const joint = jointRef.current;
                 const scaleAnchor = (anchor) => ({
                     x: anchor.x * relativeScale,
                     y: anchor.y * relativeScale,
@@ -90,7 +90,8 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
             <ParticleRigidBody
                 ref={nodeRef}
                 position={initialPosition}
-                type={"dynamic"} // "kinematicVelocity" "fixed"
+                type={"dynamic"} // "kinematicPosition" "fixed"
+                //type={"kinematicPosition"} // ""
                 colliders={false}
                 linearDamping={1}
                 angularDamping={1}
@@ -101,9 +102,9 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
                 worldToLocal={worldToLocal}
                 id={id}
             >
-                <BallCollider args={[colliderRadius]} />
+                <BallCollider args={[colliderRadius * 1.0]} />
             </ParticleRigidBody>
-            {isDebug && (
+            {isDebug || true && (
                 <>
                     <Text
                         position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting

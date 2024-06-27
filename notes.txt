@@ -79,3 +79,17 @@ Eventually a CompoundEntity could become a Particle or vice-verca. In this case 
 useAnimateComplexity to start with [9] then move to [9,9] etc Could move the particle down or maybe just the joints. useAnimateComplexity would operate on storeEntity. use it from complexity, wait until Particles are present and then x seconds.
 
 If CompoundEntities are of different sizes then the outer algorithm will break.
+
+Instead of setCurrentScene, setReloadScene, setUsePhysics, setPausePhysics
+const setOption = useStore((state) => state.setOption);
+const getOption = useStore((state) => state.getOption);
+
+const entityNode = directGetNode(entitiesInstantiated[i]);
+// Create a quaternion representing a small rotation
+const quaternion = new THREE.Quaternion();
+const axis = new THREE.Vector3(0, 0, 1); // Rotate around the Z axis
+const angle = THREE.MathUtils.degToRad(rotation); // Rotate by degrees
+quaternion.setFromAxisAngle(axis, angle);
+entityNode.ref.current.current.lockRotations(false, true);
+entityNode.ref.current.current.setRotation(quaternion, true);
+entityNode.ref.current.current.lockRotations(true, true);

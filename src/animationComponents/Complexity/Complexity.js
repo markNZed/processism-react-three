@@ -6,7 +6,6 @@ import { useControls } from 'leva'
 import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
-import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
 import useAnimateComplexity from './useAnimateComplexity';
 
@@ -49,6 +48,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         showRelations: { value: false, label: "Show Relations" },
         attractor: { value: false, label: "Enable attractor" },
         detach: { value: false, label: "Detach Experiment" },
+        slowdown: { value: 1.0, min: 1, max: 100, step: 10, label: "Slowdown Physics" },
     };
 
     const [controls] = useControls(() => controlsConfig);
@@ -70,11 +70,11 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         showRelations: controls.showRelations,
         detach: controls.detach,
         maxRelations: 200,
+        slowdown: controls.slowdown,
     };
 
     const { step } = useRapier();
-    const framesPerStep = 2; // Update every framesPerStep frames
-    const fixedDelta = framesPerStep / 60; //fps
+    
     const framesPerStepCount = useRef(0);
     const startTimeRef = useRef(0);
     const durations = useRef([]); // Store the last 100 durations
@@ -83,6 +83,8 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     const averageOver = 1000;
 
     useFrame(() => {
+        const framesPerStep = 2 * config.slowdown; // Update every framesPerStep frames
+        const fixedDelta = (framesPerStep / 60); //fps
         framesPerStepCount.current++;
         if (framesPerStepCount.current == framesPerStep) framesPerStepCount.current = 0;
         if (framesPerStepCount.current == 0 && !pausePhysics) {

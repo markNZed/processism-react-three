@@ -19,8 +19,10 @@ const useWhyDidYouUpdate = (name, props) => {
             });
 
             if (Object.keys(changesObj).length) {
-                console.log(`[${name}] re-rendered due to changes in props:`, changesObj);
+                console.log(`[${name}] re-rendered due to changes in:`, changesObj);
                 found = true;
+            } else {
+                console.log(`[${name}] rendered due to unknown`);
             }
         }
 

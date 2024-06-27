@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 /**
  * Retrieves a color setting from a configuration object.
  * Allows for the color setting to be a static value or a function.
@@ -34,7 +36,10 @@ export const getRandomColorFn = () => {
 };
 
 export const jointId = (id1, id2) => {
-    return id1 < id2 ? `${id1}-${id2}` : `${id2}-${id1}`;
+    const numId1 = Number(id1);
+    const numId2 = Number(id2);
+    const jointString = numId1 < numId2 ? `${numId1}-${numId2}` : `${numId2}-${numId1}`;
+    return jointString;
 }
 
 export const jointIdToNodeIds = (jointId) => {
@@ -42,4 +47,24 @@ export const jointIdToNodeIds = (jointId) => {
     const body1Id = parts[0];
     const body2Id = parts[1];
     return [body1Id, body2Id];
+}
+
+export const calculateJointOffsets = (body1, body2, particleRadius) => {
+    const body1position = body1.translation();
+    const body2position = body2.translation();
+    const direction = new THREE.Vector3()
+        .subVectors(body1position, body2position)
+        .normalize();
+    const offset1 = direction.clone().multiplyScalar(-particleRadius);
+    const offset2 = direction.clone().multiplyScalar(particleRadius);
+    return { offset1, offset2 };
+};
+
+export const calculateMidpoint = (body1, body2) => {
+    const body1position = body1.translation();
+    const body2position = body2.translation();
+    const midpoint = new THREE.Vector3()
+        .addVectors(body1position, body2position)
+        .divideScalar(2);
+    return midpoint;    
 }

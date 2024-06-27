@@ -25,6 +25,10 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         let blobOuterUniqueIds = [];
         let flattenedIndexes = [];
         for (let i = 0; i < particles.length; ++i) {
+            if (!particles[i].current) {
+                console.warn(`particles[i] ${i}, was empty`);
+                continue;
+            }
             const outerChain = particles[i].current.getVisualConfig().outerChain;
             if (outerChain) {
                 let outer = outerChain[node.depth];
@@ -60,7 +64,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
         const blobIndexes = orderedIds;
 
-        console.log("Blob", id, blobOuterUniqueIds, blobIndexes)
+        //console.log("Blob", id, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
