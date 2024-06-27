@@ -70,7 +70,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [particlesReady, setParticlesReady] = useState();
     const [innerCoreActive, setInnerCoreActive] = useState();
     const innerCoreRef = useRef();
-    const [innerCoreRadius, setInnerCoreRadius] = useState(entityRadius);
+    const [innerCoreRadius, setInnerCoreRadius] = useState();
     const innerCoreInitialPositionRef = useRef();
     const innerCoreChangeRef = useRef(1);
 
@@ -186,10 +186,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     // Find the midpoint between the two nodes
                     // Need to wait for the joints to update first so the midpoint is up to date.
                     const [jointRef, body1Id, body2Id] = directGetJoint(oldestJointId);
-                    const entityNode1 = directGetNode(body1Id);
-                    const entityNode2 = directGetNode(body2Id);
+                    const node1 = directGetNode(body1Id);
+                    const node2 = directGetNode(body2Id);
+                    const body1Ref = node1.ref.current;
+                    const body2Ref = node2.ref.current;
                     // Create the particle in the middle and let the joints "pull" it into place.
-                    const midpoint = utils.calculateMidpoint(entityNode1.ref.current, entityNode2.ref.current);
+                    const midpoint = utils.calculateMidpoint(body1Ref, body2Ref);
                     nodeRef.current.worldToLocal(midpoint);
                     newPosition[0] = midpoint.x;
                     newPosition[1] = midpoint.y;
@@ -210,22 +212,24 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const instantiatedJoints = [];
             // Create a new joint connecting entities that are already connected
             instantiateJoints.forEach(([id1, id2], i) => {
-                if (id1 === null && id2 === null) return;
-                const entityNode1 = directGetNode(id1); 
-                const entityNode2 = directGetNode(id2); 
-                if (!entityNode1.ref.current?.current || !entityNode2.ref.current?.current) return;
+                if (id1 === null && id2 === null) return; // special case for first entity (no join to create for now
+                const node1 = directGetNode(id1); 
+                const node2 = directGetNode(id2); 
+                const body1Ref = node1.ref.current;
+                const body2Ref = node2.ref.current;
+                if (!body1Ref?.current || !body2Ref?.current) return;
                 // Should deal with different radius
-                const { offset1, offset2 } = utils.calculateJointOffsets(entityNode1.ref.current, entityNode2.ref.current, entityRadius);
+                const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius);
                 const a = {
-                    ref: entityNode1.ref.current,
+                    ref: body1Ref,
                     offset: offset1,
                 }
                 const b = {
-                    ref: entityNode2.ref.current,
+                    ref: body2Ref,
                     offset: offset2 ,
                 }
-                createJoint(a, b);
-                activeJointsStackRef.current.push(utils.jointId(entityNode1.id, entityNode2.id));
+                createJoint(body1Ref, offset1, body2Ref, offset2);
+                activeJointsStackRef.current.push(utils.jointId(node1.id, node2.id));
                 instantiatedJoints.push(i);   
             });
             setInstantiateJoints(p => p.filter((value, i) => !instantiatedJoints.includes(i)));
@@ -249,12 +253,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const anchor1 = joint.anchor1()
                 const anchor2 = joint.anchor2()
 
-                const entityNode1 = directGetNode(body1Id); 
-                const entityNode2 = directGetNode(body2Id); 
+                const node1 = directGetNode(body1Id); 
+                const node2 = directGetNode(body2Id);
+                const body1Ref = node1.ref.current;
+                const body2Ref = node2.ref.current;
 
                 if (newPosition) {
                     // We want to use the particle position for the offsets
-                    const { offset1, offset2 } = utils.calculateJointOffsets(entityNode1.ref.current, entityReplace.ref.current, entityRadius);
+                    const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, entityReplace.ref.current, entityRadius);
                     anchor1.x = offset1.x;
                     anchor1.y = offset1.y;
                     anchor1.z = offset1.z;
@@ -272,39 +278,39 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
                 {
                 console.log("anchor1 before", anchor1, entityReplace.id);
-                        const rotation1 = quat(entityNode1.ref.current.current.rotation());
+                        const rotation1 = quat(body1Ref.current.rotation());
                         console.log("anchor1 after", anchor1, entityReplace.id, rotation1);
                         const newAnchor1 = vec3(anchor1).applyQuaternion(rotation1);
                         anchor1.x = newAnchor1.x;
                         anchor1.y = newAnchor1.y;
                         anchor1.z = newAnchor1.z;
-                        const rotation2 = quat(entityNode2.ref.current.current.rotation());
+                        const rotation2 = quat(body2Ref.current.rotation());
                         console.log("anchor2 before", anchor2, entityReplace.id);
                         const newAnchor2 = vec3(anchor2).applyQuaternion(rotation2);
                         anchor2.x = newAnchor2.x;
                         anchor2.y = newAnchor2.y;
                         anchor2.z = newAnchor2.z;
-                        console.log("anchor2 after", anchor2, rotation2, entityNode2.id);
+                        console.log("anchor2 after", anchor2, rotation2, node2.id);
                 }
 
                     {
 
                         const a = {
-                            ref: entityNode1.ref.current,
+                            ref: body1Ref,
                             offset: anchor1 // offset1,
                         }
                         const b = {
                             ref: entityReplace.ref.current,
                             offset: anchor2 //offset2 ,
                         }
-                        console.log("createJoint", id, utils.jointId(entityNode1.id, entityReplace.id));
-                        createJoint(a, b);
-                        activeJointsStackRef.current.push(utils.jointId(entityNode1.id, entityReplace.id));
+                        console.log("createJoint", id, utils.jointId(node1.id, entityReplace.id));
+                        createJoint(body1Ref, anchor1, entityReplace.ref.current, anchor2);
+                        activeJointsStackRef.current.push(utils.jointId(node1.id, entityReplace.id));
                     }
 
                     if (newPosition) {   
                         // We want to use the particle position for the offsets
-                        const { offset1, offset2 } = utils.calculateJointOffsets(entityReplace.ref.current, entityNode2.ref.current, entityRadius);
+                        const { offset1, offset2 } = utils.calculateJointOffsets(entityReplace.ref.current, body2Ref, entityRadius);
                         anchor1.x = offset1.x;
                         anchor1.y = offset1.y;
                         anchor1.z = offset1.z;
@@ -319,13 +325,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         anchor1.x = newAnchor1.x;
                         anchor1.y = newAnchor1.y;
                         anchor1.z = newAnchor1.z;
-                        const rotation2 = quat(entityNode2.ref.current.current.rotation());
-                        console.log("anchor2 before", anchor2, entityNode2.id);
+                        const rotation2 = quat(body2Ref.current.rotation());
+                        console.log("anchor2 before", anchor2, node2.id);
                         const newAnchor2 = vec3(anchor2).applyQuaternion(rotation2);
                         anchor2.x = newAnchor2.x;
                         anchor2.y = newAnchor2.y;
                         anchor2.z = newAnchor2.z;
-                        console.log("anchor2 after", anchor2, rotation2, entityNode2.id);
+                        console.log("anchor2 after", anchor2, rotation2, node2.id);
 
                     }
 
@@ -336,13 +342,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             offset: anchor1,
                         }
                         const b = {
-                            ref: entityNode2.ref.current,
+                            ref: body2Ref,
                             offset: anchor2,
                         }
 
-                        console.log("createJoint", id, utils.jointId(entityNode2.id, entityReplace.id));
-                        createJoint(a, b);
-                        activeJointsStackRef.current.push(utils.jointId(entityNode2.id, entityReplace.id));
+                        console.log("createJoint", id, utils.jointId(node2.id, entityReplace.id));
+                        createJoint(entityReplace.ref.current, anchor1, body2Ref, anchor2);
+                        activeJointsStackRef.current.push(utils.jointId(node2.id, entityReplace.id));
                     }
 
             
@@ -398,7 +404,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 calculateCenterFromIds(directGetNode, entitiesInstantiated, centerRef);
                 innerCoreInitialPositionRef.current = centerRef.current;
                 //console.log("innerCoreInitialPositionRef", innerCoreInitialPositionRef.current, entitiesInstantiated);
-                setInnerCoreRadius(entityRadius / 2);
+                setInnerCoreRadius(entityRadius / 3);
                 setInnerCoreActive(true);
 
                 // From here on we can increase the size of innerCore radius and extend a jint which is then replaced
@@ -409,7 +415,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (lastEntity?.ref?.current?.current) {
                 setEntityInstantiated(lastEntity.id);
                 busyInstantiatingRef.current = false;
-                //lastEntity.ref.current.current.lockRotations(true, true);
+                if (entitiesInstantiated.length == 1) {
+                    lastEntity.ref.current.current.lockRotations(true, true);
+                }
                 if (entitiesInstantiated.length == entityCount) {
                     setParticlesReady(true);
                 }

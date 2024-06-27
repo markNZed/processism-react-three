@@ -135,33 +135,23 @@ const useJoints = () => {
         // Create the joints
         const createJointResults = []
         newJoints.forEach((particles) => {
-            // Offset needs to be in local coordinates - should be OK for 
-            const a = {
-                ref: particles.a.ref,
-                offset: particles.a.offset,
-            }
-            const b = {
-                ref: particles.b.ref,
-                offset: particles.b.offset,
-            }
-            const jointRef = createJoint(a, b, true)
+            const jointRef = createJoint(particles.a.ref, particles.a.offset, particles.b.ref, particles.b.offset, true)
             createJointResults.push([particles.a.ref.getVisualConfig().uniqueId, particles.b.ref.getVisualConfig().uniqueId, jointRef]);
         });
         directAddJoints(createJointResults); // Because batch operation
     };
 
-    const createJoint = (a, b, batch=false) => {
-        const aVisualConfig = a.ref.getVisualConfig();
-        const bVisualConfig = b.ref.getVisualConfig();
+    const createJoint = (aRef, aOffset, bRef, bOffset, batch=false) => {
+        const aVisualConfig = aRef.getVisualConfig();
+        const bVisualConfig = bRef.getVisualConfig();
         const jointRef = { current: null }; // Create a plain object to hold the reference
         jointRef.current = world.createImpulseJoint(
-            rapier.JointData.spherical(a.offset, b.offset),
-            a.ref.current,
-            b.ref.current,
+            rapier.JointData.spherical(aOffset, bOffset),
+            aRef.current,
+            bRef.current,
             true
         );
         if (!batch) {
-            console.log("directAddJoint", a, b, aVisualConfig.uniqueId, bVisualConfig.uniqueId)
             directAddJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
         }
         return jointRef;

@@ -119,7 +119,7 @@ const useAnimateJoints = (
                 jointsToCreate.forEach(([a, b]) => {
                     a.ref.current.getVisualConfig().color = 'orange';
                     b.ref.current.getVisualConfig().color = 'orange';
-                    createJoint(a, b);
+                    createJoint(a.ref.current, a.offset, b.ref.current, b.offset);
                 })
             }
             clearInterval(interval);
