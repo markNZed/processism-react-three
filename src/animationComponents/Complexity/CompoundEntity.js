@@ -64,7 +64,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const busyInstantiatingRef = useRef(false);
     const instantiatingIdRef = useRef();
     const [instantiateJoints, setInstantiateJoints] = useState([]);
-    const activeJointsStackRef = useRef([]);
+    const activeJointsQueueRef = useRef([]);
     const [replaceJointWith, setReplaceJointWith] = useState([]);
     const [entityInstantiated, setEntityInstantiated] = useState();
     const [particlesReady, setParticlesReady] = useState();
@@ -131,12 +131,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         setInstantiateJoints(p => [...p, [entityNodes[1].id, entityNodes[2].id], [entityNodes[2].id, entityNodes[0].id]]);
                         break;
                     case 3:
-                        const jointId = utils.jointId(entityNodes[0].id, entityNodes[1].id);
                         const newPosition = true;
-                        setReplaceJointWith(p => [...p, [entityNodes[i].id, jointId, newPosition]]);
+                        setReplaceJointWith(p => [...p, [entityNodes[i].id, newPosition]]);
                         break;
                     default:
-                        setReplaceJointWith(p => [...p, [entityNodes[i].id, null, false]]);
+                        setReplaceJointWith(p => [...p, [entityNodes[i].id, false]]);
                         break;
                 }
             }, 1000); 
@@ -166,11 +165,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     break;
                 default: {
                     // Should be the joint that is being replaced - first need to widen the joint
-                    const oldestJointId = activeJointsStackRef.current[0];
-                    console.log("oldestJointId", oldestJointId, i, isDividedBy3APowerOf2(i));
+                    const replaceJointId = activeJointsQueueRef.current[0];
+                    console.log("replaceJointId", replaceJointId, i, isDividedBy3APowerOf2(i));
                     if (isDividedBy3APowerOf2(i)) {
 
-                        activeJointsStackRef.current.forEach((jointId, i) => {
+                        activeJointsQueueRef.current.forEach((jointId, i) => {
                             const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
                             const joint = jointRef.current;
                             const scaleAnchor = (anchor) => ({
@@ -185,7 +184,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     }
                     // Find the midpoint between the two nodes
                     // Need to wait for the joints to update first so the midpoint is up to date.
-                    const [jointRef, body1Id, body2Id] = directGetJoint(oldestJointId);
+                    const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                     const node1 = directGetNode(body1Id);
                     const node2 = directGetNode(body2Id);
                     const body1Ref = node1.ref.current;
@@ -208,8 +207,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     useFrame(() => {
         
         if (instantiateJoints.length || replaceJointWith.length) {
-            calculateWorldCenterFromIds(directGetNode, entitiesInstantiated, worldCenterRef);
-            const instantiatedJoints = [];
+            calculateCenter({
+                getNode: directGetNode,
+                items: entitiesInstantiated,
+                centerRef: worldCenterRef,
+                useWorld: true,
+            });
+            const instantiatedJointsIndex = [];
             // Create a new joint connecting entities that are already connected
             instantiateJoints.forEach(([id1, id2], i) => {
                 if (id1 === null && id2 === null) return; // special case for first entity (no join to create for now
@@ -221,122 +225,59 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Should deal with different radius
                 const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius);
                 createJoint(body1Ref, offset1, body2Ref, offset2);
-                activeJointsStackRef.current.push(utils.jointId(node1.id, node2.id));
-                instantiatedJoints.push(i);   
+                activeJointsQueueRef.current.push(utils.jointId(node1.id, node2.id));
+                instantiatedJointsIndex.push(i);   
             });
-            setInstantiateJoints(p => p.filter((value, i) => !instantiatedJoints.includes(i)));
-            const replacedJoints = [];
+            setInstantiateJoints(p => p.filter((value, i) => !instantiatedJointsIndex.includes(i)));
+            const processedJointIndices = [];
             // Replace a joint with a new entity and connect that entity
-            replaceJointWith.forEach(([newId, replaceJointId, newPosition], i) => {
-                const entityReplace = directGetNode(newId); 
-                // Can just create the "right" joint and it will snap the entity into place ?
-                if (!entityReplace.ref.current?.current) return;
-                //const oldestJointId = replaceJointId ? replaceJointId : activeJointsStackRef.current[0];
-                // Replace the oldest joint
-                const oldestJointId = activeJointsStackRef.current[0];
-
-                console.log("Replacing joint oldestJointId", oldestJointId, "newId", newId, "replaceJointId", replaceJointId);
-
-                // The order of this depends on the ids 
-                // we always store smallest to largest ? 
-
-                const [jointRef, body1Id, body2Id] = directGetJoint(oldestJointId);
+            replaceJointWith.forEach(([nextId, newPosition], i) => {
+                const nextEntity = directGetNode(nextId); 
+                const nextBodyRef = nextEntity.ref.current;
+                if (!nextBodyRef?.current) return;
+            
+                const replaceJointId = activeJointsQueueRef.current[0];
+            
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                 const joint = jointRef.current;
-                const anchor1 = joint.anchor1()
-                const anchor2 = joint.anchor2()
-
+                const anchor1 = vec3(joint.anchor1());
+                const anchor2 = vec3(joint.anchor2());
+            
                 const node1 = directGetNode(body1Id); 
                 const node2 = directGetNode(body2Id);
                 const body1Ref = node1.ref.current;
                 const body2Ref = node2.ref.current;
-
-                if (newPosition) {
-                    // We want to use the particle position for the offsets
-                    const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, entityReplace.ref.current, entityRadius);
-                    anchor1.x = offset1.x;
-                    anchor1.y = offset1.y;
-                    anchor1.z = offset1.z;
-                    anchor2.x = offset2.x;
-                    anchor2.y = offset2.y;
-                    anchor2.z = offset2.z;
-                } else {
-                    anchor1.x = anchor1.x * 0.5;
-                    anchor1.y = anchor1.y * 0.5;
-                    anchor1.z = anchor1.z * 0.5;
-                    anchor2.x = anchor2.x * 0.5;
-                    anchor2.y = anchor2.y * 0.5;
-                    anchor2.z = anchor2.z * 0.5;
-                }
-
-                {
-                console.log("anchor1 before", anchor1, entityReplace.id);
-                        const rotation1 = quat(body1Ref.current.rotation());
-                        console.log("anchor1 after", anchor1, entityReplace.id, rotation1);
-                        const newAnchor1 = vec3(anchor1).applyQuaternion(rotation1);
-                        anchor1.x = newAnchor1.x;
-                        anchor1.y = newAnchor1.y;
-                        anchor1.z = newAnchor1.z;
-                        const rotation2 = quat(body2Ref.current.rotation());
-                        console.log("anchor2 before", anchor2, entityReplace.id);
-                        const newAnchor2 = vec3(anchor2).applyQuaternion(rotation2);
-                        anchor2.x = newAnchor2.x;
-                        anchor2.y = newAnchor2.y;
-                        anchor2.z = newAnchor2.z;
-                        console.log("anchor2 after", anchor2, rotation2, node2.id);
-                }
-
-                    console.log("createJoint", id, utils.jointId(node1.id, entityReplace.id));
-                    createJoint(body1Ref, anchor1, entityReplace.ref.current, anchor2);
-                    activeJointsStackRef.current.push(utils.jointId(node1.id, entityReplace.id));
-
-                    if (newPosition) {   
-                        // We want to use the particle position for the offsets
-                        const { offset1, offset2 } = utils.calculateJointOffsets(entityReplace.ref.current, body2Ref, entityRadius);
-                        anchor1.x = offset1.x;
-                        anchor1.y = offset1.y;
-                        anchor1.z = offset1.z;
-                        anchor2.x = offset2.x;
-                        anchor2.y = offset2.y;
-                        anchor2.z = offset2.z;
-
-                        console.log("anchor1 before", anchor1, entityReplace.id);
-                        const rotation1 = quat(entityReplace.ref.current.current.rotation());
-                        console.log("anchor1 after", anchor1, entityReplace.id, rotation1);
-                        const newAnchor1 = vec3(anchor1).applyQuaternion(rotation1);
-                        anchor1.x = newAnchor1.x;
-                        anchor1.y = newAnchor1.y;
-                        anchor1.z = newAnchor1.z;
-                        const rotation2 = quat(body2Ref.current.rotation());
-                        console.log("anchor2 before", anchor2, node2.id);
-                        const newAnchor2 = vec3(anchor2).applyQuaternion(rotation2);
-                        anchor2.x = newAnchor2.x;
-                        anchor2.y = newAnchor2.y;
-                        anchor2.z = newAnchor2.z;
-                        console.log("anchor2 after", anchor2, rotation2, node2.id);
-
-                    }
-
-                    console.log("createJoint", id, utils.jointId(node2.id, entityReplace.id));
-                    createJoint(entityReplace.ref.current, anchor1, body2Ref, anchor2);
-                    activeJointsStackRef.current.push(utils.jointId(node2.id, entityReplace.id));
-
-                // Deleting the joint causes an impulse on the Particles
-                deleteJoint(oldestJointId);
-                activeJointsStackRef.current.shift();
-
-                replacedJoints.push(i);
+            
+                applyNewJointPositions(newPosition, body1Ref, nextBodyRef, anchor1, anchor2, entityRadius);
+                createJoint(body1Ref, anchor1, nextBodyRef, anchor2);
+                activeJointsQueueRef.current.push(utils.jointId(node1.id, nextEntity.id));
+            
+                applyNewJointPositions(newPosition, nextBodyRef, body2Ref, anchor1, anchor2, entityRadius);
+                createJoint(nextBodyRef, anchor1, body2Ref, anchor2);
+                activeJointsQueueRef.current.push(utils.jointId(node2.id, nextEntity.id));
+            
+                deleteJoint(replaceJointId);
+                activeJointsQueueRef.current.shift();
+            
+                processedJointIndices.push(i);
             });
-            // filter out indexes that have already been instantiated
-            setReplaceJointWith(p => p.filter((value, i) => !replacedJoints.includes(i)));
-
-            // If we haev a shape then update the joints with new angles to allow for change in the number of entities
+            
+            // Filter out indices that have already been processed
+            setReplaceJointWith(p => p.filter((value, i) => !processedJointIndices.includes(i)));
+            
+            // If we have a shape then update the joints with new angles to allow for change in the number of entities
             if (entitiesInstantiated.length > 2) {
-                calculateWorldCenterFromIds(directGetNode, entitiesInstantiated, worldCenterRef);
+                calculateCenter({
+                    getNode: directGetNode,
+                    items: entitiesInstantiated,
+                    centerRef: worldCenterRef,
+                    useWorld: true,
+                });
                
                 // Align each joint to conform to the shape with newJointAngle
                 const sumInternal = (entitiesInstantiated.length - 2) * 180;
                 const newJointAngle = sumInternal / entitiesInstantiated.length / 2;
-                activeJointsStackRef.current.forEach((jointId, i) => {
+                activeJointsQueueRef.current.forEach((jointId, i) => {
                     // Because we use a clockwise direction for joints angle1 is positive, angle2 is negative
                     const angle1 = THREE.MathUtils.degToRad(newJointAngle * 1);
                     const angle2 = THREE.MathUtils.degToRad(newJointAngle * -1);
@@ -369,9 +310,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 })
 
                 // create innerCore
-                calculateCenterFromIds(directGetNode, entitiesInstantiated, centerRef);
+                calculateCenter({
+                    getNode: directGetNode,
+                    items: entitiesInstantiated,
+                    centerRef: centerRef,
+                });
                 innerCoreInitialPositionRef.current = centerRef.current;
-                //console.log("innerCoreInitialPositionRef", innerCoreInitialPositionRef.current, entitiesInstantiated);
                 setInnerCoreRadius(entityRadius / 3);
                 setInnerCoreActive(true);
 
@@ -434,7 +378,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 }
                 break;
             case "findCenter":
-                calculateCenter(entityNodes, centerRef);
+                calculateCenter({
+                    items: entityNodes,
+                    centerRef: centerRef,
+                });
                 nodeRef.current.setCenter(centerRef.current);
                 break;
             default:
@@ -555,62 +502,56 @@ const generateEntityPositions = (radius, count, initialPoint) => {
     return positions;
 }
 
-// Find center of this CompoundEntity (using the centers of the entities at the lower scope)
-const calculateCenter = (getNode,entityNodes, centerRef) => {
+const calculateCenter = ({getNode, items, centerRef, useWorld = false}) => {
     centerRef.current.set(0, 0, 0); // Reset the center vector
     let activeEntities = 0;
-    entityNodes.forEach((entityNode) => {
-        if (entityNode.ref.current) {
-            const entityCenter = entityNode.ref.current.getCenter();
+    
+    items.forEach((item) => {
+        let entityNode;
+
+        // Check if the item is an ID or a node object and get the node accordingly
+        if (typeof item === 'string' || typeof item === 'number') {
+            entityNode = getNode(item);
+        } else {
+            entityNode = item;
+        }
+
+        // Continue if the entity node and its reference are valid
+        if (entityNode && entityNode.ref.current) {
+            // Decide whether to use world or local center based on the 'useWorld' flag
+            const method = useWorld ? 'getCenterWorld' : 'getCenter';
+            const entityCenter = entityNode.ref.current[method]();
             if (entityCenter) {
                 centerRef.current.add(entityCenter);
                 activeEntities++;
             }
         }
     });
+
     if (activeEntities > 0) {
         centerRef.current.divideScalar(activeEntities);
     }
 };
 
-const calculateWorldCenterFromIds = (getNode, ids, centerRef) => {
-    centerRef.current.set(0, 0, 0); // Reset the center vector
-    let activeEntities = 0;
-    ids.forEach((id) => {
-        const entityNode = getNode(id);
-        if (entityNode.ref.current) {
-            const entityCenter = entityNode.ref.current.getCenterWorld();
-            if (entityCenter) {
-                centerRef.current.add(entityCenter);
-                activeEntities++;
-            }
-        }
-    });
-    if (activeEntities > 0) {
-        centerRef.current.divideScalar(activeEntities);
-    }
-};
-
-const calculateCenterFromIds = (getNode, ids, centerRef) => {
-    centerRef.current.set(0, 0, 0); // Reset the center vector
-    let activeEntities = 0;
-    ids.forEach((id) => {
-        const entityNode = getNode(id);
-        if (entityNode.ref.current) {
-            const entityCenter = entityNode.ref.current.getCenter();
-            if (entityCenter) {
-                centerRef.current.add(entityCenter);
-                activeEntities++;
-            }
-        }
-    });
-    if (activeEntities > 0) {
-        centerRef.current.divideScalar(activeEntities);
-    }
-};
 
 function isDividedBy3APowerOf2(i) {
     if (i % 3 !== 0) return false;  // First, ensure i is divisible by 3
     let quotient = i / 3;
     return (quotient & (quotient - 1)) === 0;  // Check if quotient is a power of 2
+}
+
+function applyNewJointPositions(newPosition, bodyRef1, bodyRef2, anchor1, anchor2, radius) {
+    if (newPosition) {
+        const { offset1, offset2 } = utils.calculateJointOffsets(bodyRef1, bodyRef2, radius);
+        Object.assign(anchor1, offset1);
+        Object.assign(anchor2, offset2);
+
+        const rotation1 = quat(bodyRef1.current.rotation());
+        anchor1.applyQuaternion(rotation1);
+        const rotation2 = quat(bodyRef2.current.rotation());
+        anchor2.applyQuaternion(rotation2);
+    } else {
+        anchor1.multiplyScalar(0.5);
+        anchor2.multiplyScalar(0.5);
+    }
 }
