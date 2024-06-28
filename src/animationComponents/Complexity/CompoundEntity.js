@@ -239,9 +239,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const replaceJointId = activeJointsQueueRef.current[0];
             
                 const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
-                const joint = jointRef.current;
-                const anchor1 = vec3(joint.anchor1());
-                const anchor2 = vec3(joint.anchor2());
+                const anchor1 = vec3(jointRef.current.anchor1());
+                const anchor2 = vec3(jointRef.current.anchor2());
             
                 const node1 = directGetNode(body1Id); 
                 const node2 = directGetNode(body2Id);
@@ -274,70 +273,69 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     useWorld: true,
                 });
                
-                // Align each joint to conform to the shape with newJointAngle
+                // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
                 const sumInternal = (entitiesInstantiated.length - 2) * 180;
                 const newJointAngle = sumInternal / entitiesInstantiated.length / 2;
+                const axis = new THREE.Vector3(0, 0, 1); // Axis doesn't change, define once outside the loop
+                const quaternion1 = new THREE.Quaternion();
+                const quaternion2 = new THREE.Quaternion();
+                // Because we use a clockwise direction for joints angle1 is positive, angle2 is negative
+                const angle1 = THREE.MathUtils.degToRad(newJointAngle);
+                const angle2 = THREE.MathUtils.degToRad(-newJointAngle);
+                
                 activeJointsQueueRef.current.forEach((jointId, i) => {
-                    // Because we use a clockwise direction for joints angle1 is positive, angle2 is negative
-                    const angle1 = THREE.MathUtils.degToRad(newJointAngle * 1);
-                    const angle2 = THREE.MathUtils.degToRad(newJointAngle * -1);
                     const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
                     const joint = jointRef.current;
-                    const axis = new THREE.Vector3(0, 0, 1); // Rotate around the Z axis
-                    const quaternion1 = new THREE.Quaternion();
+                
                     quaternion1.setFromAxisAngle(axis, angle1);
-                    const quaternion2 = new THREE.Quaternion();
                     quaternion2.setFromAxisAngle(axis, angle2);
+                
                     const anchor1 = joint.anchor1();
                     const anchor2 = joint.anchor2();
-
                     const radius1 = vec3(anchor1).length();
                     const radius2 = vec3(anchor2).length();
-
-
-                    // Calculate the new position based on the angle
+                
                     const newX1 = radius1 * Math.cos(angle1);
                     const newY1 = radius1 * Math.sin(angle1);
-                    const newAnchorPosition1 = new THREE.Vector3(newX1, newY1, 0); 
-
-                    // Calculate the new position based on the angle
                     const newX2 = radius2 * Math.cos(angle2);
                     const newY2 = radius2 * Math.sin(angle2);
-                    const newAnchorPosition2 = new THREE.Vector3(newX2, newY2, 0);
-
-                    jointRef.current.setAnchor1(newAnchorPosition1);
-                    jointRef.current.setAnchor2(newAnchorPosition2);
-                })
-
-                // create innerCore
-                calculateCenter({
-                    getNode: directGetNode,
-                    items: entitiesInstantiated,
-                    centerRef: centerRef,
+                
+                    joint.setAnchor1(new THREE.Vector3(newX1, newY1, 0));
+                    joint.setAnchor2(new THREE.Vector3(newX2, newY2, 0));
                 });
-                innerCoreInitialPositionRef.current = centerRef.current;
-                setInnerCoreRadius(entityRadius / 3);
-                setInnerCoreActive(true);
+                
+                if (!innerCoreActive) {
+                    // create innerCore
+                    calculateCenter({
+                        getNode: directGetNode,
+                        items: entitiesInstantiated,
+                        centerRef: centerRef,
+                    });
+                    innerCoreInitialPositionRef.current = centerRef.current;
+                    setInnerCoreRadius(entityRadius / 3);
+                    setInnerCoreActive(true);
+                }
 
                 // From here on we can increase the size of innerCore radius and extend a jint which is then replaced
             }
         }
         if (busyInstantiatingRef.current) {
             const lastEntity = directGetNode(instantiatingIdRef.current); 
+            // Is the rigid body reference available
             if (lastEntity?.ref?.current?.current) {
                 setEntityInstantiated(lastEntity.id);
                 busyInstantiatingRef.current = false;
-                if (entitiesInstantiated.length == 1) {
-                    lastEntity.ref.current.current.lockRotations(true, true);
-                }
+                //if (entitiesInstantiated.length == 1) {
+                //    lastEntity.ref.current.current.lockRotations(true, true);
+                //}
                 if (entitiesInstantiated.length == entityCount) {
+                    // This could be a property of the node
                     setParticlesReady(true);
                 }
                 node.particlesRef.current.push(lastEntity.ref);
             }
         }
     });
-
 
     useFrame(() => {
         if (innerCoreActive) {
