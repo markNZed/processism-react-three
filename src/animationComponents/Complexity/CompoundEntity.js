@@ -106,100 +106,88 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     // Need particles[i].current.getVisualConfig().outerChain
 
+    const instantiateEntity = (entityNodeId, i) => {
+        // Strip out any id from entitiesInstantiated that is not in entityNodes and add next entity
+        setEntitiesInstantiated(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
+        const newPosition = [...initialPosition];
+        // Not doing anything with i = 0 yet
+        switch (i) {
+            case 0:
+                setInstantiateJoints(p => [...p, [null, null]]);
+                break;
+            case 1:
+                setInstantiateJoints(p => [...p, [entityNodes[0].id, entityNodes[1].id]]);
+                newPosition[0] += 2 * entityRadius;
+                break;
+            case 2:
+                // Order is important, it must be clockwise
+                setInstantiateJoints(p => [...p, [entityNodes[1].id, entityNodes[2].id], [entityNodes[2].id, entityNodes[0].id]]);
+                newPosition[0] += entityRadius;
+                newPosition[1] -= 2 * entityRadius; 
+                break;
+            case 3:
+                const newJointPosition = true;
+                setReplaceJointWith(p => [...p, [entityNodes[i].id, newJointPosition]]);
+                newPosition[0] += entityRadius;
+                newPosition[1] += 2 * entityRadius; 
+                break;
+            default:
+                setReplaceJointWith(p => [...p, [entityNodes[i].id, false]]);
+                // Should be the joint that is being replaced - first need to widen the joint
+                const replaceJointId = activeJointsQueueRef.current[0];
+                console.log("replaceJointId", replaceJointId, i, isDividedBy3APowerOf2(i));
+                if (isDividedBy3APowerOf2(i)) {
+
+                    activeJointsQueueRef.current.forEach((jointId, i) => {
+                        const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+                        const joint = jointRef.current;
+                        const scaleAnchor = (anchor) => ({
+                            x: anchor.x * 2,
+                            y: anchor.y * 2,
+                            z: anchor.z * 2,
+                        });
+                        joint.setAnchor1(scaleAnchor(joint.anchor1()));
+                        joint.setAnchor2(scaleAnchor(joint.anchor2()));
+                    })
+
+                }
+                // Find the midpoint between the two nodes
+                // Need to wait for the joints to update first so the midpoint is up to date.
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const node1 = directGetNode(body1Id);
+                const node2 = directGetNode(body2Id);
+                const body1Ref = node1.ref.current;
+                const body2Ref = node2.ref.current;
+                // Create the particle in the middle and let the joints "pull" it into place.
+                const midpoint = utils.calculateMidpoint(body1Ref, body2Ref);
+                nodeRef.current.worldToLocal(midpoint);
+                newPosition[0] = midpoint.x;
+                newPosition[1] = midpoint.y;
+                newPosition[2] = midpoint.z;
+                break;
+        }
+        entityPositionsRef.current.push(newPosition);
+        console.log("Instantiating entityNodeId", id, i, entitiesInstantiated, entityNodeId, newPosition);
+    }
+
     // This will cause a render on each change of entitiesInstantiated, adding one entity at a time
     useEffect(() => {
-        console.log("useEffect", entityCount, busyInstantiatingRef.current);
         if (busyInstantiatingRef.current) return;
         for (let i = 0; i < entityNodes.length; i++) {
             const entityNodeId = entityNodes[i].id;
             if (entitiesInstantiated.includes(entityNodeId)) continue;
             busyInstantiatingRef.current = true;
             instantiatingIdRef.current = entityNodeId;
+            // Use a timer for a delay so we can see the sequence for debug etc 
             setTimeout(() => {
-                // Strip out any id from entitiesInstantiated that is not in entityNodes
-                setEntitiesInstantiated(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
-                // Not doing anything with i = 0 yet
-                switch (i) {
-                    case 0:
-                        setInstantiateJoints(p => [...p, [null, null]]);
-                        break;
-                    case 1:
-                        setInstantiateJoints(p => [...p, [entityNodes[0].id, entityNodes[1].id]]);
-                        break;
-                    case 2:
-                        // Order is important, it must be clockwise
-                        setInstantiateJoints(p => [...p, [entityNodes[1].id, entityNodes[2].id], [entityNodes[2].id, entityNodes[0].id]]);
-                        break;
-                    case 3:
-                        const newPosition = true;
-                        setReplaceJointWith(p => [...p, [entityNodes[i].id, newPosition]]);
-                        break;
-                    default:
-                        setReplaceJointWith(p => [...p, [entityNodes[i].id, false]]);
-                        break;
-                }
+                instantiateEntity(entityNodeId, i);
             }, 1000); 
-            
             // This is a hack for now as we should check that deeper levels are ready first
             // Probably just check if all children are ready (rather than all particles)
             if (physicsState !== "ready") {
                 setPhysicsState("ready");
-                console.log("setPhysicsState", physicsState, "to", "ready");
             }
-            
-            const newPosition = [...initialPosition];
-            switch (i) {
-                case 0: // point
-                    break;
-                case 1: // line
-                    newPosition[0] += 2 * entityRadius;
-                    break;
-                case 2: // triangle
-                    newPosition[0] += entityRadius;
-                    newPosition[1] -= 2 * entityRadius; 
-                    break;
-                case 3: // diamond
-                    // Here we can insert a virtual circle that "grows" to create a spherical blob
-                    newPosition[0] += entityRadius;
-                    newPosition[1] += 2 * entityRadius; 
-                    break;
-                default: {
-                    // Should be the joint that is being replaced - first need to widen the joint
-                    const replaceJointId = activeJointsQueueRef.current[0];
-                    console.log("replaceJointId", replaceJointId, i, isDividedBy3APowerOf2(i));
-                    if (isDividedBy3APowerOf2(i)) {
-
-                        activeJointsQueueRef.current.forEach((jointId, i) => {
-                            const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
-                            const joint = jointRef.current;
-                            const scaleAnchor = (anchor) => ({
-                                x: anchor.x * 2,
-                                y: anchor.y * 2,
-                                z: anchor.z * 2,
-                            });
-                            joint.setAnchor1(scaleAnchor(joint.anchor1()));
-                            joint.setAnchor2(scaleAnchor(joint.anchor2()));
-                        })
-
-                    }
-                    // Find the midpoint between the two nodes
-                    // Need to wait for the joints to update first so the midpoint is up to date.
-                    const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
-                    const node1 = directGetNode(body1Id);
-                    const node2 = directGetNode(body2Id);
-                    const body1Ref = node1.ref.current;
-                    const body2Ref = node2.ref.current;
-                    // Create the particle in the middle and let the joints "pull" it into place.
-                    const midpoint = utils.calculateMidpoint(body1Ref, body2Ref);
-                    nodeRef.current.worldToLocal(midpoint);
-                    newPosition[0] = midpoint.x;
-                    newPosition[1] = midpoint.y;
-                    newPosition[2] = midpoint.z;
-                    break;
-                }
-            }
-            entityPositionsRef.current.push(newPosition);
-            console.log("Instantiating entityNodeId", id, i, entitiesInstantiated, entityNodeId, newPosition);
+            // Add one entity at a time
             break;
         }
     }, [entityInstantiated, entityNodes]);
@@ -226,7 +214,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius);
                 createJoint(body1Ref, offset1, body2Ref, offset2);
                 activeJointsQueueRef.current.push(utils.jointId(node1.id, node2.id));
-                instantiatedJointsIndex.push(i);   
+                instantiatedJointsIndex.push(i);
             });
             setInstantiateJoints(p => p.filter((value, i) => !instantiatedJointsIndex.includes(i)));
             const processedJointIndices = [];
@@ -235,13 +223,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const nextEntity = directGetNode(nextId); 
                 const nextBodyRef = nextEntity.ref.current;
                 if (!nextBodyRef?.current) return;
-            
+    
                 const replaceJointId = activeJointsQueueRef.current[0];
             
                 const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                 const anchor1 = vec3(jointRef.current.anchor1());
                 const anchor2 = vec3(jointRef.current.anchor2());
-            
+    
                 const node1 = directGetNode(body1Id); 
                 const node2 = directGetNode(body2Id);
                 const body1Ref = node1.ref.current;
@@ -260,41 +248,41 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             
                 processedJointIndices.push(i);
             });
-            
+    
             // Filter out indices that have already been processed
             setReplaceJointWith(p => p.filter((value, i) => !processedJointIndices.includes(i)));
-            
+    
             // If we have a shape then update the joints with new angles to allow for change in the number of entities
             if (entitiesInstantiated.length > 2) {
-                calculateCenter({
-                    getNode: directGetNode,
+        calculateCenter({
+            getNode: directGetNode,
                     items: entitiesInstantiated,
-                    centerRef: worldCenterRef,
-                    useWorld: true,
-                });
-               
+            centerRef: worldCenterRef,
+            useWorld: true,
+        });
+    
                 // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
                 const sumInternal = (entitiesInstantiated.length - 2) * 180;
                 const newJointAngle = sumInternal / entitiesInstantiated.length / 2;
                 const axis = new THREE.Vector3(0, 0, 1); // Axis doesn't change, define once outside the loop
-                const quaternion1 = new THREE.Quaternion();
-                const quaternion2 = new THREE.Quaternion();
+        const quaternion1 = new THREE.Quaternion();
+        const quaternion2 = new THREE.Quaternion();
                 // Because we use a clockwise direction for joints angle1 is positive, angle2 is negative
-                const angle1 = THREE.MathUtils.degToRad(newJointAngle);
-                const angle2 = THREE.MathUtils.degToRad(-newJointAngle);
-                
+        const angle1 = THREE.MathUtils.degToRad(newJointAngle);
+        const angle2 = THREE.MathUtils.degToRad(-newJointAngle);
+    
                 activeJointsQueueRef.current.forEach((jointId, i) => {
                     const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
-                    const joint = jointRef.current;
+            const joint = jointRef.current;
                 
-                    quaternion1.setFromAxisAngle(axis, angle1);
-                    quaternion2.setFromAxisAngle(axis, angle2);
-                
-                    const anchor1 = joint.anchor1();
-                    const anchor2 = joint.anchor2();
-                    const radius1 = vec3(anchor1).length();
-                    const radius2 = vec3(anchor2).length();
-                
+            quaternion1.setFromAxisAngle(axis, angle1);
+            quaternion2.setFromAxisAngle(axis, angle2);
+    
+            const anchor1 = joint.anchor1();
+            const anchor2 = joint.anchor2();
+            const radius1 = vec3(anchor1).length();
+            const radius2 = vec3(anchor2).length();
+    
                     const newX1 = radius1 * Math.cos(angle1);
                     const newY1 = radius1 * Math.sin(angle1);
                     const newX2 = radius2 * Math.cos(angle2);
@@ -306,35 +294,35 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 
                 if (!innerCoreActive) {
                     // create innerCore
-                    calculateCenter({
-                        getNode: directGetNode,
+        calculateCenter({
+            getNode: directGetNode,
                         items: entitiesInstantiated,
-                        centerRef: centerRef,
-                    });
-                    innerCoreInitialPositionRef.current = centerRef.current;
-                    setInnerCoreRadius(entityRadius / 3);
-                    setInnerCoreActive(true);
-                }
-
+            centerRef: centerRef,
+        });
+        innerCoreInitialPositionRef.current = centerRef.current;
+        setInnerCoreRadius(entityRadius / 3);
+        setInnerCoreActive(true);
+    }
+    
                 // From here on we can increase the size of innerCore radius and extend a jint which is then replaced
             }
         }
         if (busyInstantiatingRef.current) {
-            const lastEntity = directGetNode(instantiatingIdRef.current); 
+        const lastEntity = directGetNode(instantiatingIdRef.current);
             // Is the rigid body reference available
-            if (lastEntity?.ref?.current?.current) {
-                setEntityInstantiated(lastEntity.id);
-                busyInstantiatingRef.current = false;
+        if (lastEntity?.ref?.current?.current) {
+            setEntityInstantiated(lastEntity.id);
+            busyInstantiatingRef.current = false;
                 //if (entitiesInstantiated.length == 1) {
                 //    lastEntity.ref.current.current.lockRotations(true, true);
                 //}
                 if (entitiesInstantiated.length == entityCount) {
                     // This could be a property of the node
-                    setParticlesReady(true);
-                }
-                node.particlesRef.current.push(lastEntity.ref);
+                setParticlesReady(true);
             }
+            node.particlesRef.current.push(lastEntity.ref);
         }
+    }    
     });
 
     useFrame(() => {
