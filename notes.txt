@@ -93,3 +93,14 @@ quaternion.setFromAxisAngle(axis, angle);
 entityNode.ref.current.current.lockRotations(false, true);
 entityNode.ref.current.current.setRotation(quaternion, true);
 entityNode.ref.current.current.lockRotations(true, true);
+
+A ref that causes a rerender:
+const [ref, setRef] = useState(null);
+
+useEffect(() => {
+  if (ref) {
+    // do the thing
+  }
+}, [ref]);
+
+<RigidBody ref={setRef}>
