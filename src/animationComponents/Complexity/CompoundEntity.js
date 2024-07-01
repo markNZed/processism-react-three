@@ -19,12 +19,14 @@ import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
+// EntityType is CompoundEntity for the first time and this causes issues for Rapier?
+
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
     useImperativeHandle(ref, () => nodeRef.current);
-    const { world, rapier } = useRapier();
+    //const { world, rapier } = useRapier();
 
     // Direct access to the state outside of React's render flow
     const {
@@ -49,7 +51,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const localColor = useMemo(() => utils.getColor(configColor, color), [configColor, color]);
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     //const entityRadius = config.radius / getNodeCount();
-    const entityRadius = config.radius / 10; // Fixed to help with testing
+    const entityRadius = config.radius / 10 / (node.depth + 1); // Fixed to help with testing
     //const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.97, [radius, entityCount]);
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
@@ -59,7 +61,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [physicsState, setPhysicsState] = useState("waiting");
     // A function to encapsulate the condition
     const isPhysicsReady = () => physicsState === "ready";
-    const [entitiesInstantiated, setEntitiesInstantiated] = useState([]);
+    const [entitiesToInstantiate, setEntitiesToInstantiate] = useState([]);
     // Block the instnatiating of next entity
     const busyInstantiatingRef = useRef(false);
     const instantiatingIdRef = useRef();
@@ -67,12 +69,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const activeJointsQueueRef = useRef([]);
     const [replaceJointWith, setReplaceJointWith] = useState([]);
     const [entityInstantiated, setEntityInstantiated] = useState();
-    const [particlesReady, setParticlesReady] = useState();
-    const [coreActive, setInnerCoreActive] = useState();
+    const [entitiesReady, setEntitiesReady] = useState(false);
+    const [coreActive, setCoreActive] = useState();
     const coreRef = useRef();
     const coreColliderRef = useRef();
     const coreInitialPositionRef = useRef();
-    const coreScalingRef = useRef();
     const axis = new THREE.Vector3(0, 0, 1); // 2D Axis
 
     // Layout to avoid Particle overlap (which can cause extreme forces in Rapier)
@@ -108,8 +109,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     // Need particles[i].current.getVisualConfig().outerChain
 
     const instantiateEntity = (entityNodeId, i) => {
-        // Strip out any id from entitiesInstantiated that is not in entityNodes and add next entity
-        setEntitiesInstantiated(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
+        // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
+        setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
         const newPosition = [...initialPosition];
         // Not doing anything with i = 0 yet
         switch (i) {
@@ -126,35 +127,53 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 newPosition[0] += entityRadius;
                 newPosition[1] -= 2 * entityRadius;
                 break;
-            case 3:
-                const newJointPosition = true;
+            case 3: {
+                const newJointPosition = false;
                 setReplaceJointWith(p => [...p, [entityNodes[i].id, newJointPosition]]);
+                const replaceJointId = activeJointsQueueRef.current[0];
+
+                // Scale up the joint to use setReplaceJointWith
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const joint = jointRef.current;
+                const scaleAnchor = (anchor) => ({
+                    x: anchor.x * 2,
+                    y: anchor.y * 2,
+                    z: anchor.z * 2,
+                });
+                joint.setAnchor1(scaleAnchor(joint.anchor1()));
+                joint.setAnchor2(scaleAnchor(joint.anchor2()));
+                
                 newPosition[0] += entityRadius;
                 newPosition[1] += 2 * entityRadius;
                 break;
-            default:
+            }
+            default: {
                 setReplaceJointWith(p => [...p, [entityNodes[i].id, false]]);
                 // Should be the joint that is being replaced - first need to widen the joint
                 const replaceJointId = activeJointsQueueRef.current[0];
-                console.log("replaceJointId", replaceJointId, i, isDividedBy3APowerOf2(i));
-                if (isDividedBy3APowerOf2(i)) {
+                console.log("replaceJointId", replaceJointId, i);
 
-                    activeJointsQueueRef.current.forEach((jointId, i) => {
-                        const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
-                        const joint = jointRef.current;
-                        const scaleAnchor = (anchor) => ({
-                            x: anchor.x * 2,
-                            y: anchor.y * 2,
-                            z: anchor.z * 2,
-                        });
-                        joint.setAnchor1(scaleAnchor(joint.anchor1()));
-                        joint.setAnchor2(scaleAnchor(joint.anchor2()));
-                    })
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const joint = jointRef.current;
+                const scaleAnchor = (anchor) => ({
+                    x: anchor.x * 2,
+                    y: anchor.y * 2,
+                    z: anchor.z * 2,
+                });
+                joint.setAnchor1(scaleAnchor(joint.anchor1()));
+                joint.setAnchor2(scaleAnchor(joint.anchor2()));
 
+                function calculateOptimalCircleRadius(n, entityRadius) {
+                    const theta = (2 * Math.PI) / n;
+                    return entityRadius / Math.sin(theta / 2);
                 }
+                if (coreActive) {
+                    const optimalRadius = calculateOptimalCircleRadius(entitiesToInstantiate.length + 1, entityRadius);
+                    coreColliderRef.current.setRadius(optimalRadius - entityRadius);
+                }
+                
                 // Find the midpoint between the two nodes
                 // Need to wait for the joints to update first so the midpoint is up to date.
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                 const node1 = directGetNode(body1Id);
                 const node2 = directGetNode(body2Id);
                 const body1Ref = node1.ref.current;
@@ -166,17 +185,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 newPosition[1] = midpoint.y;
                 newPosition[2] = midpoint.z;
                 break;
+            }
         }
         entityPositionsRef.current.push(newPosition);
-        console.log("Instantiating entityNodeId", id, i, entitiesInstantiated, entityNodeId, newPosition);
+        console.log("Instantiating entityNodeId", id, i, entitiesToInstantiate, entityNodeId, newPosition);
     }
 
-    // This will cause a render on each change of entitiesInstantiated, adding one entity at a time
+    // This will cause a render on each change of entitiesToInstantiate, adding one entity at a time
     useEffect(() => {
         if (busyInstantiatingRef.current) return;
+        //if (props.entitiesReady === false && entitiesToInstantiate.length > 0) return;
         for (let i = 0; i < entityNodes.length; i++) {
             const entityNodeId = entityNodes[i].id;
-            if (entitiesInstantiated.includes(entityNodeId)) continue;
+            if (entitiesToInstantiate.includes(entityNodeId)) continue;
             busyInstantiatingRef.current = true;
             instantiatingIdRef.current = entityNodeId;
             // Use a timer for a delay so we can see the sequence for debug etc 
@@ -191,14 +212,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             // Add one entity at a time
             break;
         }
-    }, [entityInstantiated, entityNodes]);
+    }, [entityInstantiated, entityNodes, props.entitiesReady]);
 
     useFrame(() => {
 
         if (instantiateJoints.length || replaceJointWith.length) {
             calculateCenter({
                 getNode: directGetNode,
-                items: entitiesInstantiated,
+                items: entitiesToInstantiate,
                 centerRef: worldCenterRef,
                 useWorld: true,
             });
@@ -210,12 +231,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             setReplaceJointWith(p => p.filter((value, i) => !replacedJointIndices.includes(i)));
 
             // If we have a shape then update the joints with new angles to allow for change in the number of entities
-            if (entitiesInstantiated.length > 3) {
+            if (entitiesToInstantiate.length > 3) {
 
                 // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
                 alignJointsToPolygon();
 
-                if (!coreActive) {
+                if (false && !coreActive) {
                     createCore();
                 }
 
@@ -229,12 +250,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (lastEntity?.ref?.current?.current) {
                 setEntityInstantiated(lastEntity.id);
                 busyInstantiatingRef.current = false;
-                //if (entitiesInstantiated.length == 1) {
+                //if (entitiesToInstantiate.length == 1) {
                 //    lastEntity.ref.current.current.lockRotations(true, true);
                 //}
-                if (entitiesInstantiated.length == entityCount) {
+                if (entitiesToInstantiate.length == entityCount) {
                     // This could be a property of the node
-                    setParticlesReady(true);
+                    setEntitiesReady(true);
                 }
                 node.particlesRef.current.push(lastEntity.ref);
             }
@@ -243,16 +264,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         function createCore() {
             calculateCenter({
                 getNode: directGetNode,
-                items: entitiesInstantiated,
+                items: entitiesToInstantiate,
                 centerRef: centerRef,
             });
             coreInitialPositionRef.current = centerRef.current;
-            setInnerCoreActive(true);
+            setCoreActive(true);
         }
 
         function alignJointsToPolygon() {
-            const sumInternal = (entitiesInstantiated.length - 2) * 180;
-            const newJointAngle = sumInternal / entitiesInstantiated.length / 2;
+            const sumInternal = (entitiesToInstantiate.length - 2) * 180;
+            const newJointAngle = sumInternal / entitiesToInstantiate.length / 2;
 
             const quaternion1 = new THREE.Quaternion();
             const quaternion2 = new THREE.Quaternion();
@@ -303,11 +324,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const body1Ref = node1.ref.current;
                 const body2Ref = node2.ref.current;
 
-                applyNewJointPositions(newPosition, body1Ref, nextBodyRef, anchor1, anchor2, entityRadius);
+                //applyNewJointPositions(newPosition, body1Ref, nextBodyRef, anchor1, anchor2, entityRadius);
+                anchor1.multiplyScalar(0.5);
+                anchor2.multiplyScalar(0.5);
                 createJoint(body1Ref, anchor1, nextBodyRef, anchor2);
                 activeJointsQueueRef.current.push(utils.jointId(node1.id, nextEntity.id));
 
-                applyNewJointPositions(newPosition, nextBodyRef, body2Ref, anchor1, anchor2, entityRadius);
+                //applyNewJointPositions(newPosition, nextBodyRef, body2Ref, anchor1, anchor2, entityRadius);
                 createJoint(nextBodyRef, anchor1, body2Ref, anchor2);
                 activeJointsQueueRef.current.push(utils.jointId(node2.id, nextEntity.id));
 
@@ -341,16 +364,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     });
 
     useFrame(() => {
-        if (coreActive && coreColliderRef.current) {
-            const currentRadius = coreColliderRef.current.radius();
-            if (currentRadius > entityRadius * 1.5) {
-                coreScalingRef.current = -1;
-            } else if (currentRadius < entityRadius * 0.5) {
-                coreScalingRef.current = 1;
-            }
-            const newRadius = currentRadius + coreScalingRef.current * currentRadius * 0.005;
-            coreColliderRef.current.setRadius(newRadius)
-        }
         return
         if (entityCount == 0) return;
         // State machine can distribute computation across frames, reducing load on the physics engine
@@ -393,12 +406,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     });
 
     //console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "entityNodes", entityNodes)
-    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, index, config, node, entityNodes, entitiesInstantiated} );
+    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, index, config, node, entityNodes, entitiesToInstantiate} );
 
     return (
         <group>
             <CompoundEntityGroup ref={nodeRef} position={initialPosition} >
-                {entitiesInstantiated.map((entityId, i) => {
+                {entitiesToInstantiate.map((_, i) => {
                     let entity = entityNodes[i];
                     let EntityType = (entity.childrenIds.length === 0) ? Particle : CompoundEntity;
                     return (
@@ -412,6 +425,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             debug={isDebug}
                             config={config}
                             index={`${i}`}
+                            entitiesReady={entitiesReady}
                         />
                     )
                 })}
@@ -425,13 +439,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         enabledTranslations={[true, true, false]}
                         enabledRotations={[false, false, true]}
                     >
-                        <BallCollider ref={coreColliderRef} args={[entityRadius / 3]} />
+                        <BallCollider ref={coreColliderRef} args={[entityRadius * 0.1]} />
                     </RigidBody>
                 )}
 
                 {physicsState === "ready" && (
                     <group>
-                        {particlesReady && (
+                        {entitiesReady && (
                             <Blob
                                 color={localColor}
                                 node={node}
@@ -487,23 +501,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
 export default CompoundEntity;
 
-// Function declarations outside the Component to reduce computation during rendering
-// Distribute entities within the perimeter
-const generateEntityPositions = (radius, count, initialPoint) => {
-    const positions = [];
-    const angleStep = (2 * Math.PI) / count;
-    const initialAngle = Math.atan2(initialPoint[1], initialPoint[0]); // Calculate the angle of the initial point
-
-    for (let i = 0; i < count; i++) {
-        const angle = initialAngle + (i * angleStep);
-        const x = radius * Math.cos(angle);
-        const y = radius * Math.sin(angle);
-        positions.push(new THREE.Vector3(x, y, 0));
-    }
-
-    return positions;
-}
-
 const calculateCenter = ({ getNode, items, centerRef, useWorld = false }) => {
     centerRef.current.set(0, 0, 0); // Reset the center vector
     let activeEntities = 0;
@@ -534,13 +531,6 @@ const calculateCenter = ({ getNode, items, centerRef, useWorld = false }) => {
         centerRef.current.divideScalar(activeEntities);
     }
 };
-
-
-function isDividedBy3APowerOf2(i) {
-    if (i % 3 !== 0) return false;  // First, ensure i is divisible by 3
-    let quotient = i / 3;
-    return (quotient & (quotient - 1)) === 0;  // Check if quotient is a power of 2
-}
 
 function applyNewJointPositions(newPosition, bodyRef1, bodyRef2, anchor1, anchor2, radius) {
     if (newPosition) {

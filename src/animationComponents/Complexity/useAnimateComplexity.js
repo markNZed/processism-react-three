@@ -33,7 +33,7 @@ function useAnimateComplexity(config, internalRef) {
         // Blow away the storesremountConfigState
         useStoreEntity.getState().reset();
         const rootNode = directGetNode("root");
-        addNodesRecursively([4], rootNode);
+        addNodesRecursively([5], rootNode);
         //addNodesRecursively([config.entityCounts[0]], rootNode);
         // addNodesRecursively(config.entityCounts, rootNode);
         directUpdateNode("root", { ref: internalRef });
