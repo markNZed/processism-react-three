@@ -139,6 +139,8 @@ const useStoreEntity = create((set, get) => {
         relationCount: 0,
         joints: {},
         jointCount: 0,
+        particleChange: true,
+        particleRefs: [],
 
         reset: () => set(() => {
             return {
@@ -286,19 +288,32 @@ const useStoreEntity = create((set, get) => {
         },
 
         // Function to get all nodes with isParticle set to true.
+        // Cache the result in state.particles
         getAllParticleRefs: (id = 'root') => {
-            const particles = [];
-            const nodes = get().nodes;
-            const traverse = (node) => {
-                if (node.isParticle) {
-                    particles.push(node.ref);
-                }
-                if (node.childrenIds && Array.isArray(node.childrenIds)) {
-                    node.childrenIds.forEach(childId => traverse(nodes[childId]));
-                }
-            };
-            traverse(nodes[id]);
-            return particles;
+            const particleChange = get().particleChange;
+            if (particleChange) {
+                const particles = [];
+                const nodes = get().nodes;
+                const traverse = (node) => {
+                    if (node.isParticle) {
+                        particles.push(node.ref);
+                    }
+                    if (node.childrenIds && Array.isArray(node.childrenIds)) {
+                        node.childrenIds.forEach(childId => traverse(nodes[childId]));
+                    }
+                };
+                traverse(nodes[id]);
+                set((state) => ({
+                    particleChange: false,
+                    particles: {
+                        ...state.particles,
+                        [id]: particles
+                    }
+                }))
+                return particles;
+            } else {
+                return get().particles[id];
+            }
         },
 
         // Function to add a new node to the tree.
@@ -316,6 +331,8 @@ const useStoreEntity = create((set, get) => {
                 const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId }, node.childrenIds || []);
                 newNodeId = newNode.id;
                 state.nodeCount++;
+
+                state.particleChange = true;
 
                 return {
                     nodes: {
@@ -340,6 +357,7 @@ const useStoreEntity = create((set, get) => {
                 console.error(`Node ${id} does not exist`, id)
                 throw new Error(`Node ${id} does not exist`);
             }
+            const isParticle = node.isParticle;
 
             // Allow updates to be a function similar to setState
             const updatedProperties = typeof updates === 'function' ? updates(node) : updates;
@@ -375,6 +393,10 @@ const useStoreEntity = create((set, get) => {
             });
 
             const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
+
+            if (isParticle !== updatedProperties.isParticle) {
+                state.particleChange = true;
+            }
 
             return {
                 nodes: {
@@ -421,8 +443,13 @@ const useStoreEntity = create((set, get) => {
                 }
             };
 
+            if (node.isParticle) {
+                state.particleChange = true;
+            }
+
             deleteRecursively(id);
             removeNodeFromParent(nodes, id);
+
 
             return { nodes, propertyLookups };
         }),
@@ -549,6 +576,10 @@ const useStoreEntity = create((set, get) => {
             };
 
             updateSubtree(nodeId);
+
+            if (property === 'isParticle') {
+                state.particleChange = true;
+            }
 
             return { nodes };
         }),

@@ -253,7 +253,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 //if (entitiesToInstantiate.length == 1) {
                 //    lastEntity.ref.current.current.lockRotations(true, true);
                 //}
-                if (entitiesToInstantiate.length == entityCount) {
+                if (entitiesToInstantiate.length == entityCount && !entitiesReady) {
                     // This could be a property of the node
                     setEntitiesReady(true);
                 }
@@ -347,7 +347,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         function instatiateJoints() {
             const instantiatedJointsIndices = [];
             instantiateJoints.forEach(([id1, id2], i) => {
-                if (id1 === null && id2 === null) return; // special case for first entity (no join to create for now
+                if (id1 === null && id2 === null) {
+                    instantiatedJointsIndices.push(i);
+                    return; // special case for first entity (no join to create for now
+                }
                 const node1 = directGetNode(id1);
                 const node2 = directGetNode(id2);
                 const body1Ref = node1.ref.current;
@@ -414,6 +417,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 {entitiesToInstantiate.map((_, i) => {
                     let entity = entityNodes[i];
                     let EntityType = (entity.childrenIds.length === 0) ? Particle : CompoundEntity;
+                    // If the entity changes from a Particle to a CompoundEntity then the ref needs to be cleared ?
                     return (
                         <EntityType
                             key={`${id}-${i}`}

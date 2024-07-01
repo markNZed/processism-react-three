@@ -1,4 +1,4 @@
-import React, { useRef, useImperativeHandle } from 'react';
+import React, { useRef, useImperativeHandle, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
@@ -8,33 +8,44 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
+    const { getNodeProperty, getAllParticleRefs } = useStoreEntity.getState();
     const particleRadius = getNodeProperty('root', 'particleRadius');
     const userColor = new THREE.Color();
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();
     const currentScale = new THREE.Vector3();
     const currentQuaternion = new THREE.Quaternion();
+    const currentColor = new THREE.Color();
     const invisibleScale = new THREE.Vector3(0.001, 0.001, 0.001);
     const instanceMatrix = new THREE.Matrix4();
-
+    const [particleCount, setParticleCount] = useState(0);
+    
     useFrame(() => {
         if (!internalRef.current) return;
         const mesh = internalRef.current;
         let matrixChanged = false;
         let colorChanged = false;
 
-        node.particlesRef.current.forEach((particleRef, i) => {
+        const allParticleRefs = getAllParticleRefs();
+        const count = allParticleRefs.length;
+        if (count !== particleCount) {
+            setParticleCount(count);
+        }
+
+        allParticleRefs.forEach((particleRef, i) => {
+            
             const particle = particleRef.current;
             if (!particle || !particle.current) return;
         
             mesh.getMatrixAt(i, instanceMatrix);
             instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
+ 
+            const visualConfig = particle.getVisualConfig();
 
             const pos = particle.translation();
-            const scale = particle.getVisualConfig().scale || 1;
+            const scale = visualConfig.scale || 1;
             userScale.set(scale, scale, scale);
-            const color = particle.getVisualConfig().color || 'red';
+            const color = visualConfig.color || 'red';
             userColor.set(color);
 
             if (!currentPos.equals(pos)) {
@@ -42,7 +53,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
                 matrixChanged = true;
             }
 
-            const visible = particle.getVisualConfig().visible || true;
+            const visible = visualConfig.visible || true;
             if (!visible) {
                 currentScale.copy(invisibleScale);
                 matrixChanged = true;
@@ -57,7 +68,6 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
             }
 
             if (mesh.instanceColor) {
-                const currentColor = new THREE.Color();
                 mesh.getColorAt(i, currentColor);
             
                 // Tolerance because the conversion to floats causing mismatch
@@ -77,6 +87,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
                 mesh.setColorAt(i, userColor);
                 colorChanged = true;
             }
+
         });
 
         if (matrixChanged) {
@@ -102,7 +113,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
     return (
         <instancedMesh
             ref={internalRef}
-            args={[null, null, node.particlesRef.current.length]}
+            args={[null, null, particleCount]}
             onPointerUp={handlePointerDown}
         >
             <circleGeometry args={[particleRadius, 16]} />
