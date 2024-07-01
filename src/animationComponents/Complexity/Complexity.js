@@ -144,6 +144,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
     // which might be an issue with useMemo?
 
+    const getTopBlobGeometryRef = useRef({ geometry: undefined, visible: false });
     return (
         <>
             {storeEntityReady && (
@@ -153,6 +154,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
                     radius={config.radius}
                     initialPosition={[0, 0, 0]}
                     config={config}
+                    getTopBlobGeometryRef={getTopBlobGeometryRef}
                 />
             )}
         </>

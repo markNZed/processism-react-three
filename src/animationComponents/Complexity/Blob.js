@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
 
-const Blob = ({ color, node, centerRef, entityNodes }) => {
+const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
@@ -75,7 +75,9 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
 
         if (!blobData.current) return;
 
-        if (node.ref.current.getVisualConfig().visible) {
+        if (node.ref.current.getVisualConfig().visible || getGeometryRef) {
+
+            const shouldBeVisible = node.ref.current.getVisualConfig().visible;
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
@@ -89,7 +91,13 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
                 const geometry = points_to_geometry(blobPoints, particleRadius, centerRef);
                 blobRef.current.geometry.dispose();
                 blobRef.current.geometry = geometry;
-                blobRef.current.visible = true;
+                blobRef.current.visible = shouldBeVisible;
+
+                if (getGeometryRef) {
+                    getGeometryRef.current.geometry = geometry;
+                    getGeometryRef.current.visible = true;
+                    getGeometryRef.current.blobRadius = getBlobRadius(blobPoints, particleRadius, centerRef);
+                }
             }
 
         } else {
@@ -154,19 +162,26 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
 
 export default Blob;
 
+const expandPointsFromCenter = (points, distance, center) => {
+    return points.map(point => {
+        const direction = new THREE.Vector3().subVectors(point, center).normalize();
+        return new THREE.Vector3(
+            point.x + direction.x * distance,
+            point.y + direction.y * distance,
+            point.z + direction.z * distance
+        );
+    });
+};
+
 // Outside of component to avoid recreation on render
+const getBlobRadius = (points, particleRadius, centerRef) => {
+    const center = centerRef.current;
+    const expandedPoints = expandPointsFromCenter(points, particleRadius, center);
+    const dist2 = expandedPoints.reduce((a, b) => Math.max(a, b.lengthSq()), 0);
+    return Math.sqrt(dist2);
+}
  
 const points_to_geometry = (points, particleRadius = 0, centerRef) => {
-    const expandPointsFromCenter = (points, distance, center) => {
-        return points.map(point => {
-            const direction = new THREE.Vector3().subVectors(point, center).normalize();
-            return new THREE.Vector3(
-                point.x + direction.x * distance,
-                point.y + direction.y * distance,
-                point.z + direction.z * distance
-            );
-        });
-    };
 
     // Ensure centerRef is a Vector3
     const center = centerRef.current;

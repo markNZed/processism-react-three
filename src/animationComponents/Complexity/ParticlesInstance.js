@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
 
-const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, node, geometryRef }, ref) => {
 
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
@@ -21,9 +21,16 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
 
     useFrame(() => {
         if (!internalRef.current) return;
+
         const mesh = internalRef.current;
         let matrixChanged = false;
         let colorChanged = false;
+
+        let blobScale = 1.0;
+        if (geometryRef?.current?.geometry != null) { 
+            internalRef.current.geometry = geometryRef.current.geometry;
+            blobScale = (particleRadius / geometryRef.current.blobRadius) * 1.3;
+        }
 
         particles.forEach((particleRef, i) => {
             const particle = particleRef.current;
@@ -32,7 +39,8 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
             instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
 
             const pos = particle.translation();
-            const scale = particle.getVisualConfig().scale || 1;
+            const scale = (particle.getVisualConfig().scale || 1) * blobScale;
+
             userScale.set(scale, scale, scale);
             const color = particle.getVisualConfig().color || 'red';
             userColor.set(color);
@@ -99,11 +107,15 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
         visualConfig.color = 'pink';
     };
 
+    //const geometry = new THREE.CircleGeometry(particleRadius, 16);
+    //const material = new THREE.MeshStandardMaterial();
+
     return (
         <instancedMesh
             ref={internalRef}
             args={[null, null, particles.length]}
             onPointerUp={handlePointerDown}
+
         >
             <circleGeometry args={[particleRadius, 16]} />
             <meshStandardMaterial />

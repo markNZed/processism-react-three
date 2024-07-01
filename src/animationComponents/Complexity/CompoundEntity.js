@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useImperativeHandle, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useImperativeHandle, useState, useCallback, createRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Tube } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
@@ -18,7 +18,7 @@ import useStoreEntity from './useStoreEntity';
 import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, getTopBlobGeometryRef, topBlobGeometryRef }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -81,6 +81,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     useFrame(() => {
         if (entityCount === 0) return;
+
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
@@ -125,8 +126,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         <group>
             <CompoundEntityGroup ref={nodeRef} position={initialPosition} >
                 {entityNodes.map((entity, i) => {
+
                     let Entity = CompoundEntity;
-                    if (entity.childrenIds.length === 0) Entity = Particle
+                    if (entity.childrenIds.length === 0) Entity = Particle;
                     return (
                         <Entity
                             key={`${id}-${i}`}
@@ -138,6 +140,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             debug={isDebug}
                             config={config}
                             index={`${i}`}
+                            topBlobGeometryRef={getTopBlobGeometryRef ?? topBlobGeometryRef}
                         />
                     )
                 })}
@@ -148,12 +151,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             node={node}
                             centerRef={centerRef}
                             entityNodes={entityNodes}
+                            getGeometryRef={getTopBlobGeometryRef}
                         />
                         {node.depth === 0 && (
                             <group>
                                 <ParticlesInstance
                                     id={`${id}`}
                                     node={node}
+                                    geometryRef={getTopBlobGeometryRef}
                                 />
                                 {config.showRelations && (
                                     <Relations 
