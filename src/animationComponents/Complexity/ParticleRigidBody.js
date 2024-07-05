@@ -55,6 +55,13 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
                 return null;
             }
         },
+        rotation: () => {
+            if (internalRef.current) {
+                return internalRef.current.rotation();
+            } else { 
+                return null;
+            }
+        },
         getVisualConfig: () => {
             if (visualConfigRef.current) {
                 return visualConfigRef.current;

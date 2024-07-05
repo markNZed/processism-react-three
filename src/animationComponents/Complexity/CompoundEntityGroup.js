@@ -7,6 +7,7 @@ const CompoundEntityGroup = forwardRef(({ children, position, visualConfig }, re
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
     const visualConfigRef = useRef({});
+    let quaternionRef = useRef(new THREE.Quaternion());
 
     // Convert position array to THREE.Vector3 instance
     const verifiedPosition = useMemo(() => new THREE.Vector3(...position), [position]);
@@ -47,8 +48,11 @@ const CompoundEntityGroup = forwardRef(({ children, position, visualConfig }, re
         localToWorld: (vector) => {
             return internalRef.current.localToWorld(vector);
         },
-        translation: (vector) => {
+        translation: () => {
             return internalRef.current.localToWorld(centerRef.current.clone());
+        },
+        rotation: () => {
+            return quaternionRef.current;
         },
         getWorldPosition: (vector) => {
             return internalRef.current.getWorldPosition(vector);

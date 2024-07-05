@@ -37,6 +37,7 @@ export const getRandomColorFn = () => {
 };
 
 export const jointId = (id1, id2) => {
+    return `${id1}-${id2}`;
     const numId1 = Number(id1);
     const numId2 = Number(id2);
     const jointString = numId1 < numId2 ? `${numId1}-${numId2}` : `${numId2}-${numId1}`;
@@ -53,8 +54,8 @@ export const jointIdToNodeIds = (jointId) => {
 export const calculateJointOffsets = (body1, body2, particleRadius) => {
     const body1position = body1.translation();
     const body2position = body2.translation();
-    const quaternion1 = quat(body1.current.rotation());
-    const quaternion2 = quat(body2.current.rotation());
+    const quaternion1 = quat(body1.rotation());
+    const quaternion2 = quat(body2.rotation());
     const direction = new THREE.Vector3()
         .subVectors(body1position, body2position)
         .normalize();

@@ -20,7 +20,7 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
 // Need to orient the CompoundEntity with the Particle it replaces
-// 
+// Pair need to orient at 90 degrees 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, ...props }, ref) => {
 
@@ -142,12 +142,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 outIndex = 0;
                 break;
             case 2:
-                inIndex = 0;
-                outIndex = 1;
+                inIndex = 1;
+                outIndex = 0;
                 break;
             default:
-                inIndex = 0;
-                outIndex = Math.ceil(entities.length / 2) - 1;
+                inIndex = Math.ceil(entities.length / 2) - 1;
+                outIndex = 0;
                 break;
         }
         return { inIndex, outIndex };
@@ -178,8 +178,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             // Should be 2-5 
 
             if (props.jointsTo) {
+                console.log("jointsTo", id, props.jointsTo);
                 props.jointsTo.forEach((jointId, i) => {
-                    console.log("jointId", node.depth, jointId);
+                    console.log("jointsTo jointId", node.depth, jointId);
                     const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
                     console.log("jointRef, body1Id, body2Id, jointId", node.depth,jointRef, body1Id, body2Id, jointId)
                     const body1Ref = directGetNode(body1Id).ref;
@@ -191,7 +192,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 });
             }
             if (props.jointsFrom) {
+                console.log("jointsFrom", id, props.jointsFrom);
                 props.jointsFrom.forEach((jointId, i) => {
+                    console.log("jointsFrom jointId", node.depth, jointId);
                     const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
                     const body2Ref = directGetNode(body2Id).ref;
                     console.log("Map jointsFrom", node.depth, id, jointId, `${outNode.id}-${body2Id}`);
@@ -209,22 +212,36 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const instantiateEntity = (entityNodeId, i) => {
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
-        const newPosition = node.childrenIds.length > 1 ? [0, 0, 0] : [...initialPosition];
+        //const newPosition = node.childrenIds.length > 0 ? [0, 0, 0] : [...initialPosition];
         //const newPosition = [...initialPosition];
+        const newPosition = [0, 0, 0];
         // Not doing anything with i = 0 yet
         switch (i) {
             case 0:
-                newPosition[0] -= entityRadius;
+                if (node.childrenIds.length > 1) {
+                    newPosition[0] -= entityRadius;
+                }
                 setInstantiateJoints(p => [...p, [null, null]]);
                 break;
             case 1: {
-                setInstantiateJoints(p => [...p, [entityNodes[1].id, entityNodes[0].id]]);
+                setInstantiateJoints(p => [...p, [entityNodes[0].id, entityNodes[1].id], [entityNodes[1].id, entityNodes[0].id]]);
                 newPosition[0] += entityRadius;
                 break;
             }
             case 2: {
-                setInstantiateJoints(p => [...p, [entityNodes[0].id, entityNodes[2].id], [entityNodes[2].id, entityNodes[1].id]]);
+                setReplaceJointWith(p => [...p, entityNodes[i].id]);
                 newPosition[1] -= entityRadius * Math.sqrt(3);
+                const replaceJointId = activeJointsQueueRef.current[0];
+                // Scale up the joint to use setReplaceJointWith
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const joint = jointRef.current;
+                const scaleAnchor = (anchor) => ({
+                    x: anchor.x * scaleJoint,
+                    y: anchor.y * scaleJoint,
+                    z: anchor.z * scaleJoint,
+                });
+                joint.setAnchor1(scaleAnchor(joint.anchor1()));
+                joint.setAnchor2(scaleAnchor(joint.anchor2()));
                 break;
             }
             case 3: {
@@ -369,6 +386,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             // If we have a shape then update the joints with new angles to allow for change in the number of entities
             if (entitiesToInstantiate.length > 2) {
 
+                console.log("directGetJoints", directGetJoints())
                 // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
                 alignJointsToPolygon();
 
@@ -474,18 +492,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Should deal with different radius
                 const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius);
                 createJoint(body1Ref, offset1, body2Ref, offset2);
-                const jointId = utils.jointId(id1, id2)
-                if (jointsToRef.current[id2]) {
-                    jointsToRef.current[id2].push(jointId);
-                } else {
-                    jointsToRef.current[id2] = [jointId];
-                }
+                const jointId = utils.jointId(id1, id2);
                 if (jointsFromRef.current[id1]) {
                     jointsFromRef.current[id1].push(jointId);
                 } else {
                     jointsFromRef.current[id1] = [jointId];
                 }
-                activeJointsQueueRef.current.push(utils.jointId(node1.id, node2.id));
+                console.log("jointsFromRef", id1, jointId)
+                if (jointsToRef.current[id2]) {
+                    jointsToRef.current[id2].push(jointId);
+                } else {
+                    jointsToRef.current[id2] = [jointId];
+                }
+                console.log("jointsToRef", id2, jointId)
+                activeJointsQueueRef.current.push(jointId);
                 instantiatedJointsIndices.push(i);
             });
             return instantiatedJointsIndices;
@@ -516,33 +536,44 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 createJoint(body1Ref, anchor1, nextBodyRef, anchor2);
                 // This is not ideal we are creaeting the joint1Id, would be better if createJoint returned it.
                 const joint1Id = utils.jointId(body1Id, nextEntity.id);
-                if (jointsToRef.current[nextEntity.id]) {
-                    jointsToRef.current[nextEntity.id].push(joint1Id);
-                } else {
-                    jointsToRef.current[nextEntity.id] = [joint1Id];
-                }
                 if (jointsFromRef.current[body1Id]) {
                     jointsFromRef.current[body1Id].push(joint1Id);
                 } else {
                     jointsFromRef.current[body1Id] = [joint1Id];
                 }
-                activeJointsQueueRef.current.push(utils.jointId(node1.id, nextEntity.id));
+                console.log("jointsFromRef", body1Id, joint1Id)
+                if (jointsToRef.current[nextEntity.id]) {
+                    jointsToRef.current[nextEntity.id].push(joint1Id);
+                } else {
+                    jointsToRef.current[nextEntity.id] = [joint1Id];
+                }
+                console.log("jointsToRef", nextEntity.id, joint1Id)
+                activeJointsQueueRef.current.push(joint1Id);
 
                 createJoint(nextBodyRef, anchor1, body2Ref, anchor2);
                 const joint2Id = utils.jointId(nextEntity.id, body2Id);
-                if (jointsToRef.current[body2Id]) {
-                    jointsToRef.current[body2Id].push(joint2Id);
-                } else {
-                    jointsToRef.current[body2Id] = [joint2Id];
-                }
                 if (jointsFromRef.current[nextEntity.id]) {
                     jointsFromRef.current[nextEntity.id].push(joint2Id);
                 } else {
                     jointsFromRef.current[nextEntity.id] = [joint2Id];
                 }
-                activeJointsQueueRef.current.push(utils.jointId(node2.id, nextEntity.id));
+                console.log("jointsFromRef", nextEntity.id, joint2Id)
+                if (jointsToRef.current[body2Id]) {
+                    jointsToRef.current[body2Id].push(joint2Id);
+                } else {
+                    jointsToRef.current[body2Id] = [joint2Id];
+                }
+                console.log("jointsToRef", body2Id, joint2Id)
+                activeJointsQueueRef.current.push(joint2Id);
 
                 deleteJoint(replaceJointId);
+                if (jointsFromRef.current[body1Id]) {
+                    jointsFromRef.current[body1Id] = jointsFromRef.current[body1Id].filter((jointId) => jointId !== replaceJointId);
+                }
+                if (jointsToRef.current[body2Id]) {
+                    jointsToRef.current[body2Id] = jointsToRef.current[body2Id].filter((jointId) => jointId !== replaceJointId);
+                }
+                //console.log("deleteJoint", replaceJointId, jointsFromRef.current, jointsToRef.current)
                 activeJointsQueueRef.current.shift();
 
                 replacedJointIndices.push(i);
