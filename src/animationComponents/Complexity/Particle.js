@@ -11,7 +11,7 @@ import * as utils from './utils';
 // At leasst keep uniqueId aligned with id
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, config, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuaternion, radius, config, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -70,7 +70,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
     // Set the initial visualConfig, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && nodeRef.current) {
-            nodeRef.current.setVisualConfig({ color: color, uniqueId: id });
+            nodeRef.current.setVisualConfig({ color: color, uniqueId: id, radius: radius });
             directUpdateNode(id, {isParticle: true});
             const rootNode = directGetNode("root");
             if (!rootNode.particleRadius) {
@@ -83,15 +83,17 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, radius, con
         }
     }, [nodeRef]);
 
-    //console.log("Particle rendering");
+    console.log("Particle rendering", id, nodeRef?.current?.current?.rotation());
 
     return (
         <>
             <ParticleRigidBody
                 ref={nodeRef}
                 position={initialPosition}
+                quaternion={initialQuaternion}
                 type={"dynamic"} // "kinematicPosition" "fixed"
                 //type={"kinematicPosition"} // ""
+                //type={"fixed"} 
                 colliders={false}
                 linearDamping={1}
                 angularDamping={1}

@@ -15,6 +15,7 @@ const useJoints = () => {
             addJoints: directAddJoints, 
             addJoint: directAddJoint, 
             deleteJoint: storeDeleteJoint,
+            updateJoint: directUpdateJoint,
             getNode: directGetNode,
             getAllParticleRefs: directGetAllParticleRefs } = useStoreEntity.getState();
     const particleRadius = directGetNodeProperty('root', 'particleRadius');
@@ -153,7 +154,33 @@ const useJoints = () => {
         }
     };
 
-    return {initializeJoints, deleteJoint, createJoint};
+    const updateJoint = (jointId, aRef, aOffset, bRef, bOffset) => {
+        const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+        const aVisualConfig = aRef.getVisualConfig();
+        const bVisualConfig = bRef.getVisualConfig();
+        console.log("updateJoint", jointId, body1Id, body2Id, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
+        console.log("updateJoint ref", jointId, aRef.current, bRef.current);
+        if (jointRef.current) {
+            const joint = jointRef.current;
+            jointRef.current = undefined;
+            if (world.getImpulseJoint(joint.handle)) {
+                world.removeImpulseJoint(joint, true);
+            }
+        }
+        const newJointRef = { current: null }; // Create a plain object to hold the reference
+        if (aRef.current?.type !== "Group" && bRef.current?.type !== "Group") {
+            newJointRef.current = world.createImpulseJoint(
+                rapier.JointData.spherical(aOffset, bOffset),
+                aRef.current,
+                bRef.current,
+                true
+            );
+        } else {
+            console.warn("No aRef or bRef for updateJoint", jointId, aRef.current.type, bRef.current.type);
+        }
+        directUpdateJoint(jointId, aVisualConfig.uniqueId, bVisualConfig.uniqueId, newJointRef);
+    };
+    return {initializeJoints, deleteJoint, createJoint, updateJoint};
 };
 
 export default useJoints;

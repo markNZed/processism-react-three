@@ -215,6 +215,18 @@ const useStoreEntity = create((set, get) => {
             return joints[jointId];
         },
 
+        getJoints: () => {
+            return get().joints;
+        },
+
+        updateJoint: (jointId, body1Id, body2Id, ref) => set(state => {
+            const joints = state.joints;
+            joints[jointId] = [ref, body1Id, body2Id]; // Store the order the joint was created in (important for offset)
+            return {
+                joints,
+            };
+        }),
+
         addRelation: (fromId, toId) => set(state => {
             const relations = state.relations;
             if (!relations[fromId]) relations[fromId] = [];

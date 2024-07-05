@@ -32,6 +32,8 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
             setParticleCount(count);
         }
 
+        //console.log("allParticleRefs", allParticleRefs)
+
         allParticleRefs.forEach((particleRef, i) => {
             
             const particle = particleRef.current;
@@ -43,8 +45,15 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
             const visualConfig = particle.getVisualConfig();
 
             const pos = particle.translation();
-            const scale = visualConfig.scale || 1;
+            let scale = visualConfig.scale || 1;
+
+            const radius = visualConfig.radius || particleRadius;
+            if (radius !== particleRadius) {
+                scale = scale * (radius / particleRadius);
+            }
+
             userScale.set(scale, scale, scale);
+
             const color = visualConfig.color || 'red';
             userColor.set(color);
 

@@ -33,9 +33,11 @@ function useAnimateComplexity(config, internalRef) {
         // Blow away the storesremountConfigState
         useStoreEntity.getState().reset();
         const rootNode = directGetNode("root");
-        addNodesRecursively([1,2], rootNode);
+        // We have 2 nodes at top that should have a joint - but the joint is not between two particles at this level
+
+        addNodesRecursively([9], rootNode);
         //addNodesRecursively([config.entityCounts[0]], rootNode);
-        // addNodesRecursively(config.entityCounts, rootNode);
+        //addNodesRecursively(config.entityCounts, rootNode);
         directUpdateNode("root", { ref: internalRef });
         setStoreEntityReady(true);
         console.log("Nodes after initialization", useStoreEntity.getState().getAllNodes());

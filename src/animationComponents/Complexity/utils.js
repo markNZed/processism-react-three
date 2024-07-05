@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { quat } from '@react-three/rapier';
 
 /**
  * Retrieves a color setting from a configuration object.
@@ -52,11 +53,15 @@ export const jointIdToNodeIds = (jointId) => {
 export const calculateJointOffsets = (body1, body2, particleRadius) => {
     const body1position = body1.translation();
     const body2position = body2.translation();
+    const quaternion1 = quat(body1.current.rotation());
+    const quaternion2 = quat(body2.current.rotation());
     const direction = new THREE.Vector3()
         .subVectors(body1position, body2position)
         .normalize();
     const offset1 = direction.clone().multiplyScalar(-particleRadius);
     const offset2 = direction.clone().multiplyScalar(particleRadius);
+    offset1.applyQuaternion(quaternion1);
+    offset2.applyQuaternion(quaternion2);
     return { offset1, offset2 };
 };
 
@@ -67,4 +72,18 @@ export const calculateMidpoint = (body1, body2) => {
         .addVectors(body1position, body2position)
         .divideScalar(2);
     return midpoint;    
+}
+
+export const stringifyCircular = (obj) => {
+    const seen = new WeakSet();
+    return JSON.stringify(obj, (key, value) => {
+        if (typeof value === "object" && value !== null) {
+            if (seen.has(value)) {
+                // Return some custom object or a marker indicating a circular reference
+                return "[Circular]";
+            }
+            seen.add(value);
+        }
+        return value;
+    });
 }
