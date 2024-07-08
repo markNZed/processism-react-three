@@ -138,6 +138,7 @@ const useJoints = () => {
         if (!batch) {
             directAddJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
         }
+        console.log("createJoint", `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`, jointRef.current)
         return jointRef;
     };
     

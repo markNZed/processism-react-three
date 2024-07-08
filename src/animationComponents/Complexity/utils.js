@@ -51,23 +51,15 @@ export const jointIdToNodeIds = (jointId) => {
     return [body1Id, body2Id];
 }
 
-export const calculateJointOffsets = (body1, body2, particleRadius, body1Quaternion = null, body2Quaternion = null) => {
+export const calculateJointOffsets = (body1, body2, particleRadius, body2Radius = null) => {
     const body1position = body1.translation();
     const body2position = body2.translation();
     const quaternion1 = quat(body1.rotation());
     // Invert so we counteract the body rotation
     quaternion1.invert();
-    console.log("quaternion1", quaternion1, body1Quaternion)
-    if (body1Quaternion) {
-        quaternion1.multiply(body1Quaternion);
-    }
     const quaternion2 = quat(body2.rotation());
     // Invert so we counteract the body rotation
     quaternion2.invert();
-    console.log("quaternion2", quaternion2, body2Quaternion)
-    if (body2Quaternion) {
-        quaternion2.multiply(body2Quaternion);
-    }
     const direction1 = new THREE.Vector3()
         .subVectors(body2position, body1position)
         .normalize();
@@ -75,7 +67,7 @@ export const calculateJointOffsets = (body1, body2, particleRadius, body1Quatern
         .subVectors(body1position, body2position)
         .normalize();
     const offset1 = direction1.clone().multiplyScalar(particleRadius);
-    const offset2 = direction2.clone().multiplyScalar(particleRadius);
+    const offset2 = direction2.clone().multiplyScalar(body2Radius || particleRadius);
     console.log("offset1 before quaternion1", offset1)
     console.log("offset2 before quaternion2", offset2)
     offset1.applyQuaternion(quaternion1);
