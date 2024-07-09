@@ -45,7 +45,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.99, [radius, entityCount]);
     // Track the center of this CompoundEntity
-    const centerRef = useRef(new THREE.Vector3());
+    //const centerRef = useRef(new THREE.Vector3());
+    const centerRef = node.centerRef;
     // State machine that can distribute computation across frames
     const frameStateRef = useRef("init");
     const [physicsState, setPhysicsState] = useState("waiting");
@@ -159,6 +160,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                     id={`${id}`}
                                     node={node}
                                     geometryRef={getTopBlobGeometryRef}
+                                    config={config}
                                 />
                                 {config.showRelations && (
                                     <Relations 

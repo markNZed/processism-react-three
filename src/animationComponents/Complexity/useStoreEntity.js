@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import uniqueIdGenerator from './uniqueIdGenerator';
 import { devtools } from 'zustand/middleware';
 import * as utils from './utils';
+import * as THREE from 'three';
 
 /**
  * Zustand Tree Store
@@ -73,6 +74,12 @@ const createNode = (id = null, properties = {}, childrenIds = []) => {
         id: id || uniqueIdGenerator.getNextId(),
         ref: React.createRef(),
         childrenIds,
+        parentRef: React.createRef(),
+        centerRef: (() => {
+            const ref = React.createRef();
+            ref.current = new THREE.Vector3();  // Initialize .current with an empty object
+            return ref;
+        })(),
         relationsRef: (() => {
             const ref = React.createRef();
             ref.current = [];  // Initialize .current with an empty object
@@ -314,6 +321,7 @@ const useStoreEntity = create((set, get) => {
 
                 const nodeDepth = (parentNode.depth || 0) + 1;
                 const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId }, node.childrenIds || []);
+                newNode.parentRef.current = parentNode;
                 newNodeId = newNode.id;
                 state.nodeCount++;
 

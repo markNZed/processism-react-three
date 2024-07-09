@@ -8,6 +8,7 @@ import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
+import * as THREE from 'three';
 
 /* Overview:
   Animation framework intended to provide a visual language for representing complexity.
@@ -144,7 +145,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
     // which might be an issue with useMemo?
 
-    const getTopBlobGeometryRef = useRef({ geometry: undefined, visible: false });
+    const getTopBlobGeometryRef = useRef({ geometry: undefined, visible: false, center: new THREE.Vector3() });
     return (
         <>
             {storeEntityReady && (
