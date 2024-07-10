@@ -76,12 +76,12 @@ const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config }, r
         instanceGeometry.setAttribute('uv', planeGeometry.getAttribute('uv'));
         instanceGeometry.setIndex(planeGeometry.index);
 
-        const timeOffsets = new Float32Array(maxParticleCount);
+        const timeOffsets = new Float32Array(maxParticleCount*2);
         for (let i=0; i<timeOffsets.length; ++i) { 
             let off = Math.random() * 2*Math.PI;
             timeOffsets[i] = off; 
         }
-        const timeOffsetsAttribute = new THREE.InstancedBufferAttribute(timeOffsets, 1, undefined, 1);
+        const timeOffsetsAttribute = new THREE.InstancedBufferAttribute(timeOffsets, 2, undefined, 1);
         timeOffsetsAttribute.needsUpdate = true;
         instanceGeometry.setAttribute('timeOffset', timeOffsetsAttribute);
         
@@ -113,8 +113,8 @@ const sinVertexShader = meshBasicVertex
 .replace('#include <clipping_planes_pars_vertex>',
 `#include <clipping_planes_pars_vertex>
 
-    attribute float timeOffset;
-    varying float vTimeOffset;
+    attribute vec2 timeOffset;
+    varying vec2 vTimeOffset;
 `)
 .replace('#include <skinning_vertex>', 
 `#include <skinning_vertex>
@@ -132,14 +132,14 @@ const sinVertexShader = meshBasicVertex
     uniform vec2 strength;
     uniform vec2 speed;
     //uniform float timeOffset;
-    varying float vTimeOffset;
+    varying vec2 vTimeOffset;
 	uniform sampler2D map;
     
     //attribute vec2 sinDir;`)
 .replace(
 '#include <map_fragment>', 
 `    
-    vec2 uvOff = vec2(vUv.x + sin(vUv.y*PI2+(time+vTimeOffset)*speed.x)*strength.x, vUv.y + sin(vUv.x*PI2+(time+vTimeOffset)*speed.y)*strength.y);
+    vec2 uvOff = vec2(vUv.x + sin(vUv.y*PI2+(time+vTimeOffset.x)*speed.x)*strength.x, vUv.y + sin(vUv.x*PI2+(time+vTimeOffset.y)*speed.y)*strength.y);
     //uvOff = vec2(vUv.x, vUv.y + sin(time+vUv.x*PI2)*0.05);
     vec4 sampledDiffuseColor = texture2D( map, uvOff );
     diffuseColor *= sampledDiffuseColor;
@@ -156,6 +156,7 @@ const sinVertexShader = meshBasicVertex
             transparent: true,
             wireframe: false,
             depthWrite: false,
+            depthTest: false,
             uniforms: { 
                 time: { value: 0 },
                 strength: { value: new THREE.Vector2(0.05, 0.05), },

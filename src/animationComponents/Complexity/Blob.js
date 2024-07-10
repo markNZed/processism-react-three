@@ -5,10 +5,6 @@ import useStoreEntity from './useStoreEntity';
 import * as TME from '@immugio/three-math-extensions';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import _ from 'lodash';
-//import * as TSM from '../../SubdivisionModifierJackrugile';
-import * as TESM from 'three/examples/jsm/modifiers/EdgeSplitModifier';
-import * as TTM from 'three/examples/jsm/modifiers/TessellateModifier';
-import { LoopSubdivision } from './LoopSubdivision';
 
 const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     const worldVector = new THREE.Vector3();
