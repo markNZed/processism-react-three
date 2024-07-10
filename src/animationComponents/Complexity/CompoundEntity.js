@@ -43,6 +43,8 @@ import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rap
 // Core gets thrown out of blob
 //   Add joints to entities ? make it fixed and move with center ?
 //   When particles are replaced joints are not updated for the core
+// The blob particles can change dynamically so this needs to refresh on changes too
+//   Problem for pre-calculating blob points
 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, ...props }, ref) => {
@@ -75,9 +77,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const configColor = config.colors[node.depth];
     const localColor = useMemo(() => utils.getColor(configColor, color), [configColor, color]);
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
-    //const entityRadius = config.radius / getNodeCount();
-    const entityRadius = entityCount ? radius / entityCount : radius; // Fixed to help with testing
-    //const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.97, [radius, entityCount]);
+    //const entityRadius = entityCount ? radius / entityCount : radius; // Fixed to help with testing
+    const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.97, [radius, entityCount]);
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
     const worldCenterRef = useRef(new THREE.Vector3());
@@ -117,6 +118,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [initiatedCore, setInitiatedCore] = useState(false);
     const particlesInstanceRef = useRef();
     const animDelay = 250;
+    const [allParticlesReady, setAllParticlesReady] = useState(false);
     
     const entityPositionsRef = useRef([]);
     const entityOrientationsRef = useRef({});
@@ -203,6 +205,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     console.log("Map jointsTo", node.depth, id, jointId, `${body1Id}-${inNode.id}`, quaternion);
                     // Radius needs to be fetched
                     // Instead of calculating angle keep the previous angle to maintian shape
+                    // Copy the angle from body1 and transfer the angle from body2 to in Node ?
+                    // But we are not using the jointRef (it may not be stable?)
                     const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref.current, inNode.ref.current, entityRadius);
                     console.log("jointsTo offset1, offset2", offset1, offset2)
                     // Replace body
@@ -425,7 +429,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius);
             //const offset1 = new THREE.Vector3(entityRadius, 0, 0);
             //const offset2 = new THREE.Vector3(entityRadius, 0, 0);
-            createJoint(body1Ref, offset1, body2Ref, offset2);
+            createJoint(node.chainRef, body1Ref, offset1, body2Ref, offset2);
             const jointId = utils.jointId(id1, id2);
             console.log("offsets", jointId, offset1, offset2);
             if (jointsFromRef.current[id1]) {
@@ -474,7 +478,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
             anchor1.multiplyScalar(1 / scaleJoint);
             anchor2.multiplyScalar(1 / scaleJoint);
-            createJoint(body1Ref, anchor1, nextBodyRef, anchor2);
+            createJoint(node.chainRef, body1Ref, anchor1, nextBodyRef, anchor2);
             // This is not ideal we are creaeting the joint1Id, would be better if createJoint returned it.
             const joint1Id = utils.jointId(body1Id, nextEntity.id);
             if (jointsFromRef.current[body1Id]) {
@@ -489,7 +493,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             activeJointsQueueRef.current.push(joint1Id);
 
-            createJoint(nextBodyRef, anchor1, body2Ref, anchor2);
+            createJoint(node.chainRef, nextBodyRef, anchor1, body2Ref, anchor2);
             const joint2Id = utils.jointId(nextEntity.id, body2Id);
             if (jointsFromRef.current[nextEntity.id]) {
                 jointsFromRef.current[nextEntity.id].push(joint2Id);
@@ -503,7 +507,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             activeJointsQueueRef.current.push(joint2Id);
 
-            deleteJoint(replaceJointId);
+            deleteJoint(node.chainRef, replaceJointId);
             if (jointsFromRef.current[body1Id]) {
                 jointsFromRef.current[body1Id] = jointsFromRef.current[body1Id].filter((jointId) => jointId !== replaceJointId);
             }
@@ -579,27 +583,48 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         if (busyInstantiatingRef.current) {
             const lastEntity = directGetNode(instantiatingIdRef.current);
             // Is the rigid body reference available
-            if (lastEntity?.ref?.current?.current) {
+            const particleRef = lastEntity.ref;
+            const instantiatedCount = entitiesToInstantiate.length;
+            if (particleRef?.current?.current) {
                 console.log("Ready", lastEntity.id, lastEntity);
                 setEntityInstantiated(lastEntity.id);
                 busyInstantiatingRef.current = false;
-                if (entitiesToInstantiate.length == 1) {
-                    //lastEntity.ref.current.current.lockTranslations(true, true);
-                    //lastEntity.ref.current.current.lockRotations(true, true);
+                if (instantiatedCount == 1) {
+                    //particleRef.current.current.lockTranslations(true, true);
+                    //particleRef.current.current.lockRotations(true, true);
                 }
-                if (entitiesToInstantiate.length == entityCount && particlesFirst) {
+                if (instantiatedCount == entityCount && particlesFirst) {
                     const firstEntity = directGetNode(entitiesToInstantiate[0]);
                     firstEntity.ref.current.current.lockTranslations(false, true);
                     firstEntity.ref.current.current.lockRotations(false, true);
                     setParticlesFirst(false);
                 }
-                node.particlesRef.current.push(lastEntity.ref);
+                node.particlesRef.current.push(particleRef);
                 // If we have a shape then update the joints with new angles to allow for change in the number of entities
-                if (entitiesToInstantiate.length > 2) {
+                if (instantiatedCount > 2) {
                     console.log("directGetJoints", directGetJoints())
                     // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
                     alignJointsToPolygon();
                 }
+
+                // Blob is called for root before the particles are ready at the lowest level 
+                // entitiesReadyDelayed is not sufficient for that
+
+                const visualConfig = particleRef.current.getVisualConfig();
+                if (!visualConfig.outerChain) visualConfig.outerChain = {};
+                // both input and output are outer
+                let outer = false;
+                if (instantiatedCount == 1 || instantiatedCount == 2) {
+                    outer = true;
+                }
+                // If instantiateCount is odd then outer is true
+                if (instantiatedCount % 2 != 0) {
+                    outer = true;
+                }
+                //let outer = distanceToCenter >= (distanceToFirstJoint);
+                visualConfig.outerChain[node.depth] = outer
+                console.log("Outer", id, instantiatedCount, outer)
+                particleRef.current.setVisualConfig(visualConfig);
             }
         }
 
@@ -701,7 +726,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
                 const joint = jointRef.current;
 
-                if (!joint) return; // Joint is being modified and not yet ready
+                if (!joint) {
+                    console.warn("Joint not found", id, jointId);
+                    return; // Joint is being modified and not yet ready
+                }
 
                 const anchor1 = vec3(joint.anchor1());
                 const anchor2 = vec3(joint.anchor2());
@@ -733,15 +761,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     });
 
     useFrame(() => {
-        return
         if (entityCount == 0) return;
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
                 // useEffect to call initializeJoints because it may take longer than a frame
-                if (physicsState === "waiting") {
+                // particleChange is global in storeEntity but cleared 
+                // Should only chek it from root ? But need a better fix
+                // chainRef is not built ?
+                // createJoint and updateJoint need to maintain chainRef
+                if (!allParticlesReady) {
                     const allParticleRefs = directGetAllParticleRefs(id);
-                    if (allParticleRefs.length) {
+                    //console.log("allParticleRefs", id, allParticleRefs); // empty
+                    if (allParticleRefs.length >= node.childrenIds.length) {
                         //console.log("allParticleRefs.length", id, allParticleRefs.length)
                         let particlesExist = true;
                         allParticleRefs.forEach((particleRef) => {
@@ -749,10 +781,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                 particlesExist = false;
                             }
                         });
-                        if (particlesExist) setPhysicsState("initialize");
+                        //if (particlesExist) setPhysicsState("initialize");
+                        if (particlesExist) {
+                            setAllParticlesReady(true);
+                            console.log("allParticlesReady", id, allParticleRefs);
+                        }
                     }
-                }
-                if (isPhysicsReady()) {
+                } else {
                     if (id == "root") {
                         console.log("Physics ready", nodeRef);
                         console.log("useStoreEntity", useStoreEntity.getState());
@@ -826,17 +861,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     </RigidBody>
                 )}
 
-                {physicsState === "ready" && (
-                    <group>
-                        {entitiesReadyDelayed && (
-                            <Blob
-                                color={localColor}
-                                node={node}
-                                centerRef={centerRef}
-                                entityNodes={entityNodes}
-                            />
-                        )}
-                    </group>
+                {allParticlesReady && (
+                    <Blob
+                        color={localColor}
+                        node={node}
+                        centerRef={centerRef}
+                        entityNodes={entityNodes}
+                    />
                 )}
                 {isDebug && (
                     <DebugRender

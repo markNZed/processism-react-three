@@ -20,6 +20,24 @@ const useJoints = () => {
             getAllParticleRefs: directGetAllParticleRefs } = useStoreEntity.getState();
     const particleRadius = directGetNodeProperty('root', 'particleRadius');
 
+    const addLink = (chainRef, uniqueIdA, uniqueIdB) => {
+        console.log("addLink", uniqueIdA, uniqueIdB);
+        if (chainRef.current[uniqueIdA]) {
+            if (!chainRef.current[uniqueIdA].includes(uniqueIdB)) {
+                chainRef.current[uniqueIdA].push(uniqueIdB);
+            }
+        } else {
+            chainRef.current[uniqueIdA] = [uniqueIdB];
+        }
+    }
+
+    const removeLink = (chainRef, uniqueIdA, uniqueIdB) => {
+        console.log("removeLink", uniqueIdA, uniqueIdB);
+        if (chainRef.current[uniqueIdA]) {
+            chainRef.current[uniqueIdA] = chainRef.current[uniqueIdA].filter(id => id !== uniqueIdB);
+        }
+    }
+
     const allocateJointsToParticles = (node, chainRef, entityPositions) => {
         const nodeRef = node.ref;
         const worldPosition = new THREE.Vector3();
@@ -62,20 +80,7 @@ const useJoints = () => {
             const uniqueIdA = closestParticleARef.getVisualConfig().uniqueId;
             const uniqueIdB = closestParticleBRef.getVisualConfig().uniqueId;
 
-            if (chainRef.current[uniqueIdA]) {
-                if (!chainRef.current[uniqueIdA].includes(uniqueIdB)) {
-                    chainRef.current[uniqueIdA].push(uniqueIdB);
-                }
-            } else {
-                chainRef.current[uniqueIdA] = [uniqueIdB];
-            }
-            if (chainRef.current[uniqueIdB]) {
-                if (!chainRef.current[uniqueIdB].includes(uniqueIdA)) {
-                    chainRef.current[uniqueIdB].push(uniqueIdA);
-                }
-            } else {
-                chainRef.current[uniqueIdB] = [uniqueIdA];
-            }
+            addLink(chainRef, uniqueIdA, uniqueIdB);
 
             return [closestParticleARef, offsetA, closestParticleBRef, offsetB];
         });
@@ -119,13 +124,13 @@ const useJoints = () => {
         // Create the joints
         const createJointResults = []
         newJoints.forEach(([body1Ref, offset1, body2Ref, offset2]) => {
-            const jointRef = createJoint(body1Ref, offset1, body2Ref, offset2, true)
+            const jointRef = createJoint(chainRef, body1Ref, offset1, body2Ref, offset2, true)
             createJointResults.push([body1Ref.getVisualConfig().uniqueId, body2Ref.getVisualConfig().uniqueId, jointRef]);
         });
         directAddJoints(createJointResults); // Because batch operation
     };
 
-    const createJoint = (aRef, aOffset, bRef, bOffset, batch=false) => {
+    const createJoint = (chainRef, aRef, aOffset, bRef, bOffset, batch=false) => {
         const aVisualConfig = aRef.getVisualConfig();
         const bVisualConfig = bRef.getVisualConfig();
         const jointRef = { current: null }; // Create a plain object to hold the reference
@@ -135,6 +140,7 @@ const useJoints = () => {
             bRef.current,
             true
         );
+        addLink(chainRef, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
         if (!batch) {
             directAddJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
         }
@@ -142,7 +148,7 @@ const useJoints = () => {
         return jointRef;
     };
     
-    const deleteJoint = (jointKey) => {
+    const deleteJoint = (chainRef, jointKey) => {
         //console.log("deleteJoint", jointKey)
         const [jointRef, body1Id, body2Id] = directGetJoint(jointKey);
         if (jointRef.current) {
@@ -153,6 +159,7 @@ const useJoints = () => {
             }
             storeDeleteJoint(body1Id, body2Id);
         }
+        removeLink(chainRef, body1Id, body2Id)
     };
 
     const updateJoint = (jointId, aRef, aOffset, bRef, bOffset) => {

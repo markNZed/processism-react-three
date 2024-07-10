@@ -225,10 +225,14 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
     }
 
     // Guard clause to prevent infinite loops
-    if (visited.has(uniqueId)) return null;
+    if (visited.has(uniqueId)) {
+        return null;
+    }
     
     // Guard clause to check if uniqueId is in blobOuterUniqueIds
-    if (!blobOuterUniqueIds.includes(uniqueId)) return null;
+    if (!blobOuterUniqueIds.includes(uniqueId)) {
+        return null;
+    }
 
     visited.add(uniqueId);
     
@@ -250,6 +254,6 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
     linkedIndexes.forEach((id) => {visited.add(id)});
     foundChain.forEach((id) => {visited.add(id)});
     result.push(...foundChain);
-    
+
     return result;
 }

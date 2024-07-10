@@ -324,7 +324,7 @@ const useStoreEntity = create((set, get) => {
                 }))
                 return particles;
             } else {
-                return get().particles[id];
+                return get().particles[id] || [];
             }
         },
 

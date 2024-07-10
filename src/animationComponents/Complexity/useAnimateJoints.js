@@ -105,13 +105,13 @@ const useAnimateJoints = (
                     jointsToCreate.push([body1, offset1, body2, offset2]);
                 });
                 entityJointIndexes.forEach((jointId) => {
-                    deleteJoint(jointId);
+                    deleteJoint(node.chainRef, jointId);
                     console.log("deleteJoint", jointId);
                 });
                 jointsToCreate.forEach(([body1, offset1, body2,offset2]) => {
                     body1.getVisualConfig().color = 'orange';
                     body2.getVisualConfig().color = 'orange';
-                    createJoint(body1, offset1, body2,offset2);
+                    createJoint(node.chainRef, body1, offset1, body2,offset2);
                 })
             }
             clearInterval(interval);
