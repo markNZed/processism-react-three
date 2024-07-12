@@ -7,23 +7,25 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateVisualConfigValue, getNodeProperty } = useStoreEntity.getState();
-    const { chainRef, id, particlesRef: { current: particles } } = node;
+    const { getNode, propagateVisualConfigValue, getNodeProperty, getparticlesStable, getAllParticleRefs } = useStoreEntity.getState();
+    const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const particleRadius = useMemo(() => getNodeProperty('root', 'particleRadius'), []);
     const [pressStart, setPressStart] = useState(0);
     const longPressThreshold = 500; // Time in milliseconds to distinguish a long press
+    const particlesRef = useRef();
+    const particlesHashRef = useRef();
 
-    // This only runs once upon mounting to build the blobData which acts as a cache for objects
-    useEffect(() => {
-
+    function buildBlobPoints() {
         blobData.current = {
             positions: [],
             flattenedIndexes: [],
-        }
+        };
 
         let blobOuterUniqueIds = [];
         let flattenedIndexes = [];
+        particlesRef.current = getAllParticleRefs(id);
+        const particles = particlesRef.current;
         for (let i = 0; i < particles.length; ++i) {
             if (!particles[i].current) {
                 console.warn(`particles[i] ${i}, was empty`);
@@ -50,21 +52,22 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
 
         if (blobOuterUniqueIds.length < 3) {
             console.error("blobOuterUniqueIds less than 3!", id, blobOuterUniqueIds.length, particles.length);
-            // Dealing with the case where there is only one particle
-            // Which means there will be no blob, so no way to click on the blob ansds show the particle
-            entityNodes[0].ref.current.setVisualConfig(p => ({ ...p, visible: true }));
-            if (particles.length == 2) {
-                entityNodes[1].ref.current.setVisualConfig(p => ({ ...p, visible: true }));
+            // Dealing with the case where there is only one or two particles
+            // Which means there will be no blob, so no way to click on the blob and show the particle
+            // This no longer works as there can be an intermediate state where blobOuterUniqueIds.length is < 3 but the
+            // number of entities wil lbe more thean three.
+            if (entityNodes.length < 3) {
+                entityNodes.forEach(e => e.ref.current.setVisualConfig(p => ({ ...p, visible: false })));
             }
         }
 
         // buildOrderedIds can return null if there are no blobOuterUniqueIds
-        const orderedIds = buildOrderedIds(chainRef, blobOuterUniqueIds) || [];
+        const orderedIds = buildOrderedIds(id, chainRef, blobOuterUniqueIds) || [];
         if (!orderedIds.length) console.error("orderedIds is empty!", id);
         //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
         const blobIndexes = orderedIds;
 
-        //console.log("Blob", id, blobOuterUniqueIds, blobIndexes)
+        //console.log("buildBlobPoints", id, particles, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
@@ -72,14 +75,29 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
             const flattenedIndex = flattenedIndexes[indexInOuter];
             blobData.current.flattenedIndexes.push(flattenedIndex);
         }
+    }
+
+    // This only runs once upon mounting to build the blobData which acts as a cache for objects
+    useEffect(() => {
+
+        buildBlobPoints();
 
     },[]);
 
     useFrame(() => {
 
+        const hash = getparticlesStable(id);
+        //if (id == "root") console.log("getparticlesStable(id) hash", hash);
+        if (hash !== particlesHashRef.current) {
+            particlesHashRef.current = hash;
+            buildBlobPoints();
+        }
+
         if (!blobData.current) return;
 
         if (node.ref.current.getVisualConfig().visible) {
+
+            const particles = particlesRef.current;
 
             const blobPoints = blobData.current.positions.map((positiion, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
@@ -215,7 +233,7 @@ function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
 
 // visited should be specific to a "search" of the chain
 
-function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null) {
+function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null) {
     let initial = false;
     // Initialize uniqueId with the first element of blobOuterUniqueIds if null
     if (uniqueId === null) {
@@ -224,13 +242,16 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
         firstId = uniqueId;
     }
 
+    //console.log("buildOrderedIds", id, uniqueId, JSON.stringify(chainRef.current), blobOuterUniqueIds);
     // Guard clause to prevent infinite loops
     if (visited.has(uniqueId)) {
+        //console.log("buildOrderedIds loop", uniqueId); 
         return null;
     }
     
     // Guard clause to check if uniqueId is in blobOuterUniqueIds
     if (!blobOuterUniqueIds.includes(uniqueId)) {
+        //console.log("buildOrderedIds not in outer", uniqueId); 
         return null;
     }
 
@@ -242,8 +263,9 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
     // Search for the longest loop
     let foundChain = [];
     for (let linkedIndex of linkedIndexes) {
+        //console.log("buildOrderedIds linkedIndex", id, linkedIndex, linkedIndexes);
         const clonedVisited = new Set([...visited]);
-        const recursiveResult = buildOrderedIds(chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId);
+        const recursiveResult = buildOrderedIds(id, chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId);
         if (recursiveResult) {
             const lastIndexes = chainRef.current[recursiveResult[recursiveResult.length - 1]];
             // A loop will include a link back to firstId
@@ -251,7 +273,7 @@ function buildOrderedIds(chainRef, blobOuterUniqueIds, uniqueId = null, visited 
         }
         visited.add(linkedIndex);
     }
-    linkedIndexes.forEach((id) => {visited.add(id)});
+    //linkedIndexes.forEach((id) => {visited.add(id)});
     foundChain.forEach((id) => {visited.add(id)});
     result.push(...foundChain);
 

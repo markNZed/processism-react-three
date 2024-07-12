@@ -21,11 +21,9 @@ const useJoints = () => {
     const particleRadius = directGetNodeProperty('root', 'particleRadius');
 
     const addLink = (chainRef, uniqueIdA, uniqueIdB) => {
-        console.log("addLink", uniqueIdA, uniqueIdB);
+        //console.log("Before addLink", JSON.stringify(chainRef.current), uniqueIdA, uniqueIdB);
         if (chainRef.current[uniqueIdA]) {
-            if (!chainRef.current[uniqueIdA].includes(uniqueIdB)) {
-                chainRef.current[uniqueIdA].push(uniqueIdB);
-            }
+            if (!chainRef.current[uniqueIdA].includes(uniqueIdB)) chainRef.current[uniqueIdA].push(uniqueIdB);
         } else {
             chainRef.current[uniqueIdA] = [uniqueIdB];
         }
@@ -162,7 +160,7 @@ const useJoints = () => {
         removeLink(chainRef, body1Id, body2Id)
     };
 
-    const updateJoint = (jointId, aRef, aOffset, bRef, bOffset) => {
+    const updateJoint = (chainRef, jointId, aRef, aOffset, bRef, bOffset) => {
         const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
         const aVisualConfig = aRef.getVisualConfig();
         const bVisualConfig = bRef.getVisualConfig();
@@ -186,9 +184,11 @@ const useJoints = () => {
         } else {
             console.warn("No aRef or bRef for updateJoint", jointId, aRef.current.type, bRef.current.type);
         }
+        removeLink(chainRef, body1Id, body2Id);
+        addLink(chainRef, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
         directUpdateJoint(jointId, aVisualConfig.uniqueId, bVisualConfig.uniqueId, newJointRef);
     };
-    return {initializeJoints, deleteJoint, createJoint, updateJoint};
+    return {initializeJoints, deleteJoint, createJoint, updateJoint, addLink};
 };
 
 export default useJoints;

@@ -45,9 +45,17 @@ import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rap
 //   When particles are replaced joints are not updated for the core
 // The blob particles can change dynamically so this needs to refresh on changes too
 //   Problem for pre-calculating blob points
+// particles[i].current.getVisualConfig().outerChain is probably not built as particles in blob are replaced
+// chain is broken in buildOrderedIds
+//   chainRef is broken - not accumulating joints for higher level
+//   When we create a new CompoundEntity that replaces a particle then when we update the joints we also need to update chainRefs
+//   If chainRef changes then we also need to reset the blobs
+//     Maybe after each entity becomes stable we reset for the blobs ?
+//       A separate condition to generate new blob data on joint updates
+// Why are lower level blobs showing ?
 
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, parentOuter = {}, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -61,6 +69,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         getAllParticleRefs: directGetAllParticleRefs,
         getJoint: directGetJoint,
         getJoints: directGetJoints,
+        resetParticlesStable: directResetParticlesStable,
     } = useStoreEntity.getState();
     const setOption = useStore((state) => state.setOption);
     const getOption = useStore((state) => state.getOption);
@@ -119,11 +128,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const particlesInstanceRef = useRef();
     const animDelay = 250;
     const [allParticlesReady, setAllParticlesReady] = useState(false);
+    const outerNodesRef = useRef({});
     
     const entityPositionsRef = useRef([]);
     const entityOrientationsRef = useRef({});
 
-    const { initializeJoints, deleteJoint, createJoint, updateJoint } = useJoints();
+    const { initializeJoints, deleteJoint, createJoint, updateJoint, addLink } = useJoints();
 
     //useAnimateImpulses(isPhysicsReady(), node, entityNodes, initialPosition, radius, config);
     useAnimateRelations(isPhysicsReady(), node, entityNodes, config);
@@ -210,7 +220,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref.current, inNode.ref.current, entityRadius);
                     console.log("jointsTo offset1, offset2", offset1, offset2)
                     // Replace body
-                    updateJoint(jointId, body1Ref.current, offset1, inNode.ref.current, offset2);
+                    updateJoint(node.chainRef, jointId, body1Ref.current, offset1, inNode.ref.current, offset2);
                     jointsUpdated.push(jointId);
                 });
                 jointsToInRef.current = jointsToInRef.current.filter((jointId) => !jointsUpdated.includes(jointId));
@@ -227,7 +237,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const { offset1, offset2 } = utils.calculateJointOffsets(outNode.ref.current, body2Ref.current, entityRadius);
                     console.log("jointsFrom offset1, offset2", offset1, offset2)
                     // Replace body
-                    updateJoint(jointId, outNode.ref.current, offset1, body2Ref.current, offset2);
+                    updateJoint(node.chainRef, jointId, outNode.ref.current, offset1, body2Ref.current, offset2);
                     jointsUpdated.push(jointId);
                 });
                 jointsFromInRef.current = jointsFromInRef.current.filter((jointId) => !jointsUpdated.includes(jointId));
@@ -382,6 +392,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (entitiesToInstantiate.includes(entityNodeId)) continue;
             busyInstantiatingRef.current = true;
             instantiatingIdRef.current = entityNodeId;
+
+            // Define the node as outer or not for the blob 
+            // both input and output are outer
+            let outer = node.id === "root" ? true: false;
+            if (i == 1 || i == 2 ) {
+                outer = true;
+            }
+            // If instantiateCount is odd then outer is true
+            if (i % 2 == 0) {
+                outer = true;
+            }
+            const newOuter = {...parentOuter, [node.depth]: outer};
+            outerNodesRef.current[entityNodeId] = newOuter;
+
             // Use a timer for a delay so we can see the sequence for debug etc 
             const delay = (i === 0) ? 0 : animDelay;
             setTimeout(() => {
@@ -610,21 +634,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Blob is called for root before the particles are ready at the lowest level 
                 // entitiesReadyDelayed is not sufficient for that
 
-                const visualConfig = particleRef.current.getVisualConfig();
-                if (!visualConfig.outerChain) visualConfig.outerChain = {};
-                // both input and output are outer
-                let outer = false;
-                if (instantiatedCount == 1 || instantiatedCount == 2) {
-                    outer = true;
-                }
-                // If instantiateCount is odd then outer is true
-                if (instantiatedCount % 2 != 0) {
-                    outer = true;
-                }
-                //let outer = distanceToCenter >= (distanceToFirstJoint);
-                visualConfig.outerChain[node.depth] = outer
-                console.log("Outer", id, instantiatedCount, outer)
-                particleRef.current.setVisualConfig(visualConfig);
+                
             }
         }
 
@@ -643,6 +653,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             if (ready) {
                 setEntitiesReady(true);
+                // So we update the blob info
+                directResetParticlesStable();
             }
         }
 
@@ -843,6 +855,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             jointsTo={jointsToRef.current[entity.id] || []}
                             jointsFrom={jointsFromRef.current[entity.id] || []}
                             initialQuaternion={entityOrientationsRef.current[entity.id]}
+                            parentOuter={outerNodesRef.current[entity.id]}
                         />
                     )
                 })}

@@ -124,6 +124,16 @@ const updatePropertyLookups = (node, propertyLookups) => {
     return updatedLookups;
 };
 
+function simpleHash(input) {
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+        const char = input.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+
 const useStoreEntity = create((set, get) => {
 
     const rootNode = createNode('root', { depth: 0, parentId: null }, []);
@@ -139,8 +149,19 @@ const useStoreEntity = create((set, get) => {
         relationCount: 0,
         joints: {},
         jointCount: 0,
-        particleChange: true,
+        particlesStable: {},
         particleRefs: [],
+
+        getparticlesStable: (id) => {
+            return get().particlesStable[id];
+        },
+
+        resetParticlesStable: () => set(() => {
+            console.log("resetParticlesStable")
+            return {
+                particlesStable: {}
+            };
+        }),
 
         reset: () => set(() => {
             return {
@@ -302,8 +323,8 @@ const useStoreEntity = create((set, get) => {
         // Function to get all nodes with isParticle set to true.
         // Cache the result in state.particles
         getAllParticleRefs: (id = 'root') => {
-            const particleChange = get().particleChange;
-            if (particleChange) {
+            const particlesStable = get().particlesStable[id];
+            if (!particlesStable) {
                 const particles = [];
                 const nodes = get().nodes;
                 const traverse = (node) => {
@@ -315,8 +336,20 @@ const useStoreEntity = create((set, get) => {
                     }
                 };
                 traverse(nodes[id]);
+                let concatenatedIds = particles.reduce((acc, particle) => {
+                    let uniqueId = particle.current.getVisualConfig().uniqueId;
+                    return acc + uniqueId; // Concatenate all uniqueIds
+                }, "");
+                // We include the date so resetting particlesStable will force a refresh
+                // That will in turn take into account joint updates
+                // This is very hacky!
+                let hashedResult = simpleHash(concatenatedIds).toString() + Date.now().toString();
+                //console.log("hashedResult", id, particles, hashedResult)
                 set((state) => ({
-                    particleChange: false,
+                    particlesStable: {
+                        ...state.particlesStable, 
+                        [id]: hashedResult
+                    },
                     particles: {
                         ...state.particles,
                         [id]: particles
@@ -344,7 +377,7 @@ const useStoreEntity = create((set, get) => {
                 newNodeId = newNode.id;
                 state.nodeCount++;
 
-                state.particleChange = true;
+                state.particlesStable = {};
 
                 return {
                     nodes: {
@@ -407,7 +440,7 @@ const useStoreEntity = create((set, get) => {
             const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
 
             if (isParticle !== updatedProperties.isParticle) {
-                state.particleChange = true;
+                state.particlesStable = {};
             }
 
             return {
@@ -456,7 +489,7 @@ const useStoreEntity = create((set, get) => {
             };
 
             if (node.isParticle) {
-                state.particleChange = true;
+                state.particlesStable = {};
             }
 
             deleteRecursively(id);
@@ -590,7 +623,7 @@ const useStoreEntity = create((set, get) => {
             updateSubtree(nodeId);
 
             if (property === 'isParticle') {
-                state.particleChange = true;
+                state.particlesStable = {};
             }
 
             return { nodes };
