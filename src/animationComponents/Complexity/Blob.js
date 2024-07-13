@@ -133,17 +133,23 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
             let ancestorId = node.parentId;
             for (let i = node.depth - 1; i >= 0; i--) {
                 const ancestorNode = getNode(ancestorId);
-                if (ancestorNode.ref.current.getVisualConfig().visible) return;
+                if (ancestorNode.ref.current.getVisualConfig().visible) {
+                    console.log(`Return because ${ancestorId} visible`);
+                    return;
+                }
                 ancestorId = ancestorNode.parentId;
             }
-            event.stopPropagation();
             // If the node is about to become invisible
             if (node.ref.current.getVisualConfig().visible) {
+                event.stopPropagation();
                 entityNodes.forEach(nodeEntity => {
                     nodeEntity.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
                 });
                 node.ref.current.setVisualConfig(p => ({ ...p, visible: false }));
-            } else {
+            // If the number of overlapping blobs (intersections) is equal to the depth of this blob
+            // then we will show this blob
+            } else if (event.intersections.length === (node.depth + 1)) { 
+                event.stopPropagation();
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
                 node.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
@@ -152,7 +158,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
                         propagateVisualConfigValue(nodeEntity.id, 'visible', false);
                     });
                 }, 0); // Introduce a slight delay to avoid flashing
-            }
+            } 
         }
     };
 

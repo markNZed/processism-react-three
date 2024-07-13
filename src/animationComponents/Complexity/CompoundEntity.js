@@ -19,42 +19,6 @@ import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
-// Need to order/delay transformation of Particle to CompoundEntity - should add joints one by one
-// 2,2,3 Multiple levels of hierarchy joint goes missing
-// Joint may not be ready because waiting for particle to remap joint but the jonit could be used in alignJointsToPolygon()
-// joint Ref is not always valid e.g. when scaling the joint for new entity due to "No aRef or bRef for updateJoint" in updateJoint
-// calculateJointOffsets needs to deal with different radius
-// The ref may be to a CompoundEntity not a Particle so ew cannot create joint yet
-//   Could delay joint creation so the joint ref is not invalid/null 
-//   entitiesReadyDelayed should gaurantee all entities are ready (particles available)
-//     This is passed down not up
-//       Could check that all joints have particles but the transform could be in progress
-//         Add a property to the node to indicaate rady ?
-//         Better to loop over the joints to be transformed and check if ready
-//  inNode or outNode could also be CompoundEnity with delay to find particles
-//    Should not change particles to CompoundEnity until after joints are mapped ?
-// setParticlesFirstDelayed(false); is not retriggering - need something like a counter ?
-// Stuck in a deadlock waiting for particle
-// Can we assume that if it is passed lower then we do not need to map it ? 
-// Particles are there to transmit joints ?
-//   That is why it is layer by layer ?
-//   Need the mapping from particle to particle
-//   Allow group to have joints
-// Core gets thrown out of blob
-//   Add joints to entities ? make it fixed and move with center ?
-//   When particles are replaced joints are not updated for the core
-// The blob particles can change dynamically so this needs to refresh on changes too
-//   Problem for pre-calculating blob points
-// particles[i].current.getVisualConfig().outerChain is probably not built as particles in blob are replaced
-// chain is broken in buildOrderedIds
-//   chainRef is broken - not accumulating joints for higher level
-//   When we create a new CompoundEntity that replaces a particle then when we update the joints we also need to update chainRefs
-//   If chainRef changes then we also need to reset the blobs
-//     Maybe after each entity becomes stable we reset for the blobs ?
-//       A separate condition to generate new blob data on joint updates
-// Why are lower level blobs showing ?
-
-
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, parentOuter = {}, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
