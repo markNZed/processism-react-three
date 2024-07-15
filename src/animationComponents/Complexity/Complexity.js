@@ -9,6 +9,7 @@ import useStore from '../../useStore'
 import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
 import * as THREE from 'three';
+import ResourceImages from './ResourceImages';
 
 /* Overview:
   Animation framework intended to provide a visual language for representing complexity.
@@ -36,6 +37,9 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Using forwardRef and need to access the ref from inside this component too
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
+    
+    /** @type {{ current: THREE.Texture }} */
+    const particleTexturesRef = useRef();
 
     // Avoid changes in store causing rerender
     // Direct access to the state outside of React's render flow
@@ -127,6 +131,10 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         }
     }
 
+    const loadTextures = async () => {
+        particleTexturesRef.current = await ResourceImages.loadBlob(1);
+    };
+
     // Initialization logging/debug
     useEffect(() => {
         console.log("Complexity mounting");
@@ -137,6 +145,8 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         directUpdateNode("root", {ref: internalRef});
         setStoreEntityReady(true);
         console.log("Nodes after initialization", useStoreEntity.getState().getAllNodes());
+        
+        loadTextures();
     }, []);
     
     console.log("Complexity rendering", storeEntityReady, config)
@@ -156,6 +166,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
                     initialPosition={[0, 0, 0]}
                     config={config}
                     getTopBlobGeometryRef={getTopBlobGeometryRef}
+                    particleTexturesRef={particleTexturesRef}
                 />
             )}
         </>

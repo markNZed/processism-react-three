@@ -7,7 +7,7 @@ import { vertex as meshBasicVertex, fragment as meshBasicFragment } from 'three/
 import useStore from '../../useStore'
 import { useThree } from '@react-three/fiber';
 
-const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config, particleTexturesRef }, ref) => {
 
     /** @type {{ gl: THREE.WebGLRenderer }} */
     const { gl } = useThree();
@@ -35,6 +35,9 @@ const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config }, r
     //const circleGeometry = useRef(new THREE.CircleGeometry(0.0001, 4));
     //const internalRef = useRef(new TIUM.InstancedUniformsMesh(circleGeometry.current, material.current, particles.length));
 
+    /** @type {THREE.Texture | Null} */
+    const blobTexture = particleTexturesRef.current;
+
     useEffect(() => {
         if (!internalRef.current) return;
 
@@ -57,17 +60,18 @@ const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config }, r
 
     useEffect(() => {
         renderBlobRef.current = {
-            renderTarget: new THREE.WebGLRenderTarget(1024, 1024),
-            camera: new THREE.OrthographicCamera(-10, 10, -10, 10, 0.1, 100),
-            scene: new THREE.Scene(),
-            blobMesh: new THREE.Mesh(undefined, new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })),
+            // Old - we don't want to do this anymore, too expensive
+            //renderTarget: new THREE.WebGLRenderTarget(1024, 1024),
+            //camera: new THREE.OrthographicCamera(-10, 10, -10, 10, 0.1, 100),
+            //scene: new THREE.Scene(),
+            //blobMesh: new THREE.Mesh(undefined, new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })),
             v1: new THREE.Vector3(), v2: new THREE.Vector3(),
         };
-        const { camera, scene, blobMesh, renderTarget } = renderBlobRef.current;
+        //const { camera, scene, blobMesh, renderTarget } = renderBlobRef.current;
         //renderBlobRef.current.material = new THREE.MeshBasicMaterial({ map: renderTarget.texture, transparent: true, side: THREE.DoubleSide });
-        scene.add(camera);
-        scene.add(blobMesh);
-        camera.position.set(0, 0, 10);
+        //scene.add(camera);
+        //scene.add(blobMesh);
+        //camera.position.set(0, 0, 10);
 
         const planeGeometry = new THREE.PlaneGeometry(particleRadius*2, particleRadius*2, 1, 1);
         const instanceGeometry = new THREE.InstancedBufferGeometry();
@@ -163,7 +167,7 @@ const sinVertexShader = meshBasicVertex
                 speed: { value: new THREE.Vector2(1, 1) },
                 diffuse: { value: new THREE.Vector3(1, 1, 1) },
                 center: { value: new THREE.Vector2() },
-                map: { value: renderTarget.texture },
+                map: { value: undefined },
             },
             defines: { USE_UV: true },
             vertexShader: sinVertexShader,
@@ -186,31 +190,41 @@ const sinVertexShader = meshBasicVertex
         let matrixChanged = false;
         let colorChanged = false;
 
-        if (gl && geometryRef && geometryRef.current && geometryRef.current.geometry && renderBlobRef.current) {
+        if (gl && geometryRef && geometryRef.current && geometryRef.current.geometry && renderBlobRef.current && blobTexture) {
 
-            const { camera: textureCamera, material: instanceMaterial, blobMesh, renderTarget, scene: textureScene, v1: gCenter, v2: gSize, geometry: instanceGeometry } = renderBlobRef.current;
-            blobMesh.geometry = geometryRef.current.geometry;
-
+            //const { camera: textureCamera, material: instanceMaterial, blobMesh, renderTarget, scene: textureScene, v1: gCenter, v2: gSize, geometry: instanceGeometry } = renderBlobRef.current;
+            const { material: instanceMaterial, geometry: instanceGeometry } = renderBlobRef.current;
+            
             instanceMaterial.uniforms.time.value = timeRef.current;
             if (instanceGeometry.instanceCount !== particles.length) instanceGeometry.instanceCount = particles.length;
 
-            blobMesh.geometry.computeBoundingSphere();
-            const bs = blobMesh.geometry.boundingSphere;
-            const sizeMult = 1.5;
-            textureCamera.position.set(bs.center.x, bs.center.y, 10);
-            textureCamera.updateMatrix();
-            textureCamera.left = -bs.radius*sizeMult; textureCamera.right = bs.radius*sizeMult;
-            textureCamera.top = -bs.radius*sizeMult; textureCamera.bottom = bs.radius*sizeMult;
-            textureCamera.updateProjectionMatrix();
-            let brk = 5;
-
-
-            gl.setRenderTarget(renderTarget);
-            gl.setSize(1024, 1024);
-            gl.clear();
-            gl.render(textureScene, textureCamera);
-            gl.setRenderTarget(null);
-            gl.setSize(window.innerWidth, window.innerHeight);
+            if (instanceMaterial.uniforms.map.value != blobTexture) {
+                instanceMaterial.uniforms.map.value = blobTexture;
+                instanceMaterial.uniforms.map.needsUpdate = true;
+            }
+            
+            //const uniforms = instanceMaterial.uniforms;
+            //if (uniforms.map1.value != blobTexture[0]) { uniforms.map1.value = blobTexture[0]; uniforms.map1.needsUpdate = true; }
+            //if (uniforms.map2.value != blobTexture[1]) { uniforms.map2.value = blobTexture[1]; uniforms.map2.needsUpdate = true; }
+            //if (uniforms.map3.value != blobTexture[2]) { uniforms.map3.value = blobTexture[2]; uniforms.map3.needsUpdate = true; }
+            //if (uniforms.map4.value != blobTexture[3]) { uniforms.map4.value = blobTexture[3]; uniforms.map4.needsUpdate = true; }
+            
+            //blobMesh.geometry = geometryRef.current.geometry;
+            //blobMesh.geometry.computeBoundingSphere();
+            //const bs = blobMesh.geometry.boundingSphere;
+            //const sizeMult = 1.5;
+            //textureCamera.position.set(bs.center.x, bs.center.y, 10);
+            //textureCamera.updateMatrix();
+            //textureCamera.left = -bs.radius*sizeMult; textureCamera.right = bs.radius*sizeMult;
+            //textureCamera.top = -bs.radius*sizeMult; textureCamera.bottom = bs.radius*sizeMult;
+            //textureCamera.updateProjectionMatrix();
+            //
+            //gl.setRenderTarget(renderTarget);
+            //gl.setSize(1024, 1024);
+            //gl.clear();
+            //gl.render(textureScene, textureCamera);
+            //gl.setRenderTarget(null);
+            //gl.setSize(window.innerWidth, window.innerHeight);
 
             if (mesh.material !== instanceMaterial) mesh.material = instanceMaterial;
             if (mesh.geometry !== instanceGeometry) mesh.geometry = instanceGeometry;

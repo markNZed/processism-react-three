@@ -5,6 +5,8 @@ import useStoreEntity from './useStoreEntity';
 import * as TME from '@immugio/three-math-extensions';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import _ from 'lodash';
+import BlobGeometryComputer from './BlobGeometryComputer';
+import BlobGeometryWebworkerComputer from './BlobGeometryWebworkerComputer';
 
 const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     const worldVector = new THREE.Vector3();
@@ -18,6 +20,10 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     const [pressStart, setPressStart] = useState(0);
     const longPressThreshold = 500; // Time in milliseconds to distinguish a long press
 
+    //const geometryComputerRef = useRef(new BlobGeometryComputer());
+    const frameIdRef = useRef(0);
+    const isBottomLevel = node.childrenIds.length !== 0 && getNode(node.childrenIds[0]).childrenIds.length === 0;
+
     // This only runs once upon mounting to build the blobData which acts as a cache for objects
     useEffect(() => {
         blobData.current = {
@@ -25,7 +31,6 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
             flattenedIndexes: [],
 
             // New
-            positions2: [],
             circlePoints: [],
             circleSegments: [],
             utilityVector3s: Array.from(Array(5).keys()).map((e) => new THREE.Vector3()),
@@ -76,7 +81,7 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
 
-            blobData.current.positions2.push(...Array.from(Array(points_to_geometry2_circle_segments + 2).keys()).map((e) => new THREE.Vector3()));
+            //blobData.current.positions2.push(...Array.from(Array(points_to_geometry2_circle_segments + 2).keys()).map((e) => new THREE.Vector3()));
             blobData.current.circlePoints.push(Array.from(Array(points_to_geometry2_circle_segments).keys()).map((e) => new THREE.Vector3()));
             blobData.current.circleSegments.push(Array.from(Array(points_to_geometry2_circle_segments).keys()).map((e) => new TME.Line2D(new TME.Vec2(), new TME.Vec2())));
 
@@ -88,6 +93,8 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     },[]);
 
     useFrame(() => {
+
+        frameIdRef.current++;
 
         if (!blobData.current) return;
 
@@ -105,7 +112,37 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
 
             if (blobPoints.length) {
                 //const geometry = points_to_geometry(blobPoints, blobPointsCenter, particleRadius, centerRef);
-                const geometry = points_to_geometry2(blobPoints, particleRadius, blobData.current, centerRef.current);
+
+                // Webworker generation
+                //const genStart = performance.now();
+                //const geometry = BlobGeometryWebworkerComputer.points_to_geometry(node.id, frameIdRef.current, blobPoints, particleRadius);
+                //const genEnd = performance.now();
+                //const genTime = genEnd - genStart;
+                //console.log(`gen time ${genTime}`);
+                //if (geometry) {
+                //    blobRef.current.geometry.dispose();
+                //    blobRef.current.geometry = geometry;
+                //    blobRef.current.visible = shouldBeVisible;
+                //}
+
+                // Frame-staggered main-thread geometry computer
+                //const genStart = performance.now();
+                //if (geometryComputerRef.current.isComputing()) geometryComputerRef.current.continueCompute();
+                //else geometryComputerRef.current.startCompute(blobPoints, particleRadius, blobData.current, 3);
+                //const genEnd = performance.now();
+                //const genTime = genEnd - genStart;
+                //console.log(`genTime ${genTime}`);
+                //if (!geometryComputerRef.current.isComputing() && geometryComputerRef.current.getResult()) {
+                //    blobRef.current.geometry.dispose();
+                //    blobRef.current.geometry = geometryComputerRef.current.getResult();
+                //    blobRef.current.visible = shouldBeVisible;
+                //}
+
+                // Use old catmull-rom geometry (faster computed) for all blobs except lowest level blobs
+                let geometry;
+                if (isBottomLevel) geometry = points_to_geometry2(blobPoints, particleRadius, blobData.current, centerRef.current);
+                else geometry = points_to_geometry(blobPoints, particleRadius, centerRef);
+                
                 blobRef.current.geometry.dispose();
                 blobRef.current.geometry = geometry;
                 blobRef.current.visible = shouldBeVisible;
@@ -389,10 +426,13 @@ const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
             dir.copy(lineToLast.end).sub(start);
             perpendicularEnd.copy(dir.y, -dir.x).add(start); // 90 degrees clockwise
             
-            firstPoint = cp.filter((cpp) => isLeftOfLine(start, perpendicularEnd, cpp) >= 0).map((cpp) => getDistPointToLine(start, dir, cpp)).sort((a, b) => a - b)[0];
+            firstPoint = cp.filter((cpp) => isLeftOfLine(start, perpendicularEnd, cpp) >= 0).map((cpp) => ({ point: cpp, dist: getDistPointToLine(start, dir, cpp) })).sort((a, b) => a.dist - b.dist);
+            if (firstPoint.length !== 0) firstPoint = firstPoint[0];
+            else return cp;
         }
         else { firstPoint = firstIntersections.reduce((a, b) => a.add(b)).divideScalar(firstIntersections.length); }
         if (firstPoint) firstPoint = new THREE.Vector3(firstPoint.x, firstPoint.y, 0);
+        else return cp;
 
         /** @type {Array<TME.Vec2>} */
         let lastIntersections = circleSegments[i].reduce((a, cs) => {
@@ -407,10 +447,13 @@ const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
             dir.copy(lineToNext.end).sub(start);
             perpendicularEnd.copy(dir.y, -dir.x).add(start); // 90 degrees clockwise
 
-            lastPoint = cp.filter((cpp) => isLeftOfLine(start, perpendicularEnd, cpp) >= 0).map((cpp) => getDistPointToLine(start, dir, cpp)).sort((a, b) => a - b)[0];
+            lastPoint = cp.filter((cpp) => isLeftOfLine(start, perpendicularEnd, cpp) >= 0).map((cpp) => ({ point: cpp, dist: getDistPointToLine(start, dir, cpp) })).sort((a, b) => a.dist - b.dist);
+            if (lastPoint.length !== 0) lastPoint = lastPoint[0];
+            else return cp;
         }
         else { lastPoint = lastIntersections.reduce((a, b) => a.add(b)).divideScalar(lastIntersections.length); }
         if (lastPoint) lastPoint = new THREE.Vector3(lastPoint.x, lastPoint.y, 0);
+        else return cp;
 
         let startAngle = Math.atan2(firstPoint.y - p.y, firstPoint.x - p.x);
         let endAngle = Math.atan2(lastPoint.y - p.y, lastPoint.x - p.x);
@@ -621,7 +664,7 @@ const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
     
 }
  
-const points_to_geometry = (points, pointsCenter, particleRadius = 0, centerRef) => {
+const points_to_geometry = (points, particleRadius = 0, centerRef) => {
 
     // Ensure centerRef is a Vector3
     const center = centerRef.current;
