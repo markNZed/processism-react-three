@@ -1,3 +1,5 @@
+Instead of entities it may be better to refer to communities (as per Whitehead)
+
 WDS_SOCKET_PORT=0 only in CodeSpace ?
 The AnimationMixer in Three.js provides a robust and flexible way to handle animations
 Entity-Component-System (ECS) is an architectural pattern often used in game development. Entity: A unique identifier representing an object. Component: Holds data attributes for an entity (e.g., position, velocity). System: Contains logic to process entities with specific components (e.g., movement, rendering).

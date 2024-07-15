@@ -545,7 +545,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         setParticleReady({ ...particleReady, [entityId]: true });
                         const entityNode = directGetNode(entityId);
                         const newPosition = entityNode.ref.current.getCenter()
-                        entityPositionsRef.current[i] = newPosition;
+                        entityPositionsRef.current[i] = [newPosition.x, newPosition.y, newPosition.z];
                     }, animDelay);
                     break;
                 }
@@ -924,14 +924,4 @@ const calculateCenter = ({ getNode, items, centerRef, useWorld = false }) => {
     }
 };
 
-function perpendicular(newPosition, quaternion) {
-    const newPositionVector3 = new THREE.Vector3().fromArray(newPosition);
-    newPositionVector3.applyQuaternion(quaternion);
-    const perpendicular = new THREE.Quaternion();
-    perpendicular.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2); // 90 degrees around Z axis
-    newPositionVector3.applyQuaternion(perpendicular);
-    newPosition[0] = newPositionVector3.x;
-    newPosition[1] = newPositionVector3.y;
-    newPosition[2] = newPositionVector3.z;
-}
 

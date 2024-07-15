@@ -67,7 +67,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
         const blobIndexes = orderedIds;
 
-        //console.log("buildBlobPoints", id, particles, blobOuterUniqueIds, blobIndexes)
+        console.log("buildBlobPoints", id, chainRef, particles, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
