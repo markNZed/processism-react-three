@@ -1,7 +1,5 @@
 
 
-import * as TTHRE from './_testdelete3';
-
 function useBlobGeometryWorker() {
     //const code = blobGeometryWorker.toString();
     const workerBlob = new Blob([source]);
