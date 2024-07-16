@@ -213,7 +213,8 @@ const sinVertexShader = meshBasicVertex
 '#include <dithering_fragment>',
 `#include <dithering_fragment>
 
-    gl_FragColor = vec4(sampledDiffuseColor.rgb * vColor.rgb, sampledDiffuseColor.a);
+    //gl_FragColor = vec4(sampledDiffuseColor.rgb * vColor.rgb, sampledDiffuseColor.a);
+    gl_FragColor = vec4(gl_FragColor.rgb, sampledDiffuseColor.a);
 `);
 
         renderBlobRef.current.material = new THREE.ShaderMaterial({
@@ -312,7 +313,7 @@ const sinVertexShader = meshBasicVertex
             else blobScale = 1.0;
         }
         else {
-            blobScale = 1.3;
+            blobScale = 1.2;
         }
 
         if (geometryRef && geometryRef.current && geometryRef.current.geometry) { 
