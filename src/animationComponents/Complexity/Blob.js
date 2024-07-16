@@ -5,8 +5,6 @@ import useStoreEntity from './useStoreEntity';
 import * as TME from '@immugio/three-math-extensions';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import _ from 'lodash';
-import BlobGeometryComputer from './BlobGeometryComputer';
-import BlobGeometryWebworkerComputer from './BlobGeometryWebworkerComputer';
 
 const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     const worldVector = new THREE.Vector3();
@@ -20,7 +18,6 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
     const [pressStart, setPressStart] = useState(0);
     const longPressThreshold = 500; // Time in milliseconds to distinguish a long press
 
-    //const geometryComputerRef = useRef(new BlobGeometryComputer());
     const frameIdRef = useRef(0);
     const isBottomLevel = node.childrenIds.length !== 0 && getNode(node.childrenIds[0]).childrenIds.length === 0;
 
@@ -81,7 +78,6 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
 
-            //blobData.current.positions2.push(...Array.from(Array(points_to_geometry2_circle_segments + 2).keys()).map((e) => new THREE.Vector3()));
             blobData.current.circlePoints.push(Array.from(Array(points_to_geometry2_circle_segments).keys()).map((e) => new THREE.Vector3()));
             blobData.current.circleSegments.push(Array.from(Array(points_to_geometry2_circle_segments).keys()).map((e) => new TME.Line2D(new TME.Vec2(), new TME.Vec2())));
 
@@ -111,33 +107,6 @@ const Blob = ({ color, node, centerRef, entityNodes, getGeometryRef }) => {
             });
 
             if (blobPoints.length) {
-                //const geometry = points_to_geometry(blobPoints, blobPointsCenter, particleRadius, centerRef);
-
-                // Webworker generation
-                //const genStart = performance.now();
-                //const geometry = BlobGeometryWebworkerComputer.points_to_geometry(node.id, frameIdRef.current, blobPoints, particleRadius);
-                //const genEnd = performance.now();
-                //const genTime = genEnd - genStart;
-                //console.log(`gen time ${genTime}`);
-                //if (geometry) {
-                //    blobRef.current.geometry.dispose();
-                //    blobRef.current.geometry = geometry;
-                //    blobRef.current.visible = shouldBeVisible;
-                //}
-
-                // Frame-staggered main-thread geometry computer
-                //const genStart = performance.now();
-                //if (geometryComputerRef.current.isComputing()) geometryComputerRef.current.continueCompute();
-                //else geometryComputerRef.current.startCompute(blobPoints, particleRadius, blobData.current, 3);
-                //const genEnd = performance.now();
-                //const genTime = genEnd - genStart;
-                //console.log(`genTime ${genTime}`);
-                //if (!geometryComputerRef.current.isComputing() && geometryComputerRef.current.getResult()) {
-                //    blobRef.current.geometry.dispose();
-                //    blobRef.current.geometry = geometryComputerRef.current.getResult();
-                //    blobRef.current.visible = shouldBeVisible;
-                //}
-
                 // Use old catmull-rom geometry (faster computed) for all blobs except lowest level blobs
                 let geometry;
                 if (isBottomLevel) geometry = points_to_geometry2(blobPoints, particleRadius, blobData.current, centerRef.current);
@@ -248,42 +217,6 @@ const expandPointsFromCenter = (points, distance, center) => {
             point.z + direction.z * distance
         );
     });
-        
-    //if (divisions < 1) divisions = 1;
-    //if (divisions === 1) {
-    //    return points.map((point, i) => {
-    //        const direction = new THREE.Vector3().subVectors(point, center).normalize();
-    //        return new THREE.Vector3(
-    //            point.x + direction.x * distance,
-    //            point.y + direction.y * distance,
-    //            point.z + direction.z * distance
-    //        );
-    //    });
-    //}
-    //else {
-    //    let ret = [];
-    //
-    //    let stepCount = Math.pow(2, (divisions - 1));
-    //    let stepAngle = -Math.PI / stepCount;
-    //    for (let n=0; n<points.length; ++n)
-    //    {
-    //        let point = points[n];
-    //        let pointCenter = pointsCenter[n];
-    //        const direction = new THREE.Vector3().subVectors(point, pointCenter).normalize();
-    //        let angleFromOrigin = Math.atan2(direction.y, direction.x);
-    //        let startAngle = angleFromOrigin + 0.5*Math.PI;
-    //        for (let i=0; i<=stepCount; ++i)
-    //        {
-    //            let angle = startAngle + stepAngle * i;
-    //            let newDir = new THREE.Vector2(Math.cos(angle), Math.sin(angle));
-    //            let newDir2 = newDir;
-    //            let p = new THREE.Vector3(point.x + Math.cos(angle) * distance, point.y + Math.sin(angle) * distance, 0.0);
-    //            ret.push(p);
-    //        }
-    //    }
-    //
-    //    return ret;
-    //}
 }
 
 // Outside of component to avoid recreation on render
@@ -302,49 +235,6 @@ const getBlobRadius = (points, particleRadius, centerRef) => {
 const isLeftOfLine = (a, b, p) => 
     ( (b.x - a.x)*(p.y - a.y)
     - (p.x - a.x)*(b.y - a.y))
-    
-// getPolygonWindingNumber(): winding number test for a point in a polygon
-//      Input:   p = a point,
-//               polygonPoints[] = vertex points of a polygon V[n+1] with V[n]=V[0]
-//      Return:  wn = the winding number (=0 only when p is outside)
-const getPolygonWindingNumber = (p, polygonPoints) => {
-    const pp = polygonPoints;
-    let wn = 0; // the  winding number counter
-    
-    // loop through all edges of the polygon
-    for (let i = 0, n = pp.length-1; i < n; i++) {  // edge from pp[i] to  pp[i+1]
-      if (pp[i][1] <= p[1]) {                       // start y <= p.y
-        if (pp[i + 1][1] > p[1])                    // an upward crossing
-          if (isLeft(pp[i], pp[i + 1], p) > 0)       // p left of  edge
-            ++wn;                                  // valid up intersection
-      }
-      else {                                       // start y > p.y (no test needed)
-        if (pp[i + 1][1] <= p[1])                   // a downward crossing
-          if (isLeft(pp[i], pp[i + 1], p) < 0)       // p right of  edge
-            --wn;                                  // valid down intersection
-      }
-    }
-    return wn;
-}
-
-const isInsidePolygon = (point, vs) => {
-
-    var x = point.x,
-        y = point.z;
-
-    var inside = false;
-    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        var xi = vs[i].x,
-            yi = vs[i].z;
-        var xj = vs[j].x,
-            yj = vs[j].z;
-
-        var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-
-    return inside;
-}
 
 /**
  * Phong https://forum.unity.com/threads/closest-point-on-a-line.121567/
@@ -358,10 +248,6 @@ const getDistPointToLine = (origin, direction, point) => {
     _point2origin.set(origin.x, origin.y, 0).sub(point);
     _point2closestPointOnLine.copy(_point2origin).sub(_direction.multiplyScalar(_point2origin.dot(_direction)));
     return _point2closestPointOnLine.clone();
-
-    //let point2origin = origin.clone().sub(point);
-    //let point2closestPointOnLine = point2origin.clone().sub(direction.multiplyScalar(point2origin.dot(direction)));
-    //return point2closestPointOnLine.length();
 }
 const _point2origin = new THREE.Vector3();
 const _direction = new THREE.Vector3();
@@ -372,22 +258,8 @@ const setLine2D = (line, x1, y1, x2, y2) => {
     line.end.set(x2, y2);
 }
 
-/**
- * 
- * @param {THREE.Vector2} a 
- * @param {THREE.Vector2} b 
- * @param {THREE.Vector2} c 
- */
-const getArea = (a, b, c) => {
-    let base = _gav.copy(b).sub(a).length();
-    
-}
-const _gav = new THREE.Vector3;
-
-var ddoOnce = true;
-
 const points_to_geometry2_circle_segments = 16;
-const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
+const points_to_geometry2 = (points, particleRadius, blobData) => {
     const { circlePoints, circleSegments, utilityVector2s, utilityVector3s, utilityLines, positions2 } = blobData;
 
     getCirclePointsForPoints(points, particleRadius, points_to_geometry2_circle_segments, circlePoints);
@@ -427,7 +299,7 @@ const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
             perpendicularEnd.copy(dir.y, -dir.x).add(start); // 90 degrees clockwise
             
             firstPoint = cp.filter((cpp) => isLeftOfLine(start, perpendicularEnd, cpp) >= 0).map((cpp) => ({ point: cpp, dist: getDistPointToLine(start, dir, cpp) })).sort((a, b) => a.dist - b.dist);
-            if (firstPoint.length !== 0) firstPoint = firstPoint[0];
+            if (firstPoint.length !== 0) firstPoint = firstPoint[0].point;
             else return cp;
         }
         else { firstPoint = firstIntersections.reduce((a, b) => a.add(b)).divideScalar(firstIntersections.length); }
@@ -448,7 +320,7 @@ const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
             perpendicularEnd.copy(dir.y, -dir.x).add(start); // 90 degrees clockwise
 
             lastPoint = cp.filter((cpp) => isLeftOfLine(start, perpendicularEnd, cpp) >= 0).map((cpp) => ({ point: cpp, dist: getDistPointToLine(start, dir, cpp) })).sort((a, b) => a.dist - b.dist);
-            if (lastPoint.length !== 0) lastPoint = lastPoint[0];
+            if (lastPoint.length !== 0) lastPoint = lastPoint[0].point;
             else return cp;
         }
         else { lastPoint = lastIntersections.reduce((a, b) => a.add(b)).divideScalar(lastIntersections.length); }
@@ -485,182 +357,7 @@ const points_to_geometry2 = (points, particleRadius, blobData, bCenter) => {
     shape.closePath();
     let shapeGeometry = new THREE.ShapeGeometry(shape);
 
-    //let g2 = LoopSubdivision.modify(shapeGeometry, 4);
-    //shapeGeometry.dispose();
-    //shapeGeometry = g2;
-
-    //if (ddoOnce) {
-    //    ddoOnce = false;
-    //
-    //    let json = {};
-    //    json['circlePoints'] = circlePoints.map((cp) => cp.map((cpp) => { return { x: cpp.x, y: cpp.y, z: cpp.z }; }));
-    //    json['points'] = points.map((p) => { return { x: p.x, y: p.y, z: p.z }; });
-    //    json['particleRadius'] = particleRadius;
-    //    let text = JSON.stringify(json);
-    //    console.log(text);
-    //}
-
-
-
-    //let tes = new TTM.TessellateModifier(particleRadius * 0.25, 32);
-    //tes.modify(shapeGeometry);
-
-    //let vertCount = circlePoints2.reduce((a, b) => a + b.length, 0) + circlePoints2.length;
-    /*let faceCount = circlePoints2.reduce((a, b) => a + b.length - 1, 0);
-
-    //let vertCount = circlePoints2.reduce((a, b) => a + (b.length - 1) * 3, 0);
-    let vertCount = (points.length - 1) * 3;
-    
-    let verts = new Float32Array(vertCount*3);
-    let norms = new Float32Array(vertCount*3);
-    let uvs = new Float32Array(vertCount*2);
-    let faces = new Uint32Array(faceCount*3);
-
-    let vIndex = 0, fIndex = 0;
-
-    for (let n=0; n<points.length-1; ++n) {
-        let v1 = points[n], v2 = points[n+1];
-
-        verts[vIndex*3+0] = bCenter.x; verts[vIndex+1] = bCenter.y; verts[vIndex+2] = 0;
-        norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-        uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-        vIndex++;
-
-        verts[vIndex*3+0] = v1.x; verts[vIndex+1] = v1.y; verts[vIndex+2] = 0;
-        norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-        uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-        vIndex++;
-
-        verts[vIndex*3+0] = v2.x; verts[vIndex*3+1] = v2.y; verts[vIndex*3+2] = 0;
-        norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-        uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-        vIndex++;
-
-        //faces[fIndex*3+0] = centerIndex; faces[fIndex*3+1] = vIndex; faces[fIndex*3+2] = vIndex+1;
-
-        let d1 = v1.clone().sub(bCenter).length(), d2 = v2.clone().sub(bCenter).length(), d3 = v2.clone().sub(v1).length();
-        let rad = particleRadius * 1.1;
-        if (d1 > rad || d2 > rad || d3 > rad) {
-            let brkk = 5;
-            let asdf = 10;
-        }
-
-        //++vIndex;
-        //++fIndex;
-    }
-
-    //for (let i=0; i<circlePoints2.length; ++i) {
-    //    let cps = circlePoints2[i];
-    //    let center = points[i];
-    //    
-    //    let centerIndex = vIndex;
-    //    //verts[vIndex*3+0] = center.x; verts[vIndex*3+1] = center.y; verts[vIndex*3+2] = center.z;
-    //    //norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-    //    //uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-    //    //++vIndex;
-    //
-    //    let dists = cps.map((cp) => cp.clone().sub(center).length());
-    //    let maxDist = dists.reduce((a,b) => Math.max(a, b), Number.NEGATIVE_INFINITY);
-    //    let minDist = dists.reduce((a, b) => Math.min(a, b), Number.POSITIVE_INFINITY);
-    //    let brk = 5;
-    //
-    //    for (let n=0; n<cps.length-1; ++n) {
-    //        let v1 = cps[n], v2 = cps[n+1];
-    //
-    //        verts[vIndex*3+0] = center.x; verts[vIndex+1] = center.y; verts[vIndex+2] = 0;
-    //        norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-    //        uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-    //        vIndex++;
-    //
-    //        verts[vIndex*3+0] = v1.x; verts[vIndex+1] = v1.y; verts[vIndex+2] = 0;
-    //        norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-    //        uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-    //        vIndex++;
-    //
-    //        verts[vIndex*3+0] = v2.x; verts[vIndex*3+1] = v2.y; verts[vIndex*3+2] = 0;
-    //        norms[vIndex*3+0] = 0; norms[vIndex*3+1] = 0; norms[vIndex*3+2] = 1; 
-    //        uvs[vIndex*2+0] = 0; uvs[vIndex*2+1] = 0;
-    //        vIndex++;
-    //
-    //        //faces[fIndex*3+0] = centerIndex; faces[fIndex*3+1] = vIndex; faces[fIndex*3+2] = vIndex+1;
-    //
-    //        let d1 = v1.clone().sub(center).length(), d2 = v2.clone().sub(center).length(), d3 = v2.clone().sub(v1).length();
-    //        let rad = particleRadius * 1.1;
-    //        if (d1 > rad || d2 > rad || d3 > rad) {
-    //            let brkk = 5;
-    //            let asdf = 10;
-    //        }
-    //
-    //        //++vIndex;
-    //        //++fIndex;
-    //    }
-    //    //++vIndex;
-    //}
-
-    //for (let i=0; i<verts.length; ++i) {
-    //    if (Number.isNaN(verts[i])) {
-    //        let br2 = 2;
-    //    }
-    //}
-
-    //verts = new Float32Array(3*3);
-    //norms = new Float32Array(3*3);
-    //uvs = new Float32Array(3*2);
-    //faces = new Uint32Array(3);
-    //
-    //vIndex = 0;
-    //
-    //verts[vIndex+0] = 0; verts[vIndex+1] = 0; verts[vIndex+2] = 0;
-    //norms[vIndex+0] = 0; norms[vIndex+1] = 0; norms[vIndex+2] = 1;
-    //uvs[vIndex+0] = 0; uvs[vIndex+1] = 0;
-    //vIndex++;
-    //
-    //verts[vIndex+0] = 15; verts[vIndex+1] = 15; verts[vIndex+2] = 0;
-    //norms[vIndex+0] = 0; norms[vIndex+1] = 0; norms[vIndex+2] = 1;
-    //uvs[vIndex+0] = 0; uvs[vIndex+1] = 0;
-    //vIndex++;
-    //
-    //verts[vIndex+0] = 30; verts[vIndex+1] = 0; verts[vIndex+2] = 0;
-    //norms[vIndex+0] = 0; norms[vIndex+1] = 0; norms[vIndex+2] = 1;
-    //uvs[vIndex+0] = 0; uvs[vIndex+1] = 0;
-    //vIndex++;
-    //
-    //faces[0] = 0; faces[1] = 1; faces[2] = 2;
-
-
-    let g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(verts, 3));
-    g.setAttribute('normal', new THREE.BufferAttribute(norms, 3));
-    g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-    g.setIndex(new THREE.BufferAttribute(faces, 3));
-    const shapeGeometry = g;//*/
-
-    // Catmull geometry
-    //const finalPoints3 = finalPoints.map((p) => new THREE.Vector3(p.x, p.y, 0));
-    //const curve = new THREE.CatmullRomCurve3(finalPoints3, true);
-    //const curvePoints = curve.getPoints(finalPoints.length);
-    //const shape = new THREE.Shape(curvePoints);
-    //const shapeGeometry = new THREE.ShapeGeometry(shape);
-
-
-    //let nanCount = finalPoints.reduce((a, b) => a + (Number.isNaN(b.x) || Number.isNaN(b.y) || Number.isNaN(b.z)) ? 1 : 0, 0);
-    //if (nanCount != 0) console.log(`Nan Count ${nanCount}`);
-    //else console.log('No NaNs!');
-
-    //let circ = new THREE.CircleGeometry(particleRadius * 0.1, 8);
-    //let gs = [];
-    //for (let i=0; i<finalPoints.length; ++i) {
-    //    let p = finalPoints[i];
-    //    let g = circ.clone(); g.translate(p.x, p.y, 0);
-    //    gs.push(g);
-    //}
-    ////gs.push(shapeGeometry);
-    //return BufferGeometryUtils.mergeGeometries(gs)
-
     return shapeGeometry;
-
-
-    //return new THREE.ShapeGeometry(new THREE.Shape(new THREE.CatmullRomCurve3(finalPoints, true).getPoints(finalPoints.length)));
     
 }
  

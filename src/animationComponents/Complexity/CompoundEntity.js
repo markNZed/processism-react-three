@@ -159,7 +159,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                 <ParticlesInstance
                                     id={`${id}`}
                                     node={node}
-                                    geometryRef={getTopBlobGeometryRef}
                                     config={config}
                                     particleTexturesRef={particleTexturesRef}
                                 />

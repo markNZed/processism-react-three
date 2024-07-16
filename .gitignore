@@ -2,3 +2,5 @@ node_modules
 build
 concatenated_code.txt
 yarn.lock
+.vscode/
+_junk/

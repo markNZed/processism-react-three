@@ -7,10 +7,9 @@ import { vertex as meshBasicVertex, fragment as meshBasicFragment } from 'three/
 import useStore from '../../useStore'
 import { useThree } from '@react-three/fiber';
 
-//const USE_BLOB_TEXTURE_PARTICLES = false;
 const USE_CIRCLE_PARTICLES = true; // True to use circle geometry particles, false to use blob texture particles
 
-const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config, particleTexturesRef }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, node, config, particleTexturesRef }, ref) => {
 
     /** @type {{ gl: THREE.WebGLRenderer }} */
     const { gl } = useThree();
@@ -34,9 +33,6 @@ const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config, par
     const renderBlobRef = useRef();
     const timeRef = useRef(0);
     const pausePhysics = useStore((state) => state.pausePhysics);
-    //const groupRef = useRef();
-    //const circleGeometry = useRef(new THREE.CircleGeometry(0.0001, 4));
-    //const internalRef = useRef(new TIUM.InstancedUniformsMesh(circleGeometry.current, material.current, particles.length));
 
     /** @type {THREE.Texture | Null} */
     const blobTexture = particleTexturesRef.current;
@@ -64,38 +60,7 @@ const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config, par
     }, [ internalRef.current ]);
 
     useEffect(() => {
-        renderBlobRef.current = {
-            // Old - we don't want to do this anymore, too expensive
-            //renderTarget: new THREE.WebGLRenderTarget(1024, 1024),
-            //camera: new THREE.OrthographicCamera(-10, 10, -10, 10, 0.1, 100),
-            //scene: new THREE.Scene(),
-            //blobMesh: new THREE.Mesh(undefined, new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })),
-            v1: new THREE.Vector3(), v2: new THREE.Vector3(),
-        };
-        //const { camera, scene, blobMesh, renderTarget } = renderBlobRef.current;
-        //renderBlobRef.current.material = new THREE.MeshBasicMaterial({ map: renderTarget.texture, transparent: true, side: THREE.DoubleSide });
-        //scene.add(camera);
-        //scene.add(blobMesh);
-        //camera.position.set(0, 0, 10);
-
-        const planeGeometry = new THREE.PlaneGeometry(particleRadius*2, particleRadius*2, 1, 1);
-        const instanceGeometry = new THREE.InstancedBufferGeometry();
-        instanceGeometry.setAttribute('position', planeGeometry.getAttribute('position'));
-        instanceGeometry.setAttribute('normal', planeGeometry.getAttribute('normal'));
-        instanceGeometry.setAttribute('uv', planeGeometry.getAttribute('uv'));
-        instanceGeometry.setIndex(planeGeometry.getIndex());
-
-        const timeOffsets = new Float32Array(maxParticleCount*2);
-        for (let i=0; i<timeOffsets.length; ++i) { 
-            let off = Math.random() * 2*Math.PI;
-            timeOffsets[i] = off; 
-        }
-        const timeOffsetsAttribute = new THREE.InstancedBufferAttribute(timeOffsets, 2, undefined, 1);
-        timeOffsetsAttribute.needsUpdate = true;
-        instanceGeometry.setAttribute('timeOffset', timeOffsetsAttribute);
-        
-        instanceGeometry.instanceCount = particles.length;
-        renderBlobRef.current.geometry = instanceGeometry;
+        renderBlobRef.current = {};
 
         const circleSinVertexShader = meshBasicVertex.replace('#include <clipping_planes_pars_vertex>',
 `#include <clipping_planes_pars_vertex>
@@ -104,77 +69,81 @@ const ParticlesInstance = React.forwardRef(({ id, node, geometryRef, config, par
     attribute float vertTimeOffset;
     uniform float radius;
     uniform float time;
-    uniform vec2 strength;
-    uniform vec2 speed;
+    uniform vec4 strength;
+    uniform vec4 speed;
 `
             ).replace('#include <skinning_vertex>', 
 `#include <skinning_vertex>
 
+    // Make sure circle radius is equal to the radius uniform
+    float len = length(transformed.xy);
+    vec2 sinDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(position.x, position.y));
+    transformed = vec3(sinDir * radius, 1.0);
+    vec4 strength2 = strength * radius;
+
     // Just before #include <project_vertex>
-    vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speed.x)*strength.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speed.y)*strength.y);
-    //vec2 vertOff = vec2(sin((time+timeOffset.x)*speed.x)*strength.x, sin((time+timeOffset.y)*speed.y)*strength.y);
+    vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speed.x)*strength2.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speed.y)*strength2.y);
+    //vec2 vertOff = vec2(sin((time+timeOffset.x)*speed.x)*strength2.x, sin((time+timeOffset.y)*speed.y)*strength2.y);
     transformed.x += vertOff.x;
     transformed.y += vertOff.y;
     
-    if (!(position.x == 0.0 && position.y == 0.0)) {
-        vec2 sinDir = normalize(vec2(position.x, position.y));
-        vec2 vertOff2 = sinDir * 0.5*strength.x * sin(vertTimeOffset+(time+timeOffset.x)*speed.x*2.0);
-        transformed.x += vertOff2.x;
-        transformed.y += vertOff2.y;
-    }
+    //float vo2Mult = sin(time*speed.z); // -- Looks bad, causes ripples to smooth out
+    vec2 vertOff2 = sinDir * strength2.z * sin(vertTimeOffset+(time+timeOffset.x)*speed.z);// * vo2Mult;
+    transformed.x += vertOff2.x;
+    transformed.y += vertOff2.y;
 `);
-    renderBlobRef.current.circleMaterial = new THREE.ShaderMaterial({
-        //map: renderTarget.texture,
-        transparent: false,
-        wireframe: false,
-        //depthWrite: false,
-        //depthTest: false,
-        uniforms: { 
-            radius: { value: particleRadius },
-            time: { value: 0 },
-            strength: { value: new THREE.Vector2(particleRadius*0.08, particleRadius*0.08), },
-            speed: { value: new THREE.Vector2(1, 1) },
-            diffuse: { value: new THREE.Vector3(1, 1, 1) },
-        },
-        vertexShader: circleSinVertexShader,
-        fragmentShader: meshBasicFragment,
-    });
+        renderBlobRef.current.circleMaterial = new THREE.ShaderMaterial({
+            //map: renderTarget.texture,
+            transparent: false,
+            wireframe: false,
+            //depthWrite: false,
+            //depthTest: false,
+            uniforms: { 
+                radius: { value: particleRadius },
+                time: { value: 0 },
+                strength: { value: new THREE.Vector4(0.08, 0.08, 0.04, 0.04), },
+                speed: { value: new THREE.Vector4(1, 1, 2, 2) },
+                diffuse: { value: new THREE.Vector3(1, 1, 1) },
+            },
+            vertexShader: circleSinVertexShader,
+            fragmentShader: meshBasicFragment,
+        });
 
-    const circleSegments = 64;
-    const circleGeometry = new THREE.CircleGeometry(particleRadius, circleSegments);
-    const circleInstanceGeometry = new THREE.InstancedBufferGeometry();
-    circleInstanceGeometry.setAttribute('position', circleGeometry.getAttribute('position'));
-    circleInstanceGeometry.setAttribute('normal', circleGeometry.getAttribute('normal'));
-    circleInstanceGeometry.setAttribute('uv', circleGeometry.getAttribute('uv'));
-    circleInstanceGeometry.setIndex(circleGeometry.getIndex());
+        const circleSegments = 64;
+        const circleGeometry = new THREE.CircleGeometry(particleRadius, circleSegments);
+        const circleInstanceGeometry = new THREE.InstancedBufferGeometry();
+        circleInstanceGeometry.setAttribute('position', circleGeometry.getAttribute('position'));
+        circleInstanceGeometry.setAttribute('normal', circleGeometry.getAttribute('normal'));
+        circleInstanceGeometry.setAttribute('uv', circleGeometry.getAttribute('uv'));
+        circleInstanceGeometry.setIndex(circleGeometry.getIndex());
 
-    let stepAngle = 2*Math.PI / circleSegments;
-    const vertTimeOffs = new Float32Array((circleSegments+2));
-    vertTimeOffs[0] = 0;
-    for (let i=1; i<(circleSegments+2); ++i) {
-        let angle = (stepAngle * (i-1)) % 2*Math.PI;
-        vertTimeOffs[i] = angle*4;
-    }
-    vertTimeOffs[vertTimeOffs.length - 1] = vertTimeOffs[1];
-    const vertTimeOffsAttribute = new THREE.BufferAttribute(vertTimeOffs, 1);
-    circleInstanceGeometry.setAttribute('vertTimeOffset', vertTimeOffsAttribute);
+        let stepAngle = 2*Math.PI / circleSegments;
+        const vertTimeOffs = new Float32Array((circleSegments+2));
+        vertTimeOffs[0] = 0;
+        for (let i=1; i<(circleSegments+2); ++i) {
+            let angle = (stepAngle * (i-1)) % 2*Math.PI;
+            vertTimeOffs[i] = angle*4;
+        }
+        vertTimeOffs[vertTimeOffs.length - 1] = vertTimeOffs[1];
+        const vertTimeOffsAttribute = new THREE.BufferAttribute(vertTimeOffs, 1);
+        circleInstanceGeometry.setAttribute('vertTimeOffset', vertTimeOffsAttribute);
 
-    const circleTimeOffsets = new Float32Array(maxParticleCount*2);
-    for (let i=0; i<circleTimeOffsets.length; ++i) { 
-        let off = Math.random() * 2*Math.PI;
-        circleTimeOffsets[i] = off; 
-    }
-    const circleTimeOffsetsAttribute = new THREE.InstancedBufferAttribute(circleTimeOffsets, 2, undefined, 1);
-    circleTimeOffsetsAttribute.needsUpdate = true;
-    circleInstanceGeometry.setAttribute('timeOffset', circleTimeOffsetsAttribute);
-    
-    circleInstanceGeometry.instanceCount = particles.length;
-    renderBlobRef.current.circleGeometry = circleInstanceGeometry;
-    renderBlobRef.current.originalRadius = particleRadius;
+        const circleTimeOffsets = new Float32Array(maxParticleCount*2);
+        for (let i=0; i<circleTimeOffsets.length; ++i) { 
+            let off = Math.random() * 2*Math.PI;
+            circleTimeOffsets[i] = off; 
+        }
+        const circleTimeOffsetsAttribute = new THREE.InstancedBufferAttribute(circleTimeOffsets, 2, undefined, 1);
+        circleTimeOffsetsAttribute.needsUpdate = true;
+        circleInstanceGeometry.setAttribute('timeOffset', circleTimeOffsetsAttribute);
+        
+        circleInstanceGeometry.instanceCount = particles.length;
+        renderBlobRef.current.circleGeometry = circleInstanceGeometry;
+        renderBlobRef.current.originalRadius = particleRadius;
 
 
 
-const sinVertexShader = meshBasicVertex
+        const sinVertexShader = meshBasicVertex
 .replace('#include <clipping_planes_pars_vertex>',
 `#include <clipping_planes_pars_vertex>
 
@@ -236,25 +205,39 @@ const sinVertexShader = meshBasicVertex
             fragmentShader: sinFragmentShader,
         });
 
-        renderBlobRef.current.material.onBeforeCompile = (shader) => {
-            //console.log(shader.vertexShader);
-        };
+        const planeGeometry = new THREE.PlaneGeometry(particleRadius*2, particleRadius*2, 1, 1);
+        const instanceGeometry = new THREE.InstancedBufferGeometry();
+        instanceGeometry.setAttribute('position', planeGeometry.getAttribute('position'));
+        instanceGeometry.setAttribute('normal', planeGeometry.getAttribute('normal'));
+        instanceGeometry.setAttribute('uv', planeGeometry.getAttribute('uv'));
+        instanceGeometry.setIndex(planeGeometry.getIndex());
+
+        const timeOffsets = new Float32Array(maxParticleCount*2);
+        for (let i=0; i<timeOffsets.length; ++i) { 
+            let off = Math.random() * 2*Math.PI;
+            timeOffsets[i] = off; 
+        }
+        const timeOffsetsAttribute = new THREE.InstancedBufferAttribute(timeOffsets, 2, undefined, 1);
+        timeOffsetsAttribute.needsUpdate = true;
+        instanceGeometry.setAttribute('timeOffset', timeOffsetsAttribute);
+        
+        instanceGeometry.instanceCount = particles.length;
+        renderBlobRef.current.geometry = instanceGeometry;
         
     }, []);
 
     useFrame((_, deltaTime) => {
         if (!internalRef.current) return;
 
-        //if (!pausePhysics) timeRef.current += deltaTime;
-        timeRef.current += deltaTime;
+        if (!pausePhysics) timeRef.current += deltaTime;
+        //timeRef.current += deltaTime;
 
         const mesh = internalRef.current;
         let matrixChanged = false;
         let colorChanged = false;
 
-        if (gl && geometryRef && geometryRef.current && geometryRef.current.geometry && renderBlobRef.current && blobTexture) {
+        if (renderBlobRef.current && blobTexture) {
 
-            //const { camera: textureCamera, material: instanceMaterial, blobMesh, renderTarget, scene: textureScene, v1: gCenter, v2: gSize, geometry: instanceGeometry } = renderBlobRef.current;
             const { material: instanceMaterial, geometry: instanceGeometry } = renderBlobRef.current;
             const { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
 
@@ -262,6 +245,9 @@ const sinVertexShader = meshBasicVertex
                 circleInstanceMaterial.uniforms.time.value = timeRef.current;
                 if (circleInstanceGeometry.instanceCount !== particles.length) circleInstanceGeometry.instanceCount = particles.length;
                 if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
+                
+                if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
+                if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
             }
             else {
                 instanceMaterial.uniforms.time.value = timeRef.current;
@@ -271,36 +257,7 @@ const sinVertexShader = meshBasicVertex
                     instanceMaterial.uniforms.map.value = blobTexture;
                     instanceMaterial.uniforms.map.needsUpdate = true;
                 }
-            }
-            
-            //const uniforms = instanceMaterial.uniforms;
-            //if (uniforms.map1.value != blobTexture[0]) { uniforms.map1.value = blobTexture[0]; uniforms.map1.needsUpdate = true; }
-            //if (uniforms.map2.value != blobTexture[1]) { uniforms.map2.value = blobTexture[1]; uniforms.map2.needsUpdate = true; }
-            //if (uniforms.map3.value != blobTexture[2]) { uniforms.map3.value = blobTexture[2]; uniforms.map3.needsUpdate = true; }
-            //if (uniforms.map4.value != blobTexture[3]) { uniforms.map4.value = blobTexture[3]; uniforms.map4.needsUpdate = true; }
-            
-            //blobMesh.geometry = geometryRef.current.geometry;
-            //blobMesh.geometry.computeBoundingSphere();
-            //const bs = blobMesh.geometry.boundingSphere;
-            //const sizeMult = 1.5;
-            //textureCamera.position.set(bs.center.x, bs.center.y, 10);
-            //textureCamera.updateMatrix();
-            //textureCamera.left = -bs.radius*sizeMult; textureCamera.right = bs.radius*sizeMult;
-            //textureCamera.top = -bs.radius*sizeMult; textureCamera.bottom = bs.radius*sizeMult;
-            //textureCamera.updateProjectionMatrix();
-            //
-            //gl.setRenderTarget(renderTarget);
-            //gl.setSize(1024, 1024);
-            //gl.clear();
-            //gl.render(textureScene, textureCamera);
-            //gl.setRenderTarget(null);
-            //gl.setSize(window.innerWidth, window.innerHeight);
-
-            if (USE_CIRCLE_PARTICLES) {
-                if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
-                if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
-            }
-            else {
+                
                 if (mesh.material !== instanceMaterial) mesh.material = instanceMaterial;
                 if (mesh.geometry !== instanceGeometry) mesh.geometry = instanceGeometry;
             }
@@ -308,21 +265,8 @@ const sinVertexShader = meshBasicVertex
 
 
         let blobScale;
-        if (USE_CIRCLE_PARTICLES) {
-            if (renderBlobRef.current) { blobScale = particleRadius / renderBlobRef.current.originalRadius; }
-            else blobScale = 1.0;
-        }
-        else {
-            blobScale = 1.2;
-        }
-
-        if (geometryRef && geometryRef.current && geometryRef.current.geometry) { 
-            //mesh.geometry = geometryRef.current.geometry;
-            //blobScale = (particleRadius / geometryRef.current.blobRadius) * 1.3;
-
-            //geometry.current = createInstancedGeometry(geometryRef.current.geometry, geometry.current);
-            //mesh.geometry = geometry.current;
-        }
+        if (USE_CIRCLE_PARTICLES) { blobScale = 1.0; }
+        else { blobScale = 1.2; }
 
         particles.forEach((particleRef, i) => {
             const particle = particleRef.current;
@@ -378,11 +322,6 @@ const sinVertexShader = meshBasicVertex
                 colorChanged = true;
             }
         });
-
-        // Test
-        //mesh.getMatrixAt(0, instanceMatrix);
-        //instanceMatrix.compose(new THREE.Vector3(0, 0, 34), new THREE.Quaternion(), new THREE.Vector3(blobScale * 100, blobScale * 100, blobScale * 100));
-        //mesh.setMatrixAt(0, instanceMatrix);
 
         if (matrixChanged) {
             mesh.instanceMatrix.needsUpdate = true;
