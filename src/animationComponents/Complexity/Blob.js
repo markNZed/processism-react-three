@@ -2,28 +2,30 @@ import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
+import { or } from 'three/examples/jsm/nodes/Nodes.js';
 
-const Blob = ({ color, node, centerRef, entityNodes }) => {
+const Blob = ({ color, node, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateVisualConfigValue, getNodeProperty, getparticlesStable, getAllParticleRefs } = useStoreEntity.getState();
+    const { getNode, propagateVisualConfigValue, getparticlesStable, getAllParticleRefs } = useStoreEntity.getState();
     const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
-    const particleRadius = useMemo(() => getNodeProperty('root', 'particleRadius'), []);
     const [pressStart, setPressStart] = useState(0);
     const longPressThreshold = 500; // Time in milliseconds to distinguish a long press
     const particlesRef = useRef();
     const particlesHashRef = useRef();
 
-    function buildBlobPoints() {
+    function buildBlobData() {
         blobData.current = {
             positions: [],
             flattenedIndexes: [],
+            radii: [],
         };
 
         let blobOuterUniqueIds = [];
         let flattenedIndexes = [];
+        let radii = [];
         particlesRef.current = getAllParticleRefs(id);
         const particles = particlesRef.current;
         for (let i = 0; i < particles.length; ++i) {
@@ -46,6 +48,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
                     const uniqueId = particles[i].current.getVisualConfig().uniqueId;
                     blobOuterUniqueIds.push(uniqueId);
                     flattenedIndexes.push(i);
+                    radii.push(particles[i].current.getVisualConfig().origRadius);
                 }
             }
         }
@@ -66,21 +69,24 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         if (!orderedIds.length) console.error("orderedIds is empty!", id);
         //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
         const blobIndexes = orderedIds;
+        blobIndexes.push(orderedIds[0]);
 
-        console.log("buildBlobPoints", id, chainRef, particles, blobOuterUniqueIds, blobIndexes)
+        //console.log("buildBlobData", id, blobData, chainRef, particles, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
             const indexInOuter = blobOuterUniqueIds.indexOf(blobIndexes[i]);
             const flattenedIndex = flattenedIndexes[indexInOuter];
             blobData.current.flattenedIndexes.push(flattenedIndex);
+            blobData.current.radii.push(radii[indexInOuter]);
         }
+    
     }
 
     // This only runs once upon mounting to build the blobData which acts as a cache for objects
     useEffect(() => {
 
-        buildBlobPoints();
+        buildBlobData();
 
     },[]);
 
@@ -90,7 +96,7 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
         //if (id == "root") console.log("getparticlesStable(id) hash", hash);
         if (hash !== particlesHashRef.current) {
             particlesHashRef.current = hash;
-            buildBlobPoints();
+            buildBlobData();
         }
 
         if (!blobData.current) return;
@@ -99,16 +105,16 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
 
             const particles = particlesRef.current;
 
-            const blobPoints = blobData.current.positions.map((positiion, i) => {
+            const blobPoints = blobData.current.positions.map((position, i) => {
                 const flattenedIndex = blobData.current.flattenedIndexes[i]
                 const pos = particles[flattenedIndex].current.translation();
                 worldVector.set(pos.x, pos.y, pos.z);
-                positiion.copy(worldToLocalFn(worldVector))
-                return positiion;
+                position.copy(worldToLocalFn(worldVector))
+                return position;
             });
 
             if (blobPoints.length) {
-                const geometry = points_to_geometry(blobPoints, particleRadius, centerRef);
+                const geometry = points_to_geometry(blobPoints, blobData.current.radii);
                 blobRef.current.geometry.dispose();
                 blobRef.current.geometry = geometry;
                 blobRef.current.visible = true;
@@ -183,11 +189,21 @@ const Blob = ({ color, node, centerRef, entityNodes }) => {
 export default Blob;
 
 // Outside of component to avoid recreation on render
+
+function calculateCenter(points) {
+    let sum = new THREE.Vector3(0, 0, 0);
+    points.forEach(point => {
+        sum.add(point);
+    });
+    return sum.divideScalar(points.length);
+}
  
-const points_to_geometry = (points, particleRadius = 0, centerRef) => {
-    const expandPointsFromCenter = (points, distance, center) => {
-        return points.map(point => {
+const points_to_geometry = (points, radii) => {
+    const expandPointsFromCenter = (points, radii, center) => {
+        return points.map((point, i) => {
+            const distance = radii[i];
             const direction = new THREE.Vector3().subVectors(point, center).normalize();
+            //console.log("direction", direction, distance, center);
             return new THREE.Vector3(
                 point.x + direction.x * distance,
                 point.y + direction.y * distance,
@@ -196,11 +212,15 @@ const points_to_geometry = (points, particleRadius = 0, centerRef) => {
         });
     };
 
-    // Ensure centerRef is a Vector3
-    const center = centerRef.current;
+    // We calculate the center rather than using the entity center (which is more like a center of gravity than a geometric center)
+    const center = calculateCenter(points);
+
+    // These are very different
+    //console.log("center", center, centerRef.current);
 
     // Offset the points before creating the curve
-    const expandedPoints = expandPointsFromCenter(points, particleRadius, center);
+    const expandedPoints = expandPointsFromCenter(points, radii, center);
+    //const expandedPoints = points;
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
     const oneToOnePoints = curve.getPoints(expandedPoints.length);

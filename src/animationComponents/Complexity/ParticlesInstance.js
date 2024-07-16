@@ -9,7 +9,6 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
     useImperativeHandle(ref, () => internalRef.current);
 
     const { getNodeProperty, getAllParticleRefs } = useStoreEntity.getState();
-    const particleRadius = getNodeProperty('root', 'particleRadius');
     const userColor = new THREE.Color();
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();
@@ -47,9 +46,16 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
             const pos = particle.translation();
             let scale = visualConfig.scale || 1;
 
-            const radius = visualConfig.radius || particleRadius;
-            if (radius !== particleRadius) {
-                scale = scale * (radius / particleRadius);
+            const radius = visualConfig.radius;
+            const origRadius = visualConfig.origRadius;
+            //console.log("radius", i, radius, origRadius);
+            if (radius !== origRadius) {
+                scale = scale * (radius / origRadius);
+            }
+
+            // Default radius is 1
+            if (radius !== 1) {
+                scale = scale * (radius);
             }
 
             userScale.set(scale, scale, scale);
@@ -119,13 +125,14 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
         visualConfig.color = 'pink';
     };
 
+    // Use a fixed radius and scale this for particle size
     return (
         <instancedMesh
             ref={internalRef}
             args={[null, null, particleCount]}
             onPointerUp={handlePointerDown}
         >
-            <circleGeometry args={[particleRadius, 16]} />
+            <circleGeometry args={[1, 16]} />
             <meshStandardMaterial />
         </instancedMesh>
     );

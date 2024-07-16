@@ -72,15 +72,12 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
         if (initialize && nodeRef.current) {
             // Must set outerChain before isParticle
             //console.log("particle parentOuter", id, parentOuter)
-            nodeRef.current.setVisualConfig({ color: color, uniqueId: id, radius: radius, outerChain: parentOuter });
+            nodeRef.current.setVisualConfig({ color: color, uniqueId: id, radius: radius, origRadius: radius, outerChain: parentOuter });
             directUpdateNode(id, {isParticle: true});
             const rootNode = directGetNode("root");
-            if (!rootNode.particleRadius) {
-                directUpdateNode("root", {
-                    particleRadius: radius,
-                    particleArea: utils.calculateCircleArea(radius),
-                })
-            }
+            directUpdateNode("root", {
+                particleArea: utils.calculateCircleArea(radius),
+            })
             setInitialize(false);
         }
     }, [nodeRef]);
@@ -100,6 +97,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 linearDamping={2000}
                 angularDamping={2000}
                 enabledTranslations={[true, true, false]}
+                //enabledTranslations={[false, false, false]}
                 enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}

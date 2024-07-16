@@ -10,15 +10,11 @@ const useJoints = () => {
     const { world, rapier } = useRapier();
     // Be careful not to have this sensitive to updates to nodes
     // Direct access to the state outside of React's render flow
-    const { getNodeProperty: directGetNodeProperty, 
-            getJoint: directGetJoint,
-            addJoints: directAddJoints, 
+    const { getJoint: directGetJoint,
             addJoint: directAddJoint, 
             deleteJoint: storeDeleteJoint,
             updateJoint: directUpdateJoint,
-            getNode: directGetNode,
             getAllParticleRefs: directGetAllParticleRefs } = useStoreEntity.getState();
-    const particleRadius = directGetNodeProperty('root', 'particleRadius');
 
     const addLink = (chainRef, uniqueIdA, uniqueIdB) => {
         //console.log("Before addLink", JSON.stringify(chainRef.current), uniqueIdA, uniqueIdB);
@@ -59,17 +55,19 @@ const useJoints = () => {
             const closestParticleAPosition = resultA.closestParticlePosition;
             const particleAEntityIndex = resultA.particleEntityIndex;
             const closestParticleARef = resultA.closestParticleRef;
+            const particleARadius = closestParticleARef.current.getVisualConfig().radius;
 
             const resultB = findClosestParticle(entitiesParticlesRefs, jointData, worldPosition, particleAEntityIndex, particleWorldPosition);
             const closestParticleBPosition = resultB.closestParticlePosition;
             const closestParticleBRef = resultB.closestParticleRef;
+            const particleBRadius = closestParticleBRef.current.getVisualConfig().radius;
 
             const direction = new THREE.Vector3()
                 .subVectors(closestParticleBPosition, closestParticleAPosition)
                 .normalize();
 
-            const offsetA = direction.clone().multiplyScalar(particleRadius);
-            const offsetB = direction.clone().multiplyScalar(-particleRadius);
+            const offsetA = direction.clone().multiplyScalar(particleARadius);
+            const offsetB = direction.clone().multiplyScalar(-particleBRadius);
 
             if (!closestParticleARef) {
                 console.log("!closestParticleARef", node)
@@ -83,49 +81,6 @@ const useJoints = () => {
             return [closestParticleARef, offsetA, closestParticleBRef, offsetB];
         });
         return allocatedJoints;
-    };
-
-    const initializeJoints = (node, entityPositions) => {
-        const scope = node.depth;
-        const nodeRef = node.ref;
-        const chainRef = node.chainRef;
-        const centerRef = new THREE.Vector3();
-        centerRef.current = nodeRef.current.localToWorld(vec3(node.initialPosition));
-
-        const newJoints = allocateJointsToParticles(node, chainRef, entityPositions);
-
-        if (!newJoints.length) {
-            // Happens if there is just one entity
-            console.warn("No newJoints in initializeJoints");
-            return;
-        }
-
-        // Distance to the first joint
-        // We place the joints first because they will not align with the perimeter of the scope
-        const jointPosition = newJoints[0].a.ref.translation();
-        const jointPositionVector = new THREE.Vector3(jointPosition.x, jointPosition.y, jointPosition.z);
-        const distanceToFirstJoint = centerRef.current.distanceTo(jointPositionVector) - particleRadius;
-
-        node.particlesRef.current.forEach(particleRef => {
-            const particlePosition = particleRef.current.translation();
-            const particleVector = new THREE.Vector3(particlePosition.x, particlePosition.y, particlePosition.z);
-            const distanceToCenter = centerRef.current.distanceTo(particleVector);
-            const visualConfig = particleRef.current.getVisualConfig();
-            if (!visualConfig.outerChain) visualConfig.outerChain = {};
-            let outer = distanceToCenter >= (distanceToFirstJoint);
-            visualConfig.outerChain[scope] = outer
-            particleRef.current.setVisualConfig(visualConfig);
-            // To debug the chains of particles
-            //if (scope == 0 && outer) particleRef.current.getVisualConfig().color = "black";
-        });
-
-        // Create the joints
-        const createJointResults = []
-        newJoints.forEach(([body1Ref, offset1, body2Ref, offset2]) => {
-            const jointRef = createJoint(chainRef, body1Ref, offset1, body2Ref, offset2, true)
-            createJointResults.push([body1Ref.getVisualConfig().uniqueId, body2Ref.getVisualConfig().uniqueId, jointRef]);
-        });
-        directAddJoints(createJointResults); // Because batch operation
     };
 
     const createJoint = (chainRef, aRef, aOffset, bRef, bOffset, batch=false) => {
@@ -188,7 +143,7 @@ const useJoints = () => {
         addLink(chainRef, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
         directUpdateJoint(jointId, aVisualConfig.uniqueId, bVisualConfig.uniqueId, newJointRef);
     };
-    return {initializeJoints, deleteJoint, createJoint, updateJoint, addLink};
+    return {deleteJoint, createJoint, updateJoint, addLink};
 };
 
 export default useJoints;
