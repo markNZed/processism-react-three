@@ -11,8 +11,6 @@ const USE_CIRCLE_PARTICLES = true; // True to use circle geometry particles, fal
 
 const ParticlesInstance = React.forwardRef(({ id, node, config, particleTexturesRef }, ref) => {
 
-    /** @type {{ gl: THREE.WebGLRenderer }} */
-    const { gl } = useThree();
     const maxParticleCount = config.entityCounts.reduce((a, b) => a * b);
 
     const internalRef = useRef();

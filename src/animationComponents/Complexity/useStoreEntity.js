@@ -75,11 +75,6 @@ const createNode = (id = null, properties = {}, childrenIds = []) => {
         ref: React.createRef(),
         childrenIds,
         parentRef: React.createRef(),
-        centerRef: (() => {
-            const ref = React.createRef();
-            ref.current = new THREE.Vector3();  // Initialize .current with an empty object
-            return ref;
-        })(),
         relationsRef: (() => {
             const ref = React.createRef();
             ref.current = [];  // Initialize .current with an empty object
