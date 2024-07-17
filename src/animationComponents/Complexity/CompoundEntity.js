@@ -18,7 +18,7 @@ import useStoreEntity from './useStoreEntity';
 import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, getTopBlobGeometryRef, topBlobGeometryRef, particleTexturesRef }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, getTopBlobGeometryRef, topBlobGeometryRef }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -160,7 +160,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                                     id={`${id}`}
                                     node={node}
                                     config={config}
-                                    particleTexturesRef={particleTexturesRef}
                                 />
                                 {config.showRelations && (
                                     <Relations 
