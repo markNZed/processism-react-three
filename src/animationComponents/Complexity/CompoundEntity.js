@@ -19,7 +19,10 @@ import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, index, config, parentOuter = {}, ...props }, ref) => {
+// Priorities refactoring
+//   
+
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, config, outer = {}, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -35,8 +38,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         getJoints: directGetJoints,
         resetParticlesStable: directResetParticlesStable,
     } = useStoreEntity.getState();
+
+    // This allows us to pause the physics simulation
     const setOption = useStore((state) => state.setOption);
     const getOption = useStore((state) => state.getOption);
+    //if (!getOption("pausePhysics")) setOption("pausePhysics", true);
 
     // Select so we are only sensitive to changes of this node
     const { node, entityNodes } = useStoreEntity(useCallback((state) => {
@@ -50,7 +56,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const configColor = config.colors[node.depth];
     const localColor = useMemo(() => utils.getColor(configColor, color), [configColor, color]);
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
-    //const entityRadius = entityCount ? radius / entityCount : radius; // Fixed to help with testing
     const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.97, [radius, entityCount]);
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3());
@@ -61,7 +66,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     // A function to encapsulate the condition
     const isPhysicsReady = () => physicsState === "ready";
     const [entitiesToInstantiate, setEntitiesToInstantiate] = useState([]);
-    // Block the instnatiating of next entity
+    // Block the instantiating of next entity
     const busyInstantiatingRef = useRef(false);
     const instantiatingIdRef = useRef();
     const [instantiateJoints, setInstantiateJoints] = useState([]);
@@ -70,11 +75,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [entityInstantiated, setEntityInstantiated] = useState();
     const [entitiesReady, setEntitiesReady] = useState(false);
     const [entitiesReadyDelayed, setEntitiesReadyDelayed] = useState(false);
-    const [coreActive, setCoreActive] = useState();
-    const coreRef = useRef();
-    const coreColliderRef = useRef();
-    const coreInitialPositionRef = useRef();
-    const axis = new THREE.Vector3(0, 0, 1); // 2D Axis
     const [particlesFirst, setParticlesFirst] = useState(true);
     const [prevParticlesFirst, setPrevParticlesFirst] = useState(true);
     const [particlesFirstDelayed, setParticlesFirstDelayed] = useState(true);
@@ -82,21 +82,22 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const jointsToRef = useRef({});
     const scaleJoint = 2.1; // Slightly bigger to avoid "hitting" the surrounding particles
     const quaternion = props.initialQuaternion || new THREE.Quaternion();
-    const quaternionInverted = quaternion.clone().invert();
     const jointsToInRef = useRef(props.jointsTo || []);
     const jointsFromInRef = useRef(props.jointsFrom || []);
     const [particleReady, setParticleReady] = useState({});
     const [jointsMapped, setJointsMapped] = useState(true);
     const [triggerJoints, setTriggerJoints] = useState(false);
-    const [initiatedCore, setInitiatedCore] = useState(false);
     const particlesInstanceRef = useRef();
     const animDelay = 250;
     const [allParticlesReady, setAllParticlesReady] = useState(false);
-    const outerNodesRef = useRef({});
-    const [center, setCenter] = useState(initialPosition);
+    const outerRef = useRef({});
+
+    const entityPoseRef = useRef({
+        positions: [],
+        orientations: {},
+    });
     
-    const entityPositionsRef = useRef([]);
-    const entityOrientationsRef = useRef({});
+    const orientationsRef = useRef({});
 
     const { deleteJoint, createJoint, updateJoint, addLink } = useJoints();
 
@@ -164,9 +165,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const { inIndex, outIndex } = inOutIndices();
             const inNode = directGetNode(entitiesToInstantiate[inIndex]);
             const outNode = directGetNode(entitiesToInstantiate[outIndex])
-            const inNodeQuaternion = entityOrientationsRef.current[inNode.id];
+            const inNodeQuaternion = entityPoseRef.current.orientations[inNode.id];
             inNodeQuaternion.invert();
-            const outNodeQuaternion = entityOrientationsRef.current[outNode.id];
+            const outNodeQuaternion = entityPoseRef.current.orientations[outNode.id];
             outNodeQuaternion.invert();
 
             // The rotation of the old body may no longer be relevant because of CompoundEntity rotation
@@ -223,8 +224,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
         }
     }, [particlesFirstDelayed, triggerJoints]);
-
-    // Need particles[i].current.getVisualConfig().outerChain
 
     const instantiateEntity = (entityNodeId, i) => {
         console.log("instantiateEntity", id, entityNodeId, i);
@@ -303,11 +302,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const theta = (2 * Math.PI) / n;
                     return entityRadius / Math.sin(theta / 2);
                 }
-
-                if (coreActive) {
-                    const optimalRadius = calculateOptimalCircleRadius(entitiesToInstantiate.length + 1, entityRadius);
-                    coreColliderRef.current.setRadius(optimalRadius - entityRadius);
-                }
                 
                 // Find the midpoint between the two nodes
                 // Would be better to calculate midpoint at the time of instantiation after the joint has grown
@@ -326,11 +320,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
         }
-        entityPositionsRef.current.push(newPosition);
+        entityPoseRef.current.positions.push(newPosition);
         console.log("newPosition", newPosition, radius);
         
         const entityOrientation = centerRef.current.clone()
-        entityOrientation.sub(new THREE.Vector3(...entityPositionsRef.current[i]));
+        entityOrientation.sub(new THREE.Vector3(...entityPoseRef.current.positions[i]));
         // Check if the resultant vector is zero
         if (entityOrientation.lengthSq() === 0) {
             // If zero vector, set to default direction
@@ -351,7 +345,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             entityInitialQuaternion.setFromUnitVectors(forward, entityOrientation);
         }
         console.log("entityInitialQuaternion", entityNodeId, entityInitialQuaternion);
-        entityOrientationsRef.current[entityNodeId] = entityInitialQuaternion;
+        entityPoseRef.current.orientations[entityNodeId] = entityInitialQuaternion;
 
         console.log("Instantiating entityNodeId", id, i, entitiesToInstantiate, entityNodeId, newPosition);
     }
@@ -367,16 +361,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
             // Define the node as outer or not for the blob 
             // both input and output are outer
-            let outer = node.id === "root" ? true: false;
+            let outerAtDepth = node.id === "root" ? true: false;
             if (i == 1 || i == 2 ) {
-                outer = true;
+                outerAtDepth = true;
             }
-            // If instantiateCount is odd then outer is true
+            // If instantiateCount is odd then outerAtDepth is true
             if (i % 2 == 0) {
-                outer = true;
+                outerAtDepth = true;
             }
-            const newOuter = {...parentOuter, [node.depth]: outer};
-            outerNodesRef.current[entityNodeId] = newOuter;
+            const newOuter = {...outer, [node.depth]: outerAtDepth};
+            outerRef.current[entityNodeId] = newOuter;
 
             // Use a timer for a delay so we can see the sequence for debug etc 
             const delay = (i === 0) ? 0 : animDelay;
@@ -421,7 +415,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const body2Ref = node2.ref.current;
             if (!body1Ref?.current || !body2Ref?.current) return;
             // Should deal with different radius
-            //const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius, entityOrientationsRef.current[id1], entityOrientationsRef.current[id2]);
+            //const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, entityRadius, entityPoseRef.current.orientations[id1], entityPoseRef.current.orientations[id2]);
             const visualConfig1 = node1.ref.current.getVisualConfig();
             const body1radius = visualConfig1.radius;
             const visualConfig2 = node2.ref.current.getVisualConfig();
@@ -521,16 +515,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             jointsFromInRef.current = jointsFromInRef.current.filter((jointId) => jointId !== replaceJointId);
             jointsToInRef.current= jointsToInRef.current.filter((jointId) => jointId !== replaceJointId);
             replacedJointIndices.push(i);
-
-            if (false && coreActive) {
-                const { offset1, offset2 } = utils.calculateJointOffsets(coreColliderRef.current, nextBodyRef.current, entityRadius);
-                world.createImpulseJoint(
-                    rapier.JointData.spherical(offset1, offset2),
-                    coreColliderRef.current,
-                    nextBodyRef.current,
-                    true
-                );
-            }
         });
 
         return replacedJointIndices;
@@ -557,7 +541,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         setParticleReady({ ...particleReady, [entityId]: true });
                         const entityNode = directGetNode(entityId);
                         const newPosition = entityNode.ref.current.getCenter()
-                        entityPositionsRef.current[i] = [newPosition.x, newPosition.y, newPosition.z];
+                        entityPoseRef.current.positions[i] = [newPosition.x, newPosition.y, newPosition.z];
                     }, animDelay);
                     break;
                 }
@@ -565,19 +549,45 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     }, [particleReady, particlesFirstDelayed, jointsMapped]);
 
+    const calculateCenter = ({ items }) => {
+        worldCenterRef.current.set(0, 0, 0); // Reset the center vector
+        let activeEntities = 0;
+    
+        items.forEach((item) => {
+            let entityNode;
+    
+            // Check if the item is an ID or a node object and get the node accordingly
+            if (typeof item === 'string' || typeof item === 'number') {
+                entityNode = directGetNode(item);
+            } else {
+                entityNode = item;
+            }
+    
+            // Continue if the entity node and its reference are valid
+            if (entityNode && entityNode.ref.current) {
+                // Decide whether to use world or local center based on the 'useWorld' flag
+                const entityCenter = entityNode.ref.current.getCenterWorld();
+                if (entityCenter) {
+                    worldCenterRef.current.add(entityCenter);
+                    activeEntities++;
+                }
+            }
+        });
+    
+        if (activeEntities > 0) {
+            worldCenterRef.current.divideScalar(activeEntities);
+        }
+
+        centerRef.current = nodeRef.current.worldToLocal(worldCenterRef.current.clone());
+
+        nodeRef.current.setCenter(centerRef.current);
+    
+    };
+
     useFrame(() => {
 
         calculateCenter({
-            getNode: directGetNode,
             items: entitiesToInstantiate,
-            centerRef: centerRef,
-        });
-        nodeRef.current.setCenter(centerRef.current);
-        calculateCenter({
-            getNode: directGetNode,
-            items: entitiesToInstantiate,
-            centerRef: worldCenterRef,
-            useWorld: true,
         });
 
         if (busyInstantiatingRef.current) {
@@ -634,7 +644,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
         }
 
-        if (!particlesFirstDelayed && !coreActive && entitiesReady) {
+        if (!particlesFirstDelayed && entitiesReady) {
             let allParticles = true;
             for (let i = 0; i < entityNodes.length; i++) {
                 const entity = entityNodes[i];
@@ -646,59 +656,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (allParticles) {
                 //createCore();
             }
-        }
-
-        if (coreActive && !initiatedCore && coreColliderRef.current) {
-            const corePosition = coreColliderRef.current.translation();
-            const coreRotation = quat(coreColliderRef.current.rotation());
-            const coreQuaternion = coreRotation.invert();
-            const joints = [];
-            for (let i = 0; i < 3; i++) {
-                const entityId = entitiesToInstantiate[i];
-                const entityNode = directGetNode(entityId);
-                console.log("initiate core", id, entitiesToInstantiate[i], coreColliderRef.current, entityNode.ref.current.current);
-                
-                const coreRadius = coreColliderRef.current.radius();
-                const bodyPosition = entityNode.ref.current.current.translation();
-                
-                // Calculate the direction vector and distance
-                const direction = new THREE.Vector3().subVectors(bodyPosition, corePosition);
-                //const distance = direction.length() - entityRadius;
-                const distance = coreRadius
-                direction.normalize();
-                
-                // Calculate anchor1 position
-                const anchor1 = direction.clone().multiplyScalar(distance);
-                
-                // Apply inverse rotation to anchor1
-                anchor1.applyQuaternion(coreQuaternion);
-                
-                // Define anchor2
-                const anchor2 = { x: entityRadius, y: 0, z: 0 };
-
-                joints.push([
-                    rapier.JointData.spherical(anchor1, anchor2),
-                    coreColliderRef.current,
-                    entityNode.ref.current.current,
-                    true
-                ])
-            }
-            joints.forEach(joint =>
-                world.createImpulseJoint(...joint)
-            );
-            setInitiatedCore(true);
-        }
-        
-
-        function createCore() {
-            calculateCenter({
-                getNode: directGetNode,
-                items: entitiesToInstantiate,
-                centerRef: centerRef,
-            });
-            coreInitialPositionRef.current = centerRef.current;
-            //console.log("centerRef.current", centerRef.current);
-            setCoreActive(true);
         }
 
         function alignJointsToPolygon() {
@@ -785,11 +742,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 }
                 break;
             case "findCenter":
+                /*
                 calculateCenter({
                     items: entityNodes,
                     centerRef: centerRef,
                 });
                 nodeRef.current.setCenter(centerRef.current);
+                */
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)
@@ -804,7 +763,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     return (
         <group>
-             <CompoundEntityGroup ref={nodeRef} position={initialPosition} initialQuaternion={quaternion}>
+             <CompoundEntityGroup ref={nodeRef} position={initialPosition} initialQuaternion={quaternion} id={id}>
                 {entitiesToInstantiate.map((entityId, i) => {
                     let entity = directGetNode(entityId);
                     let EntityType = CompoundEntity;
@@ -820,35 +779,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         <EntityType
                             key={`${id}-${i}`}
                             id={`${entity.id}`}
-                            initialPosition={entityPositionsRef.current[i]}
+                            initialPosition={entityPoseRef.current.positions[i]}
                             radius={entityRadius}
                             color={localColor}
                             ref={entity.ref}
                             debug={isDebug}
                             config={config}
-                            index={`${i}`}
                             entitiesReady={entitiesReadyDelayed}
                             jointsTo={jointsToRef.current[entity.id] || []}
                             jointsFrom={jointsFromRef.current[entity.id] || []}
-                            initialQuaternion={entityOrientationsRef.current[entity.id]}
-                            parentOuter={outerNodesRef.current[entity.id]}
+                            initialQuaternion={entityPoseRef.current.orientations[entity.id]}
+                            outer={outerRef.current[entity.id]}
                         />
                     )
                 })}
-
-                {coreActive && (
-                    <RigidBody
-                        ref={coreRef}
-                        position={coreInitialPositionRef.current}
-                        type={"dynamic"}
-                        //type={"fixed"}
-                        colliders={false}
-                        enabledTranslations={[true, true, false]}
-                        enabledRotations={[false, false, true]}
-                    >
-                        <BallCollider ref={coreColliderRef} args={[entityRadius * 0.1]} />
-                    </RigidBody>
-                )}
 
                 {allParticlesReady && (
                     <Blob
@@ -864,7 +808,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         color={localColor}
                         initialPosition={initialPosition}
                         newJointsRef={node.jointsRef}
-                        index={index || 0}
                         nodeRef={nodeRef}
                         isDebug={isDebug}
                         centerRef={centerRef}
@@ -894,7 +837,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     anchorX="center"
                     anchorY="middle"
                 >
-                    {index || 0}
+                    {id || 0}
                 </Text>
             )}
         </group>
@@ -903,36 +846,3 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 }));
 
 export default CompoundEntity;
-
-const calculateCenter = ({ getNode, items, centerRef, useWorld = false }) => {
-    centerRef.current.set(0, 0, 0); // Reset the center vector
-    let activeEntities = 0;
-
-    items.forEach((item) => {
-        let entityNode;
-
-        // Check if the item is an ID or a node object and get the node accordingly
-        if (typeof item === 'string' || typeof item === 'number') {
-            entityNode = getNode(item);
-        } else {
-            entityNode = item;
-        }
-
-        // Continue if the entity node and its reference are valid
-        if (entityNode && entityNode.ref.current) {
-            // Decide whether to use world or local center based on the 'useWorld' flag
-            const method = useWorld ? 'getCenterWorld' : 'getCenter';
-            const entityCenter = entityNode.ref.current[method]();
-            if (entityCenter) {
-                centerRef.current.add(entityCenter);
-                activeEntities++;
-            }
-        }
-    });
-
-    if (activeEntities > 0) {
-        centerRef.current.divideScalar(activeEntities);
-    }
-};
-
-

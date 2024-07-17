@@ -2,7 +2,7 @@ import React, { forwardRef, useRef, useImperativeHandle, useMemo, useEffect } fr
 import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
-const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion, visualConfig }, ref) => {
+const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion, id }, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
@@ -46,6 +46,7 @@ const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion,
             impulseRef.current.add(newImpulse);
         },
         getCenter: () => {
+            //console.log("CompoundEntityGroup getCenter", id, centerRef.current)
             if (centerRef.current) {
                 return centerRef.current.clone();
             } else {
@@ -53,9 +54,11 @@ const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion,
             }
         },
         setCenter: (center) => {
+            //console.log("CompoundEntityGroup setCenter", id, center)
             return centerRef.current.copy(center);
         },
         getCenterWorld: () => {
+            //console.log("CompoundEntityGroup getCenterWorld", id, centerRef.current, internalRef.current.localToWorld(centerRef.current.clone()))
             if (centerRef.current) {
                 return internalRef.current.localToWorld(centerRef.current.clone());
             } else {
@@ -66,7 +69,8 @@ const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion,
             return internalRef.current.worldToLocal(vector);
         },
         localToWorld: (vector) => {
-            return internalRef.current.localToWorld(vector);
+            //console.log("localToWorld", vector, internalRef.current.localToWorld(vector))
+            return internalRef.current.localToWorld(vector.clone());
         },
         translation: () => {
             return internalRef.current.localToWorld(centerRef.current.clone());
@@ -120,11 +124,6 @@ CompoundEntityGroup.propTypes = {
             }
         }
     ).isRequired,
-    visualConfig: PropTypes.object,
-};
-
-CompoundEntityGroup.defaultProps = {
-    visualConfig: {},
 };
 
 export default CompoundEntityGroup;

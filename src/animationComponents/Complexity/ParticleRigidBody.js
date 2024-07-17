@@ -34,6 +34,7 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
                 const pos = internalRef.current.translation(); // world position
                 centerRef.current.set(pos.x, pos.y, pos.z);
                 worldToLocal(centerRef.current);
+                //console.log("ParticleRigidBody getCenter", id, centerRef.current)
                 return centerRef.current.clone();
             } else {
                 return null;
@@ -43,6 +44,7 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
             if (internalRef.current) {
                 const pos = internalRef.current.translation(); // world position
                 centerWorldRef.current.set(pos.x, pos.y, pos.z);
+                //console.log("ParticleRigidBody getCenterWorld", id, centerRef.current)
                 return centerWorldRef.current.clone();
             } else {
                 return null;

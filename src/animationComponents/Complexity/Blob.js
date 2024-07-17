@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
-import { or } from 'three/examples/jsm/nodes/Nodes.js';
 
 const Blob = ({ color, node, entityNodes }) => {
     const worldVector = new THREE.Vector3();
@@ -33,18 +32,18 @@ const Blob = ({ color, node, entityNodes }) => {
                 console.warn(`particles[i] ${i}, was empty`);
                 continue;
             }
-            const outerChain = particles[i].current.getVisualConfig().outerChain;
-            if (outerChain) {
-                let outer = outerChain[node.depth];
-                if (outer) {
-                    for (let j = Object.keys(outerChain).length - 1;j > node.depth; j--) {
-                        if (!outerChain[j.toString()]) {
-                            outer = false;
+            const outer = particles[i].current.getVisualConfig().outer;
+            if (outer) {
+                let outerDepth = outer[node.depth];
+                if (outerDepth) {
+                    for (let j = Object.keys(outer).length - 1;j > node.depth; j--) {
+                        if (!outer[j.toString()]) {
+                            outerDepth = false;
                             break;
                         }
                     }
                 }
-                if (outer) {
+                if (outerDepth) {
                     const uniqueId = particles[i].current.getVisualConfig().uniqueId;
                     blobOuterUniqueIds.push(uniqueId);
                     flattenedIndexes.push(i);
@@ -54,7 +53,7 @@ const Blob = ({ color, node, entityNodes }) => {
         }
 
         if (blobOuterUniqueIds.length < 3) {
-            console.error("blobOuterUniqueIds less than 3!", id, blobOuterUniqueIds.length, particles.length);
+            console.error("blobOuterUniqueIds < 3", id, blobOuterUniqueIds.length, particles.length);
             // Dealing with the case where there is only one or two particles
             // Which means there will be no blob, so no way to click on the blob and show the particle
             // This no longer works as there can be an intermediate state where blobOuterUniqueIds.length is < 3 but the
@@ -199,6 +198,8 @@ function calculateCenter(points) {
 }
  
 const points_to_geometry = (points, radii) => {
+
+    // Rather than expand we should just use the particle overlap - maybe Jeremy could look into this?
     const expandPointsFromCenter = (points, radii, center) => {
         return points.map((point, i) => {
             const distance = radii[i];
@@ -260,11 +261,9 @@ function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
 // visited should be specific to a "search" of the chain
 
 function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null) {
-    let initial = false;
     // Initialize uniqueId with the first element of blobOuterUniqueIds if null
     if (uniqueId === null) {
         uniqueId = blobOuterUniqueIds[0];
-        initial = true;
         firstId = uniqueId;
     }
 

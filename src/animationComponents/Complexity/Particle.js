@@ -11,7 +11,7 @@ import * as utils from './utils';
 // At leasst keep uniqueId aligned with id
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuaternion, radius, config, parentOuter, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuaternion, radius, config, outer, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -70,9 +70,9 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     // Set the initial visualConfig, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && nodeRef.current) {
-            // Must set outerChain before isParticle
-            //console.log("particle parentOuter", id, parentOuter)
-            nodeRef.current.setVisualConfig({ color: color, uniqueId: id, radius: radius, origRadius: radius, outerChain: parentOuter });
+            // Must set outer before isParticle
+            //console.log("particle outer", id, outer)
+            nodeRef.current.setVisualConfig({ color: color, uniqueId: id, radius: radius, origRadius: radius, outer: outer });
             directUpdateNode(id, {isParticle: true});
             const rootNode = directGetNode("root");
             directUpdateNode("root", {
