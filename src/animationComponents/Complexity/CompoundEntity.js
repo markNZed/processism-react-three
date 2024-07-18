@@ -91,13 +91,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const animDelay = 250;
     const [allParticlesReady, setAllParticlesReady] = useState(false);
     const outerRef = useRef({});
+    const inIndex = 0;
+    const outIndex = (entityCount == 1) ? 0 : 1;
+    const FORWARD = new THREE.Vector3(1, 0, 0);
+    const entityInitialQuaternion = new THREE.Quaternion(); 
 
     const entityPoseRef = useRef({
         positions: [],
         orientations: {},
     });
-    
-    const orientationsRef = useRef({});
 
     const { deleteJoint, createJoint, updateJoint, addLink } = useJoints();
 
@@ -118,18 +120,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     }, []);
 
     useEffect(() => {
-        return;
-        if (physicsState === "initialize") {
-            node.ref.current.setVisualConfig({ color: color, uniqueId: id, radius: radius });
-            const allParticleRefs = directGetAllParticleRefs(id);
-            node.particlesRef.current = allParticleRefs;
-            //initializeJoints(node, entityPositions);
-            setPhysicsState("ready");
-            if (!getOption("pausePhysics")) setOption("pausePhysics", true);
-        }
-    }, [physicsState]);
-
-    useEffect(() => {
         if (particlesFirst !== prevParticlesFirst) { 
             setPrevParticlesFirst(particlesFirst);
         }
@@ -139,84 +129,43 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     }, [particlesFirst]);
 
-    const inOutIndices = () => {
-        if (entityCount > 1) {
-            return { inIndex: 0, outIndex: 1 };
-        } else {
-            return { inIndex: 0, outIndex: 0 };
-        }
-    };
 
     // Passing down the joints through CompoundEntity
     useEffect(() => {
-        const { inIndex, outIndex } = inOutIndices();
         const inNode = entityNodes[inIndex];
         const outNode = entityNodes[outIndex];
+        // Transfer joints from parent entity
         jointsFromRef.current[outNode.id] = props.jointsFrom;
         jointsToRef.current[inNode.id] = props.jointsTo;
     }, []);
 
     // Only need to do this if entity is a Particle ?
     useEffect(() => {
-        console.log("particlesFirstDelayed", particlesFirstDelayed)
+
+        function processJoints(jointsRef, newNodeId, isTo) {
+            const jointsUpdated = [];
+            jointsRef.current.forEach(jointId => {
+                const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+                const node1Ref = isTo ? directGetNode(body1Id).ref : directGetNode(newNodeId).ref;
+                const node2Ref = isTo ? directGetNode(newNodeId).ref : directGetNode(body2Id).ref;
+                const visualConfig1 = node1Ref.current.getVisualConfig();
+                const visualConfig2 = node2Ref.current.getVisualConfig();
+                const radius1 = visualConfig1.radius;
+                const radius2 = visualConfig2.radius;
+                const { offset1, offset2 } = utils.calculateJointOffsets(node1Ref.current, node2Ref.current, radius1, radius2);
+                updateJoint(node.chainRef, jointId, node1Ref.current, offset1, node2Ref.current, offset2);
+                jointsUpdated.push(jointId);
+            });
+            jointsRef.current = jointsRef.current.filter(jointId => !jointsUpdated.includes(jointId));
+        }
+
         if (!particlesFirstDelayed) {
-            //console.log("Map jointsTo", id, props.jointsTo, jointsToRef.current);
-            //console.log("Map jointsFrom", id, props.jointsFrom, jointsFromRef.current);
-            const { inIndex, outIndex } = inOutIndices();
-            const inNode = directGetNode(entitiesToInstantiate[inIndex]);
-            const outNode = directGetNode(entitiesToInstantiate[outIndex])
-            const inNodeQuaternion = entityPoseRef.current.orientations[inNode.id];
-            inNodeQuaternion.invert();
-            const outNodeQuaternion = entityPoseRef.current.orientations[outNode.id];
-            outNodeQuaternion.invert();
-
-            // The rotation of the old body may no longer be relevant because of CompoundEntity rotation
-
-            if (jointsToInRef.current) {
-                console.log("jointsTo", id, jointsToInRef.current, directGetJoints());
-                const jointsUpdated = [];
-                jointsToInRef.current.forEach((jointId, i) => {
-                    console.log("jointsTo jointId", node.depth, jointId);
-                    const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
-                    console.log("jointsTo body1Id, inNode.id", body1Id, inNode.id)
-                    const node1Ref = directGetNode(body1Id).ref;
-                    console.log("Map jointsTo", node.depth, id, jointId, `${body1Id}-${inNode.id}`, quaternion);
-                    // Radius needs to be fetched
-                    // Instead of calculating angle keep the previous angle to maintian shape
-                    // Copy the angle from body1 and transfer the angle from body2 to in Node ?
-                    // But we are not using the jointRef (it may not be stable?)
-                    const visualConfig = node1Ref.current.getVisualConfig();
-                    const body1radius = visualConfig.radius;
-                    const { offset1, offset2 } = utils.calculateJointOffsets(node1Ref.current, inNode.ref.current, body1radius, entityRadius);
-                    console.log("jointsTo offset1, offset2", offset1, offset2)
-                    // Replace body
-                    updateJoint(node.chainRef, jointId, node1Ref.current, offset1, inNode.ref.current, offset2);
-                    jointsUpdated.push(jointId);
-                });
-                jointsToInRef.current = jointsToInRef.current.filter((jointId) => !jointsUpdated.includes(jointId));
-            }
-            if (jointsFromInRef.current) {
-                console.log("jointsFrom", id, jointsFromInRef.current, directGetJoints());
-                const jointsUpdated = [];
-                jointsFromInRef.current.forEach((jointId, i) => {
-                    console.log("jointsFrom jointId", node.depth, jointId);
-                    const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
-                    const node2Ref = directGetNode(body2Id).ref;
-                    console.log("Map jointsFrom", node.depth, id, jointId, `${outNode.id}-${body2Id}`, quaternion);
-                    // Radius needs to be fetched
-                    const visualConfig = node2Ref.current.getVisualConfig();
-                    const body2radius = visualConfig.radius;
-                    const { offset1, offset2 } = utils.calculateJointOffsets(outNode.ref.current, node2Ref.current, entityRadius, body2radius);
-                    console.log("jointsFrom offset1, offset2", offset1, offset2)
-                    // Replace body
-                    updateJoint(node.chainRef, jointId, outNode.ref.current, offset1, node2Ref.current, offset2);
-                    jointsUpdated.push(jointId);
-                });
-                jointsFromInRef.current = jointsFromInRef.current.filter((jointId) => !jointsUpdated.includes(jointId));
-            }
+            processJoints(jointsToInRef, entitiesToInstantiate[inIndex], true);
+            processJoints(jointsFromInRef, entitiesToInstantiate[outIndex], false);
+            
             if (jointsToInRef.current.length || jointsFromInRef.current.length) {
+                // Do we need this now ?
                 setTriggerJoints(!triggerJoints);
-                //setParticlesFirstDelayed(false);
                 console.log("setTriggerJoints", id);
             } else {
                 setJointsMapped(true);
@@ -225,86 +174,52 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     }, [particlesFirstDelayed, triggerJoints]);
 
+    // Scale up the joint to use setReplaceJointWith
+    function expandJoint() {
+        const replaceJointId = activeJointsQueueRef.current[0];
+        const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+        const joint = jointRef.current;
+        const scaleAnchor = (anchor) => ({
+            x: anchor.x * scaleJoint,
+            y: anchor.y * scaleJoint,
+            z: anchor.z * scaleJoint,
+        });
+        joint.setAnchor1(scaleAnchor(joint.anchor1()));
+        joint.setAnchor2(scaleAnchor(joint.anchor2()));
+    }
+
     const instantiateEntity = (entityNodeId, i) => {
         console.log("instantiateEntity", id, entityNodeId, i);
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
-        //const newPosition = node.childrenIds.length > 0 ? [0, 0, 0] : [...initialPosition];
-        //const newPosition = [...initialPosition];
         const newPosition = [0, 0, 0];
-        // Not doing anything with i = 0 yet
-        // We need to orient the positions , the in/out is not the position but relative to the direction
         switch (i) {
             case 0:
-                if (node.childrenIds.length > 1) {
+                if (entityCount > 1) {
                     newPosition[0] -= entityRadius;
-                    //perpendicular(newPosition, quaternion);
                 }
-                setInstantiateJoints(p => [...p, [null, null]]);
                 break;
             case 1: {
                 newPosition[0] += entityRadius;
-                // perpendicular to quaternion 
-                //perpendicular(newPosition, quaternion);
                 setInstantiateJoints(p => [...p, [entityNodes[0].id, entityNodes[1].id], [entityNodes[1].id, entityNodes[0].id]]);
                 break;
             }
             case 2: {
                 newPosition[1] -= entityRadius * Math.sqrt(3);
-                //perpendicular(newPosition, quaternion);
-                const replaceJointId = activeJointsQueueRef.current[0];
-                // Scale up the joint to use setReplaceJointWith
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
-                const joint = jointRef.current;
-                const scaleAnchor = (anchor) => ({
-                    x: anchor.x * scaleJoint,
-                    y: anchor.y * scaleJoint,
-                    z: anchor.z * scaleJoint,
-                });
-                joint.setAnchor1(scaleAnchor(joint.anchor1()));
-                joint.setAnchor2(scaleAnchor(joint.anchor2()));
+                expandJoint();
                 setReplaceJointWith(p => [...p, entityNodes[i].id]);
                 break;
             }
             case 3: {
                 newPosition[1] += entityRadius * Math.sqrt(3);
-                //perpendicular(newPosition, quaternion);
-                const replaceJointId = activeJointsQueueRef.current[0];
-                // Scale up the joint to use setReplaceJointWith
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
-                const joint = jointRef.current;
-                const scaleAnchor = (anchor) => ({
-                    x: anchor.x * scaleJoint,
-                    y: anchor.y * scaleJoint,
-                    z: anchor.z * scaleJoint,
-                });
-                joint.setAnchor1(scaleAnchor(joint.anchor1()));
-                joint.setAnchor2(scaleAnchor(joint.anchor2()));
+                expandJoint();
                 setReplaceJointWith(p => [...p, entityNodes[i].id]);
                 break;
             }
             default: {
-                // Should be the joint that is being replaced - first need to widen the joint
-                const replaceJointId = activeJointsQueueRef.current[0];
-                console.log("replaceJointId", replaceJointId, i);
-
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
-                const joint = jointRef.current;
-                const scaleAnchor = (anchor) => ({
-                    x: anchor.x * scaleJoint,
-                    y: anchor.y * scaleJoint,
-                    z: anchor.z * scaleJoint,
-                });
-                joint.setAnchor1(scaleAnchor(joint.anchor1()));
-                joint.setAnchor2(scaleAnchor(joint.anchor2()));
-
-                function calculateOptimalCircleRadius(n, entityRadius) {
-                    const theta = (2 * Math.PI) / n;
-                    return entityRadius / Math.sin(theta / 2);
-                }
-                
+                expandJoint();
                 // Find the midpoint between the two nodes
-                // Would be better to calculate midpoint at the time of instantiation after the joint has grown
+                // Would be better to calculate midpoint at the time of instantiation after the joint has expanded
                 const node1 = directGetNode(body1Id);
                 const node2 = directGetNode(body2Id);
                 const body1Ref = node1.ref.current;
@@ -313,41 +228,32 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const midpoint = utils.calculateMidpoint(body1Ref, body2Ref);
                 nodeRef.current.worldToLocal(midpoint);
                 console.log("midpoint", id, i, midpoint, body1Ref.translation(), body2Ref.translation());
-                newPosition[0] = midpoint.x;
-                newPosition[1] = midpoint.y;
-                newPosition[2] = midpoint.z;
+                newPosition = [midpoint.x, midpoint.y, midpoint.z];
                 setReplaceJointWith(p => [...p, entityNodes[i].id]);
                 break;
             }
         }
         entityPoseRef.current.positions.push(newPosition);
-        console.log("newPosition", newPosition, radius);
         
         const entityOrientation = centerRef.current.clone()
         entityOrientation.sub(new THREE.Vector3(...entityPoseRef.current.positions[i]));
-        // Check if the resultant vector is zero
+        // If zero vector, set to default direction
         if (entityOrientation.lengthSq() === 0) {
-            // If zero vector, set to default direction
             entityOrientation.set(1, 0, 0);
         } else {
-            // Otherwise, normalize the vector to turn it into a unit vector
             entityOrientation.normalize();
         }
-        const forward = new THREE.Vector3(1, 0, 0); 
-        let entityInitialQuaternion = new THREE.Quaternion(); 
-        // if vectors are directly opposite, the resulting quaternion can cause a flip that affects other axes than intended.
-        if (forward.dot(entityOrientation) === -1) {
+        // If vectors are directly opposite, the resulting quaternion can cause a flip that affects other axes than intended.
+        if (FORWARD.dot(entityOrientation) === -1) {
             // Vectors are opposite, manually create quaternion for 180-degree rotation around the Z-axis
-            entityInitialQuaternion.set(0, 0, 1, 0);  // Rotate 180 degrees around the Z-axis
-            console.log("entityInitialQuaternion Rotate 180 degrees around the Z-axis", entityNodeId)
+            entityInitialQuaternion.set(0, 0, 1, 0);
         } else {
-            // Use setFromUnitVectors if not directly opposite
-            entityInitialQuaternion.setFromUnitVectors(forward, entityOrientation);
+            entityInitialQuaternion.setFromUnitVectors(FORWARD, entityOrientation);
         }
-        console.log("entityInitialQuaternion", entityNodeId, entityInitialQuaternion);
         entityPoseRef.current.orientations[entityNodeId] = entityInitialQuaternion;
 
         console.log("Instantiating entityNodeId", id, i, entitiesToInstantiate, entityNodeId, newPosition);
+
     }
 
     // This will cause a render on each change of entitiesToInstantiate, adding one entity at a time
@@ -405,10 +311,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         const instantiatedJointsIndices = [];
         console.log("instantiateJoints", instantiateJoints)
         instantiateJoints.forEach(([id1, id2], i) => {
-            if (id1 === null && id2 === null) {
-                instantiatedJointsIndices.push(i);
-                return; // special case for first entity - no joint to create for now
-            }
             const node1 = directGetNode(id1);
             const node2 = directGetNode(id2);
             const body1Ref = node1.ref.current;
