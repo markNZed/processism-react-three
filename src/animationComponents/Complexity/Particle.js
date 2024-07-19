@@ -71,13 +71,14 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     useEffect(() => {
         if (initialize && nodeRef.current) {
             // Must set outer before isParticle
-            //console.log("particle outer", id, outer)
-            nodeRef.current.setVisualConfig({ color: color, uniqueId: id, radius: radius, origRadius: radius, outer: outer });
+            console.log("particle outer", id, outer)
+            // if all outer array is true then set color to pink
+            let localColor = color;
+            if (Object.values(outer).every((o) => o)) {
+                localColor = "pink";
+            }
+            nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer });
             directUpdateNode(id, {isParticle: true});
-            const rootNode = directGetNode("root");
-            directUpdateNode("root", {
-                particleArea: utils.calculateCircleArea(radius),
-            })
             setInitialize(false);
         }
     }, [nodeRef]);

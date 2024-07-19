@@ -20,6 +20,8 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
 // Priorities refactoring
+// [4, 4, 4] breaks
+// Outer markup is not right
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, config, outer = {}, ...props }, ref) => {
 
@@ -113,7 +115,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             // Need to correct this so the storeEntity maintains a valid list of Particles
             directUpdateNode(id, {isParticle: false});
         }
-        console.log("props.jointsFrom", id, props.jointsFrom);
     }, []);
 
     useEffect(() => {
@@ -125,7 +126,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             console.log("Transitioning to !particlesFirst", id);
         }
     }, [particlesFirst]);
-
 
     // Passing down the joints through CompoundEntity
     useEffect(() => {
@@ -170,12 +170,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 console.log("Set jointsMapped to true", id);
             }
         }
+
     }, [particlesFirstDelayed, triggerJoints]);
 
-    // Scale up the joint to use setReplaceJointWith
-    function expandJoint() {
-        const replaceJointId = activeJointsQueueRef.current[0];
-        const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+    // Scale up the joint to create space for a new entity
+    function expandJoint(jointRef) {
         const joint = jointRef.current;
         const scaleAnchor = (anchor) => ({
             x: anchor.x * scaleJoint,
@@ -188,9 +187,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     const instantiateEntity = (entityNodeId, i) => {
         console.log("instantiateEntity", id, entityNodeId, i);
-        // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
-        setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
-        const newPosition = [0, 0, 0];
+        let newPosition = [0, 0, 0];
+        let isOuter = true;
         switch (i) {
             case 0:
                 if (entityCount > 1) {
@@ -204,34 +202,43 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             case 2: {
                 newPosition[1] -= entityRadius * Math.sqrt(3);
-                expandJoint();
+                const replaceJointId = activeJointsQueueRef.current[0];
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                expandJoint(jointRef);
                 setReplaceJointWith(p => [...p, entityNodes[i].id]);
                 break;
             }
             case 3: {
                 newPosition[1] += entityRadius * Math.sqrt(3);
-                expandJoint();
+                const replaceJointId = activeJointsQueueRef.current[0];
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                expandJoint(jointRef);
                 setReplaceJointWith(p => [...p, entityNodes[i].id]);
+                isOuter = false;
                 break;
             }
             default: {
-                expandJoint();
+                const replaceJointId = activeJointsQueueRef.current[0];
+                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                expandJoint(jointRef);
                 // Find the midpoint between the two nodes
                 // Would be better to calculate midpoint at the time of instantiation after the joint has expanded
                 const node1 = directGetNode(body1Id);
                 const node2 = directGetNode(body2Id);
+                const visualConfig2 = node2.ref.current.getVisualConfig();
+                isOuter = visualConfig2["outer"][node.depth];
                 const body1Ref = node1.ref.current;
                 const body2Ref = node2.ref.current;
                 // Create the particle in the middle and let the joints "pull" it into place.
                 const midpoint = utils.calculateMidpoint(body1Ref, body2Ref);
                 nodeRef.current.worldToLocal(midpoint);
-                console.log("midpoint", id, i, midpoint, body1Ref.translation(), body2Ref.translation());
                 newPosition = [midpoint.x, midpoint.y, midpoint.z];
                 setReplaceJointWith(p => [...p, entityNodes[i].id]);
                 break;
             }
         }
         entityPoseRef.current.positions.push(newPosition);
+        outerRef.current[entityNodeId] = {...outer, [node.depth]: isOuter};
         
         const entityOrientation = centerRef.current.clone()
         entityOrientation.sub(new THREE.Vector3(...entityPoseRef.current.positions[i]));
@@ -250,6 +257,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
         entityPoseRef.current.orientations[entityNodeId] = entityInitialQuaternion;
 
+        // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
+        setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
+
         console.log("Instantiating entityNodeId", id, i, entitiesToInstantiate, entityNodeId, newPosition);
 
     }
@@ -262,19 +272,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (entitiesToInstantiate.includes(entityNodeId)) continue;
             busyInstantiatingRef.current = true;
             instantiatingIdRef.current = entityNodeId;
-
-            // Define the node as outer or not for the blob 
-            // both input and output are outer
-            let outerAtDepth = node.id === "root" ? true: false;
-            if (i == 1 || i == 2 ) {
-                outerAtDepth = true;
-            }
-            // If instantiateCount is odd then outerAtDepth is true
-            if (i % 2 == 0) {
-                outerAtDepth = true;
-            }
-            const newOuter = {...outer, [node.depth]: outerAtDepth};
-            outerRef.current[entityNodeId] = newOuter;
 
             // Use a timer for a delay so we can see the sequence for debug etc 
             const delay = (i === 0) ? 0 : animDelay;
@@ -312,7 +309,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     }
 
     // Create a new joint connecting entities that are already connected
-    // We know this is only used for when tere are 2 entities
+    // We know this is only used for when there are 2 entities
     function instatiateJoints() {
         const instantiatedJointsIndices = [];
         console.log("instantiateJoints", instantiateJoints)
@@ -346,7 +343,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         const replacedJointIndices = [];
         // Replace a joint with a new entity and connect that entity
         replaceJointWith.forEach((nextId, i) => {
-            console.log("replaceJoint", nextId);
+            console.log("replaceJoint with", nextId);
             const nextEntity = directGetNode(nextId);
             const nextBodyRef = nextEntity.ref.current;
             if (!nextBodyRef?.current) return;
@@ -515,9 +512,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const newAnchor1 = new THREE.Vector3(newX1, newY1, 0);
                 const newAnchor2 = new THREE.Vector3(newX2, newY2, 0);
 
-                const node1 = directGetNode(body1Id);
-                const node2 = directGetNode(body2Id);
-
                 joint.setAnchor1(newAnchor1);
                 joint.setAnchor2(newAnchor2);
             });
@@ -527,6 +521,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     useFrame(() => {
         if (entityCount == 0) return;
+        if (frameStateRef.current == "done") return;
+        
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
@@ -553,17 +549,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         console.log("useStoreEntity", useStoreEntity.getState());
                         nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                     }
-                    frameStateRef.current = "findCenter";
+                    frameStateRef.current = "done";
                 }
                 break;
-            case "findCenter":
-                /*
-                calculateCenter({
-                    items: entityNodes,
-                    centerRef: centerRef,
-                });
-                nodeRef.current.setCenter(centerRef.current);
-                */
+            case "done":
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)

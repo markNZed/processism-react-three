@@ -45,11 +45,14 @@ const Blob = ({ color, node, entityNodes }) => {
                         }
                     }
                 }
-                if (outerDepth) {
-                    const uniqueId = particles[i].current.getVisualConfig().uniqueId;
+                const uniqueId = particles[i].current.getVisualConfig().uniqueId;
+                if (outerDepth) { 
                     blobOuterUniqueIds.push(uniqueId);
                     flattenedIndexes.push(i);
                     radii.push(particles[i].current.getVisualConfig().origRadius);
+                    //console.log("buildBlobData Outer", uniqueId)
+                } else {
+                    //console.log("buildBlobData Inner", uniqueId)
                 }
             }
         }
@@ -67,7 +70,7 @@ const Blob = ({ color, node, entityNodes }) => {
 
         // buildOrderedIds can return null if there are no blobOuterUniqueIds
         const orderedIds = buildOrderedIds(id, chainRef, blobOuterUniqueIds) || [];
-        if (!orderedIds.length) console.error("orderedIds is empty!", id);
+        if (!orderedIds.length) console.error("orderedIds is empty!", id, chainRef.current, blobOuterUniqueIds);
         const blobIndexes = orderedIds;
 
         //console.log("buildBlobData", id, blobData, chainRef.current, particles, blobOuterUniqueIds, blobIndexes)
@@ -263,7 +266,7 @@ function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
 
 function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null, path = []) {
 
-    //console.log("buildOrderedIds", id, uniqueId, JSON.stringify(chainRef.current), blobOuterUniqueIds);
+    //console.log("buildOrderedIds", id, path, uniqueId);
     // Guard clause to prevent infinite loops
     if (visited.has(uniqueId)) {
         //console.log("buildOrderedIds visited", id, uniqueId);
@@ -292,29 +295,27 @@ function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visi
     
     const linkedIndexes = chainRef.current[uniqueId] || [];
 
+    // Depth first search
+
     // Search for the longest loop
     let foundChain = [];
     for (let linkedIndex of linkedIndexes) {
-        //console.log("buildOrderedIds linkedIndex", id, uniqueId, linkedIndex, linkedIndexes, localPath);
+        // Close so we can mark as visited without interfering in parallel branches of th esearch
         const clonedVisited = new Set([...visited]);
         const recursiveResult = buildOrderedIds(id, chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId, localPath);
         if (recursiveResult) {
-            // part of the chain being returned
+            // We only want the longest chain
             if (recursiveResult.length > foundChain.length) {
                 foundChain = [uniqueId, ...recursiveResult];
-                //console.log("buildOrderedIds foundChain", id, uniqueId, recursiveResult, foundChain);             
-                //foundChain.forEach((id) => {visited.add(id)});
             }
+        } else {
+            // If there was no path to a loop then we can consider this a dead end
+            visited.add(linkedIndex);
         }
-        //visited.add(linkedIndex);
     }
-    //linkedIndexes.forEach((id) => {visited.add(id)});
-    //foundChain.forEach((id) => {visited.add(id)});
     if (!foundChain.length) {
         return null;
     }
-
-    //console.log("buildOrderedIds result", id, uniqueId, foundChain); 
 
     return foundChain;
 }

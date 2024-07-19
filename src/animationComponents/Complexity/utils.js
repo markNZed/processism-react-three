@@ -68,12 +68,8 @@ export const calculateJointOffsets = (body1, body2, body1Radius, body2Radius = n
         .normalize();
     const offset1 = direction1.clone().multiplyScalar(body1Radius);
     const offset2 = direction2.clone().multiplyScalar(body2Radius || body1Radius);
-    console.log("offset1 before quaternion1", offset1)
-    console.log("offset2 before quaternion2", offset2)
     offset1.applyQuaternion(quaternion1);
-    console.log("offset1 after quaternion1", offset1)
     offset2.applyQuaternion(quaternion2);
-    console.log("offset2 after quaternion2", offset2)
     return { offset1, offset2 };
 };
 
