@@ -19,9 +19,9 @@ import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
-// Priorities refactoring
-// [4, 4, 4] breaks
 // Outer markup is not right
+// Click on sub-group not working
+// Not scaling to 9,3,3 etc
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, config, outer = {}, ...props }, ref) => {
 
@@ -238,6 +238,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
         }
         entityPoseRef.current.positions.push(newPosition);
+        if (node.depth === 0) {
+            isOuter = true;
+        }
         outerRef.current[entityNodeId] = {...outer, [node.depth]: isOuter};
         
         const entityOrientation = centerRef.current.clone()

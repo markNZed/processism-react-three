@@ -96,7 +96,8 @@ const Blob = ({ color, node, entityNodes }) => {
         }
 
         if (!blobData.current) {
-            //if (id == "root") console.log("!blobData.current", id);
+            //console.log("!blobData.current", id);
+            buildBlobData();
             return;
         }
 
@@ -130,7 +131,7 @@ const Blob = ({ color, node, entityNodes }) => {
     });
 
     const handleOnClick = (event) => {
-        //console.log("Blob handleOnClick", event);
+        //console.log("Blob handleOnClick", id, event);
         if (event.shiftKey) {
             return;
         }
@@ -143,21 +144,24 @@ const Blob = ({ color, node, entityNodes }) => {
             for (let i = node.depth - 1; i >= 0; i--) {
                 const ancestorNode = getNode(ancestorId);
                 if (ancestorNode.ref.current.getVisualConfig().visible) {
-                    console.log(`Return because ${ancestorId} visible`);
+                    //console.log(`Blob handleOnClick return because ${ancestorId} visible`, id);
                     return;
                 }
                 ancestorId = ancestorNode.parentId;
             }
             // If the node is about to become invisible
             if (node.ref.current.getVisualConfig().visible) {
+                //console.log("Blob handleOnClick visible", id);
                 event.stopPropagation();
                 entityNodes.forEach(nodeEntity => {
+                    //console.log("Blob handleOnClick visible sert visible", nodeEntity.id);
                     nodeEntity.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
                 });
                 node.ref.current.setVisualConfig(p => ({ ...p, visible: false }));
             // If the number of overlapping blobs (intersections) is equal to the depth of this blob
             // then we will show this blob
             } else if (event.intersections.length === (node.depth + 1)) { 
+                //console.log("Blob handleOnClick event.intersections.length is node.depth + 1", id, event.intersections.length);
                 event.stopPropagation();
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
@@ -167,7 +171,9 @@ const Blob = ({ color, node, entityNodes }) => {
                         propagateVisualConfigValue(nodeEntity.id, 'visible', false);
                     });
                 }, 0); // Introduce a slight delay to avoid flashing
-            } 
+            } else {
+                //console.log("Blob handleOnClick event.intersections.length", id, event.intersections.length);
+            }
         }
     };
 
