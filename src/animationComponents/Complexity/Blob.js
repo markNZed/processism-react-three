@@ -7,7 +7,7 @@ const Blob = ({ color, node, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateVisualConfigValue, getparticlesStable, getAllParticleRefs } = useStoreEntity.getState();
+    const { getNode, propagateVisualConfigValue, getparticlesHash, getAllParticleRefs } = useStoreEntity.getState();
     const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const [pressStart, setPressStart] = useState(0);
@@ -16,6 +16,8 @@ const Blob = ({ color, node, entityNodes }) => {
     const particlesHashRef = useRef();
 
     function buildBlobData() {
+
+        //console.log("buildBlobData", id);
         blobData.current = {
             positions: [],
             flattenedIndexes: [],
@@ -66,11 +68,9 @@ const Blob = ({ color, node, entityNodes }) => {
         // buildOrderedIds can return null if there are no blobOuterUniqueIds
         const orderedIds = buildOrderedIds(id, chainRef, blobOuterUniqueIds) || [];
         if (!orderedIds.length) console.error("orderedIds is empty!", id);
-        //blobIndexes = filterMiddleIndexes(chainRef, orderedIds);
         const blobIndexes = orderedIds;
-        blobIndexes.push(orderedIds[0]);
 
-        //console.log("buildBlobData", id, blobData, chainRef, particles, blobOuterUniqueIds, blobIndexes)
+        //console.log("buildBlobData", id, blobData, chainRef.current, particles, blobOuterUniqueIds, blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
@@ -82,23 +82,20 @@ const Blob = ({ color, node, entityNodes }) => {
     
     }
 
-    // This only runs once upon mounting to build the blobData which acts as a cache for objects
-    useEffect(() => {
-
-        buildBlobData();
-
-    },[]);
-
     useFrame(() => {
 
-        const hash = getparticlesStable(id);
-        //if (id == "root") console.log("getparticlesStable(id) hash", hash);
+        const hash = getparticlesHash(id);
+
         if (hash !== particlesHashRef.current) {
+            //if (id == "root") console.log("blobData getparticlesHash", id, hash);
             particlesHashRef.current = hash;
             buildBlobData();
         }
 
-        if (!blobData.current) return;
+        if (!blobData.current) {
+            //if (id == "root") console.log("!blobData.current", id);
+            return;
+        }
 
         if (node.ref.current.getVisualConfig().visible) {
 
@@ -119,7 +116,11 @@ const Blob = ({ color, node, entityNodes }) => {
                 blobRef.current.visible = true;
             }
 
+            //if (id == "root") console.log("blobData visible", blobPoints);
+
+
         } else {
+            //if (id == "root") console.log("blobData blobRef.current.visible = false;", id);
             blobRef.current.visible = false;
         }
 
@@ -260,47 +261,60 @@ function handleOnContextMenuFn(getNode, propagateVisualConfigValue) {
 
 // visited should be specific to a "search" of the chain
 
-function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null) {
-    // Initialize uniqueId with the first element of blobOuterUniqueIds if null
-    if (uniqueId === null) {
-        uniqueId = blobOuterUniqueIds[0];
-        firstId = uniqueId;
-    }
+function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visited = new Set(), firstId = null, path = []) {
 
     //console.log("buildOrderedIds", id, uniqueId, JSON.stringify(chainRef.current), blobOuterUniqueIds);
     // Guard clause to prevent infinite loops
     if (visited.has(uniqueId)) {
-        //console.log("buildOrderedIds loop", uniqueId); 
+        //console.log("buildOrderedIds visited", id, uniqueId);
         return null;
     }
+
+    // Initialize uniqueId with the first element of blobOuterUniqueIds if null
+    if (uniqueId === null) {
+        uniqueId = blobOuterUniqueIds[0];
+        firstId = uniqueId;
+        //console.log("buildOrderedIds firstId", id, firstId, JSON.stringify(chainRef.current), blobOuterUniqueIds);
+    } else {
+        visited.add(uniqueId);
+        if (uniqueId === firstId) return [...path, uniqueId];
+    }
+
+    //console.log("buildOrderedIds input", id, uniqueId); 
     
     // Guard clause to check if uniqueId is in blobOuterUniqueIds
     if (!blobOuterUniqueIds.includes(uniqueId)) {
-        //console.log("buildOrderedIds not in outer", uniqueId); 
+        //console.log("buildOrderedIds not in outer", id, uniqueId); 
         return null;
     }
 
-    visited.add(uniqueId);
+    const localPath = [...path, uniqueId];
     
-    const result = [uniqueId];
     const linkedIndexes = chainRef.current[uniqueId] || [];
-    
+
     // Search for the longest loop
     let foundChain = [];
     for (let linkedIndex of linkedIndexes) {
-        //console.log("buildOrderedIds linkedIndex", id, linkedIndex, linkedIndexes);
+        //console.log("buildOrderedIds linkedIndex", id, uniqueId, linkedIndex, linkedIndexes, localPath);
         const clonedVisited = new Set([...visited]);
-        const recursiveResult = buildOrderedIds(id, chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId);
+        const recursiveResult = buildOrderedIds(id, chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId, localPath);
         if (recursiveResult) {
-            const lastIndexes = chainRef.current[recursiveResult[recursiveResult.length - 1]];
-            // A loop will include a link back to firstId
-            if (lastIndexes.includes(firstId) && recursiveResult.length > foundChain.length) foundChain = recursiveResult;
+            // part of the chain being returned
+            if (recursiveResult.length > foundChain.length) {
+                foundChain = [uniqueId, ...recursiveResult];
+                //console.log("buildOrderedIds foundChain", id, uniqueId, recursiveResult, foundChain);             
+                //foundChain.forEach((id) => {visited.add(id)});
+            }
         }
-        visited.add(linkedIndex);
+        //visited.add(linkedIndex);
     }
     //linkedIndexes.forEach((id) => {visited.add(id)});
-    foundChain.forEach((id) => {visited.add(id)});
-    result.push(...foundChain);
+    //foundChain.forEach((id) => {visited.add(id)});
+    if (!foundChain.length) {
+        return null;
+    }
 
-    return result;
+    //console.log("buildOrderedIds result", id, uniqueId, foundChain); 
+
+    return foundChain;
 }

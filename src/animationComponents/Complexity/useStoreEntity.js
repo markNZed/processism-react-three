@@ -152,7 +152,7 @@ const useStoreEntity = create((set, get) => {
         particlesStable: {},
         particleRefs: [],
 
-        getparticlesStable: (id) => {
+        getparticlesHash: (id) => {
             return get().particlesStable[id];
         },
 
