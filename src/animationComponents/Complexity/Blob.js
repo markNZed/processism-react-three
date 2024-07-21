@@ -15,9 +15,9 @@ const Blob = ({ color, node, entityNodes }) => {
     const particlesRef = useRef();
     const particlesHashRef = useRef();
 
-    function buildBlobData() {
+    function buildBlobData(reason) {
 
-        console.log("buildBlobData", id);
+        console.log("buildBlobData", id, reason);
         blobData.current = {
             positions: [],
             flattenedIndexes: [],
@@ -95,15 +95,15 @@ const Blob = ({ color, node, entityNodes }) => {
 
         const hash = getparticlesHash(id);
 
-        if (!hash || hash !== particlesHashRef.current) {
+        if (hash === undefined || hash !== particlesHashRef.current) {
+            buildBlobData(`hash mismatch ${JSON.stringify(hash)} != ${JSON.stringify(particlesHashRef.current)}`);
             //if (id == "root") console.log("blobData getparticlesHash", id, hash);
-            particlesHashRef.current = hash;
-            buildBlobData();
+            particlesHashRef.current = hash;            
         }
 
         if (!blobData.current) {
             console.log("!blobData.current", id);
-            buildBlobData();
+            buildBlobData("empty");
             return;
         }
 
@@ -243,7 +243,7 @@ const points_to_geometry = (points, radii) => {
     const expandedPoints = points;
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
-    const numPoints = expandedPoints.length > 100 ? expandedPoints.length : expandedPoints.length //100;
+    const numPoints = expandedPoints.length > 100 ? expandedPoints.length : expandedPoints.length * 10;
     const curvePoints = curve.getPoints(numPoints);
     //const curvePoints = expandedPoints;
     const shape = new THREE.Shape(curvePoints);

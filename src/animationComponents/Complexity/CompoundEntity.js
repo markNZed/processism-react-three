@@ -19,14 +19,15 @@ import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
-// Not scaling to 9,3,3 etc
-// Problem when particles are "twisted" then we can get weird boundaries
-//   5 in/out not making sense 14-7 and 11-9
-// When entity count is 4 or 5 entity 2 has joints swapped - why?
-// Now need to check 3,3 with new orientations
-// Clicking to sub-blob is broken?
-//   Entity 1 is not rerendered - so its blob is not drawn
-//   Do we need to set its state ? set node.visible to trigger 
+/*
+
+ Even when instantiating compound entities we need to create "space" so we first craete particles
+ particlesFirst is true by default to ensure this
+*/
+
+// Do we need to create particles before creating CompoundEntity ?
+// If we set particlesFirst false er get a runtime error because trying to expand a joint that does not exist for adding entities
+// 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, config, outer = {}, ...props }, ref) => {
 
@@ -79,8 +80,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [replaceJointWith, setReplaceJointWith] = useState([]);
     const [entityInstantiated, setEntityInstantiated] = useState();
     const [particlesFirst, setParticlesFirst] = useState(true);
-    const [prevParticlesFirst, setPrevParticlesFirst] = useState(true);
-    const [particlesFirstDelayed, setParticlesFirstDelayed] = useState(true);
     const jointsFromRef = useRef({});
     const jointsToRef = useRef({});
     const scaleJoint = 2.1; // Slightly bigger to avoid "hitting" the surrounding particles
@@ -123,16 +122,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     }, []);
 
-    useEffect(() => {
-        if (particlesFirst !== prevParticlesFirst) { 
-            setPrevParticlesFirst(particlesFirst);
-        }
-        // If transitioning to !particlesFirst
-        if (!particlesFirst && prevParticlesFirst) {
-            console.log("Transitioning to !particlesFirst", id);
-        }
-    }, [particlesFirst]);
-
     // Passing down the joints through CompoundEntity
     useEffect(() => {
         const inNode = entityNodes[inIndex];
@@ -162,7 +151,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             jointsRef.current = jointsRef.current.filter(jointId => !jointsUpdated.includes(jointId));
         }
 
-        if (!particlesFirstDelayed) {
+        if (!particlesFirst) {
             processJoints(jointsToInRef, entitiesToInstantiate[inIndex], true);
             processJoints(jointsFromInRef, entitiesToInstantiate[outIndex], false);
             
@@ -177,7 +166,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
         }
 
-    }, [particlesFirstDelayed, triggerJoints]);
+    }, [particlesFirst, triggerJoints]);
 
     // Scale up the joint to create space for a new entity
     function expandJoint(jointRef) {
@@ -290,12 +279,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     }, [entityInstantiated, entityNodes]);
 
-    useEffect(() => {
-        setTimeout(() => {
-            setParticlesFirstDelayed(particlesFirst);
-        }, animDelay);
-    }, [particlesFirst]);
-
     function addActiveJoint(id1, id2) {
         const jointId = utils.jointId(id1, id2);
         if (jointsFromRef.current[id1]) {
@@ -395,7 +378,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     useEffect(() => {
         // All the joints have been mapped
-        if (!particlesFirstDelayed && jointsMapped) {
+        if (!particlesFirst && jointsMapped) {
             // Can update all the initial positions
             for (let i = 0; i < entitiesToInstantiate.length; i++) {
                 const entityId = entitiesToInstantiate[i];
@@ -410,7 +393,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 }
             }
         }
-    }, [particleReady, particlesFirstDelayed, jointsMapped]);
+    }, [particleReady, particlesFirst, jointsMapped]);
 
     const calculateCenter = ({ items }) => {
         worldCenterRef.current.set(0, 0, 0); // Reset the center vector
@@ -568,7 +551,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     });
 
     console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "allParticlesReady", allParticlesReady)
-    useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, config, node, entityNodes, entitiesToInstantiate, instantiateJoints, replaceJointWith, particlesFirst, prevParticlesFirst, particlesFirstDelayed, particleReady, jointsMapped, triggerJoints, allParticlesReady} );
+    useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, config, node, entityNodes, entitiesToInstantiate, instantiateJoints, replaceJointWith, particlesFirst, particleReady, jointsMapped, triggerJoints, allParticlesReady} );
 
     //<CompoundEntityGroup ref={nodeRef} position={initialPosition} initialQuaternion={quaternion}>
 
@@ -580,12 +563,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     let EntityType = CompoundEntity;
                     if (entity.childrenIds.length === 0) {
                         EntityType = Particle;
-                    } else if (particlesFirstDelayed) {
+                    } else if (particlesFirst) {
                         EntityType = Particle;
                     } else if (!particleReady[entityId]) {
                         EntityType = Particle;
                     }
-                    //console.log("EntityType", entity.id, entity.childrenIds.length === 0, particlesFirstDelayed, !particleReady[entityId])
+                    //console.log("EntityType", entity.id, entity.childrenIds.length === 0, particlesFirst, !particleReady[entityId])
                     return (
                         <EntityType
                             key={`${id}-${i}`}

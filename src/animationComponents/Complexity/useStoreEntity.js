@@ -172,7 +172,7 @@ const useStoreEntity = create((set, get) => {
         },
 
         resetParticlesStable: () => debounce(() => set(() => {
-            console.log("resetParticlesStable debounced");
+            console.log("particlesStable resetParticlesStable debounced");
             return {
                 particlesStable: {}
             };
@@ -454,7 +454,7 @@ const useStoreEntity = create((set, get) => {
 
             const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
 
-            if (isParticle !== updatedProperties.isParticle) {
+            if (updatedProperties.isParticle !== undefined && isParticle !== updatedProperties.isParticle) {
                 state.particlesStable = {};
             }
 
@@ -638,6 +638,7 @@ const useStoreEntity = create((set, get) => {
             updateSubtree(nodeId);
 
             if (property === 'isParticle') {
+                console.log("particlesStable propagateValue reset", nodeId);
                 state.particlesStable = {};
             }
 
