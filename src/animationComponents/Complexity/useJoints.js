@@ -26,7 +26,7 @@ const useJoints = () => {
     }
 
     const removeLink = (chainRef, uniqueIdA, uniqueIdB) => {
-        console.log("removeLink", uniqueIdA, uniqueIdB);
+        //console.log("removeLink", uniqueIdA, uniqueIdB);
         if (chainRef.current[uniqueIdA]) {
             chainRef.current[uniqueIdA] = chainRef.current[uniqueIdA].filter(id => id !== uniqueIdB);
         }
@@ -46,7 +46,7 @@ const useJoints = () => {
         if (!batch) {
             directAddJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
         }
-        console.log("createJoint", `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`, jointRef.current)
+        //console.log("createJoint", `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`, jointRef.current)
         return jointRef;
     };
     
@@ -68,8 +68,8 @@ const useJoints = () => {
         const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
         const aVisualConfig = aRef.getVisualConfig();
         const bVisualConfig = bRef.getVisualConfig();
-        console.log("updateJoint", jointId, body1Id, body2Id, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
-        console.log("updateJoint ref", jointId, aRef.current, bRef.current);
+        //console.log("updateJoint", jointId, body1Id, body2Id, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
+        //console.log("updateJoint ref", jointId, aRef.current, bRef.current);
         if (jointRef.current) {
             const joint = jointRef.current;
             jointRef.current = undefined;

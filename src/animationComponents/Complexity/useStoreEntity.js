@@ -140,7 +140,7 @@ const debouncedResetParticlesStable = debounce((set) => {
     set(() => ({
         particlesStable: {}
     }));
-}, 300);
+}, 500);
 
 const useStoreEntity = create((set, get) => {
 
