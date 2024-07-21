@@ -135,6 +135,13 @@ function simpleHash(input) {
     return hash;
 }
 
+const debouncedResetParticlesStable = debounce((set) => {
+    console.log("particlesStable resetParticlesStable debounced");
+    set(() => ({
+        particlesStable: {}
+    }));
+}, 300);
+
 const useStoreEntity = create((set, get) => {
 
     const rootNode = createNode('root', { depth: 0, parentId: null, visible: false }, []);
@@ -171,12 +178,7 @@ const useStoreEntity = create((set, get) => {
             return get().particlesStable[id];
         },
 
-        resetParticlesStable: () => debounce(() => set(() => {
-            console.log("particlesStable resetParticlesStable debounced");
-            return {
-                particlesStable: {}
-            };
-        }), 300),
+        resetParticlesStable: () => debouncedResetParticlesStable(set),
 
         reset: () => set(() => {
             return {

@@ -85,7 +85,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
         }
     }, [nodeRef]);
 
-    console.log("Particle rendering", id, initialPosition, initialQuaternion);
+    //console.log("Particle rendering", id, initialPosition, initialQuaternion);
 
     return (
         <>

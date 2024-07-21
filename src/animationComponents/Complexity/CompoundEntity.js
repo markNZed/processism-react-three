@@ -87,16 +87,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const jointsToInRef = useRef(props.jointsTo || []);
     const jointsFromInRef = useRef(props.jointsFrom || []);
     const [particleReady, setParticleReady] = useState({});
-    const [jointsMapped, setJointsMapped] = useState(true);
+    const [jointsMapped, setJointsMapped] = useState(false);
     const [triggerJoints, setTriggerJoints] = useState(false);
     const particlesInstanceRef = useRef();
     const animDelay = 100 // 250;
     const [allParticlesReady, setAllParticlesReady] = useState(false);
     const outerRef = useRef({});
     const inIndex = 0;
-    //const inIndex = (entityCount == 1) ? 0 : 1;
     const outIndex = (entityCount == 1) ? 0 : 1;
-    //const outIndex = 0;
     const FORWARD = new THREE.Vector3(1, 0, 0);
     const entityInitialQuaternion = new THREE.Quaternion(); 
 
@@ -528,7 +526,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         if (particlesExist) {
                             setAllParticlesReady(true);
                             // So we update the blob info
-                            directResetParticlesStable();
+                            //directResetParticlesStable();
                             console.log("allParticlesReady", id, allParticleRefs);
                         }
                     }
@@ -550,8 +548,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     });
 
-    console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "allParticlesReady", allParticlesReady)
-    useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, config, node, entityNodes, entitiesToInstantiate, instantiateJoints, replaceJointWith, particlesFirst, particleReady, jointsMapped, triggerJoints, allParticlesReady} );
+    //console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "allParticlesReady", allParticlesReady)
+    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, config, node, entityNodes, entitiesToInstantiate, instantiateJoints, replaceJointWith, particlesFirst, particleReady, jointsMapped, triggerJoints, allParticlesReady} );
 
     //<CompoundEntityGroup ref={nodeRef} position={initialPosition} initialQuaternion={quaternion}>
 

@@ -243,8 +243,7 @@ const points_to_geometry = (points, radii) => {
     const expandedPoints = points;
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
-    const numPoints = expandedPoints.length > 100 ? expandedPoints.length : expandedPoints.length * 10;
-    const curvePoints = curve.getPoints(numPoints);
+    const curvePoints = curve.getPoints(expandedPoints.length * 5);
     //const curvePoints = expandedPoints;
     const shape = new THREE.Shape(curvePoints);
     const shape_geometry = new THREE.ShapeGeometry(shape);
