@@ -136,7 +136,7 @@ function simpleHash(input) {
 
 const useStoreEntity = create((set, get) => {
 
-    const rootNode = createNode('root', { depth: 0, parentId: null }, []);
+    const rootNode = createNode('root', { depth: 0, parentId: null, visible: false }, []);
 
     return {
             
@@ -151,6 +151,20 @@ const useStoreEntity = create((set, get) => {
         jointCount: 0,
         particlesStable: {},
         particleRefs: [],
+        options: [],
+
+        getoption: (id) => {
+            return get().options[id];
+        },
+
+        setoption: (id) => set(() => {
+            return {
+                options: {
+                    ...get().options,
+                    [id]: true
+                }
+            };
+        }),
 
         getparticlesHash: (id) => {
             return get().particlesStable[id];
@@ -373,7 +387,7 @@ const useStoreEntity = create((set, get) => {
                 }
 
                 const nodeDepth = (parentNode.depth || 0) + 1;
-                const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId }, node.childrenIds || []);
+                const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId, visible: false }, node.childrenIds || []);
                 newNodeId = newNode.id;
                 state.nodeCount++;
 

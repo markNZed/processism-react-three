@@ -39,9 +39,15 @@ export default function App() {
   const { sceneComponent, isOrthographic, key } = useSceneManager();
   const pausePhysics = useStore((state) => state.pausePhysics);
   const setPausePhysics = useStore((state) => state.setPausePhysics);
+  const setOption = useStore((state) => state.setOption);
+  const fixParticles = useStore((state) => state.getOption("fixParticles"));
   
   const toggleAnimation = () => {
     setPausePhysics(!pausePhysics); // Toggle animation state
+  };
+
+  const toggleFixParticles = () => {
+    setOption("fixParticles", !fixParticles);
   };
 
   return (
@@ -53,6 +59,9 @@ export default function App() {
       <SceneSelector />
       <button onClick={toggleAnimation}>
         {pausePhysics ? 'Play physics' : 'Pause physics'}
+      </button>
+      <button onClick={toggleFixParticles}>
+        {fixParticles ? 'Dynamic particles' : 'Fix particles'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}

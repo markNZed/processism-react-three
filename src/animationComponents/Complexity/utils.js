@@ -38,10 +38,6 @@ export const getRandomColorFn = () => {
 
 export const jointId = (id1, id2) => {
     return `${id1}-${id2}`;
-    const numId1 = Number(id1);
-    const numId2 = Number(id2);
-    const jointString = numId1 < numId2 ? `${numId1}-${numId2}` : `${numId2}-${numId1}`;
-    return jointString;
 }
 
 export const jointIdToNodeIds = (jointId) => {

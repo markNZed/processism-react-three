@@ -5,6 +5,7 @@ import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
+import useStore from './../../useStore';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
 // Coud store visualConfig only in node but would slow data access when rendering the instanced mesh of particles
@@ -29,6 +30,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     // So we can get the particle position relative to the parent's position
     // Rapier uses world coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
+    const fixParticles = useStore((state) => state.getOption("fixParticles"));
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -77,13 +79,14 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
             if (Object.values(outer).every((o) => o)) {
                 localColor = "pink";
             }
+            console.log("Particle outer", id, outer)
             nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer });
             directUpdateNode(id, {isParticle: true});
             setInitialize(false);
         }
     }, [nodeRef]);
 
-    console.log("Particle rendering", id);
+    console.log("Particle rendering", id, initialPosition, initialQuaternion);
 
     return (
         <>
@@ -91,7 +94,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 ref={nodeRef}
                 position={initialPosition}
                 quaternion={initialQuaternion}
-                type={"dynamic"} // "kinematicPosition" "fixed"
+                type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed"
                 //type={"kinematicPosition"} // ""
                 //type={"fixed"} 
                 colliders={false}

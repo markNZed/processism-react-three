@@ -35,7 +35,7 @@ function useAnimateComplexity(config, internalRef) {
         const rootNode = directGetNode("root");
         // We have 2 nodes at top that should have a joint - but the joint is not between two particles at this level
 
-        addNodesRecursively([3, 3, 3], rootNode);
+        addNodesRecursively([3,4], rootNode);
         //addNodesRecursively([config.entityCounts[0]], rootNode);
         //addNodesRecursively(config.entityCounts, rootNode);
         directUpdateNode("root", { ref: internalRef });

@@ -7,7 +7,7 @@ const Blob = ({ color, node, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateVisualConfigValue, getparticlesHash, getAllParticleRefs } = useStoreEntity.getState();
+    const { getNode, propagateVisualConfigValue, getparticlesHash, getAllParticleRefs, updateNode } = useStoreEntity.getState();
     const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const [pressStart, setPressStart] = useState(0);
@@ -27,6 +27,7 @@ const Blob = ({ color, node, entityNodes }) => {
         let blobOuterUniqueIds = [];
         let flattenedIndexes = [];
         let radii = [];
+        const entityNodeIds = entityNodes.map(n => n.id);
         particlesRef.current = getAllParticleRefs(id);
         const particles = particlesRef.current;
         for (let i = 0; i < particles.length; ++i) {
@@ -34,9 +35,14 @@ const Blob = ({ color, node, entityNodes }) => {
                 console.warn(`particles[i] ${i}, was empty`);
                 continue;
             }
-            const outer = particles[i].current.getVisualConfig().outer;
+            const uniqueId = particles[i].current.getVisualConfig().uniqueId;
+            let outer = particles[i].current.getVisualConfig().outer;
             if (outer) {
                 let outerDepth = outer[node.depth];
+                // if this is a child then it is outer at this level
+                if (entityNodeIds.includes(uniqueId)) {
+                    outerDepth = true;
+                }
                 if (outerDepth) {
                     for (let j = Object.keys(outer).length - 1;j > node.depth; j--) {
                         if (!outer[j.toString()]) {
@@ -45,7 +51,7 @@ const Blob = ({ color, node, entityNodes }) => {
                         }
                     }
                 }
-                const uniqueId = particles[i].current.getVisualConfig().uniqueId;
+                
                 if (outerDepth) { 
                     blobOuterUniqueIds.push(uniqueId);
                     flattenedIndexes.push(i);
@@ -73,7 +79,7 @@ const Blob = ({ color, node, entityNodes }) => {
         if (!orderedIds.length) console.error("orderedIds is empty!", id, chainRef.current, blobOuterUniqueIds);
         const blobIndexes = orderedIds;
 
-        //console.log("buildBlobData", id, blobData, chainRef.current, particles, blobOuterUniqueIds, blobIndexes)
+        //console.log("buildBlobData", id, "blobData", blobData, "chianRef", chainRef.current, "particles",particles, "blobOuterUniqueIds",blobOuterUniqueIds, "blobIndexes", blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
@@ -89,14 +95,14 @@ const Blob = ({ color, node, entityNodes }) => {
 
         const hash = getparticlesHash(id);
 
-        if (hash !== particlesHashRef.current) {
+        if (!hash || hash !== particlesHashRef.current) {
             //if (id == "root") console.log("blobData getparticlesHash", id, hash);
             particlesHashRef.current = hash;
             buildBlobData();
         }
 
         if (!blobData.current) {
-            //console.log("!blobData.current", id);
+            console.log("!blobData.current", id);
             buildBlobData();
             return;
         }
@@ -154,10 +160,12 @@ const Blob = ({ color, node, entityNodes }) => {
                 //console.log("Blob handleOnClick visible", id);
                 event.stopPropagation();
                 entityNodes.forEach(nodeEntity => {
-                    //console.log("Blob handleOnClick visible sert visible", nodeEntity.id);
+                    console.log("Blob handleOnClick set visible", nodeEntity.id);
                     nodeEntity.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
+                    updateNode(nodeEntity.id, {visible: true});
                 });
                 node.ref.current.setVisualConfig(p => ({ ...p, visible: false }));
+                updateNode(id, {visible: true});
             // If the number of overlapping blobs (intersections) is equal to the depth of this blob
             // then we will show this blob
             } else if (event.intersections.length === (node.depth + 1)) { 
@@ -166,6 +174,7 @@ const Blob = ({ color, node, entityNodes }) => {
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
                 node.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
+                updateNode(id, {visible: true});
                 setTimeout(() => {
                     entityNodes.forEach(nodeEntity => {
                         propagateVisualConfigValue(nodeEntity.id, 'visible', false);
@@ -230,12 +239,14 @@ const points_to_geometry = (points, radii) => {
     //console.log("center", center, centerRef.current);
 
     // Offset the points before creating the curve
-    const expandedPoints = expandPointsFromCenter(points, radii, center);
-    //const expandedPoints = points;
+    //const expandedPoints = expandPointsFromCenter(points, radii, center);
+    const expandedPoints = points;
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
-    const oneToOnePoints = curve.getPoints(expandedPoints.length);
-    const shape = new THREE.Shape(oneToOnePoints);
+    const numPoints = expandedPoints.length > 100 ? expandedPoints.length : expandedPoints.length //100;
+    //const curvePoints = curve.getPoints(numPoints);
+    const curvePoints = expandedPoints;
+    const shape = new THREE.Shape(curvePoints);
     const shape_geometry = new THREE.ShapeGeometry(shape);
 
     return shape_geometry;

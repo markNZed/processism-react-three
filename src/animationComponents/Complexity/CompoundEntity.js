@@ -19,9 +19,14 @@ import useStore from './../../useStore';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { useRapier, vec3, quat, RigidBody, BallCollider } from '@react-three/rapier';
 
-// Outer markup is not right
-// Click on sub-group not working
 // Not scaling to 9,3,3 etc
+// Problem when particles are "twisted" then we can get weird boundaries
+//   5 in/out not making sense 14-7 and 11-9
+// When entity count is 4 or 5 entity 2 has joints swapped - why?
+// Now need to check 3,3 with new orientations
+// Clicking to sub-blob is broken?
+//   Entity 1 is not rerendered - so its blob is not drawn
+//   Do we need to set its state ? set node.visible to trigger 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, color, config, outer = {}, ...props }, ref) => {
 
@@ -43,7 +48,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     // This allows us to pause the physics simulation
     const setOption = useStore((state) => state.setOption);
     const getOption = useStore((state) => state.getOption);
-    //if (!getOption("pausePhysics")) setOption("pausePhysics", true);
 
     // Select so we are only sensitive to changes of this node
     const { node, entityNodes } = useStoreEntity(useCallback((state) => {
@@ -91,7 +95,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [allParticlesReady, setAllParticlesReady] = useState(false);
     const outerRef = useRef({});
     const inIndex = 0;
+    //const inIndex = (entityCount == 1) ? 0 : 1;
     const outIndex = (entityCount == 1) ? 0 : 1;
+    //const outIndex = 0;
     const FORWARD = new THREE.Vector3(1, 0, 0);
     const entityInitialQuaternion = new THREE.Quaternion(); 
 
@@ -225,8 +231,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Would be better to calculate midpoint at the time of instantiation after the joint has expanded
                 const node1 = directGetNode(body1Id);
                 const node2 = directGetNode(body2Id);
+                const visualConfig1 = node1.ref.current.getVisualConfig();
                 const visualConfig2 = node2.ref.current.getVisualConfig();
-                isOuter = visualConfig2["outer"][node.depth];
+                const outer1 = visualConfig1["outer"][node.depth];
+                const outer2 = visualConfig2["outer"][node.depth];
+                //console.log("isOuter", id, "outer1", outer1, "outer2", outer2);
+                isOuter = visualConfig1["outer"][node.depth] && !visualConfig2["outer"][node.depth];
                 const body1Ref = node1.ref.current;
                 const body2Ref = node2.ref.current;
                 // Create the particle in the middle and let the joints "pull" it into place.
@@ -238,9 +248,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
         }
         entityPoseRef.current.positions.push(newPosition);
-        if (node.depth === 0) {
-            isOuter = true;
-        }
+        //if (node.depth === 0) {
+        //    isOuter = true;
+        //}
         outerRef.current[entityNodeId] = {...outer, [node.depth]: isOuter};
         
         const entityOrientation = centerRef.current.clone()
@@ -252,7 +262,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             entityOrientation.normalize();
         }
         // If vectors are directly opposite, the resulting quaternion can cause a flip that affects other axes than intended.
-        if (FORWARD.dot(entityOrientation) === -1) {
+        const EPSILON = 0.01;  // You can adjust this value as needed
+        if (Math.abs(FORWARD.dot(entityOrientation) + 1) < EPSILON) {
             // Vectors are opposite, manually create quaternion for 180-degree rotation around the Z-axis
             entityInitialQuaternion.set(0, 0, 1, 0);
         } else {
@@ -263,7 +274,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), entityNodeId]);
 
-        console.log("Instantiating entityNodeId", id, i, entitiesToInstantiate, entityNodeId, newPosition);
+        console.log("Instantiating entityNodeId", id, i, entityNodeId, newPosition, entityOrientation, entityInitialQuaternion, FORWARD.dot(entityOrientation));
 
     }
 
@@ -475,7 +486,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 node.particlesRef.current.push(particleRef);
                 // If we have a shape then update the joints with new angles to allow for change in the number of entities
                 if (instantiatedCount > 2) {
-                    console.log("directGetJoints", directGetJoints())
                     // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
                     alignJointsToPolygon();
                 }
@@ -487,7 +497,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const sumInternal = (entitiesToInstantiate.length - 2) * 180;
             const newJointAngle = sumInternal / entitiesToInstantiate.length / 2;
 
-            // Because we use a clockwise direction for joints angle1 is positive, angle2 is negative
+            //console.log("alignJointsToPolygon newJointAngle", newJointAngle)
+
+            // Because we use a clockwise direction for joints angle1 is negative, angle2 is positive
             const angle1 = THREE.MathUtils.degToRad(-newJointAngle);
             const angle2 = THREE.MathUtils.degToRad(newJointAngle);
 
@@ -517,6 +529,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
                 joint.setAnchor1(newAnchor1);
                 joint.setAnchor2(newAnchor2);
+
+                //console.log("alignJointsToPolygon", id, i, jointId, newAnchor1, newAnchor2)
             });
         }
 
@@ -551,6 +565,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         console.log("Physics ready", nodeRef);
                         console.log("useStoreEntity", useStoreEntity.getState());
                         nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
+                        directUpdateNode(id, {visible: true});
                     }
                     frameStateRef.current = "done";
                 }
@@ -563,7 +578,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     });
 
-    //console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "entityNodes", entityNodes)
+    console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "allParticlesReady", allParticlesReady)
     //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, color, index, config, node, entityNodes, entitiesToInstantiate} );
 
     //<CompoundEntityGroup ref={nodeRef} position={initialPosition} initialQuaternion={quaternion}>
