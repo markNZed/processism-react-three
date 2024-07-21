@@ -160,7 +160,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             } else if (!jointsMapped) {
                 setJointsMapped(true);
                 directResetParticlesStable(); // Should only need to do this from one place
-                console.log("Set jointsMapped to true", id);
+                //console.log("Set jointsMapped to true", id);
             }
         }
 
@@ -527,7 +527,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             setAllParticlesReady(true);
                             // So we update the blob info
                             //directResetParticlesStable();
-                            console.log("allParticlesReady", id, allParticleRefs);
+                            //console.log("allParticlesReady", id, allParticleRefs);
                         }
                     }
                 } else {

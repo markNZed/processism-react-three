@@ -79,7 +79,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 // For debugging the outer map
                 //localColor = "pink";
             }
-            nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer });
+            nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer, visible: true });
             directUpdateNode(id, {isParticle: true});
             setInitialize(false);
         }

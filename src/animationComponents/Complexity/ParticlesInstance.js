@@ -68,7 +68,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
                 matrixChanged = true;
             }
 
-            const visible = visualConfig.visible || true;
+            const visible = visualConfig.visible || false;
             if (!visible) {
                 currentScale.copy(invisibleScale);
                 matrixChanged = true;

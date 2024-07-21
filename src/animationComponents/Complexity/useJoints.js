@@ -86,7 +86,7 @@ const useJoints = () => {
                 true
             );
         } else {
-            console.warn("No aRef or bRef for updateJoint", jointId, aRef.current.type, bRef.current.type);
+            //console.warn("No aRef or bRef for updateJoint", jointId, aRef.current.type, bRef.current.type);
         }
         removeLink(chainRef, body1Id, body2Id);
         addLink(chainRef, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
