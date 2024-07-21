@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import uniqueIdGenerator from './uniqueIdGenerator';
 import { devtools } from 'zustand/middleware';
 import * as utils from './utils';
+import debounce from 'lodash/debounce';
 
 /**
  * Zustand Tree Store
@@ -170,12 +171,12 @@ const useStoreEntity = create((set, get) => {
             return get().particlesStable[id];
         },
 
-        resetParticlesStable: () => set(() => {
-            console.log("resetParticlesStable")
+        resetParticlesStable: () => debounce(() => set(() => {
+            console.log("resetParticlesStable debounced");
             return {
                 particlesStable: {}
             };
-        }),
+        }), 300),
 
         reset: () => set(() => {
             return {

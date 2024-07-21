@@ -17,7 +17,7 @@ const Blob = ({ color, node, entityNodes }) => {
 
     function buildBlobData() {
 
-        //console.log("buildBlobData", id);
+        console.log("buildBlobData", id);
         blobData.current = {
             positions: [],
             flattenedIndexes: [],
@@ -244,8 +244,8 @@ const points_to_geometry = (points, radii) => {
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
     const numPoints = expandedPoints.length > 100 ? expandedPoints.length : expandedPoints.length //100;
-    //const curvePoints = curve.getPoints(numPoints);
-    const curvePoints = expandedPoints;
+    const curvePoints = curve.getPoints(numPoints);
+    //const curvePoints = expandedPoints;
     const shape = new THREE.Shape(curvePoints);
     const shape_geometry = new THREE.ShapeGeometry(shape);
 

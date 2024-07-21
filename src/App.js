@@ -41,6 +41,7 @@ export default function App() {
   const setPausePhysics = useStore((state) => state.setPausePhysics);
   const setOption = useStore((state) => state.setOption);
   const fixParticles = useStore((state) => state.getOption("fixParticles"));
+  const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
   
   const toggleAnimation = () => {
     setPausePhysics(!pausePhysics); // Toggle animation state
@@ -48,6 +49,10 @@ export default function App() {
 
   const toggleFixParticles = () => {
     setOption("fixParticles", !fixParticles);
+  };
+
+  const togglePhysicsDebug = () => {
+    setOption("physicsDebug", !physicsDebug);
   };
 
   return (
@@ -62,6 +67,9 @@ export default function App() {
       </button>
       <button onClick={toggleFixParticles}>
         {fixParticles ? 'Dynamic particles' : 'Fix particles'}
+      </button>
+      <button onClick={togglePhysicsDebug}>
+        {physicsDebug ? 'Physics debug off' : 'Physics debug on'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}

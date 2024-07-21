@@ -30,6 +30,8 @@ function SceneThree() {
         //[0, 'emergent1', { variant: "default" }],
     ];
 
+    const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
+
     const cameraInitialState = {
         position: [0, 0, 35],
         zoom: 35,
@@ -54,7 +56,7 @@ function SceneThree() {
     return (
         <>
             <AnimationController animations={animationSequence} useStore={useStore}>
-                <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={true} >
+                <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={physicsDebug} >
                     <Perf position={"bottom-left"} minimal={true} colorBlind={true} antialias={true}/>
                     <>
 

@@ -1,8 +1,8 @@
 import { useRef, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import useStoreEntity from './useStoreEntity';
 import { vec3 } from '@react-three/rapier';
+import * as utils from './utils';
 
 const useAnimateImpulses = (
     initialized,
@@ -15,7 +15,6 @@ const useAnimateImpulses = (
     // Impulse that will be applied to Particles of this CompoundEntity
     const impulseRef = useRef();
     const impulsePerParticle = (config.impulsePerParticle || 0.02);
-    const getNodeProperty = useStoreEntity.getState().getNodeProperty;
     const particleArea = utils.calculateCircleArea(node.radius)
     const id = node.id;
     const internalRef = node.ref;

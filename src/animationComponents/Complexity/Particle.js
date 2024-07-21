@@ -73,13 +73,12 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     useEffect(() => {
         if (initialize && nodeRef.current) {
             // Must set outer before isParticle
-            console.log("particle outer", id, outer)
             // if all outer array is true then set color to pink
             let localColor = color;
             if (Object.values(outer).every((o) => o)) {
-                localColor = "pink";
+                // For debugging the outer map
+                //localColor = "pink";
             }
-            console.log("Particle outer", id, outer)
             nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer });
             directUpdateNode(id, {isParticle: true});
             setInitialize(false);
@@ -110,7 +109,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
             >
                 <BallCollider args={[colliderRadius * 1.0]} />
             </ParticleRigidBody>
-            {isDebug || true && (
+            {isDebug && (
                 <>
                     <Text
                         position={[initialPosition[0], initialPosition[1], 0.1]} // Slightly offset in the z-axis to avoid z-fighting
