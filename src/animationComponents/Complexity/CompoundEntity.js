@@ -67,7 +67,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const [entitiesToInstantiate, setEntitiesToInstantiate] = useState([]);
     // Block the instantiating of next entity (unless null)
     const busyInstantiatingRef = useRef(null);
-    const [instantiateJoints, setInstantiateJoints] = useState([]);
     const activeJointsQueueRef = useRef([]);
     const [replaceJointWith, setReplaceJointWith] = useState([]);
     const [entityInstantiated, setEntityInstantiated] = useState();
@@ -323,36 +322,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         createJoint(node.chainRef, body1Ref, offset1, body2Ref, offset2);
         addActiveJoint(id1, id2);
     }
-
-    // Create a new joint connecting entities that are already connected
-    // We know this is only used for when there are 2 entities
-    function instatiateJoints() {
-        const instantiatedJointsIndices = [];
-        //console.log("instantiateJoints", instantiateJoints)
-        instantiateJoints.forEach(([id1, id2], i) => {
-            const node1 = directGetNode(id1);
-            const node2 = directGetNode(id2);
-            const body1Ref = node1.ref.current;
-            const body2Ref = node2.ref.current;
-            if (!body1Ref?.current || !body2Ref?.current) return;
-            const visualConfig1 = node1.ref.current.getVisualConfig();
-            const body1radius = visualConfig1.radius;
-            const visualConfig2 = node2.ref.current.getVisualConfig();
-            const body2radius = visualConfig2.radius;
-            const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, body1radius, body2radius);
-            createJoint(node.chainRef, body1Ref, offset1, body2Ref, offset2);
-            addActiveJoint(id1, id2);
-            instantiatedJointsIndices.push(i);
-        });
-        return instantiatedJointsIndices;
-    }
-
-    useEffect(() => {
-        if (!instantiateJoints.length) return;
-        const instantiatedJointsIndices = instatiateJoints();
-        // Filter out indices that have already been processed
-        setInstantiateJoints(p => p.filter((_, i) => !instantiatedJointsIndices.includes(i)));
-    }, [instantiateJoints]);
 
     // Replace a joint with a new entity and two joints
     function replaceJoint() {
