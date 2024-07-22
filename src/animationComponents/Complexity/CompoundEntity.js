@@ -245,25 +245,24 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 const replaceJointId = activeJointsQueueRef.current[0];
                 const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                 expandJoint(jointRef);
-                setReplaceJointWith(p => [...p, entityInstantiated]);
+                replaceJoint(entityInstantiated);
                 break;
             }
             case 3: {
                 const replaceJointId = activeJointsQueueRef.current[0];
                 const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                 expandJoint(jointRef);
-                setReplaceJointWith(p => [...p, entityInstantiated]);
+                replaceJoint(entityInstantiated);
                 break;
             }
             default: {
                 const replaceJointId = activeJointsQueueRef.current[0];
                 const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
                 expandJoint(jointRef);
-                setReplaceJointWith(p => [...p, entityInstantiated]);
+                replaceJoint(entityInstantiated);
                 break;
             }
         }
-
     }
 
     useEffect(() => {
@@ -313,7 +312,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         const node2 = directGetNode(id2);
         const body1Ref = node1.ref.current;
         const body2Ref = node2.ref.current;
-        if (!body1Ref?.current || !body2Ref?.current) return;
         const visualConfig1 = node1.ref.current.getVisualConfig();
         const body1radius = visualConfig1.radius;
         const visualConfig2 = node2.ref.current.getVisualConfig();
@@ -324,56 +322,41 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     }
 
     // Replace a joint with a new entity and two joints
-    function replaceJoint() {
-        const replacedJointIndices = [];
-        // Replace a joint with a new entity and connect that entity
-        replaceJointWith.forEach((nextId, i) => {
-            //console.log("replaceJoint with", nextId);
-            const nextEntity = directGetNode(nextId);
-            const nextBodyRef = nextEntity.ref.current;
-            if (!nextBodyRef?.current) return;
+    function replaceJoint(nextId) {
+        //console.log("replaceJoint with", nextId);
+        const nextEntity = directGetNode(nextId);
+        const nextBodyRef = nextEntity.ref.current;
 
-            const replaceJointId = activeJointsQueueRef.current[0];
+        const replaceJointId = activeJointsQueueRef.current[0];
 
-            const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
-            const anchor1 = vec3(jointRef.current.anchor1());
-            const anchor2 = vec3(jointRef.current.anchor2());
+        const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+        const anchor1 = vec3(jointRef.current.anchor1());
+        const anchor2 = vec3(jointRef.current.anchor2());
 
-            const node1 = directGetNode(body1Id);
-            const node2 = directGetNode(body2Id);
-            const body1Ref = node1.ref.current;
-            const body2Ref = node2.ref.current;
+        const node1 = directGetNode(body1Id);
+        const node2 = directGetNode(body2Id);
+        const body1Ref = node1.ref.current;
+        const body2Ref = node2.ref.current;
 
-            anchor1.multiplyScalar(1 / scaleJoint);
-            anchor2.multiplyScalar(1 / scaleJoint);
-            createJoint(node.chainRef, body1Ref, anchor1, nextBodyRef, anchor2);
-            addActiveJoint(body1Id, nextEntity.id) 
+        anchor1.multiplyScalar(1 / scaleJoint);
+        anchor2.multiplyScalar(1 / scaleJoint);
+        createJoint(node.chainRef, body1Ref, anchor1, nextBodyRef, anchor2);
+        addActiveJoint(body1Id, nextEntity.id) 
 
-            createJoint(node.chainRef, nextBodyRef, anchor1, body2Ref, anchor2);
-            addActiveJoint(nextEntity.id, body2Id) 
+        createJoint(node.chainRef, nextBodyRef, anchor1, body2Ref, anchor2);
+        addActiveJoint(nextEntity.id, body2Id) 
 
-            deleteJoint(node.chainRef, replaceJointId);
-            if (jointsFromRef.current[body1Id]) {
-                jointsFromRef.current[body1Id] = jointsFromRef.current[body1Id].filter((jointId) => jointId !== replaceJointId);
-            }
-            if (jointsToRef.current[body2Id]) {
-                jointsToRef.current[body2Id] = jointsToRef.current[body2Id].filter((jointId) => jointId !== replaceJointId);
-            }
-            jointsFromInRef.current = jointsFromInRef.current.filter((jointId) => jointId !== replaceJointId);
-            jointsToInRef.current= jointsToInRef.current.filter((jointId) => jointId !== replaceJointId);
-            activeJointsQueueRef.current.shift();
-            replacedJointIndices.push(i);
-        });
-
-        return replacedJointIndices;
+        deleteJoint(node.chainRef, replaceJointId);
+        if (jointsFromRef.current[body1Id]) {
+            jointsFromRef.current[body1Id] = jointsFromRef.current[body1Id].filter((jointId) => jointId !== replaceJointId);
+        }
+        if (jointsToRef.current[body2Id]) {
+            jointsToRef.current[body2Id] = jointsToRef.current[body2Id].filter((jointId) => jointId !== replaceJointId);
+        }
+        jointsFromInRef.current = jointsFromInRef.current.filter((jointId) => jointId !== replaceJointId);
+        jointsToInRef.current= jointsToInRef.current.filter((jointId) => jointId !== replaceJointId);
+        activeJointsQueueRef.current.shift();
     }
-
-    useEffect(() => {
-        if (!replaceJointWith.length) return;
-        const replacedJointIndices = replaceJoint();
-        // Filter out indices that have already been processed
-        setReplaceJointWith(p => p.filter((_, i) => !replacedJointIndices.includes(i)));
-    }, [replaceJointWith]);
 
     useEffect(() => {
         // All the joints have been mapped
