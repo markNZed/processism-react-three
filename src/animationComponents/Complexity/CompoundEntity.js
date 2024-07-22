@@ -68,7 +68,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     // Block the instantiating of next entity (unless null)
     const busyInstantiatingRef = useRef(null);
     const activeJointsQueueRef = useRef([]);
-    const [replaceJointWith, setReplaceJointWith] = useState([]);
     const [entityInstantiated, setEntityInstantiated] = useState();
     const [particlesFirst, setParticlesFirst] = useState(true);
     const jointsFromRef = useRef({});
@@ -290,7 +289,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             break;
         }
-    }, [entityInstantiated, entityNodes]);
+    }, [entityNodes, entityInstantiated]);
 
     function addActiveJoint(id1, id2) {
         const jointId = utils.jointId(id1, id2);
@@ -412,6 +411,47 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     
     };
 
+    function alignJointsToPolygon() {
+        const sumInternal = (entitiesToInstantiate.length - 2) * 180;
+        const newJointAngle = sumInternal / entitiesToInstantiate.length / 2;
+
+        //console.log("alignJointsToPolygon newJointAngle", newJointAngle)
+
+        // Because we use a clockwise direction for joints angle1 is negative, angle2 is positive
+        const angle1 = THREE.MathUtils.degToRad(-newJointAngle);
+        const angle2 = THREE.MathUtils.degToRad(newJointAngle);
+
+        // For each end of each joint rotate it to match with  newJointAngle
+        activeJointsQueueRef.current.forEach((jointId, i) => {
+            const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+            const joint = jointRef.current;
+
+            if (!joint) {
+                console.warn("Joint not found", id, jointId);
+                return; // Joint is being modified and not yet ready
+            }
+
+            const anchor1 = vec3(joint.anchor1());
+            const anchor2 = vec3(joint.anchor2());
+            
+            const radius1 = anchor1.length();
+            const radius2 = anchor2.length();
+
+            const newX1 = radius1 * Math.cos(angle1);
+            const newY1 = radius1 * Math.sin(angle1);
+            const newX2 = radius2 * Math.cos(angle2);
+            const newY2 = radius2 * Math.sin(angle2);
+
+            const newAnchor1 = new THREE.Vector3(newX1, newY1, 0);
+            const newAnchor2 = new THREE.Vector3(newX2, newY2, 0);
+
+            joint.setAnchor1(newAnchor1);
+            joint.setAnchor2(newAnchor2);
+
+            //console.log("alignJointsToPolygon", id, i, jointId, newAnchor1, newAnchor2)
+        });
+    }
+
     useFrame(() => {
 
         calculateCenter({
@@ -444,47 +484,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 }
                 
             }
-        }
-
-        function alignJointsToPolygon() {
-            const sumInternal = (entitiesToInstantiate.length - 2) * 180;
-            const newJointAngle = sumInternal / entitiesToInstantiate.length / 2;
-
-            //console.log("alignJointsToPolygon newJointAngle", newJointAngle)
-
-            // Because we use a clockwise direction for joints angle1 is negative, angle2 is positive
-            const angle1 = THREE.MathUtils.degToRad(-newJointAngle);
-            const angle2 = THREE.MathUtils.degToRad(newJointAngle);
-
-            // For each end of each joint rotate it to match with  newJointAngle
-            activeJointsQueueRef.current.forEach((jointId, i) => {
-                const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
-                const joint = jointRef.current;
-
-                if (!joint) {
-                    console.warn("Joint not found", id, jointId);
-                    return; // Joint is being modified and not yet ready
-                }
-
-                const anchor1 = vec3(joint.anchor1());
-                const anchor2 = vec3(joint.anchor2());
-                
-                const radius1 = anchor1.length();
-                const radius2 = anchor2.length();
-
-                const newX1 = radius1 * Math.cos(angle1);
-                const newY1 = radius1 * Math.sin(angle1);
-                const newX2 = radius2 * Math.cos(angle2);
-                const newY2 = radius2 * Math.sin(angle2);
-
-                const newAnchor1 = new THREE.Vector3(newX1, newY1, 0);
-                const newAnchor2 = new THREE.Vector3(newX2, newY2, 0);
-
-                joint.setAnchor1(newAnchor1);
-                joint.setAnchor2(newAnchor2);
-
-                //console.log("alignJointsToPolygon", id, i, jointId, newAnchor1, newAnchor2)
-            });
         }
 
     });
