@@ -31,6 +31,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     // Rapier uses world coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useStore((state) => state.getOption("fixParticles"));
+    const showParticles = useStore((state) => state.getOption("showParticles"));;
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -79,7 +80,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 // For debugging the outer map
                 //localColor = "pink";
             }
-            nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer, visible: true });
+            nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer, visible: showParticles });
             directUpdateNode(id, {isParticle: true});
             setInitialize(false);
         }

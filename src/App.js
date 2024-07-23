@@ -42,18 +42,15 @@ export default function App() {
   const setOption = useStore((state) => state.setOption);
   const fixParticles = useStore((state) => state.getOption("fixParticles"));
   const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
+  const showParticles = useStore((state) => state.getOption("showParticles"));
   
   const toggleAnimation = () => {
     setPausePhysics(!pausePhysics); // Toggle animation state
   };
 
-  const toggleFixParticles = () => {
-    setOption("fixParticles", !fixParticles);
-  };
-
-  const togglePhysicsDebug = () => {
-    setOption("physicsDebug", !physicsDebug);
-  };
+  const toggleOption = (option, value) => {
+    setOption(option, !value);
+ };
 
   return (
     <>
@@ -65,11 +62,14 @@ export default function App() {
       <button onClick={toggleAnimation}>
         {pausePhysics ? 'Play physics' : 'Pause physics'}
       </button>
-      <button onClick={toggleFixParticles}>
+      <button onClick={() => {toggleOption("fixParticles", fixParticles)}}>
         {fixParticles ? 'Dynamic particles' : 'Fix particles'}
       </button>
-      <button onClick={togglePhysicsDebug}>
+      <button onClick={() => {toggleOption("physicsDebug", physicsDebug)}}>
         {physicsDebug ? 'Physics debug off' : 'Physics debug on'}
+      </button>
+      <button onClick={() => {toggleOption("showParticles", showParticles)}}>
+        {showParticles ? 'Show Particles' : 'Hide Particles'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}
