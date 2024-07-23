@@ -69,7 +69,7 @@ export default function App() {
         {physicsDebug ? 'Physics debug off' : 'Physics debug on'}
       </button>
       <button onClick={() => {toggleOption("showParticles", showParticles)}}>
-        {showParticles ? 'Show Particles' : 'Hide Particles'}
+        {showParticles ? 'Hide Particles' : 'Show Particles'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}
