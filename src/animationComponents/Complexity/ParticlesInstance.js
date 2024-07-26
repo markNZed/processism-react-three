@@ -8,7 +8,7 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const { getNodeProperty, getAllParticleRefs } = useStoreEntity.getState();
+    const { getAllParticleRefs } = useStoreEntity.getState();
     const userColor = new THREE.Color();
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();
@@ -116,10 +116,12 @@ const ParticlesInstance = React.forwardRef(({ id, node }, ref) => {
 
     const handlePointerDown = (event) => {
         if (!event.shiftKey) return;
+        console.log("ParticlesInstance handlePointerDown", id, event);
         const instanceId = event.instanceId;
         if (instanceId === undefined) return;
         event.stopPropagation();
-        const visualConfig = node.particlesRef.current[instanceId].current.getVisualConfig();
+        const allParticleRefs = getAllParticleRefs();
+        const visualConfig = allParticleRefs[instanceId].current.getVisualConfig();
         const currentScale = visualConfig.scale;
         visualConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
         visualConfig.color = 'pink';

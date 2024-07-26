@@ -35,7 +35,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const {
         getNode: directGetNode,
         updateNode: directUpdateNode,
-        getAllParticleRefs: directGetAllParticleRefs,
         getJoint: directGetJoint,
         resetParticlesHash: directResetParticlesHash,
     } = useStoreEntity.getState();
