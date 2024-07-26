@@ -135,12 +135,12 @@ function simpleHash(input) {
     return hash;
 }
 
-const debouncedResetParticlesStable = debounce((set) => {
-    console.log("particlesStable resetParticlesStable debounced");
+const debouncedResetParticlesHash = debounce((set) => {
+    console.log("particlesHash resetParticlesHash debounced");
     set(() => ({
-        particlesStable: {}
+        particlesHash: {}
     }));
-}, 1000);
+}, 500);
 
 const useStoreEntity = create((set, get) => {
 
@@ -157,7 +157,7 @@ const useStoreEntity = create((set, get) => {
         relationCount: 0,
         joints: {},
         jointCount: 0,
-        particlesStable: {},
+        particlesHash: {},
         particleRefs: [],
         options: [],
 
@@ -174,11 +174,11 @@ const useStoreEntity = create((set, get) => {
             };
         }),
 
-        getparticlesHash: (id) => {
-            return get().particlesStable[id];
+        getParticlesHash: (id) => {
+            return get().particlesHash[id];
         },
 
-        resetParticlesStable: () => debouncedResetParticlesStable(set),
+        resetParticlesHash: () => debouncedResetParticlesHash(set),
 
         reset: () => set(() => {
             return {
@@ -192,10 +192,10 @@ const useStoreEntity = create((set, get) => {
             }
         }),
 
-        addJoint: (body1Id, body2Id, ref) => set(state => {
+        addJoint: (body1Id, body2Id, jointRef) => set(state => {
             const joints = state.joints;
             const jointId = utils.jointId(body1Id, body2Id);
-            joints[jointId] = [ref, body1Id, body2Id]; // Store the order the joint was created in (important for offset)
+            joints[jointId] = {jointRef, body1Id, body2Id}; // Store the order the joint was created in (important for offset)
             const nodes = state.nodes;
             nodes[body1Id].jointsRef.current.push(jointId);
             nodes[body2Id].jointsRef.current.push(jointId);
@@ -212,9 +212,9 @@ const useStoreEntity = create((set, get) => {
             const joints = state.joints;
             const nodes = state.nodes;
             let jointCount = state.jointCount;
-            jointsToAdd.forEach(([body1Id, body2Id, ref]) => {
+            jointsToAdd.forEach(({body1Id, body2Id, jointRef}) => {
                 const jointId = utils.jointId(body1Id, body2Id);
-                joints[jointId] = ref;
+                joints[jointId] = {jointRef, body1Id, body2Id};
                 nodes[body1Id].jointsRef.current.push(jointId);
                 nodes[body2Id].jointsRef.current.push(jointId);
                 jointCount++;
@@ -244,7 +244,7 @@ const useStoreEntity = create((set, get) => {
         }),
 
         deleteJointId: (jointId) => {
-            const [body1Id, body2Id] = utils.jointIdToNodeIds(jointId);
+            const {body1Id, body2Id} = utils.jointIdToNodeIds(jointId);
             get().deleteJoint(body1Id, body2Id);
         },
 
@@ -257,9 +257,9 @@ const useStoreEntity = create((set, get) => {
             return get().joints;
         },
 
-        updateJoint: (jointId, body1Id, body2Id, ref) => set(state => {
+        updateJoint: (jointId, body1Id, body2Id, jointRef) => set(state => {
             const joints = state.joints;
-            joints[jointId] = [ref, body1Id, body2Id]; // Store the order the joint was created in (important for offset)
+            joints[jointId] = {jointRef, body1Id, body2Id}; // Store the order the joint was created in (important for offset)
             return {
                 joints,
             };
@@ -340,8 +340,8 @@ const useStoreEntity = create((set, get) => {
         // Function to get all nodes with isParticle set to true.
         // Cache the result in state.particles
         getAllParticleRefs: (id = 'root') => {
-            const particlesStable = get().particlesStable[id];
-            if (!particlesStable) {
+            const particlesHash = get().particlesHash[id];
+            if (!particlesHash) {
                 const particles = [];
                 const nodes = get().nodes;
                 const traverse = (node) => {
@@ -357,14 +357,14 @@ const useStoreEntity = create((set, get) => {
                     let uniqueId = particle.current.getVisualConfig().uniqueId;
                     return acc + uniqueId; // Concatenate all uniqueIds
                 }, "");
-                // We include the date so resetting particlesStable will force a refresh
+                // We include the date so resetting particlesHash will force a refresh
                 // That will in turn take into account joint updates
                 // This is very hacky!
                 let hashedResult = simpleHash(concatenatedIds).toString() + Date.now().toString();
                 //console.log("hashedResult", id, particles, hashedResult)
                 set((state) => ({
-                    particlesStable: {
-                        ...state.particlesStable, 
+                    particlesHash: {
+                        ...state.particlesHash, 
                         [id]: hashedResult
                     },
                     particles: {
@@ -394,7 +394,7 @@ const useStoreEntity = create((set, get) => {
                 newNodeId = newNode.id;
                 state.nodeCount++;
 
-                state.particlesStable = {};
+                state.particlesHash = {};
 
                 return {
                     nodes: {
@@ -457,7 +457,7 @@ const useStoreEntity = create((set, get) => {
             const newDepth = updatedProperties.parentId ? (state.nodes[updatedProperties.parentId].depth || 0) + 1 : node.depth;
 
             if (updatedProperties.isParticle !== undefined && isParticle !== updatedProperties.isParticle) {
-                state.particlesStable = {};
+                state.particlesHash = {};
             }
 
             return {
@@ -506,7 +506,7 @@ const useStoreEntity = create((set, get) => {
             };
 
             if (node.isParticle) {
-                state.particlesStable = {};
+                state.particlesHash = {};
             }
 
             deleteRecursively(id);
@@ -640,8 +640,8 @@ const useStoreEntity = create((set, get) => {
             updateSubtree(nodeId);
 
             if (property === 'isParticle') {
-                console.log("particlesStable propagateValue reset", nodeId);
-                state.particlesStable = {};
+                console.log("particlesHash propagateValue reset", nodeId);
+                state.particlesHash = {};
             }
 
             return { nodes };

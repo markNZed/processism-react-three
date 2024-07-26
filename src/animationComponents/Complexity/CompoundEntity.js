@@ -37,7 +37,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         updateNode: directUpdateNode,
         getAllParticleRefs: directGetAllParticleRefs,
         getJoint: directGetJoint,
-        resetParticlesStable: directResetParticlesStable,
+        resetParticlesHash: directResetParticlesHash,
     } = useStoreEntity.getState();
 
     // Select so we are only sensitive to changes of this node
@@ -116,7 +116,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         function processJoints(jointsRef, newNodeId, isTo) {
             const jointsUpdated = [];
             jointsRef.current.forEach(jointId => {
-                const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+                const {body1Id, body2Id} = directGetJoint(jointId);
                 const node1Ref = isTo ? directGetNode(body1Id).ref : directGetNode(newNodeId).ref;
                 const node2Ref = isTo ? directGetNode(newNodeId).ref : directGetNode(body2Id).ref;
                 const visualConfig1 = node1Ref.current.getVisualConfig();
@@ -134,7 +134,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             processJoints(parentJointsToRef, entitiesToInstantiate[IN_INDEX], true);
             processJoints(parentJointsFromRef, entitiesToInstantiate[OUT_INDEX], false);
             setJointsMapped(true);
-            directResetParticlesStable();
+            directResetParticlesHash();
         }
 
     }, [initParticles]);
@@ -172,20 +172,20 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case 2: {
                 newPosition[1] -= entityRadius * Math.sqrt(3);
                 const replaceJointId = activeJointsQueueRef.current[0];
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const {jointRef} = directGetJoint(replaceJointId);
                 expandJoint(jointRef);
                 break;
             }
             case 3: {
                 newPosition[1] += entityRadius * Math.sqrt(3);
                 const replaceJointId = activeJointsQueueRef.current[0];
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const {jointRef} = directGetJoint(replaceJointId);
                 expandJoint(jointRef);
                 break;
             }
             default: {
                 const replaceJointId = activeJointsQueueRef.current[0];
-                const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+                const {jointRef, body1Id, body2Id} = directGetJoint(replaceJointId);
                 // Find the midpoint between the two nodes
                 // Would be better to calculate midpoint at the time of instantiation after the joint has expanded
                 const node1 = directGetNode(body1Id);
@@ -227,7 +227,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     }
 
-    // After an entity is instantiated we add joints
+    // After an entity is instantiated add joints
     const jointsForEntity = () => {
         switch (entitiesToInstantiate.length - 1) {
             case 0:
@@ -307,7 +307,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
         const replaceJointId = activeJointsQueueRef.current[0];
 
-        const [jointRef, body1Id, body2Id] = directGetJoint(replaceJointId);
+        const {jointRef, body1Id, body2Id} = directGetJoint(replaceJointId);
         const anchor1 = vec3(jointRef.current.anchor1());
         const anchor2 = vec3(jointRef.current.anchor2());
 
@@ -370,7 +370,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
         // For each end of each joint rotate it to match with  newJointAngle
         activeJointsQueueRef.current.forEach((jointId, i) => {
-            const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+            const {jointRef} = directGetJoint(jointId);
             const joint = jointRef.current;
 
             if (!joint) {

@@ -56,7 +56,7 @@ const useAnimateJoints = (
                 // Vector3 to be used for particle world position
                 const particleWorldPosition = new THREE.Vector3();
                 entityJointIndexes.forEach((jointId) => {
-                    const [jointRef, body1Id, body2Id] = getJoint(jointId);
+                    const {jointRef} = getJoint(jointId);
                     const body1 = jointRef.current.body1();
                     const body2 = jointRef.current.body2();
                     // Entity needs to store parent entity in visualConfig ?
@@ -86,7 +86,7 @@ const useAnimateJoints = (
                 console.log("Detach a random entity", id, entityUniqueId, entityRef, "closestId", closestId, "replacementEntity", replacementEntity);
                 const jointsToCreate = [];
                 entityJointIndexes.forEach((jointId) => {
-                    const [jointRef, body1Id, body2Id] = getJoint(jointId);
+                    const {jointRef} = getJoint(jointId);
                     let body1 = jointRef.current.body1();
                     let body2 = jointRef.current.body2();
                     if (replacementEntity.visualConfig.uniqueId == body1.visualConfig.uniqueId) return;

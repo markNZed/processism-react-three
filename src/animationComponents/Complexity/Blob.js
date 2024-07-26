@@ -7,7 +7,7 @@ const Blob = ({ color, node, entityNodes }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateVisualConfigValue, getparticlesHash, getAllParticleRefs, updateNode } = useStoreEntity.getState();
+    const { getNode, propagateVisualConfigValue, getParticlesHash, getAllParticleRefs, updateNode } = useStoreEntity.getState();
     const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const [pressStart, setPressStart] = useState(0);
@@ -29,6 +29,7 @@ const Blob = ({ color, node, entityNodes }) => {
         let radii = [];
         const entityNodeIds = entityNodes.map(n => n.id);
         particlesRef.current = getAllParticleRefs(id);
+        particlesHashRef.current = getParticlesHash(id);
         const particles = particlesRef.current;
         for (let i = 0; i < particles.length; ++i) {
             if (!particles[i].current) {
@@ -95,12 +96,13 @@ const Blob = ({ color, node, entityNodes }) => {
 
         if (node.ref.current.getVisualConfig().visible) {
 
-            const hash = getparticlesHash(id);
+            const hash = getParticlesHash(id);
+            const prevHash = particlesHashRef.current;
 
-            if (hash === undefined || hash !== particlesHashRef.current) {
-                buildBlobData(`hash mismatch ${JSON.stringify(hash)} != ${JSON.stringify(particlesHashRef.current)}`);
-                //if (id == "root") console.log("blobData getparticlesHash", id, hash);
-                particlesHashRef.current = hash;            
+            if (hash === undefined || hash !== prevHash) {
+                if (hash !== undefined) {
+                    buildBlobData(`hash mismatch ${id} ${JSON.stringify(hash)} != ${JSON.stringify(prevHash)}`);
+                }
             }
     
             if (!blobData.current) {

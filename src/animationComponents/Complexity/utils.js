@@ -44,7 +44,7 @@ export const jointIdToNodeIds = (jointId) => {
     let parts = jointId.split('-');
     const body1Id = parts[0];
     const body2Id = parts[1];
-    return [body1Id, body2Id];
+    return {body1Id, body2Id};
 }
 
 export const calculateJointOffsets = (body1, body2, body1Radius, body2Radius = null) => {

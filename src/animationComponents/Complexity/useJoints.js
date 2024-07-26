@@ -52,7 +52,7 @@ const useJoints = () => {
     
     const deleteJoint = (chainRef, jointKey) => {
         //console.log("deleteJoint", jointKey)
-        const [jointRef, body1Id, body2Id] = directGetJoint(jointKey);
+        const {jointRef, body1Id, body2Id} = directGetJoint(jointKey);
         if (jointRef.current) {
             const joint = jointRef.current;
             jointRef.current = undefined;
@@ -65,7 +65,7 @@ const useJoints = () => {
     };
 
     const updateJoint = (chainRef, jointId, aRef, aOffset, bRef, bOffset) => {
-        const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+        const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
         const aVisualConfig = aRef.getVisualConfig();
         const bVisualConfig = bRef.getVisualConfig();
         //console.log("updateJoint", jointId, body1Id, body2Id, aVisualConfig.uniqueId, bVisualConfig.uniqueId);

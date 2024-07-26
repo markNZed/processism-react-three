@@ -51,7 +51,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
             setColliderRadius(newRadius);
             nodeRef.current.setVisualConfig(visualConfig)
             node.jointsRef.current.forEach((jointId) => {
-                const [jointRef, body1Id, body2Id] = directGetJoint(jointId);
+                const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
                 const joint = jointRef.current;
                 const scaleAnchor = (anchor) => ({
                     x: anchor.x * relativeScale,
