@@ -54,15 +54,15 @@ const ParticlesInstance = React.forwardRef(({ id }, ref) => {
         }
         
         if (renderBlobRef.current) {
-          const { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
+            const { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
 
-          circleInstanceMaterial.uniforms.time.value = timeRef.current;
-          if (circleInstanceGeometry.instanceCount !== count) circleInstanceGeometry.instanceCount = count;
-          //if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
-          
-          if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
-          if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
-      }
+            circleInstanceMaterial.uniforms.time.value = timeRef.current;
+            if (circleInstanceGeometry.instanceCount !== count) circleInstanceGeometry.instanceCount = count;
+            //if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
+            
+            if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
+            if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
+        }
 
         //console.log("allParticleRefs", allParticleRefs)
 
