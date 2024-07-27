@@ -220,28 +220,55 @@ function calculateCenter(points) {
  
 const points_to_geometry = (points, radii) => {
 
-    // Rather than expand we should just use the particle overlap - maybe Jeremy could look into this?
-    const expandPointsFromCenter = (points, radii, center) => {
-        return points.map((point, i) => {
-            const distance = radii[i];
-            const direction = new THREE.Vector3().subVectors(point, center).normalize();
-            //console.log("direction", direction, distance, center);
-            return new THREE.Vector3(
-                point.x + direction.x * distance,
-                point.y + direction.y * distance,
-                point.z + direction.z * distance
-            );
+    // Function to calculate the normals that point outward
+    function calculateOutwardNormals(points, centroid) {
+        const normals = [];
+        for (let i = 0; i < points.length; i++) {
+            const prevPoint = points[i === 0 ? points.length - 1 : i - 1];
+            const currPoint = points[i];
+            const nextPoint = points[(i + 1) % points.length];
+
+            // Midpoints for more accurate normal calculation
+            const midPrev = new THREE.Vector3().addVectors(prevPoint, currPoint).multiplyScalar(0.5);
+            const midNext = new THREE.Vector3().addVectors(currPoint, nextPoint).multiplyScalar(0.5);
+
+            // Vector from midPrev to midNext
+            const edgeVector = new THREE.Vector3().subVectors(midNext, midPrev).normalize();
+
+            // Normal is perpendicular to edgeVector
+            let normal = new THREE.Vector3(-edgeVector.y, edgeVector.x, 0); // Rotate 90 degrees
+
+            // Ensure the direction of the normal is outward
+            const toCentroid = new THREE.Vector3().subVectors(centroid, currPoint).normalize();
+            if (normal.dot(toCentroid) > 0) {
+                normal.negate(); // Reverse the normal if it's pointing inward
+            }
+
+            normals.push(normal);
+        }
+        return normals;
+    }
+
+    // Function to expand points using normals
+    function expandPoints(points, normals, radii) {
+        return points.map((point, index) => {
+            const amount = radii[index];
+            //console.log("Adding amount", amount);
+            return point.clone().addScaledVector(normals[index], amount);
         });
-    };
+    }
 
     // We calculate the center rather than using the entity center (which is more like a center of gravity than a geometric center)
     const center = calculateCenter(points);
 
-    // These are very different
-    //console.log("center", center, centerRef.current);
+    // Calculate normals
+    const normals = calculateOutwardNormals(points, center);
+
+    // Expand the points
+    const expandedPoints = expandPoints(points, normals, radii);
 
     // Offset the points before creating the curve
-    const expandedPoints = expandPointsFromCenter(points, radii, center);
+    //const expandedPoints = expandPointsFromCenter(points, radii, center);
     //const expandedPoints = points;
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
