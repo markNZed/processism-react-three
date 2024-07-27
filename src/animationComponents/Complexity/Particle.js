@@ -31,7 +31,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     // Rapier uses world coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useStore((state) => state.getOption("fixParticles"));
-    const showParticles = useStore((state) => state.getOption("showParticles"));;
+    const showParticles = useStore((state) => state.getOption("showParticles"));
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -86,6 +86,10 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
         }
     }, [nodeRef]);
 
+    useEffect(() => {
+        console.log("Mounting Particle", id, initialPosition);
+    }, []);
+
     //console.log("Particle rendering", id, initialPosition, initialQuaternion);
 
     return (
@@ -98,8 +102,10 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 //type={"kinematicPosition"} // ""
                 //type={"fixed"} 
                 colliders={false}
-                linearDamping={2000}
-                angularDamping={2000}
+                //linearDamping={2000}
+                //angularDamping={2000}
+                linearDamping={500}
+                angularDamping={500}
                 enabledTranslations={[true, true, false]}
                 //enabledTranslations={[false, false, false]}
                 enabledRotations={[false, false, true]}
