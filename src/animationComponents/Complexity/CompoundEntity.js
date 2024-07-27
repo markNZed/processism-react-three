@@ -17,23 +17,21 @@ import DebugRender from './DebugRender';
 import useStoreEntity from './useStoreEntity';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { vec3, quat } from '@react-three/rapier';
+import useStore from '../../useStore'
 
 /*
 
- Even when instantiating compound entities we need to create "space" so we first instantiate particles
- initParticles is true by default to ensure this.
+  Even when instantiating compound entities we need to create "space" so we first instantiate particles initParticles is true by default to ensure this.
+
+  The config.animDelay is needed to give the Particles time to move before inserting a new particle
+
+  CompoundEntityGroup introduces a 90 degree clockwise rotation. 
+  The orientation is toward the center and we want the shape to be orthogonal to this
+  for example, a group compoundEntity each with two particles would form a circular shape
 
 */
 
 // Right click on particle could show top blob in the same color
-
-// The rotation of 2nd layer is creating problems in the instantiation of some lower layers
-//   Why CompoundEntityGroup has a 90 degree clockwise rotation ? 
-//     The orientation is toward the center and we want the shape to be orthogonal to this e.g.
-//       5 compoundEntity eacch with two particles would form a circle 
-//        This occurs at the group so the underlying particle offsets etc are not impacted
-//   Before we expand the joint we should orient for the 
-
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -47,6 +45,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         updateNode: directUpdateNode,
         getJoint: directGetJoint,
         resetParticlesHash: directResetParticlesHash,
+        getParticlesHash: directGetParticlesHash,
     } = useStoreEntity.getState();
 
     // Select so we are only sensitive to changes of this node
@@ -87,6 +86,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const entityInitialQuaternion = new THREE.Quaternion();
     const quaternion = props.initialQuaternion || new THREE.Quaternion();
     const particlesInstanceRef = useRef();
+    const setOption = useStore((state) => state.setOption);
+    const showParticles = useStore((state) => state.getOption("showParticles"));
+    const initialShowParticlesRef = useRef();
+    const prevParticlesHash = useRef();
+    const frameCountRef = useRef(0);
 
     const JOINT_EXPANSION = 1.1; // Slightly bigger to avoid "hitting" the surrounding particles
     const IN_INDEX = 0;
@@ -515,13 +519,33 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
             case "init":
+                if (id == "root" && !showParticles) {
+                    setOption("showParticles", true);
+                    initialShowParticlesRef.current = false;
+                }
                 if (jointsMapped) {
                     setPhysicsReady(true);
                     if (id == "root") {
                         console.log("useStoreEntity", useStoreEntity.getState());
                         nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                         directUpdateNode(id, {visible: true});
+                        frameStateRef.current = "stableParticles";
+                    } else {
+                        frameStateRef.current = "done";
                     }
+                }
+                break;
+            case "stableParticles":
+                const hash = directGetParticlesHash(id);
+                if (prevParticlesHash.current !== hash) {
+                    prevParticlesHash.current = hash;
+                    frameCountRef.current = 0;
+                } else {
+                    frameCountRef.current += 1;
+                }
+                if (frameCountRef.current > 100) {
+                    setOption("showParticles", initialShowParticlesRef.current);
+                    console.log("showParticles", id, initialShowParticlesRef.current)
                     frameStateRef.current = "done";
                 }
                 break;
