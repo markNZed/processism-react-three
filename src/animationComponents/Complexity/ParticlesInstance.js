@@ -9,7 +9,6 @@ const ParticlesInstance = React.forwardRef(({ id }, ref) => {
 
     const maxParticleCount = 5*5*5*2;
 
-
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
