@@ -5,7 +5,7 @@ import useStoreEntity from './useStoreEntity';
 import { vertex as meshBasicVertex, fragment as meshBasicFragment } from 'three/src/renderers/shaders/ShaderLib/meshbasic.glsl.js';
 import useStore from '../../useStore'
 
-const ParticlesInstance = React.forwardRef(({ id, node, config }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
     // We'll create the InstancedBufferGeometry for the particle shader with a max instance count based on how many particles were
     // set up in the config, with room to grow

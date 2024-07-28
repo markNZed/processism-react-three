@@ -23,7 +23,7 @@ import useStore from '../../useStore'
 
   Even when instantiating compound entities we need to create "space" so we first instantiate particles initParticles is true by default to ensure this.
 
-  The config.animDelay is needed to give the Particles time to move before inserting a new particle
+  The config.animDelayMs is needed to give the Particles time to move before inserting a new particle
 
   CompoundEntityGroup introduces a 90 degree clockwise rotation. 
   The orientation is toward the center and we want the shape to be orthogonal to this
@@ -33,6 +33,43 @@ import useStore from '../../useStore'
 
 // Right click on particle could show top blob in the same color
 // Structure into a state machine instead of using separate state and useEffect
+//   Sequence we have: 
+//     mounting
+//     busyInstantiatingRef.current
+//       setInstantiateEntityId
+//     useEffect instantiateEntityId
+//       alignJointsToPolygon
+//       setJointExpanding
+//     jointExpanded
+//       setEntitiesToInstantiate
+//     useEffect entityInstantiated
+//       instatiateJoint / replaceJoint
+//     alignJointsToPolygon
+//     useFrame
+//       jointExpanding
+//         setJointExpanded
+//       busyInstantiatingRef.current
+//         setEntityInstantiated
+//         setInitParticles
+//     initParticles
+//        processJoints(parentJointsToRef, entitiesToInstantiate[IN_INDEX], true);
+//        processJoints(parentJointsFromRef, entitiesToInstantiate[OUT_INDEX], false);
+//        setJointsMapped(true);
+//        directResetParticlesHash();
+//     jointsMapped
+//        setPhysicsReady
+
+//   Meaningful states:
+//     selectEntity
+//     alignJointsToPolygon
+//     expandJoint
+//     jointEnpanding
+//     instantiateEntity
+//     alignJointsToPolygon (unsure if we need this)
+//     mapParentJoints
+//     jointsMapped
+//     physicsReady
+
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -68,6 +105,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const worldCenterRef = useRef(new THREE.Vector3());
     // State machine that can distribute computation across frames
     const frameStateRef = useRef("init");
+    const prevFrameStateRef = useRef();
     const [physicsReady, setPhysicsReady] = useState(false);
     const [entitiesToInstantiate, setEntitiesToInstantiate] = useState([]);
     const [entityInstantiated, setEntityInstantiated] = useState();
@@ -92,6 +130,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const initialShowParticlesRef = useRef();
     const prevParticlesHash = useRef();
     const frameCountRef = useRef(0);
+    const frameStateDurationRef = useRef(0);
+    const pausePhysics = useStore((state) => state.pausePhysics);
 
     const JOINT_EXPANSION = 1.1; // Slightly bigger to avoid "hitting" the surrounding particles
     const IN_INDEX = 0;
@@ -120,10 +160,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             // Need to correct this so the storeEntity maintains a valid list of Particles
             directUpdateNode(id, {isParticle: false});
         }
-    }, []);
-
-    // Get parents To/From joints so they can be mapped to particles in lower level entities
-    useEffect(() => {
+        // Get parents To/From joints so they can be mapped to particles in lower level entities
         const inNode = entityNodes[IN_INDEX];
         const outNode = entityNodes[OUT_INDEX];
         jointsFromRef.current[outNode.id] = props.jointsFrom;
@@ -286,6 +323,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         busyInstantiatingRef.current = null;
     }, [entityInstantiated]);
 
+    /*
     // This will cause a render on each change of entitiesToInstantiate, adding one entity at a time
     useEffect(() => {
         if (busyInstantiatingRef.current) return; // Add one entity at a time
@@ -294,16 +332,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (entitiesToInstantiate.includes(entityNodeId)) continue;
             busyInstantiatingRef.current = entityNodeId;
             // Use a timer for a delay so we can see the sequence for debug
-            if (config.animDelay) {
+            if (config.animDelayMs) {
                 setTimeout(() => {
                     setInstantiateEntityId(entityNodeId);
-                }, (i === 0) ? 0 : config.animDelay);
+                }, (i === 0) ? 0 : config.animDelayMs);
             } else {
                 setInstantiateEntityId(entityNodeId);
             }
             break;
         }
     }, [entityNodes, entityInstantiated, busyInstantiatingRef.current]);
+    */
 
     function addActiveJoint(id1, id2) {
         const jointId = utils.jointId(id1, id2);
@@ -443,7 +482,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         });
     }
 
-    useFrame(() => {
+    // deltaTime is in seconds
+    useFrame((_, deltaTime) => {
+
+        if (prevFrameStateRef.current !== frameStateRef.current) {
+            frameStateDurationRef.current = 0;
+        } else {
+            if (!pausePhysics) frameStateDurationRef.current += deltaTime;
+        }
 
         calculateCenter(entitiesToInstantiate);
 
@@ -473,10 +519,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const distance = difference.length();
             const i = entitiesToInstantiate.length;
             if (i < 3 || distance > entityRadius * 2) {
-                if (config.animDelay) {
+                if (config.animDelayMs) {
                     setTimeout(() => {
                         setJointExpanded(jointExpanding);
-                    }, config.animDelay);
+                    }, config.animDelayMs);
                 } else {
                     setJointExpanded(jointExpanding);
                 }
@@ -484,6 +530,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
         }
 
+        /*
         if (busyInstantiatingRef.current) {
             const lastEntity = directGetNode(busyInstantiatingRef.current);
             // Is the rigid body reference available
@@ -499,10 +546,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         nodeRef.current.worldToLocal(position);
                         entityPoseRef.current.positions[entityId] = position;
                     })
-                    if (config.animDelay) {
+                    if (config.animDelayMs) {
                         setTimeout(() => {
                             setInitParticles(false);
-                        }, config.animDelay);
+                        }, config.animDelayMs);
                     } else {
                         setInitParticles(false);
                     }
@@ -516,14 +563,85 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 
             }
         }
+        */
+
+//   Meaningful states:
+//     selectEntity
+//     alignJointsToPolygon
+//     expandJoint
+//     jointEnpanding
+//     instantiateEntity
+//     alignJointsToPolygon (unsure if we need this)
+//     mapParentJoints
+//     jointsMapped
+//     physicsReady
+
+        prevFrameStateRef.current = frameStateRef.current
+        const animDelay = config.animDelayMs / 1000;
         
         // State machine can distribute computation across frames, reducing load on the physics engine
         switch (frameStateRef.current) {
-            case "init":
+            case "init": {
                 if (id == "root" && !showParticles) {
                     setOption("showParticles", true);
                     initialShowParticlesRef.current = false;
                 }
+                frameStateRef.current = "selectEntity";
+                //frameStateRef.current = "oldSM";
+                break;
+            }
+            case "selectEntity": {
+                if (frameStateDurationRef.current < animDelay) break;
+                for (let i = 0; i < entityNodes.length; i++) {
+                    const entityNodeId = entityNodes[i].id;
+                    if (entitiesToInstantiate.includes(entityNodeId)) continue;
+                    busyInstantiatingRef.current = entityNodeId;
+                    setInstantiateEntityId(entityNodeId);
+                    frameStateRef.current = "waitForParticle";
+                    break;
+                }
+                break;
+            }
+            case "waitForParticle": {
+                const lastEntity = directGetNode(busyInstantiatingRef.current);
+                // Is the rigid body reference available
+                const particleRef = lastEntity.ref;
+                if (particleRef?.current?.current) {
+                    setEntityInstantiated(lastEntity.id);
+                    const instantiatedCount = entitiesToInstantiate.length;
+                    if (instantiatedCount == entityCount && initParticles) {
+                        frameStateRef.current = "initialParticlesInstantiated";
+                    } else {
+                        frameStateRef.current = "alignJointsToPolygon";
+                    }
+                    node.particlesRef.current.push(particleRef);
+                }
+                break;
+            }
+            case "initialParticlesInstantiated": {
+                if (frameStateDurationRef.current < animDelay) break;
+                // Update the initialPositions based on current positions
+                entitiesToInstantiate.forEach((entityId, i) => {
+                    const entityNode = directGetNode(entityId);
+                    const position = vec3(entityNode.ref.current.translation());
+                    nodeRef.current.worldToLocal(position);
+                    entityPoseRef.current.positions[entityId] = position;
+                })
+                setInitParticles(false);
+                frameStateRef.current = "oldSM";
+                break;
+            }
+            case "alignJointsToPolygon": {
+                const instantiatedCount = entitiesToInstantiate.length;
+                // If we have a shape then update the joints with new angles to allow for change in the number of entities
+                if (instantiatedCount > 2) {
+                    // Calculate newJointAngle based on the sum of internal angles of a polygon, dividing it equally among vertices
+                    alignJointsToPolygon(instantiatedCount);
+                }
+                frameStateRef.current = "selectEntity";
+                break;
+            }
+            case "oldSM": {
                 if (jointsMapped) {
                     setPhysicsReady(true);
                     if (id == "root") {
@@ -536,7 +654,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     }
                 }
                 break;
-            case "stableParticles":
+            }
+            case "stableParticles": {
                 const hash = directGetParticlesHash(id);
                 if (prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;
@@ -550,6 +669,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     frameStateRef.current = "done";
                 }
                 break;
+            }
             case "done":
                 break;
             default:

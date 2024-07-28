@@ -39,7 +39,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Leva controls
     const controlsConfig = {
         radius: { value: radius || 10, min: 1, max: 20 },
-        animDelay: { value: 300, min: 300, max: 1000, step: 1, label: "Animation Delay" },
+        animDelayMs: { value: 300, min: 300, max: 1000, step: 1, label: "Animation Delay" },
         impulsePerParticle: { value: 1.5, min: 0.1, max: 20, step: 0.1, label: "Impulse per Particle" },
         overshootScaling: { value: 1.0, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 3, step: 0.1, label: "Max Displacement Scaling" },
@@ -59,7 +59,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         debug: false,
         entityCounts: [9, 9, 21],
         radius: controls.radius,
-        animDelay: controls.animDelay,
+        animDelayMs: controls.animDelayMs,
         colors: [color || null, utils.getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,
         overshootScaling: controls.overshootScaling,
