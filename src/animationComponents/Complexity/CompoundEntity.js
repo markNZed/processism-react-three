@@ -591,6 +591,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     <ParticlesInstance
                         id={`${id}`}
                         ref={particlesInstanceRef}
+                        config={config}
                     />
                     {config.showRelations && (
                         <Relations
