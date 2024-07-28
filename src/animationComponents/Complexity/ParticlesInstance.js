@@ -10,6 +10,7 @@ const ParticlesInstance = React.forwardRef(({ id, node, config }, ref) => {
     // We'll create the InstancedBufferGeometry for the particle shader with a max instance count based on how many particles were
     // set up in the config, with room to grow
     const startingParticleCount = config.entityCounts.reduce((a, b) => a*b, 1) * 2;
+    
 
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
