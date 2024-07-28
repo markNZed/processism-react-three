@@ -32,6 +32,7 @@ import useStore from '../../useStore'
 */
 
 // Right click on particle could show top blob in the same color
+// Structure into a state machine instead of using separate state and useEffect
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
