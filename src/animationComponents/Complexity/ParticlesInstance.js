@@ -5,9 +5,12 @@ import useStoreEntity from './useStoreEntity';
 import { vertex as meshBasicVertex, fragment as meshBasicFragment } from 'three/src/renderers/shaders/ShaderLib/meshbasic.glsl.js';
 import useStore from '../../useStore'
 
-const ParticlesInstance = React.forwardRef(({ id }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, node, config }, ref) => {
 
-    const maxParticleCount = 5*5*5*2;
+    // We'll create the InstancedBufferGeometry for the particle shader with a max instance count based on how many particles were
+    // set up in the config, with room to grow
+    const startingParticleCount = config.entityCounts.reduce((a, b) => a*b, 1) * 2;
+    
 
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
@@ -31,10 +34,10 @@ const ParticlesInstance = React.forwardRef(({ id }, ref) => {
     const pausePhysics = useStore((state) => state.pausePhysics);
 
     useEffect(() => {
-        renderBlobRef.current = {};
+        renderBlobRef.current = { };
         
         renderBlobRef.current.circleMaterial = createCircleShaderMaterial(1);
-        renderBlobRef.current.circleGeometry = createCircleShaderGeometry(1, maxParticleCount, maxParticleCount);
+        renderBlobRef.current.circleGeometry = createCircleShaderGeometry(1, startingParticleCount, startingParticleCount);
     }, []);
 
     useFrame((_, deltaTime) => {
@@ -54,15 +57,25 @@ const ParticlesInstance = React.forwardRef(({ id }, ref) => {
         }
         
         if (renderBlobRef.current) {
-            const { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
+          let { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
 
-            circleInstanceMaterial.uniforms.time.value = timeRef.current;
-            if (circleInstanceGeometry.instanceCount !== count) circleInstanceGeometry.instanceCount = count;
-            //if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
-            
-            if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
-            if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
-        }
+          circleInstanceMaterial.uniforms.time.value = timeRef.current;
+
+          // If the number of particles is greater than our max instance count, recreate the geometry with particleCount*2 max instance count
+          if (circleInstanceGeometry.userData.maxInstanceCount < particleCount) {
+            renderBlobRef.current.circleGeometry = createCircleShaderGeometry(1, particleCount, particleCount*2);
+            circleInstanceGeometry.dispose();
+            circleInstanceGeometry = renderBlobRef.current.circleGeometry;
+          }
+
+          // If the instance count of our geometry is not equal to particleCount, set it
+          if (circleInstanceGeometry.instanceCount !== particleCount) circleInstanceGeometry.instanceCount = particleCount;
+          //if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
+          
+          // If the InstancedMesh is not using our shader material and InstancedBufferGeometry, set it
+          if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
+          if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
+      }
 
         //console.log("allParticleRefs", allParticleRefs)
 
@@ -255,5 +268,6 @@ const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCo
     circleInstanceGeometry.setAttribute('timeOffset', circleTimeOffsetsAttribute);
     
     circleInstanceGeometry.instanceCount = particleCount;
+    circleInstanceGeometry.userData.maxInstanceCount = maxParticleCount;
     return circleInstanceGeometry;     
 }
