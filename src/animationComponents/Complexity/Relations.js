@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStoreEntity from './useStoreEntity';
@@ -15,6 +15,10 @@ function Relations({node}) {
     const nodeRef = node.ref;
     // Access relationRefs and make the component re-render when it changes
     //const relations = useStoreEntity(state => state.relations);
+
+    useEffect(() => {
+        console.log(`Mounting Relations ${node.id}`);
+    }, []);
 
     useFrame(() => {
         let update = false;
@@ -41,7 +45,7 @@ function Relations({node}) {
 
         if (update) {
             setLinesUpdate(prev => prev + 1);
-            //console.log("Total nodes initiating at least one relation", Object.keys(relations).length);
+            //console.log("Total nodes initiating at least one relation", Object.keys(relations).length, linesRef);
         }
 
         Object.keys(linesRef.current).forEach(fromId => {
@@ -51,7 +55,7 @@ function Relations({node}) {
                 if (!relationFrom) {
                     delete linesRef.current[fromId];
                     return;
-                } else if (!relationFrom.includes(Number(toId))) {
+                } else if (!relationFrom.includes(toId)) {
                     delete linesRef.current[fromId][toId];
                     return;
                 }

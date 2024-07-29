@@ -35,7 +35,6 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
     useEffect(() => {
         renderBlobRef.current = { };
-        
         renderBlobRef.current.circleMaterial = createCircleShaderMaterial(1);
         renderBlobRef.current.circleGeometry = createCircleShaderGeometry(1, startingParticleCount, startingParticleCount);
     }, []);
