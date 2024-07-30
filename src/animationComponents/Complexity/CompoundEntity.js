@@ -34,7 +34,7 @@ import useStore from '../../useStore'
 */
 
 // Right click on particle could show top blob in the same color
-// Test useAnimateImpulses, useAnimateJoints, useAnimateRelations
+// Test useAnimateImpulses, useAnimateJoints
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
