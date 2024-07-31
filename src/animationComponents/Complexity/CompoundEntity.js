@@ -34,7 +34,9 @@ import useStore from '../../useStore'
 */
 
 // Right click on particle could show top blob in the same color
-// Test useAnimateImpulses, useAnimateJoints
+// Test useAnimateImpulses, 
+// Test useAnimateJoints
+//   Not using center - should pass that in ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -108,7 +110,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
     useAnimateRelations(jointsMapped, node, entityNodes, config);
-    useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, config);
+    useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config);
 
     // Mounting
     useEffect(() => {
@@ -504,7 +506,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "stableRoot": {
-                if (frameStateDurationRef.current < animDelay) break;
+                if (frameStateDurationRef.current < animDelay * 2) break;
                 const hash = directGetParticlesHash(id);
                 if (prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;

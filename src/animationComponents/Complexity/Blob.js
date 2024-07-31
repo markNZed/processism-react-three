@@ -176,6 +176,7 @@ const Blob = ({ color, node, entityNodes }) => {
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
                 node.ref.current.setVisualConfig(p => ({ ...p, visible: true }));
+                console.log("Blob handleOnClick set visible", node.id);
                 updateNode(id, {visible: true});
                 setTimeout(() => {
                     entityNodes.forEach(nodeEntity => {

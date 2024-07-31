@@ -162,7 +162,6 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
     const handlePointerDown = (event) => {
         if (!event.shiftKey) return;
-        console.log("ParticlesInstance handlePointerDown", id, event);
         const instanceId = event.instanceId;
         if (instanceId === undefined) return;
         event.stopPropagation();
@@ -171,6 +170,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
         const currentScale = visualConfig.scale;
         visualConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
         visualConfig.color = 'pink';
+        console.log("ParticlesInstance handlePointerDown", id, event, visualConfig);
     };
 
     // Use a fixed radius and scale this for particle size
