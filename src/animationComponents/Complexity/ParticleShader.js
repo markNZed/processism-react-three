@@ -172,7 +172,15 @@ const createCircleShaderMaterial2 = (particleRadius) => {
     });
 }
 
+/**
+ * 
+ * @param {Number} particleRadius The radius of the circle
+ * @param {Number} particleCount The number of particles to render
+ * @param {Number} maxParticleCount The max instance count for the geometry
+ * @returns 
+ */
 const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCount) => {
+    // Use a regular THREE.CircleGeometry to get attributes for the InstancedBufferGeometry
     const circleSegments = 64;
     const circleGeometry = new THREE.CircleGeometry(particleRadius, circleSegments);
     const circleInstanceGeometry = new THREE.InstancedBufferGeometry();
@@ -181,6 +189,10 @@ const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCo
     circleInstanceGeometry.setAttribute('uv', circleGeometry.getAttribute('uv'));
     circleInstanceGeometry.setIndex(circleGeometry.getIndex());
   
+    // Set a time offset associated with each vertex on the circle based on its angle
+    // This is used to calculate vertOff2 in the shader which moves the vertices in/out around the edge
+    // of the circle. Since it's based on their angle it could be computed in the vertex shader, but this will make it
+    // slightly cheaper
     let stepAngle = 2*Math.PI / circleSegments;
     const vertTimeOffs = new Float32Array((circleSegments+2));
     vertTimeOffs[0] = 0;
@@ -192,6 +204,12 @@ const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCo
     const vertTimeOffsAttribute = new THREE.BufferAttribute(vertTimeOffs, 1);
     circleInstanceGeometry.setAttribute('vertTimeOffset', vertTimeOffsAttribute);
 
+    // strengthMult and speedMult instanced attributes
+    // Multiplies the strength/speed uniforms from the material on a per instance basis to give variety to each particle
+    // Speed determines how fast the sin wave moves, strength determines how strong the vertex displacement is
+    // Speed/strength xy are used for vertOff in the vertex shader, which displaces the vertices horizontally/vertically
+    // based on the other component (x offset is based on y position, and vice versa)
+    // Speed/strength z is used for vertOff2 which displaces the vertices in/out in their direction from the center of the circle
     const strength = new Float32Array(maxParticleCount*4);
     const speed = new Float32Array(maxParticleCount*4);
     for (let i=0; i<maxParticleCount; i+=4) {
@@ -209,6 +227,8 @@ const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCo
     circleInstanceGeometry.setAttribute('strengthMult', strengthAttribute);
     circleInstanceGeometry.setAttribute('speedMult', speedAttribute);
 
+    // timeOffset instanced attribute
+    // Added to material time uniform to give variety to each particle
     const circleTimeOffsets = new Float32Array(maxParticleCount*2);
     for (let i=0; i<circleTimeOffsets.length; ++i) { 
         let off = Math.random() * 2*Math.PI;
@@ -219,13 +239,44 @@ const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCo
     circleInstanceGeometry.setAttribute('timeOffset', circleTimeOffsetsAttribute);
     
     circleInstanceGeometry.instanceCount = particleCount;
+
+    // Keep track of max instance count in InstancedBufferGeometry.userData
+    // It will need to be recreated if the particle count ever exceeds it
     circleInstanceGeometry.userData.maxInstanceCount = maxParticleCount;
     return circleInstanceGeometry;     
 }
 
+/**
+ * 
+ * @param {*} radius The radius of the circle
+ * @param {*} segmentsPer90 The number of segments the circle has in every quadrant (total segment count will be this * 4)
+ * @param {*} particleCount The number of particles to render
+ * @param {*} maxParticleCount The max instance count for the geometry
+ * @returns 
+ */
 const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxParticleCount) => {
   if (segmentsPer90 < 1) segmentsPer90 = 1;
 
+  // Circle is created with a number of segments in the positive xy quadrant
+  // These vertices are then flipped horizontally/vertically for the other quadrants
+  // A grid is made between these vertices
+  // Then 4 positions on the outside of the circle are selected randomly and dragged
+  // outward in direction opposite the center of the circle
+  // The drag operation has a radius which determines how many vertices are affected
+  // And a strength which determines how far the vertices are dragged
+  // Vertices further from the center of the drag operation are affected less than those
+  // close to the center
+  // This is basically like dragging a vertex in Blender in vertex editing mode with "Proportional Editing" turned on
+  // That's where the idea came from.
+  // This gives the particles a decent amount of variety and uniqueness
+  // This is all done in the vertex shader so all the particles can still be rendered instanced with the same geometry and material
+  //                        .
+  //                  /     |       \
+  //                . _____ . ______ .
+  //               /|       |        |\
+  //             . _.______ . ______ ._ .
+  //            /|  |       |        |  |\
+  //           ._.__._______.________.__._.
   const segments = (segmentsPer90-1) + 2;
   const stepAngle = 0.5*Math.PI / segments;
 
@@ -289,6 +340,9 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
   let xCoords = Array.from(xPts.keys()).sort((a, b) => a - b);
   let yCoords = Array.from(yPts.keys()).sort((a, b) => b - a);
 
+  // Create a 2d square map of the vertices of the circle
+  // Indexes inside and on the edge of the circle will have THREE.Vector2's.
+  // Indexes outside the circle will be null
   const points2d = [];
   for (let y=0; y<yCoords.length; ++y) {
     const yCoord = yCoords[y];
@@ -319,6 +373,9 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
   const index = [];
   const vertTimeOffs = [];
   
+  // Create a 2d map based on points2d that instead contains the index of each vertex
+  // Also populate our position, normal, uv, and vertTimeOffs attributes in order of the vertices from
+  // top to bottom, left to right
   const indices2d = [];
   let curIndex = 0;
   for (let i=0; i<points2d.length; ++i) {
@@ -338,6 +395,10 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
       normal.push(0, 0, 1);
       uv.push(0, 0);
       
+      // Set a time offset associated with each vertex on the circle based on its angle
+      // This is used to calculate vertOff2 in the shader which moves the vertices in/out around the edge
+      // of the circle. Since it's based on their angle it could be computed in the vertex shader, but this will make it
+      // slightly cheaper
       let angle = Math.atan2(pt.y, pt.x);
       // Keep angle in 0 to 2*Math.PI range
       if (angle < 0.0) angle = angle + 2*Math.PI;
@@ -345,6 +406,7 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
     }
   }
 
+  // Populate index attribute
   for (let y=1; y<indices2d.length; ++y) {
     let lastRow = indices2d[y-1], row = indices2d[y];
     for (let x=0, xlen=row.length-1; x<xlen; ++x) {
@@ -400,12 +462,14 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
     }
   }
 
+  // Create attributes from the arrays
   const positionAttribute = new THREE.BufferAttribute(new Float32Array(position), 3);
   const normalAttribute = new THREE.BufferAttribute(new Float32Array(normal), 3);
   const uvAttribute = new THREE.BufferAttribute(new Float32Array(uv), 2);
   const vertTimeOffsAttribute = new THREE.BufferAttribute(new Float32Array(vertTimeOffs), 1);
   const indexAttribute = new THREE.BufferAttribute(new Uint32Array(index), 1);
   
+  // Create geometry and set attributes
   const geometry = new THREE.InstancedBufferGeometry();
   geometry.setAttribute('position', positionAttribute);
   geometry.setAttribute('normal', normalAttribute);
@@ -414,6 +478,12 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
   geometry.setIndex(indexAttribute);
 
   // Create instanced attributes
+  // The translate attributes contain information about the distance weighted vertex drag operations to perform on the
+  // vertices before the same code from the old shader is applied to distort them by several sin wave operations
+  // translate.xy is a position chosen on the edge of the circle
+  // translate.z is the radius for the drag operation. Vertices at the position will be affected strongly, while
+  // vertices at the edge of the radius will almost not be affected at all
+  // translate.w is the strength of the drag operation, in the direction opposite the circle center
   const strength = new Float32Array(maxParticleCount*4);
   const speed = new Float32Array(maxParticleCount*4);
   const translate1 = new Float32Array(maxParticleCount*4);
@@ -465,6 +535,13 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
     translate4[i+2] = 0.25 + Math.random() * 0.5;
     translate4[i+3] = 0.25 + Math.random() * 0.5;
   }
+    
+  // strengthMult and speedMult instanced attributes
+  // Multiplies the strength/speed uniforms from the material on a per instance basis to give variety to each particle
+  // Speed determines how fast the sin wave moves, strength determines how strong the vertex displacement is
+  // Speed/strength xy are used for vertOff in the vertex shader, which displaces the vertices horizontally/vertically
+  // based on the other component (x offset is based on y position, and vice versa)
+  // Speed/strength z is used for vertOff2 which displaces the vertices in/out in their direction from the center of the circle
   const strengthAttribute = new THREE.InstancedBufferAttribute(strength, 4, undefined, 1);
   const speedAttribute = new THREE.InstancedBufferAttribute(speed, 4, undefined, 1);
   const translate1Attribute = new THREE.InstancedBufferAttribute(translate1, 4, undefined, 1);
@@ -478,6 +555,8 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
   geometry.setAttribute('translate3', translate3Attribute);
   geometry.setAttribute('translate4', translate4Attribute);
 
+  // timeOffset instanced attribute
+  // Added to material time uniform to give variety to each particle
   const circleTimeOffsets = new Float32Array(maxParticleCount*2);
   for (let i=0; i<circleTimeOffsets.length; ++i) { 
       let off = Math.random() * 2*Math.PI;
@@ -487,6 +566,8 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
   circleTimeOffsetsAttribute.needsUpdate = true;
   geometry.setAttribute('timeOffset', circleTimeOffsetsAttribute);
   
+  // Keep track of max instance count in InstancedBufferGeometry.userData
+  // It will need to be recreated if the particle count ever exceeds it
   geometry.instanceCount = particleCount;
   geometry.userData.maxInstanceCount = maxParticleCount;
   return geometry;
