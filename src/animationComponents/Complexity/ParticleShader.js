@@ -1,8 +1,12 @@
 import * as THREE from 'three';
 import { vertex as meshBasicVertex, fragment as meshBasicFragment } from 'three/src/renderers/shaders/ShaderLib/meshbasic.glsl.js';
 
-const createCircleShaderMaterial = (particleRadius) => {
+const createParticleShaderOriginalMaterial = (particleRadius) => {
 
+    // Instead of writing a shader from scratch, we will modify the shader code of the
+    // THREE.MeshBasicMaterial vertex shader by searching for parts of the code where we want
+    // to insert our uniforms and attributes, and the part of the code in the main function
+    // just before the vertices are transformed by the modelview and projection matrices
     const circleSinVertexShader = meshBasicVertex.replace('#include <clipping_planes_pars_vertex>',
 `#include <clipping_planes_pars_vertex>
 
@@ -23,21 +27,23 @@ const createCircleShaderMaterial = (particleRadius) => {
     float len = length(transformed.xy);
     vec2 sinDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(position.x, position.y));
     transformed = vec3(sinDir * radius, 1.0);
-    vec4 strength2 = strength * strengthMult * radius;
-    vec4 speed2 = speed * speedMult;
+    vec4 strengthScaled = strength * strengthMult * radius;
+    vec4 speedScaled = speed * speedMult;
   
-    // Just before #include <project_vertex>
+    // Just before #include <project_vertex> shader chunk in MeshBasicMaterial vertex shader
+    // That shader chunk is where the vertices are transformed by modelview and projection matrices
+
     // Translate vertices horizontally/vertically based on sin of the other coordinate
     // (verticles will be translated horizontally based on time and their y coordinate, and vertically based on time and their x coordinate)
     // Translate vertices in/out in the direction toward/away from the center of the circle
-    vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speed2.x)*strength2.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speed2.y)*strength2.y);
-    //vec2 vertOff = vec2(sin((time+timeOffset.x)*speed2.x)*strength2.x, sin((time+timeOffset.y)*speed2.y)*strength2.y);
+    vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speedScaled.x)*strengthScaled.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speedScaled.y)*strengthScaled.y);
+    //vec2 vertOff = vec2(sin((time+timeOffset.x)*speedScaled.x)*strengthScaled.x, sin((time+timeOffset.y)*speedScaled.y)*strengthScaled.y);
     transformed.x += vertOff.x;
     transformed.y += vertOff.y;
     
     // Translate vertices in/out in the direction toward/away from the center of the circle
-    //float vo2Mult = sin(time*speed2.z); // -- Looks bad, causes ripples to smooth out
-    vec2 vertOff2 = sinDir * strength2.z * sin(vertTimeOffset+(time+timeOffset.x)*speed2.z);// * vo2Mult;
+    //float vo2Mult = sin(time*speedScaled.z); // -- Looks bad, causes ripples to smooth out
+    vec2 vertOff2 = sinDir * strengthScaled.z * sin(vertTimeOffset+(time+timeOffset.x)*speedScaled.z);// * vo2Mult;
     transformed.x += vertOff2.x;
     transformed.y += vertOff2.y;
 `);
@@ -61,8 +67,12 @@ const createCircleShaderMaterial = (particleRadius) => {
 }
 
 
-const createCircleShaderMaterial2 = (particleRadius) => {
+const createParticleShaderDiversityMaterial = (particleRadius) => {
 
+    // Instead of writing a shader from scratch, we will modify the shader code of the
+    // THREE.MeshBasicMaterial vertex shader by searching for parts of the code where we want
+    // to insert our uniforms and attributes, and the part of the code in the main function
+    // just before the vertices are transformed by the modelview and projection matrices
     const circleSinVertexShader = meshBasicVertex.replace('#include <clipping_planes_pars_vertex>',
 `#include <clipping_planes_pars_vertex>
 
@@ -80,6 +90,31 @@ const createCircleShaderMaterial2 = (particleRadius) => {
     uniform float time;
     uniform vec4 strength;
     uniform vec4 speed;
+
+    vec3 applyDragTranslation(vec3 transformed, vec4 translate) {
+      vec2 dragDir;
+      float dragDist;
+      float t;
+
+      // translate is a vec4 instanced buffer attribute passed in from the instanced buffer geometry
+      // transformed.xy is position, in local space, of the drag operation
+      // transformed.z is the radius of the drag operation. Vertices closer to the radius will be affected more
+      // strongly by the drag operation, and vertices further away, less strongly
+      // transformed.w is the strength of the drag operation. Vertices at distance zero from dragPos
+      // will be moved by this amount in the direction from the origin to their position
+      vec2 dragPos = translate.xy;
+      float dragRadius = translate.z;
+      float dragStrength = translate.w;
+
+      float len = length(transformed.xy);
+      dragDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
+      dragDist = length(transformed.xy - dragPos);
+      t = 1.0 - min(1.0, dragDist / dragRadius);
+      t = sin(t*0.5*PI);
+      transformed.xy += dragDir * dragStrength * t;
+
+      return transformed;
+    }
 `
 ).replace('#include <skinning_vertex>', 
 `#include <skinning_vertex>
@@ -145,20 +180,22 @@ const createCircleShaderMaterial2 = (particleRadius) => {
     len = length(transformed.xy);
     vec2 sinDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
     
-    vec4 strength2 = strength * strengthMult * radius;
-    vec4 speed2 = speed * speedMult;
+    vec4 strengthScaled = strength * strengthMult * radius;
+    vec4 speedScaled = speed * speedMult;
   
-    // Just before #include <project_vertex>
+    // Just before #include <project_vertex> shader chunk in MeshBasicMaterial vertex shader
+    // That shader chunk is where the vertices are transformed by modelview and projection matrices
+    
     // Translate vertices horizontally/vertically based on sin of the other coordinate
     // (verticles will be translated horizontally based on time and their y coordinate, and vertically based on time and their x coordinate)
-    vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speed2.x)*strength2.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speed2.y)*strength2.y);
-    //vec2 vertOff = vec2(sin((time+timeOffset.x)*speed2.x)*strength2.x, sin((time+timeOffset.y)*speed2.y)*strength2.y);
+    vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speedScaled.x)*strengthScaled.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speedScaled.y)*strengthScaled.y);
+    //vec2 vertOff = vec2(sin((time+timeOffset.x)*speedScaled.x)*strengthScaled.x, sin((time+timeOffset.y)*speedScaled.y)*strengthScaled.y);
     transformed.x += vertOff.x;
     transformed.y += vertOff.y;
     
     // Translate vertices in/out in the direction toward/away from the center of the circle
-    //float vo2Mult = sin(time*speed2.z); // -- Looks bad, causes ripples to smooth out
-    vec2 vertOff2 = sinDir * strength2.z * sin(vertTimeOffset+(time+timeOffset.x)*speed2.z);// * vo2Mult;
+    //float vo2Mult = sin(time*speedScaled.z); // -- Looks bad, causes ripples to smooth out
+    vec2 vertOff2 = sinDir * strengthScaled.z * sin(vertTimeOffset+(time+timeOffset.x)*speedScaled.z);// * vo2Mult;
     transformed.x += vertOff2.x;
     transformed.y += vertOff2.y;
 `);
@@ -188,7 +225,7 @@ const createCircleShaderMaterial2 = (particleRadius) => {
  * @param {Number} maxParticleCount The max instance count for the geometry
  * @returns 
  */
-const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCount) => {
+const createParticleShaderOriginalGeometry = (particleRadius, particleCount, maxParticleCount) => {
     // Use a regular THREE.CircleGeometry to get attributes for the InstancedBufferGeometry
     const circleSegments = 64;
     const circleGeometry = new THREE.CircleGeometry(particleRadius, circleSegments);
@@ -263,7 +300,7 @@ const createCircleShaderGeometry = (particleRadius, particleCount, maxParticleCo
  * @param {*} maxParticleCount The max instance count for the geometry
  * @returns 
  */
-const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxParticleCount) => {
+const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCount, maxParticleCount) => {
   if (segmentsPer90 < 1) segmentsPer90 = 1;
 
   // Circle is created with a number of segments in the positive xy quadrant
@@ -586,8 +623,8 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
 }
 
 export default {
-  createCircleShaderGeometry,
-  createCircleShaderGeometry2,
-  createCircleShaderMaterial,
-  createCircleShaderMaterial2
+  createCircleShaderGeometry: createParticleShaderOriginalGeometry,
+  createCircleShaderGeometry2: createParticleShaderDiversityGeometry,
+  createCircleShaderMaterial: createParticleShaderOriginalMaterial,
+  createCircleShaderMaterial2: createParticleShaderDiversityMaterial
 };
