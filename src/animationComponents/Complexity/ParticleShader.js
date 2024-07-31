@@ -27,11 +27,15 @@ const createCircleShaderMaterial = (particleRadius) => {
     vec4 speed2 = speed * speedMult;
   
     // Just before #include <project_vertex>
+    // Translate vertices horizontally/vertically based on sin of the other coordinate
+    // (verticles will be translated horizontally based on time and their y coordinate, and vertically based on time and their x coordinate)
+    // Translate vertices in/out in the direction toward/away from the center of the circle
     vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speed2.x)*strength2.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speed2.y)*strength2.y);
     //vec2 vertOff = vec2(sin((time+timeOffset.x)*speed2.x)*strength2.x, sin((time+timeOffset.y)*speed2.y)*strength2.y);
     transformed.x += vertOff.x;
     transformed.y += vertOff.y;
     
+    // Translate vertices in/out in the direction toward/away from the center of the circle
     //float vo2Mult = sin(time*speed2.z); // -- Looks bad, causes ripples to smooth out
     vec2 vertOff2 = sinDir * strength2.z * sin(vertTimeOffset+(time+timeOffset.x)*speed2.z);// * vo2Mult;
     transformed.x += vertOff2.x;
@@ -88,6 +92,8 @@ const createCircleShaderMaterial2 = (particleRadius) => {
     float t;
     float len;
 
+    // Apply 4 drag operations to the vertices in the circle to stretch and deform it, and give it uniqueness
+
       // Translate 1
       dragPos = translate1.xy;
       dragRadius = translate1.z;
@@ -143,11 +149,14 @@ const createCircleShaderMaterial2 = (particleRadius) => {
     vec4 speed2 = speed * speedMult;
   
     // Just before #include <project_vertex>
+    // Translate vertices horizontally/vertically based on sin of the other coordinate
+    // (verticles will be translated horizontally based on time and their y coordinate, and vertically based on time and their x coordinate)
     vec2 vertOff = vec2(sin((transformed.y/radius+1.0)*PI2+(time+timeOffset.x)*speed2.x)*strength2.x, sin((transformed.x/radius+1.0)*PI2+(time+timeOffset.y)*speed2.y)*strength2.y);
     //vec2 vertOff = vec2(sin((time+timeOffset.x)*speed2.x)*strength2.x, sin((time+timeOffset.y)*speed2.y)*strength2.y);
     transformed.x += vertOff.x;
     transformed.y += vertOff.y;
     
+    // Translate vertices in/out in the direction toward/away from the center of the circle
     //float vo2Mult = sin(time*speed2.z); // -- Looks bad, causes ripples to smooth out
     vec2 vertOff2 = sinDir * strength2.z * sin(vertTimeOffset+(time+timeOffset.x)*speed2.z);// * vo2Mult;
     transformed.x += vertOff2.x;
@@ -270,6 +279,9 @@ const createCircleShaderGeometry2 = (radius, segmentsPer90, particleCount, maxPa
   // That's where the idea came from.
   // This gives the particles a decent amount of variety and uniqueness
   // This is all done in the vertex shader so all the particles can still be rendered instanced with the same geometry and material
+  //
+  // After this, the vertices are displaced horizontally/vertically based on a sin wave, and then in/out toward/away from the center of
+  // the circle based on another sin wave
   //                        .
   //                  /     |       \
   //                . _____ . ______ .
