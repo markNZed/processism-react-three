@@ -73,7 +73,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const prevFrameStateRef = useRef();
     const [entitiesToInstantiate, setEntitiesToInstantiate] = useState([]);
     // Block the instantiating of next entity (unless null)
-    const [nextEntity, setNextEntity] = useState();
+    const nextEntityRef = useRef();
     const activeJointsQueueRef = useRef([]);
     const [jointsMapped, setJointsMapped] = useState(false);
     const jointsFromRef = useRef({});
@@ -147,7 +147,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     // Position, orientation, and whether the entity is on the perimeter (outer) of the parent blob
     function entityPose(instantiateEntityId) {
-        //console.log("poseEntity", jointExpanded, triggerNoJoint);
+        //console.log("poseEntity", instantiateEntityId);
         const toInstantiateCount = entitiesToInstantiate.length;
         // If we have a shape then update the joints with new angles to allow for change in the number of entities
         let newPosition = [0, 0, 0];
@@ -266,7 +266,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         addActiveJoint(body1Id, nextEntity.id) 
 
         createJoint(node.chainRef, nextBodyRef, anchor1, body2Ref, anchor2);
-        addActiveJoint(nextEntity.id, body2Id) 
+        addActiveJoint(nextId, body2Id) 
 
         deleteJoint(node.chainRef, replaceJointId);
         if (jointsFromRef.current[body1Id]) {
@@ -375,7 +375,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 for (let i = 0; i < entityNodes.length; i++) {
                     const entityNodeId = entityNodes[i].id;
                     if (entitiesToInstantiate.includes(entityNodeId)) continue;
-                    setNextEntity(entityNodeId);
+                    nextEntityRef.current = entityNodeId; // Not using state to value is available immediately
                     if (toInstantiateCount >= 2) {
                         // Add one because we have not yet set the new entity in entitiesToInstantiate
                         alignJointsToPolygon(toInstantiateCount + 1);
@@ -430,13 +430,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "poseEntity": {
-                // After entityPose entitiesToInstantiate will have nextEntity appended
-                entityPose(nextEntity);
+                // After entityPose entitiesToInstantiate will have nextEntityRef.current appended
+                entityPose(nextEntityRef.current);
                 frameStateRef.current = "waitForParticle";
                 break;
             }
             case "waitForParticle": {
-                const lastEntity = directGetNode(nextEntity);
+                const lastEntity = directGetNode(nextEntityRef.current);
                 // Is the rigid body reference available
                 const particleRef = lastEntity.ref;
                 if (particleRef?.current?.current) {
@@ -457,7 +457,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         break;
                     }
                     default: {
-                        replaceJoint(nextEntity);
+                        replaceJoint(nextEntityRef.current);
                         break;
                     }
                 } 

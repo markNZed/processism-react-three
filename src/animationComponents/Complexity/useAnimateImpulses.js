@@ -93,7 +93,6 @@ const useAnimateImpulses = (
                 if (initialized) impulseStateRef.current = "initialImpulse";
                 break;
                 // Maybe we should wait for all entities to be registered - so state machines are syned
-            // Should move this into useAnimateImpulses
             case "initialImpulse":
                 if (config.initialImpulse) {
                     applyInitialImpulses();
