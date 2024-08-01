@@ -2,10 +2,9 @@ import React, { useRef, useEffect, useImperativeHandle, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useStoreEntity from './useStoreEntity';
-import { vertex as meshBasicVertex, fragment as meshBasicFragment } from 'three/src/renderers/shaders/ShaderLib/meshbasic.glsl.js';
 import useStore from '../../useStore'
 import ParticleShader from './ParticleShader'
-const { createCircleShaderGeometry, createCircleShaderGeometry2, createCircleShaderMaterial, createCircleShaderMaterial2 } = ParticleShader;
+const { createParticleShaderOriginalGeometry, createParticleShaderDiversityGeometry, createParticleShaderOriginalMaterial, createParticleShaderDiversityMaterial } = ParticleShader;
 
 const SHADER_NONE = 0;
 const SHADER_1 = 1;
@@ -46,13 +45,13 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
             break;
           case SHADER_1:
             renderBlobRef.current = { };
-            renderBlobRef.current.circleMaterial = createCircleShaderMaterial(1);
-            renderBlobRef.current.circleGeometry = createCircleShaderGeometry(1, startingParticleCount, startingParticleCount);
+            renderBlobRef.current.circleMaterial = createParticleShaderOriginalMaterial(1);
+            renderBlobRef.current.circleGeometry = createParticleShaderOriginalGeometry(1, startingParticleCount, startingParticleCount);
             break;
           case SHADER_2:
             renderBlobRef.current = { };
-            renderBlobRef.current.circleMaterial = createCircleShaderMaterial2(1);
-            renderBlobRef.current.circleGeometry = createCircleShaderGeometry2(1, 12, startingParticleCount, startingParticleCount)
+            renderBlobRef.current.circleMaterial = createParticleShaderDiversityMaterial(1);
+            renderBlobRef.current.circleGeometry = createParticleShaderDiversityGeometry(1, 12, startingParticleCount, startingParticleCount)
             break;
         }
     }, []);
@@ -81,8 +80,8 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
           // If the number of particles is greater than our max instance count, recreate the geometry with particleCount*2 max instance count
           if (circleInstanceGeometry.userData.maxInstanceCount < particleCount) {
             renderBlobRef.current.circleGeometry = USE_SHADER === SHADER_1 ? 
-              createCircleShaderGeometry(1, particleCount, particleCount*2) :
-              createCircleShaderGeometry2(1, 12, particleCount, particleCount*2);
+              createParticleShaderOriginalGeometry(1, particleCount, particleCount*2) :
+              createParticleShaderDiversityGeometry(1, 12, particleCount, particleCount*2);
 
             circleInstanceGeometry.dispose();
             circleInstanceGeometry = renderBlobRef.current.circleGeometry;

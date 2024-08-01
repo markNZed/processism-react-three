@@ -364,22 +364,20 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
 
     addPointToMap(yPts, pt.y, pt);
     addPointToMap(xPts, pt.x, pt);
+
+    // If on the x axis then mirrorwith -py.y
     if (pt.x === 0) {
       addPointToMap(yPts, -pt.y, new THREE.Vector2(pt.x, -pt.y));
-
       addPointToMap(xPts, pt.x, new THREE.Vector2(pt.x, -pt.y));
-
-    }
-    else if (pt.y === 0) {
+    // If on the y axis then mirror with -px.x (cannot have x = 0 and y = 0 at same time)
+    } else if (pt.y === 0) {
       addPointToMap(yPts, pt.y, new THREE.Vector2(-pt.x, pt.y));
-
       addPointToMap(xPts, -pt.x, new THREE.Vector2(-pt.x, pt.y));
-    }
-    else {
+    // Add the points for the other 3 quadrants
+    } else {
       addPointToMap(yPts, pt.y, new THREE.Vector2(-pt.x, pt.y));
       addPointToMap(yPts, -pt.y, new THREE.Vector2(pt.x, -pt.y));
       addPointToMap(yPts, -pt.y, new THREE.Vector2(-pt.x, -pt.y));
-
       addPointToMap(xPts, -pt.x, new THREE.Vector2(-pt.x, pt.y));
       addPointToMap(xPts, pt.x, new THREE.Vector2(pt.x, -pt.y));
       addPointToMap(xPts, -pt.x, new THREE.Vector2(-pt.x, -pt.y));
@@ -393,25 +391,32 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
   // Indexes inside and on the edge of the circle will have THREE.Vector2's.
   // Indexes outside the circle will be null
   const points2d = [];
-  for (let y=0; y<yCoords.length; ++y) {
+  for (let y=0; y < yCoords.length; ++y) {
+    // Get the y-coordinate for the current row
     const yCoord = yCoords[y];
+    // Initialize variables to track the minimum and maximum x-coordinates for the current row
     let xMin = Number.POSITIVE_INFINITY, xMax = Number.NEGATIVE_INFINITY;
+    // Get the array of points that share the same y-coordinate
     let pts = yPts.get(yCoord);
+    // Determine the range of x-coordinates that are within the circle for this y-coordinate
     pts.forEach((pt) => { xMin = Math.min(xMin, pt.x); xMax = Math.max(xMax, pt.x); });
-
+    // Find the start and end indices for the x-coordinates within the circle for the current row
     let xStartIndex = -1;
     for (let i=0; i<xCoords.length; ++i) { if (xCoords[i] >= xMin) { xStartIndex = i; break; } }
     let xEndIndex = -1;
     for (let i=xCoords.length-1; i>=0; --i) { if (xCoords[i] <= xMax) { xEndIndex = i; break; } }
-
+    // Check if the start or end index is invalid, which should not happen
     if (xStartIndex === -1 || xEndIndex === -1) {
       let brk = 5;
     }
 
     const row = [];
-    for (let i=0; i<xStartIndex; ++i) { row.push(null); }
-    for (let i=xStartIndex; i<=xEndIndex; ++i) { row.push(new THREE.Vector2(xCoords[i], yCoord)); }
-    for (let i=xEndIndex+1; i<xCoords.length; ++i) { row.push(null); }
+    // Fill the row with null for x-coordinates outside the circle (before the start index)
+    for (let i=0; i < xStartIndex; ++i) { row.push(null); }
+    // Fill the row with THREE.Vector2 points for x-coordinates within the circle (from start to end index)
+    for (let i=xStartIndex; i <= xEndIndex; ++i) { row.push(new THREE.Vector2(xCoords[i], yCoord)); }
+    // Fill the row with null for x-coordinates outside the circle (after the end index)
+    for (let i=xEndIndex+1; i < xCoords.length; ++i) { row.push(null); }
 
     points2d.push(row);
   }
@@ -423,6 +428,7 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
   const vertTimeOffs = [];
   
   // Create a 2d map based on points2d that instead contains the index of each vertex
+  // The code can later reference these indices to construct faces (triangles) of the geometry efficiently.
   // Also populate our position, normal, uv, and vertTimeOffs attributes in order of the vertices from
   // top to bottom, left to right
   const indices2d = [];
@@ -470,41 +476,24 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
 
       // Faces should be drawn counter clockwise
       if (x0y1 != null && x1y0 != null && x1y1 != null) {
-        // 2 faces
-        // Clockwise
-        //index.push(x0y0, x0y1, x1y1);
-        //index.push(x0y0, x1y1, x1y0);
-
         // Counter clockwise
         index.push(x0y0, x1y1, x0y1);
         index.push(x0y0, x1y0, x1y1);
       }
       else if (x1y1 != null && x1y0 != null) {
-        // Clockwise
-        //index.push(x0y0, x1y1, x1y0);
-
         // Counter clockwise
         index.push(x0y0, x1y0, x1y1);
       }
       else if(x0y1 != null && x1y0 != null) {
-        // Clockwise
-        //index.push(x0y0, x0y1, x1y0);
-
         // Counter clockwise
         index.push(x0y0, x1y0, x0y1);
       }
       else if (x0y1 != null && x1y1 != null) {
-        // Clockwise
-        //index.push(x0y0, x0y1, x1y1);
-
         // Counter clockwise
         index.push(x0y0, x1y1, x0y1);
       }
 
       if (xn1y1 != null && x0y1 != null && xn1y0 == null) {
-        // Clockwise
-        //index.push(x0y0, xn1y1, x0y1);
-
         // Counter clockwise
         index.push(x0y0, x0y1, xn1y1);
       }
@@ -539,50 +528,39 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
   const translate2 = new Float32Array(maxParticleCount*4);
   const translate3 = new Float32Array(maxParticleCount*4);
   const translate4 = new Float32Array(maxParticleCount*4);
-  for (let i=0; i<maxParticleCount; i+=4) {
-    strength[i+0] = Math.random() + 1;
-    strength[i+1] = Math.random() + 1;
-    strength[i+2] = Math.random() + 1;
-    strength[i+3] = Math.random() + 1;
-    speed[i+0] = Math.random() + 1;
-    speed[i+1] = Math.random() + 1;
-    speed[i+2] = Math.random() + 1;
-    speed[i+3] = Math.random() + 1;
 
-    let angle;
-    let tx, ty;
+  /**
+   * Generates translation values for a particle.
+   * @param {Float32Array} translateArray - The array to populate with translation values.
+   * @param {number} index - The starting index in the array.
+   * @param {number} radius - The radius of the circle.
+  */
+  const generateTranslation = (translateArray, index, radius) => {
+    let angle = Math.random() * 2 * Math.PI;
+    let tx = Math.cos(angle) * radius;
+    let ty = Math.sin(angle) * radius;
+    translateArray[index + 0] = tx;
+    translateArray[index + 1] = ty;
+    translateArray[index + 2] = 0.25 + Math.random() * 0.5; // Radius
+    translateArray[index + 3] = 0.25 + Math.random() * 0.5; // Strength
+  };
 
-    // Translate 1
-    angle = Math.random() * 2*Math.PI;
-    tx = Math.cos(angle)*radius; ty = Math.sin(angle)*radius;
-    translate1[i+0] = tx;
-    translate1[i+1] = ty;
-    translate1[i+2] = 0.25 + Math.random() * 0.5;
-    translate1[i+3] = 0.25 + Math.random() * 0.5;
-
-    // Translate 1
-    angle = Math.random() * 2*Math.PI;
-    tx = Math.cos(angle)*radius; ty = Math.sin(angle)*radius;
-    translate2[i+0] = tx;
-    translate2[i+1] = ty;
-    translate2[i+2] = 0.25 + Math.random() * 0.5;
-    translate2[i+3] = 0.25 + Math.random() * 0.5;
-
-    // Translate 1
-    angle = Math.random() * 2*Math.PI;
-    tx = Math.cos(angle)*radius; ty = Math.sin(angle)*radius;
-    translate3[i+0] = tx;
-    translate3[i+1] = ty;
-    translate3[i+2] = 0.25 + Math.random() * 0.5;
-    translate3[i+3] = 0.25 + Math.random() * 0.5;
-
-    // Translate 1
-    angle = Math.random() * 2*Math.PI;
-    tx = Math.cos(angle)*radius; ty = Math.sin(angle)*radius;
-    translate4[i+0] = tx;
-    translate4[i+1] = ty;
-    translate4[i+2] = 0.25 + Math.random() * 0.5;
-    translate4[i+3] = 0.25 + Math.random() * 0.5;
+  for (let i = 0; i < maxParticleCount; i += 4) {
+    // Randomize strength and speed for variety
+    strength[i + 0] = Math.random() + 1;
+    strength[i + 1] = Math.random() + 1;
+    strength[i + 2] = Math.random() + 1;
+    strength[i + 3] = Math.random() + 1;
+    speed[i + 0] = Math.random() + 1;
+    speed[i + 1] = Math.random() + 1;
+    speed[i + 2] = Math.random() + 1;
+    speed[i + 3] = Math.random() + 1;
+  
+    // Generate translation values using the function
+    generateTranslation(translate1, i, radius);
+    generateTranslation(translate2, i, radius);
+    generateTranslation(translate3, i, radius);
+    generateTranslation(translate4, i, radius);
   }
     
   // strengthMult and speedMult instanced attributes
@@ -623,8 +601,8 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
 }
 
 export default {
-  createCircleShaderGeometry: createParticleShaderOriginalGeometry,
-  createCircleShaderGeometry2: createParticleShaderDiversityGeometry,
-  createCircleShaderMaterial: createParticleShaderOriginalMaterial,
-  createCircleShaderMaterial2: createParticleShaderDiversityMaterial
+  createParticleShaderOriginalGeometry,
+  createParticleShaderDiversityGeometry,
+  createParticleShaderOriginalMaterial,
+  createParticleShaderDiversityMaterial,
 };
