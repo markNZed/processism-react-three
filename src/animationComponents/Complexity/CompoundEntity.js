@@ -487,7 +487,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
                     nodeRef.current.worldToLocal(position);
-                    entityPoseRef.current.positions[entityId] = position;
+                    entityPoseRef.current.positions[entityId] = [position.x, position.y, position.z];
                 })
                 swapJoints(parentJointsToRef, entitiesToInstantiate[IN_INDEX], true);
                 swapJoints(parentJointsFromRef, entitiesToInstantiate[OUT_INDEX], false);
