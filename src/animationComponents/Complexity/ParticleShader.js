@@ -128,54 +128,10 @@ const createParticleShaderDiversityMaterial = (particleRadius) => {
     float len;
 
     // Apply 4 drag operations to the vertices in the circle to stretch and deform it, and give it uniqueness
-
-      // Translate 1
-      dragPos = translate1.xy;
-      dragRadius = translate1.z;
-      dragStrength = translate1.w;
-
-      len = length(transformed.xy);
-      dragDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
-      dragDist = length(transformed.xy - dragPos);
-      t = 1.0 - min(1.0, dragDist / dragRadius);
-      t = sin(t*0.5*PI);
-      transformed.xy += dragDir * dragStrength * t;
-
-      // Translate 2
-      dragPos = translate2.xy;
-      dragRadius = translate2.z;
-      dragStrength = translate2.w;
-
-      len = length(transformed.xy);
-      dragDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
-      dragDist = length(transformed.xy - dragPos);
-      t = 1.0 - min(1.0, dragDist / dragRadius);
-      t = sin(t*0.5*PI);
-      transformed.xy += dragDir * dragStrength * t;
-
-      // Translate 3
-      dragPos = translate3.xy;
-      dragRadius = translate3.z;
-      dragStrength = translate3.w;
-
-      len = length(transformed.xy);
-      dragDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
-      dragDist = length(transformed.xy - dragPos);
-      t = 1.0 - min(1.0, dragDist / dragRadius);
-      t = sin(t*0.5*PI);
-      transformed.xy += dragDir * dragStrength * t;
-
-      // Translate 4
-      dragPos = translate4.xy;
-      dragRadius = translate4.z;
-      dragStrength = translate4.w;
-
-      len = length(transformed.xy);
-      dragDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
-      dragDist = length(transformed.xy - dragPos);
-      t = 1.0 - min(1.0, dragDist / dragRadius);
-      t = sin(t*0.5*PI);
-      transformed.xy += dragDir * dragStrength * t;
+    transformed = applyDragTranslation(transformed, translate1);
+    transformed = applyDragTranslation(transformed, translate2);
+    transformed = applyDragTranslation(transformed, translate3);
+    transformed = applyDragTranslation(transformed, translate4);
 
     len = length(transformed.xy);
     vec2 sinDir = len == 0.0 ? vec2(0.0, 0.0) : normalize(vec2(transformed.x, transformed.y));
