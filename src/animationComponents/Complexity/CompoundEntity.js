@@ -35,7 +35,8 @@ import useStore from '../../useStore'
 
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
-// Joint mapping could happen after first two entities
+// The lower blbo connections should be put in place before the higher - progressiveout afte rjointing
+// With 3 top there are too many entities in the inner part for a symmertrical lay
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -484,7 +485,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 swapJoints(parentJointsToRef, entitiesToInstantiate[IN_INDEX], true);
                 swapJoints(parentJointsFromRef, entitiesToInstantiate[OUT_INDEX], false);
                 directResetParticlesHash();
-                setJointsMapped(true);
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
                     frameStateRef.current = "stableRoot";
@@ -494,7 +494,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "stableRoot": {
-                if (frameStateDurationRef.current < animDelay * 4) break;
+                if (frameStateDurationRef.current < animDelay) break;
                 nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                 directUpdateNode(id, {visible: true});
                 const hash = directGetParticlesHash(id);
@@ -509,6 +509,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "done":
+                if (frameStateDurationRef.current < animDelay) break;
+                setJointsMapped(true);
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)
