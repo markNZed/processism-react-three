@@ -259,6 +259,7 @@ const points_to_geometry = (points, radii) => {
         });
     }
 
+    /*
     // We calculate the center rather than using the entity center (which is more like a center of gravity than a geometric center)
     const center = calculateCenter(points);
 
@@ -267,13 +268,14 @@ const points_to_geometry = (points, radii) => {
 
     // Expand the points
     const expandedPoints = expandPoints(points, normals, radii);
+    */
 
     // Offset the points before creating the curve
-    //const expandedPoints = expandPointsFromCenter(points, radii, center);
-    //const expandedPoints = points;
+    const expandedPoints = points;
 
     const curve = new THREE.CatmullRomCurve3(expandedPoints, true);
-    const curvePoints = curve.getPoints(expandedPoints.length * 5);
+    const expandedPointsMultiplier = expandedPoints.length < 100 ? 5 : 1;
+    const curvePoints = curve.getPoints(expandedPoints.length * expandedPointsMultiplier);
     //const curvePoints = expandedPoints;
     const shape = new THREE.Shape(curvePoints);
     const shape_geometry = new THREE.ShapeGeometry(shape);

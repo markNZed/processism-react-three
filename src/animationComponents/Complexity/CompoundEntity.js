@@ -35,8 +35,8 @@ import useStore from '../../useStore'
 
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
-// The lower blbo connections should be put in place before the higher - progressiveout afte rjointing
-// With 3 top there are too many entities in the inner part for a symmertrical lay
+// The lower blob connections should be put in place before the higher - progressiveout afte rjointing
+// With 3 top there are too many entities in the inner part for a symmertrical layout - so it tends to rotate ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -109,7 +109,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     const { deleteJoint, createJoint, updateJoint } = useJoints();
 
-    //useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
+    useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
     useAnimateRelations(jointsMapped, node, entityNodes, config);
     useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config);
 
