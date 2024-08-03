@@ -396,6 +396,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     } else {
                         frameStateRef.current = "expandJoint";
                     }
+                    directResetParticlesHash();
                     break;
                 }
                 break;
@@ -494,9 +495,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "stableRoot": {
-                if (frameStateDurationRef.current < animDelay) break;
-                nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
-                directUpdateNode(id, {visible: true});
+                if (frameStateDurationRef.current < animDelay * 2) break;
+                if (!jointsMapped) setJointsMapped(true);
                 const hash = directGetParticlesHash(id);
                 if (prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;
@@ -504,13 +504,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 } else {
                     setOption("showParticles", initialShowParticlesRef.current);
                     console.log("showParticles", id, initialShowParticlesRef.current)
+                    nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
+                    directUpdateNode(id, {visible: true});
                     frameStateRef.current = "done";
                 }
                 break;
             }
             case "done":
                 if (frameStateDurationRef.current < animDelay) break;
-                setJointsMapped(true);
+                if (!jointsMapped) setJointsMapped(true);
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)
