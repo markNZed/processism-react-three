@@ -43,6 +43,7 @@ export default function App() {
   const fixParticles = useStore((state) => state.getOption("fixParticles"));
   const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
   const showParticles = useStore((state) => state.getOption("showParticles"));
+  const hideBlobs = useStore((state) => state.getOption("hideBlobs"));
   
   const toggleAnimation = () => {
     setPausePhysics(!pausePhysics); // Toggle animation state
@@ -70,6 +71,9 @@ export default function App() {
       </button>
       <button onClick={() => {toggleOption("showParticles", showParticles)}}>
         {showParticles ? 'Hide Particles' : 'Show Particles'}
+      </button>
+      <button onClick={() => {toggleOption("hideBlobs", hideBlobs)}}>
+        {hideBlobs ? 'Show Blobs' : 'Hide Blobs'}
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}

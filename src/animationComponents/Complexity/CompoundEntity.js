@@ -35,6 +35,7 @@ import useStore from '../../useStore'
 
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
+// Joint mapping could happen after first two entities
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -90,6 +91,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     const setOption = useStore((state) => state.setOption);
     const showParticles = useStore((state) => state.getOption("showParticles"));
+    const hideBlobs = useStore((state) => state.getOption("hideBlobs"));
     const pausePhysics = useStore((state) => state.pausePhysics);
 
     const JOINT_EXPANSION = 1.1; // Slightly bigger to avoid "hitting" the surrounding particles
@@ -99,14 +101,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     // This repeats the id 
     const entityPoseRef = useRef({
-        positions: {},
-        orientations: {},
+        position: {},
+        orientation: {},
         outer: {},
     });
 
     const { deleteJoint, createJoint, updateJoint } = useJoints();
 
-    useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
+    //useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
     useAnimateRelations(jointsMapped, node, entityNodes, config);
     useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config);
 
@@ -203,8 +205,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         } else {
             entityInitialQuaternion.setFromUnitVectors(FORWARD, entityOrientation);
         }
-        entityPoseRef.current.orientations[instantiateEntityId] = entityInitialQuaternion;
-        entityPoseRef.current.positions[instantiateEntityId] = newPosition;
+        entityPoseRef.current.orientation[instantiateEntityId] = entityInitialQuaternion;
+        entityPoseRef.current.position[instantiateEntityId] = newPosition;
         entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: true};
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), instantiateEntityId]);
@@ -297,8 +299,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         });
         if (activeEntities > 0) {
             worldCenterRef.current.divideScalar(activeEntities);
+            centerRef.current = nodeRef.current.worldToLocal(worldCenterRef.current.clone());
+        } else {
+            centerRef.current = new THREE.Vector3(0, 0, 0);
         }
-        centerRef.current = nodeRef.current.worldToLocal(worldCenterRef.current.clone());
+        
         nodeRef.current.setCenter(centerRef.current);
     };
 
@@ -350,8 +355,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
         calculateCenter(entitiesToInstantiate);
 
+        if (prevFrameStateRef.current !== frameStateRef.current) {
+            console.log("FrameState", frameStateRef.current);
+        }
+
         prevFrameStateRef.current = frameStateRef.current
-        const animDelay = config.animDelayMs / 1000;
+
+        const animDelay = config.animDelayMs / 1000 * config.slowdown;
         
         // State machine can distribute computation across frames, reducing load on the physics engine
         // Also provides the "growth" algorithm for the compoundEntity
@@ -410,66 +420,48 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "waitForExpansion": {
-                // Check if the joint has expanded
-                const replaceJointId = activeJointsQueueRef.current[0];
-                const {body1Id, body2Id} = directGetJoint(replaceJointId);
-                // get the radius of the bodies
-                const node1 = directGetNode(body1Id);
-                const node2 = directGetNode(body2Id);
-                // distance between the bodies
-                const body1 = node1.ref.current;
-                const body2 = node2.ref.current;
-                const body1position = vec3(body1.translation());
-                const body2position = vec3(body2.translation());
-                const difference = body1position.sub(body2position);
-                // Calculate the Euclidean distance using the length of the difference vector
-                const distance = difference.length();
-                if (distance > entityRadius * 2) {
-                    frameStateRef.current = "poseEntity";
-                }
+                if (frameStateDurationRef.current < animDelay) break;
+                frameStateRef.current = "poseEntity";
                 break;
             }
             case "poseEntity": {
                 // After entityPose entitiesToInstantiate will have nextEntityRef.current appended
                 entityPose(nextEntityRef.current);
-                frameStateRef.current = "waitForParticle";
+                frameStateRef.current = "replaceJoint";
                 break;
             }
-            case "waitForParticle": {
+            case "replaceJoint": {
                 const lastEntity = directGetNode(nextEntityRef.current);
                 // Is the rigid body reference available
                 const particleRef = lastEntity.ref;
                 if (particleRef?.current?.current) {
                     frameStateRef.current = "replaceJoint";
                     node.particlesRef.current.push(particleRef);
-                }
-                break;
-            }
-            case "replaceJoint": {
-                const toInstantiateCount = entitiesToInstantiate.length;
-                switch (toInstantiateCount) {
-                    case 1:
-                        break; // single entity so no joints
-                    case 2: {
-                        // No joints to replace so we create joints
-                        createNodeJoint(entityNodes[0].id, entityNodes[1].id);
-                        createNodeJoint(entityNodes[1].id, entityNodes[0].id);
-                        break;
-                    }
-                    default: {
-                        replaceJoint(nextEntityRef.current);
-                        break;
-                    }
-                } 
-                if (toInstantiateCount == entityCount) {
-                    frameStateRef.current = "initialParticlesInstantiated";
-                } else {
-                    if (toInstantiateCount > 2) {
-                        // If we have a shape then update the joints with new angles to allow for change in the number of entities
-                        // Do we need to d othis a second time here ?
-                        frameStateRef.current = "alignJointsToPolygon";
+                    const toInstantiateCount = entitiesToInstantiate.length;
+                    switch (toInstantiateCount) {
+                        case 1:
+                            break; // single entity so no joints
+                        case 2: {
+                            // No joints to replace so we create joints
+                            createNodeJoint(entityNodes[0].id, entityNodes[1].id);
+                            createNodeJoint(entityNodes[1].id, entityNodes[0].id);
+                            break;
+                        }
+                        default: {
+                            replaceJoint(nextEntityRef.current);
+                            break;
+                        }
+                    } 
+                    if (toInstantiateCount == entityCount) {
+                        frameStateRef.current = "initialParticlesInstantiated";
                     } else {
-                        frameStateRef.current = "selectNextEntity";
+                        if (toInstantiateCount > 2) {
+                            // If we have a shape then update the joints with new angles to allow for change in the number of entities
+                            // Do we need to d othis a second time here ?
+                            frameStateRef.current = "alignJointsToPolygon";
+                        } else {
+                            frameStateRef.current = "selectNextEntity";
+                        }
                     }
                 }
                 break;
@@ -487,7 +479,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
                     nodeRef.current.worldToLocal(position);
-                    entityPoseRef.current.positions[entityId] = [position.x, position.y, position.z];
+                    entityPoseRef.current.position[entityId] = [position.x, position.y, position.z];
                 })
                 swapJoints(parentJointsToRef, entitiesToInstantiate[IN_INDEX], true);
                 swapJoints(parentJointsFromRef, entitiesToInstantiate[OUT_INDEX], false);
@@ -495,8 +487,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 setJointsMapped(true);
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
-                    nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
-                    directUpdateNode(id, {visible: true});
                     frameStateRef.current = "stableRoot";
                 } else {
                     frameStateRef.current = "done";
@@ -504,7 +494,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "stableRoot": {
-                if (frameStateDurationRef.current < animDelay * 2) break;
+                if (frameStateDurationRef.current < animDelay * 4) break;
+                nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
+                directUpdateNode(id, {visible: true});
                 const hash = directGetParticlesHash(id);
                 if (prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;
@@ -543,7 +535,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         <EntityType
                             key={`${id}-${i}`}
                             id={`${entityId}`}
-                            initialPosition={entityPoseRef.current.positions[entityId]}
+                            initialPosition={entityPoseRef.current.position[entityId]}
                             radius={entityRadius}
                             color={color}
                             ref={entity.ref}
@@ -551,13 +543,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             config={config}
                             jointsTo={jointsToRef.current[entity.id] || []}
                             jointsFrom={jointsFromRef.current[entity.id] || []}
-                            initialQuaternion={entityPoseRef.current.orientations[entityId]}
+                            initialQuaternion={entityPoseRef.current.orientation[entityId]}
                             outer={entityPoseRef.current.outer[entityId]}
                         />
                     )
                 })}
 
-                {jointsMapped && (
+                {jointsMapped && !hideBlobs && (
                     <Blob
                         color={color}
                         node={node}
