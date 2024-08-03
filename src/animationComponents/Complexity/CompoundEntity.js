@@ -488,6 +488,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 directResetParticlesHash();
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
+                    setJointsMapped(true);
                     frameStateRef.current = "stableRoot";
                 } else {
                     frameStateRef.current = "done";
@@ -495,8 +496,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "stableRoot": {
-                if (frameStateDurationRef.current < animDelay * 2) break;
-                if (!jointsMapped) setJointsMapped(true);
+                if (frameStateDurationRef.current < animDelay * 4) break;
                 const hash = directGetParticlesHash(id);
                 if (prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;
