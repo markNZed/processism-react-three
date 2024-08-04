@@ -497,7 +497,7 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
     translateArray[index + 3] = 0.25 + Math.random() * 0.5; // Strength
   };
 
-  for (let i = 0; i < maxParticleCount; i += 4) {
+  for (let i = 0, count=maxParticleCount*4; i < count; i += 4) {
     // Randomize strength and speed for variety
     strength[i + 0] = Math.random() + 1;
     strength[i + 1] = Math.random() + 1;

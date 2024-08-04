@@ -15,7 +15,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
     // We'll create the InstancedBufferGeometry for the particle shader with a max instance count based on how many particles were
     // set up in the config, with room to grow
-    const startingParticleCount = config.entityCounts.reduce((a, b) => a*b, 1) * 2;
+    const startingParticleCount = config.entityCounts.reduce((a, b) => a*b, 1);
     
 
     const internalRef = useRef();
@@ -46,12 +46,12 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
           case SHADER_1:
             renderBlobRef.current = { };
             renderBlobRef.current.circleMaterial = createParticleShaderOriginalMaterial(1);
-            renderBlobRef.current.circleGeometry = createParticleShaderOriginalGeometry(1, startingParticleCount, startingParticleCount);
+            renderBlobRef.current.circleGeometry = createParticleShaderOriginalGeometry(1, startingParticleCount, startingParticleCount*2);
             break;
           case SHADER_2:
             renderBlobRef.current = { };
             renderBlobRef.current.circleMaterial = createParticleShaderDiversityMaterial(1);
-            renderBlobRef.current.circleGeometry = createParticleShaderDiversityGeometry(1, 12, startingParticleCount, startingParticleCount)
+            renderBlobRef.current.circleGeometry = createParticleShaderDiversityGeometry(1, 12, startingParticleCount, startingParticleCount*2)
             break;
         }
     }, []);
