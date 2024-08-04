@@ -361,10 +361,6 @@ const createParticleShaderDiversityGeometry = (radius, segmentsPer90, particleCo
     for (let i=0; i<xCoords.length; ++i) { if (xCoords[i] >= xMin) { xStartIndex = i; break; } }
     let xEndIndex = -1;
     for (let i=xCoords.length-1; i>=0; --i) { if (xCoords[i] <= xMax) { xEndIndex = i; break; } }
-    // Check if the start or end index is invalid, which should not happen
-    if (xStartIndex === -1 || xEndIndex === -1) {
-      let brk = 5;
-    }
 
     const row = [];
     // Fill the row with null for x-coordinates outside the circle (before the start index)

@@ -40,6 +40,8 @@ import useStore from '../../useStore'
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
+    //initialPosition = initialPosition.constructor.name !== 'Array' ? [ initialPosition.x, initialPosition.y, initialPosition.z ] : initialPosition;
+
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
     useImperativeHandle(ref, () => nodeRef.current);
