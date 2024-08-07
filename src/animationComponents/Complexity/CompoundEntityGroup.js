@@ -70,7 +70,7 @@ const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion,
         },
         localToWorld: (vector) => {
             //console.log("localToWorld", vector, internalRef.current.localToWorld(vector))
-            return internalRef.current.localToWorld(vector.clone());
+            internalRef.current.localToWorld(vector);
         },
         translation: () => {
             return internalRef.current.localToWorld(centerRef.current.clone());

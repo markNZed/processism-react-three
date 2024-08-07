@@ -40,7 +40,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     const controlsConfig = {
         radius: { value: radius || 10, min: 1, max: 20 },
         animDelayMs: { value: 100, min: 0, max: 1000, step: 1, label: "Animation Delay" },
-        impulsePerParticle: { value: 1.5, min: 0, max: 20, step: 0.1, label: "Impulse per Particle" },
+        impulsePerParticle: { value: 1.5, min: 0, max: 100, step: 0.1, label: "Impulse per Particle" },
         overshootScaling: { value: 1.0, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 3, step: 0.1, label: "Max Displacement Scaling" },
         particleRestitution: { value: 0, min: 0, max: 5, step: 0.1, label: "Particle Restitution" },
@@ -49,7 +49,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         showRelations: { value: false, label: "Show Relations" },
         attractor: { value: false, label: "Enable attractor" },
         detach: { value: false, label: "Detach Experiment" },
-        slowdown: { value: 1.0, min: 1, max: 100, step: 10, label: "Slowdown Physics" },
+        slowdown: { value: 1.0, min: 1, max: 10, step: 0.1, label: "Slowdown Physics" },
     };
 
     const [controls] = useControls(() => controlsConfig);

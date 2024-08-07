@@ -1,3 +1,5 @@
+Spent $350 as of 4/8/2024
+
 Instead of entities it may be better to refer to communities (as per Whitehead)
 
 WDS_SOCKET_PORT=0 only in CodeSpace ?

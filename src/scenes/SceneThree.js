@@ -57,7 +57,12 @@ function SceneThree() {
         <>
             <AnimationController animations={animationSequence} useStore={useStore}>
                 <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={physicsDebug} >
-                    <Perf position={"bottom-left"} minimal={true} colorBlind={true} antialias={true}/>
+                    <Perf 
+                        position={"bottom-left"} 
+                        //minimal={true} 
+                        //colorBlind={true} 
+                        //antialias={true}
+                    />
                     <>
 
                         <Complexity

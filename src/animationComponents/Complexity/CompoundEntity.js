@@ -35,12 +35,9 @@ import useStore from '../../useStore'
 
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
-// The lower blob connections should be put in place before the higher - progressiveout afte rjointing
-// With 3 top there are too many entities in the inner part for a symmertrical layout - so it tends to rotate ?
+// The lower blob connections should be put in place before the higher
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
-
-    //initialPosition = initialPosition.constructor.name !== 'Array' ? [ initialPosition.x, initialPosition.y, initialPosition.z ] : initialPosition;
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -132,13 +129,94 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         jointsToRef.current[inNode.id] = props.jointsTo;
     }, []);
 
+    function getClosestNodeId(worldpos, index) {
+        //return entitiesToInstantiate[2]; // Does not work with lowest compoundEntity
+        //return entitiesToInstantiate[index];
+        let distance = Infinity;
+        let closestNodeId = null;
+        entitiesToInstantiate.forEach((entityId) => {
+            const outerNode = entityPoseRef.current.outer[entityId][node.depth];
+            if (!outerNode) return;
+            const entityRef = directGetNode(entityId).ref;
+            const entityPosition = vec3(entityRef.current.translation());
+            const distanceToEntity = entityPosition.sub(worldpos);
+            const distanceToEntityLength = distanceToEntity.length();
+            if (distanceToEntityLength < distance) {
+                distance = distanceToEntityLength;
+                closestNodeId = entityId;
+            }
+        })
+        if (closestNodeId === null) {
+            throw new Error("No closest node found");
+        }
+        return closestNodeId;
+    }
+
+    function dampenJoints(jointsRef, isTo) {
+        jointsRef.current.forEach(jointId => {
+            const {body1Id, body2Id} = directGetJoint(jointId);
+            let node1Ref;
+            let node2Ref;
+            if (isTo) {
+                node1Ref = directGetNode(body1Id).ref;
+                const node1Center = node1Ref.current.getCenterWorld();
+                let closestNodeId;
+                if (entitiesToInstantiate.length > 4) {
+                    closestNodeId = getClosestNodeId(node1Center, IN_INDEX);
+                } else {
+                    closestNodeId = entitiesToInstantiate[IN_INDEX];
+                }
+                node2Ref = directGetNode(closestNodeId).ref;
+            } else {
+                // Find the closest node to body2Id
+                node2Ref = directGetNode(body2Id).ref;
+                const node2Center = node2Ref.current.getCenterWorld();
+                let closestNodeId;
+                if (entitiesToInstantiate.length > 4) {
+                    closestNodeId = getClosestNodeId(node2Center, OUT_INDEX);
+                } else {
+                    closestNodeId = entitiesToInstantiate[OUT_INDEX];
+                }
+                node1Ref = directGetNode(closestNodeId).ref;
+            }
+            const visualConfig1 = node1Ref.current.getVisualConfig();
+            const visualConfig2 = node2Ref.current.getVisualConfig();
+            visualConfig1.damping = Math.min(visualConfig1.damping * 2,  1);
+            visualConfig2.damping = Math.min(visualConfig2.damping * 2,  1);
+            node1Ref.current.setVisualConfig(visualConfig1);
+            node2Ref.current.setVisualConfig(visualConfig2);
+        });
+    }
+
     // Switch the origin/destination of a joint. Used to map parent joints to children.
-    function swapJoints(jointsRef, newNodeId, isTo) {
+    function swapJoints(jointsRef, isTo) {
         const jointsUpdated = [];
         jointsRef.current.forEach(jointId => {
             const {body1Id, body2Id} = directGetJoint(jointId);
-            const node1Ref = isTo ? directGetNode(body1Id).ref : directGetNode(newNodeId).ref;
-            const node2Ref = isTo ? directGetNode(newNodeId).ref : directGetNode(body2Id).ref;
+            let node1Ref;
+            let node2Ref;
+            if (isTo) {
+                node1Ref = directGetNode(body1Id).ref;
+                const node1Center = node1Ref.current.getCenterWorld();
+                let closestNodeId;
+                if (entitiesToInstantiate.length > 4) {
+                    closestNodeId = getClosestNodeId(node1Center, IN_INDEX);
+                } else {
+                    closestNodeId = entitiesToInstantiate[IN_INDEX];
+                }
+                node2Ref = directGetNode(closestNodeId).ref;
+            } else {
+                // Find the closest node to body2Id
+                node2Ref = directGetNode(body2Id).ref;
+                const node2Center = node2Ref.current.getCenterWorld();
+                let closestNodeId;
+                if (entitiesToInstantiate.length > 4) {
+                    closestNodeId = getClosestNodeId(node2Center, OUT_INDEX);
+                } else {
+                    closestNodeId = entitiesToInstantiate[OUT_INDEX];
+                }
+                node1Ref = directGetNode(closestNodeId).ref;
+            }
             const visualConfig1 = node1Ref.current.getVisualConfig();
             const visualConfig2 = node2Ref.current.getVisualConfig();
             const radius1 = visualConfig1.radius;
@@ -156,6 +234,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         const toInstantiateCount = entitiesToInstantiate.length;
         // If we have a shape then update the joints with new angles to allow for change in the number of entities
         let newPosition = [0, 0, 0];
+        let thisOuter = true;
         switch (toInstantiateCount) {
             case 0:
                 if (entityCount > 1) {
@@ -172,11 +251,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             case 3: {
                 newPosition[1] += entityRadius * Math.sqrt(3);
+                // Because at root everything is outer
+                thisOuter = false;
                 break;
             }
             default: {
                 const replaceJointId = activeJointsQueueRef.current[0];
                 const {jointRef, body1Id} = directGetJoint(replaceJointId);
+                thisOuter = entityPoseRef.current.outer[body1Id][node.depth];
                 // Find the endpoint of one joint anchor
                 const joint = jointRef.current;
                 const anchor1 = vec3(joint.anchor1());
@@ -210,7 +292,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
         entityPoseRef.current.orientation[instantiateEntityId] = entityInitialQuaternion;
         entityPoseRef.current.position[instantiateEntityId] = newPosition;
-        entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: true};
+        entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: thisOuter};
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), instantiateEntityId]);
     }
@@ -359,7 +441,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         calculateCenter(entitiesToInstantiate);
 
         if (prevFrameStateRef.current !== frameStateRef.current) {
-            console.log("FrameState", frameStateRef.current);
+            //console.log("FrameState", frameStateRef.current);
         }
 
         prevFrameStateRef.current = frameStateRef.current
@@ -420,24 +502,27 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 };
                 joint.setAnchor1(expandAnchor(vec3(joint.anchor1())));
                 joint.setAnchor2(expandAnchor(vec3(joint.anchor2())));
+                directResetParticlesHash();
                 frameStateRef.current = "waitForExpansion";
                 break;
             }
             case "waitForExpansion": {
                 if (frameStateDurationRef.current < animDelay) break;
+                directResetParticlesHash();
                 frameStateRef.current = "poseEntity";
                 break;
             }
             case "poseEntity": {
                 // After entityPose entitiesToInstantiate will have nextEntityRef.current appended
                 entityPose(nextEntityRef.current);
+                directResetParticlesHash();
                 frameStateRef.current = "replaceJoint";
                 break;
             }
             case "replaceJoint": {
-                const lastEntity = directGetNode(nextEntityRef.current);
+                const nextEntity = directGetNode(nextEntityRef.current);
                 // Is the rigid body reference available
-                const particleRef = lastEntity.ref;
+                const particleRef = nextEntity.ref;
                 if (particleRef?.current?.current) {
                     frameStateRef.current = "replaceJoint";
                     node.particlesRef.current.push(particleRef);
@@ -468,16 +553,35 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         }
                     }
                 }
+                //directResetParticlesHash();
                 break;
             }
             case "alignJointsToPolygon": {
                 const toInstantiateCount = entitiesToInstantiate.length;
                 alignJointsToPolygon(toInstantiateCount);
+                directResetParticlesHash();
                 frameStateRef.current = "selectNextEntity";
                 break;
             }
             case "initialParticlesInstantiated": {
                 if (frameStateDurationRef.current < animDelay) break;
+                dampenJoints(parentJointsToRef, true);
+                dampenJoints(parentJointsFromRef, false);
+                directResetParticlesHash();
+                frameStateRef.current = "swapJoints";
+                break;
+            }
+            case "swapJoints": {
+                if (frameStateDurationRef.current < animDelay) break;
+                swapJoints(parentJointsToRef, true);
+                swapJoints(parentJointsFromRef, false);
+                directResetParticlesHash();
+                frameStateRef.current = "jointsSwapped";
+                break;
+            }
+            case "jointsSwapped": {
+                if (frameStateDurationRef.current < animDelay) break;
+                directResetParticlesHash();
                 // Update the initialPositions based on current positions
                 entitiesToInstantiate.forEach((entityId, i) => {
                     const entityNode = directGetNode(entityId);
@@ -485,9 +589,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     nodeRef.current.worldToLocal(position);
                     entityPoseRef.current.position[entityId] = [position.x, position.y, position.z];
                 })
-                swapJoints(parentJointsToRef, entitiesToInstantiate[IN_INDEX], true);
-                swapJoints(parentJointsFromRef, entitiesToInstantiate[OUT_INDEX], false);
-                directResetParticlesHash();
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
                     setJointsMapped(true);
@@ -500,7 +601,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case "stableRoot": {
                 if (frameStateDurationRef.current < animDelay * 4) break;
                 const hash = directGetParticlesHash(id);
-                if (prevParticlesHash.current !== hash) {
+                if (hash && prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;
                     frameStateDurationRef.current = 0;
                 } else {
@@ -509,12 +610,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                     directUpdateNode(id, {visible: true});
                     frameStateRef.current = "done";
+                    //setOption("fixParticles", true);
                 }
                 break;
             }
             case "done":
                 if (frameStateDurationRef.current < animDelay) break;
-                if (!jointsMapped) setJointsMapped(true);
+                // The jointsMapped state may not be updated because not being rerendered
+                if (!jointsMapped) {
+                    setJointsMapped(true);
+                }
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)

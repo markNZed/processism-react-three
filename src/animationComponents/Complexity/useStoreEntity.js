@@ -178,7 +178,14 @@ const useStoreEntity = create((set, get) => {
             return get().particlesHash[id];
         },
 
-        resetParticlesHash: () => debouncedResetParticlesHash(set),
+        //resetParticlesHash: () => debouncedResetParticlesHash(set),
+
+        resetParticlesHash: () => set(() => {
+            //console.log("resetParticlesHash");
+            return {
+                particlesHash: {}
+            }
+        }),
 
         reset: () => set(() => {
             return {

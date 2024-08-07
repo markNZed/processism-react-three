@@ -25,7 +25,7 @@ const Blob = ({ color, node, entityNodes }) => {
         };
 
         let blobOuterUniqueIds = [];
-        let flattenedIndexes = [];
+        let mapIdToIndex = {};
         let radii = [];
         const entityNodeIds = entityNodes.map(n => n.id);
         particlesRef.current = getAllParticleRefs(id);
@@ -39,14 +39,17 @@ const Blob = ({ color, node, entityNodes }) => {
             const uniqueId = particles[i].current.getVisualConfig().uniqueId;
             let outer = particles[i].current.getVisualConfig().outer;
             if (outer) {
-                let outerDepth = outer[node.depth];
+                let outerDepth = true;//outer[node.depth];
                 // if this is a child then it is outer at this level
+                //console.log("outerDepth", id, outerDepth, outer);
                 if (entityNodeIds.includes(uniqueId)) {
-                    outerDepth = true;
+                    //outerDepth = true;
+                    //console.log("outerDepth entityNodeIds.includes", id, outerDepth);
                 }
                 if (outerDepth) {
                     for (let j = Object.keys(outer).length - 1;j > node.depth; j--) {
                         if (!outer[j.toString()]) {
+                            //console.log("outer[j] was empty", id, j);
                             outerDepth = false;
                             break;
                         }
@@ -55,7 +58,7 @@ const Blob = ({ color, node, entityNodes }) => {
                 
                 if (outerDepth) { 
                     blobOuterUniqueIds.push(uniqueId);
-                    flattenedIndexes.push(i);
+                    mapIdToIndex[uniqueId] = i;
                     radii.push(particles[i].current.getVisualConfig().origRadius);
                     //console.log("buildBlobData Outer", uniqueId)
                 } else {
@@ -75,19 +78,32 @@ const Blob = ({ color, node, entityNodes }) => {
             }
         }
 
-        // buildOrderedIds can return null if there are no blobOuterUniqueIds
-        const orderedIds = buildOrderedIds(id, chainRef, blobOuterUniqueIds) || [];
-        if (!orderedIds.length) console.error("orderedIds is empty!", id, chainRef.current, blobOuterUniqueIds);
-        const blobIndexes = orderedIds;
+        // Make sure the first id has the most joints 
+        let maxJoints = 0;
+        let firstId;
+        blobOuterUniqueIds.forEach(id => {
+            if (!chainRef.current[id]) return;
+            const linkJoints = chainRef.current[id].length;
+            if (linkJoints > maxJoints) {
+                maxJoints = linkJoints;
+                firstId = id;
+            }
+        });
+        // Move firstId to the front
+        blobOuterUniqueIds = blobOuterUniqueIds.filter(id => id !== firstId);
+        blobOuterUniqueIds.unshift(firstId);
 
-        //console.log("buildBlobData", id, "blobData", blobData, "chianRef", chainRef.current, "particles",particles, "blobOuterUniqueIds",blobOuterUniqueIds, "blobIndexes", blobIndexes)
+        // buildOrderedIds can return null if there are no blobOuterUniqueIds
+        const blobIndexes = buildOrderedIds(id, chainRef, blobOuterUniqueIds) || [];
+        if (!blobIndexes.length) console.error("blobIndexes is empty!", id, chainRef.current, blobOuterUniqueIds);
+
+        console.log("buildBlobData", id, "blobData", blobData, "chianRef", chainRef.current, "particles",particles, "blobOuterUniqueIds",blobOuterUniqueIds, "blobIndexes", blobIndexes)
 
         for (let i = 0; i < blobIndexes.length; ++i) {
             blobData.current.positions.push(new THREE.Vector3());
-            const indexInOuter = blobOuterUniqueIds.indexOf(blobIndexes[i]);
-            const flattenedIndex = flattenedIndexes[indexInOuter];
+            const flattenedIndex = mapIdToIndex[blobIndexes[i]];
             blobData.current.flattenedIndexes.push(flattenedIndex);
-            blobData.current.radii.push(radii[indexInOuter]);
+            blobData.current.radii.push(radii[flattenedIndex]);
         }
     
     }
@@ -328,14 +344,17 @@ function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visi
         //console.log("buildOrderedIds firstId", id, firstId, JSON.stringify(chainRef.current), blobOuterUniqueIds);
     } else {
         visited.add(uniqueId);
-        if (uniqueId === firstId) return [...path, uniqueId];
+        if (uniqueId === firstId) {
+            //console.log("buildOrderedIds found loop", id, uniqueId, visited, path);
+            return path;
+        }
     }
 
     //console.log("buildOrderedIds input", id, uniqueId); 
     
     // Guard clause to check if uniqueId is in blobOuterUniqueIds
     if (!blobOuterUniqueIds.includes(uniqueId)) {
-        //console.log("buildOrderedIds not in outer", id, uniqueId); 
+        //console.log("buildOrderedIds uniqueId not in blobOuterUniqueIds", id, uniqueId); 
         return null;
     }
 
@@ -348,22 +367,24 @@ function buildOrderedIds(id, chainRef, blobOuterUniqueIds, uniqueId = null, visi
     // Search for the longest loop
     let foundChain = [];
     for (let linkedIndex of linkedIndexes) {
-        // Close so we can mark as visited without interfering in parallel branches of th esearch
-        const clonedVisited = new Set([...visited]);
+        // Clone so we can mark as visited without interfering in parallel branches of the search
+        const clonedVisited = new Set(visited);
         const recursiveResult = buildOrderedIds(id, chainRef, blobOuterUniqueIds, linkedIndex, clonedVisited, firstId, localPath);
         if (recursiveResult) {
             // We only want the longest chain
             if (recursiveResult.length > foundChain.length) {
-                foundChain = [uniqueId, ...recursiveResult];
+                foundChain = recursiveResult;
             }
         } else {
-            // If there was no path to a loop then we can consider this a dead end
+            // If there was no path to a loop then this is a dead end
             visited.add(linkedIndex);
         }
     }
     if (!foundChain.length) {
         return null;
     }
+
+    //console.log("buildOrderedIds foundChain", id, foundChain); 
 
     return foundChain;
 }

@@ -31,7 +31,7 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
     // Rapier uses world coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useStore((state) => state.getOption("fixParticles"));
-    const showParticles = useStore((state) => state.getOption("showParticles"));
+    const [damping, setDamping] = useState(0.1);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame(() => {
@@ -68,6 +68,10 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
             visualConfig.rigidScale = visualConfig.scale;
             nodeRef.current.setVisualConfig(visualConfig);
         }
+        if (visualConfig.damping && visualConfig.damping !== damping) {
+            //console.log("Damping changed", id, damping, visualConfig.damping);
+            setDamping(visualConfig.damping);
+        }
     });
 
     // Set the initial visualConfig, don't do this in JSX (it would overwrite on renders)
@@ -80,7 +84,15 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 // For debugging the outer map
                 //localColor = "pink";
             }
-            nodeRef.current.setVisualConfig({ color: localColor, uniqueId: id, radius: radius, origRadius: radius, outer: outer});
+            nodeRef.current.setVisualConfig({ 
+                color: localColor, 
+                uniqueId: id, 
+                radius: radius, 
+                origRadius: radius, 
+                outer: outer, 
+                damping: damping, 
+                isParticle: true 
+            });
             directUpdateNode(id, {isParticle: true});
             setInitialize(false);
         }
@@ -104,8 +116,8 @@ const Particle = React.memo(React.forwardRef(({ id, initialPosition, initialQuat
                 colliders={false}
                 //linearDamping={2000}
                 //angularDamping={2000}
-                linearDamping={0.1}
-                angularDamping={0.1}
+                linearDamping={damping}
+                angularDamping={damping}
                 enabledTranslations={[true, true, false]}
                 //enabledTranslations={[false, false, false]}
                 enabledRotations={[false, false, true]}
