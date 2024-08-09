@@ -57,7 +57,7 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
         debug: false,
-        entityCounts: [3,3],
+        entityCounts: [3, 3],
         radius: controls.radius,
         animDelayMs: controls.animDelayMs,
         colors: [color || null, utils.getRandomColorFn, null],

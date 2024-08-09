@@ -108,7 +108,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
  
             const visualConfig = particle.getVisualConfig();
 
-            const pos = particle.translation();
+            const particlePos = particle.translation();
             let scale = visualConfig.scale || 1;
 
             const RADIUS_MULT = USE_SHADER === SHADER_2 ? 0.85 : 1.0;
@@ -129,8 +129,8 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
             const color = visualConfig.color || 'red';
             userColor.set(color);
 
-            if (!currentPos.equals(pos)) {
-                currentPos.copy(pos);
+            if (!currentPos.equals(particlePos)) {
+                currentPos.copy(particlePos);
                 matrixChanged = true;
             }
 

@@ -40,6 +40,8 @@ import useStore from '../../useStore'
 // Instead of setTranslation we could use velocity and/or impulse
 // There is a rotation in the 3,3 config of the last entity that does not make sense
 //   Maybe related to switching to dynamic ? Is the initial rotation accounted for in kinematic mode ?
+// Need to spawn new particles in an order so they do not overlap/interact e.g .when multiple blobs forming
+//   Initial solution - spawn from above the center of the blob
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -661,7 +663,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     // Array of positions potentially
                     // Clone to allow for changes to individaul entries
                     // Simulates a path where the particle "drops" down into the initialPosition
-                    const creationPath = [[0, 0 ,10], [...entityPoseRef.current.position[entityId]]];
+                    const creationPath = [[...entityPoseRef.current.position[entityId]], [...entityPoseRef.current.position[entityId]]];
+                    creationPath[0][2] = 10;
                     return (
                         <EntityType
                             key={`${id}-${i}`}

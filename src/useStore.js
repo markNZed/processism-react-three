@@ -11,6 +11,7 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
   pausePhysics: false,
   setPausePhysics: (pausePhysics) => set(() => ({ pausePhysics })),
   components: {},
+  physicsDebug: true,
   // Allows for calls like: setOption('pausePhysics', (prev) => !prev);
   setOption: (key, value) => set((state) => ({
     ...state,

@@ -31,10 +31,12 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     const parentNodeRef = parentNode.ref
     // So we can get the particle position relative to the parent's position
     // Rapier uses world coordinates
+    // Can't use groupRef because the particle may not be rendering and we still
+    // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
+    const localToWorld = useCallback((localPos) => (parentNodeRef.current.localToWorld(localPos)) , [parentNodeRef]);
     const fixParticles = useStore((state) => state.getOption("fixParticles"));
     const [damping, setDamping] = useState(0.1);
-    const creationPositionRef = useRef(new THREE.Vector3());
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
     const creationPathIndexRef = useRef(0);
@@ -44,6 +46,8 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     const worldInitialPosition = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
     const groupRef = useRef();
     const creationDurationRef = useRef(0);
+    const [enabledTranslations, setEnabledTranslations] = useState([true, true, true]);
+    const creationPositionRef = useRef(creationPath[0] || initialPosition);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame((_, deltaTime) => {
@@ -86,6 +90,8 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
             setDamping(visualConfig.damping);
         }
         if (!created && nodeRef.current.current) {
+            const currentTranslation = nodeRef.current.translation();
+            console.log("currentTranslation", currentTranslation)
             let created = false;
             // If not using creationPath
             if (creationPath.length === 0) {
@@ -95,73 +101,65 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 nextPathRef.current = false;
                 creationDurationRef.current = 0;
                 creationPathStepRef.current = 0;
-                lastCreationPositionRef.current = {
-                    x: creationPath[creationPathIndexRef.current][0],
-                    y: creationPath[creationPathIndexRef.current][1],
-                    z: creationPath[creationPathIndexRef.current][2],
-                }
+                lastCreationPositionRef.current.set(
+                    creationPath[creationPathIndexRef.current][0],
+                    creationPath[creationPathIndexRef.current][1],
+                    creationPath[creationPathIndexRef.current][2],
+                );
+                localToWorld(lastCreationPositionRef.current);
                 if (creationPath.length > creationPathIndexRef.current + 1) {
                     const nextIndex = creationPathIndexRef.current + 1;
-                    nextCreationPositionRef.current = {
-                        x: creationPath[nextIndex][0],
-                        y: creationPath[nextIndex][1],
-                        z: creationPath[nextIndex][2]
-                    }
+                    nextCreationPositionRef.current.set(
+                        creationPath[nextIndex][0],
+                        creationPath[nextIndex][1],
+                        creationPath[nextIndex][2],
+                    );
+                    localToWorld(nextCreationPositionRef.current);
                 } else {
                     created = true;
                 }
-                creationPositionRef.current.set(lastCreationPositionRef.current.x, lastCreationPositionRef.current.y, lastCreationPositionRef.current.z);
                 creationPathIndexRef.current++;
             } else {
-                //const currentTranslation = vec3(nodeRef.current.translation());
                 creationPathStepRef.current++;
                 // Move creationPositionRef closer to the nextCreationPositionRef
-                const stepDistance = 0.1;
-                const xDistance = nextCreationPositionRef.current.x - lastCreationPositionRef.current.x;
-                const yDistance = nextCreationPositionRef.current.y - lastCreationPositionRef.current.y;
-                const zDistance = nextCreationPositionRef.current.z - lastCreationPositionRef.current.z;
+                const xDistance = nextCreationPositionRef.current.x - currentTranslation.x;
+                const yDistance = nextCreationPositionRef.current.y - currentTranslation.y;
+                const zDistance = nextCreationPositionRef.current.z - currentTranslation.z;
                 const xDirection = xDistance > 0 ? 1 : -1;
                 const yDirection = yDistance > 0 ? 1 : -1;
                 const zDirection = zDistance > 0 ? 1 : -1;
-                // Round to an integer
-                const xSteps = Math.round(Math.abs(xDistance) / stepDistance);
-                const ySteps = Math.round(Math.abs(yDistance) / stepDistance);
-                const zSteps = Math.round(Math.abs(zDistance) / stepDistance);
+                let xVelocity = xDirection * 5;
+                let yVelocity = yDirection * 5;
+                let zVelocity = zDirection * 5;
                 let nextPath = true;
-                let nextX;
-                if (creationPathStepRef.current >= xSteps) {
-                    nextX = nextCreationPositionRef.current.x;
+                const closeEnough = 0.1;
+                if (Math.abs(xDistance) < closeEnough) {
+                    xVelocity = 0;
                 } else {
-                    nextX = lastCreationPositionRef.current.x + creationPathStepRef.current * stepDistance * xDirection;
                     nextPath = false;
                 }
-                let nextY;
-                if (creationPathStepRef.current >= ySteps) {
-                    nextY = nextCreationPositionRef.current.y;
+                if (Math.abs(yDistance) < closeEnough) {
+                    yVelocity = 0;
                 } else {
-                    nextY = lastCreationPositionRef.current.y + creationPathStepRef.current * stepDistance * yDirection;
                     nextPath = false;
                 }
-                let nextZ;
-                if (creationPathStepRef.current >= zSteps) {
-                    nextZ = nextCreationPositionRef.current.z;
+                if (Math.abs(zDistance) < closeEnough) {
+                    zVelocity = 0;
                 } else {
-                    nextZ = lastCreationPositionRef.current.z + creationPathStepRef.current * stepDistance * zDirection;
                     nextPath = false;
                 }
-                creationPositionRef.current.set(nextX, nextY, nextZ);
-                groupRef.current.localToWorld(creationPositionRef.current);
                 nextPathRef.current = nextPath;
-                // Operate on the rigid body            
-                //console.log("setTranslation", id, "creationPositionRef", creationPositionRef.current, "worldInitialPosition", worldInitialPosition, "creationPath", creationPath, "last creationPathIndexRef", creationPathIndexRef.current, "creationPathStepRef", creationPathStepRef.current);
-                // True argument ensures the body is awake
-                nodeRef.current.current.setTranslation(creationPositionRef.current, true);
-                nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+                nodeRef.current.current.setLinvel({ x: xVelocity, y: yVelocity, z: zVelocity }, true);
+                //console.log("setLinvel velocity", id, xVelocity, yVelocity, zVelocity);
+                //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
             }
             if (created) {
+                nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+                //creationPositionRef.current = [currentTranslation.x, currentTranslation.y, currentTranslation.z];
                 setCreated(true);
-                nodeRef.current.current.setEnabledTranslations([true, true, false]);
-                nodeRef.current.current.setBodyType("dynamic");
+                // This seems to mess things up 
+                //setEnabledTranslations([true, true, false]);
+                //nodeRef.current.current.setEnabledTranslations(true, true, false, true);
                 visualConfig.isCreated = true;
                 nodeRef.current.setVisualConfig(visualConfig);
             }
@@ -198,26 +196,26 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
         groupRef.current.localToWorld(worldInitialPosition);
     }, []);
 
-    //console.log("Particle rendering", id, initialPosition, initialQuaternion);
+    console.log("Particle rendering", id, initialPosition, initialQuaternion);
 
     return (
         <group ref={groupRef} >
             <ParticleRigidBody
                 ref={nodeRef}
-                position={initialPosition}
+                position={creationPositionRef.current}
                 quaternion={initialQuaternion}
-                type={fixParticles ? "fixed" : "kinematicPosition"} // "kinematicPosition" "fixed"
+                type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed"
                 colliders={false}
                 linearDamping={damping}
                 angularDamping={damping}
-                //enabledTranslations={[true, true, false]}
+                enabledTranslations={enabledTranslations}
                 enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
                 worldToLocal={worldToLocal}
                 id={id}
             >
-                <BallCollider args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
+                <BallCollider args={[colliderRadius * 1.0] /*scaled to avoid contact*/} />
             </ParticleRigidBody>
             {isDebug && (
                 <>

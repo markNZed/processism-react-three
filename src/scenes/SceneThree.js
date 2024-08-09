@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { Camera, Complexity } from '../animationComponents';
 import { AnimationController } from '../AnimationController';
 import useStore from '../useStore';
-import { Environment, OrbitControls } from '@react-three/drei';
+import { Environment, OrbitControls, Plane } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import { Perf } from 'r3f-perf'
+import { AxesHelper } from 'three';
 
 /****************************
 Scene Description:
@@ -53,6 +54,10 @@ function SceneThree() {
         console.log("SceneThree mounting");
     }, []);
 
+    function MyAxesHelper() {
+        return <primitive object={new AxesHelper(5)} />;
+    }
+
     return (
         <>
             <AnimationController animations={animationSequence} useStore={useStore}>
@@ -69,6 +74,12 @@ function SceneThree() {
                             id={"complex"}
                             color={"blue"}
                         />
+
+                        <Plane args={[50, 50]} position={[0, 0, -0.1]}>
+                            <meshStandardMaterial attach="material" color="lightblue" />
+                        </Plane>
+
+                        <MyAxesHelper />
 
                     </>
                 </Physics>

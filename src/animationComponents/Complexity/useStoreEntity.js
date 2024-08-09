@@ -159,7 +159,7 @@ const useStoreEntity = create((set, get) => {
         jointCount: 0,
         particlesHash: {},
         particleRefs: [],
-        options: [],
+        options: {},
 
         getoption: (id) => {
             return get().options[id];
