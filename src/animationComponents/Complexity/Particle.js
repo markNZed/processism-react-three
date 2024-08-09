@@ -91,7 +91,6 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
         }
         if (!created && nodeRef.current.current) {
             const currentTranslation = nodeRef.current.translation();
-            console.log("currentTranslation", currentTranslation)
             let created = false;
             // If not using creationPath
             if (creationPath.length === 0) {
@@ -196,7 +195,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
         groupRef.current.localToWorld(worldInitialPosition);
     }, []);
 
-    console.log("Particle rendering", id, initialPosition, initialQuaternion);
+    //console.log("Particle rendering", id, initialPosition, initialQuaternion);
 
     return (
         <group ref={groupRef} >

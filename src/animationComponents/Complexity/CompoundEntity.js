@@ -42,6 +42,7 @@ import useStore from '../../useStore'
 //   Maybe related to switching to dynamic ? Is the initial rotation accounted for in kinematic mode ?
 // Need to spawn new particles in an order so they do not overlap/interact e.g .when multiple blobs forming
 //   Initial solution - spawn from above the center of the blob
+//   Could disable collider ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
