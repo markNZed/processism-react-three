@@ -154,6 +154,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
             }
             if (created) {
                 nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+                // It seems important to update creationPositionRef when changing enabledTranslations
                 creationPositionRef.current.set(
                     currentTranslation.x,
                     currentTranslation.y,
@@ -161,9 +162,9 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 );
                 worldToLocal(creationPositionRef.current);
                 setCreated(true);
-                // This seems to mess things up 
+                // This seems to mess things up but assigning directly to rigidbody is OK
                 //setEnabledTranslations([true, true, false]);
-                //nodeRef.current.current.setEnabledTranslations(true, true, false, true);
+                nodeRef.current.current.setEnabledTranslations(true, true, false, true);
                 visualConfig.isCreated = true;
                 nodeRef.current.setVisualConfig(visualConfig);
             }
