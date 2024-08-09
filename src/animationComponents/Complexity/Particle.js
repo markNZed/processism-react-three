@@ -151,13 +151,14 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 //console.log("setLinvel velocity", id, xVelocity, yVelocity, zVelocity);
                 //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
             }
+            // Could be a state machine so we can set creationPositionRef then setLinvel
             if (created) {
                 nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
                 // It seems important to update creationPositionRef when changing enabledTranslations
                 creationPositionRef.current.set(
                     currentTranslation.x,
                     currentTranslation.y,
-                    currentTranslation.z,
+                    0, // FOrce into Z plane
                 );
                 groupRef.current.worldToLocal(creationPositionRef.current);
                 setCreated(true);

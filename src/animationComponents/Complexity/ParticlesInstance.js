@@ -7,9 +7,9 @@ import ParticleShader from './ParticleShader'
 const { createParticleShaderOriginalGeometry, createParticleShaderDiversityGeometry, createParticleShaderOriginalMaterial, createParticleShaderDiversityMaterial } = ParticleShader;
 
 const SHADER_NONE = 0;
-const SHADER_1 = 1;
-const SHADER_2 = 2;
-const USE_SHADER = SHADER_2;
+const SHADER_ORIG = 1;
+const SHADER_DIVERSE = 2;
+const USE_SHADER = SHADER_DIVERSE;
 
 const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
@@ -43,12 +43,12 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
         switch (USE_SHADER) {
           case SHADER_NONE:
             break;
-          case SHADER_1:
+          case SHADER_ORIG:
             renderBlobRef.current = { };
             renderBlobRef.current.circleMaterial = createParticleShaderOriginalMaterial(1);
             renderBlobRef.current.circleGeometry = createParticleShaderOriginalGeometry(1, startingParticleCount, startingParticleCount*2);
             break;
-          case SHADER_2:
+          case SHADER_DIVERSE:
             renderBlobRef.current = { };
             renderBlobRef.current.circleMaterial = createParticleShaderDiversityMaterial(1);
             renderBlobRef.current.circleGeometry = createParticleShaderDiversityGeometry(1, 12, startingParticleCount, startingParticleCount*2)
@@ -72,14 +72,14 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
             setParticleCount(count);
         }
         
-        if (renderBlobRef.current && (USE_SHADER === SHADER_1 || USE_SHADER === SHADER_2)) {
+        if (renderBlobRef.current && (USE_SHADER === SHADER_ORIG || USE_SHADER === SHADER_DIVERSE)) {
           let { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
 
           circleInstanceMaterial.uniforms.time.value = timeRef.current;
 
           // If the number of particles is greater than our max instance count, recreate the geometry with particleCount*2 max instance count
           if (circleInstanceGeometry.userData.maxInstanceCount < particleCount) {
-            renderBlobRef.current.circleGeometry = USE_SHADER === SHADER_1 ? 
+            renderBlobRef.current.circleGeometry = USE_SHADER === SHADER_ORIG ? 
               createParticleShaderOriginalGeometry(1, particleCount, particleCount*2) :
               createParticleShaderDiversityGeometry(1, 12, particleCount, particleCount*2);
 
@@ -111,7 +111,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
             const particlePos = particle.translation();
             let scale = visualConfig.scale || 1;
 
-            const RADIUS_MULT = USE_SHADER === SHADER_2 ? 0.85 : 1.0;
+            const RADIUS_MULT = USE_SHADER === SHADER_DIVERSE ? 0.85 : 1.0;
             const radius = visualConfig.radius * RADIUS_MULT;
             const origRadius = visualConfig.origRadius;
             //console.log("radius", i, radius, origRadius);

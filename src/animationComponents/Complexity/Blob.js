@@ -22,11 +22,14 @@ const Blob = ({ color, node, entityNodes }) => {
             positions: [],
             flattenedIndexes: [],
             radii: [],
+            uniqueIds: [],
+            refs: [],
         };
 
         let blobOuterUniqueIds = [];
         let mapIdToIndex = {};
         let radii = [];
+        let refs = [];
         const entityNodeIds = entityNodes.map(n => n.id);
         particlesRef.current = getAllParticleRefs(id);
         particlesHashRef.current = getParticlesHash(id);
@@ -60,6 +63,7 @@ const Blob = ({ color, node, entityNodes }) => {
                     blobOuterUniqueIds.push(uniqueId);
                     mapIdToIndex[uniqueId] = i;
                     radii.push(particles[i].current.getVisualConfig().origRadius);
+                    refs.push(particles[i]);
                     //console.log("buildBlobData Outer", uniqueId)
                 } else {
                     //console.log("buildBlobData Inner", uniqueId)
@@ -104,13 +108,17 @@ const Blob = ({ color, node, entityNodes }) => {
             const flattenedIndex = mapIdToIndex[blobIndexes[i]];
             blobData.current.flattenedIndexes.push(flattenedIndex);
             blobData.current.radii.push(radii[flattenedIndex]);
+            blobData.current.uniqueIds.push(blobIndexes[i]);
+            blobData.current.refs.push(refs[flattenedIndex]);
         }
     
     }
 
     useFrame(() => {
 
-        if (node.ref.current.getVisualConfig().visible) {
+        const visualConfig = node.ref.current.getVisualConfig();
+
+        if (visualConfig.visible) {
 
             const hash = getParticlesHash(id);
             const prevHash = particlesHashRef.current;
@@ -136,6 +144,12 @@ const Blob = ({ color, node, entityNodes }) => {
                 position.copy(worldToLocalFn(worldVector))
                 return position;
             });
+
+            // Could make the boundary particles visible
+            // Only once per blob
+            blobData.current.refs.forEach(ref => {
+                ref.current.setVisualConfig(p => ({ ...p, visible: true, color: visualConfig.color}));
+            })
 
             if (blobPoints.length) {
                 const geometry = points_to_geometry(blobPoints, blobData.current.radii);

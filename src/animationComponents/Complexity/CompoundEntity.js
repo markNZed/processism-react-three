@@ -39,6 +39,8 @@ import useStore from '../../useStore'
 // Make particles on boundary of visible blobs visible ?
 // Need to spawn new particles in an order so they do not overlap/interact e.g .when multiple blobs forming
 //   Could disable collider ?
+// Issue with particles not showing under lowest blob
+// Use Zustand to sync the prtical creation
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -119,7 +121,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     useEffect(() => {
         directUpdateNode(id, { initialPosition });
         console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
-        node.ref.current.setVisualConfig({ color: props.color, uniqueId: id, radius: radius });
+        node.ref.current.setVisualConfig({ color: color, uniqueId: id, radius: radius });
         if (node.childrenIds.length > 0 && node.isParticle) {
             // This is because we may be swaping the node from a Particle to a CompoundEntity
             // Need to correct this so the storeEntity maintains a valid list of Particles
@@ -609,7 +611,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 */
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
-                    setJointsMapped(true);
+                    //setJointsMapped(true);
                     frameStateRef.current = "stableRoot";
                 } else {
                     frameStateRef.current = "done";
@@ -646,7 +648,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     });
 
-    //console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount)
+    //console.log("CompoundEntity rendering", id, "node", node, "entityCount", entityCount, "initialPosition", initialPosition)
     //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, config, node, entityNodes, entitiesToInstantiate, instantiateJoints, replaceJointWith, initParticles, jointsMapped} );
 
     return (
@@ -664,7 +666,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     // Clone to allow for changes to individaul entries
                     // Simulates a path where the particle "drops" down into the initialPosition
                     const creationPath = [[...entityPoseRef.current.position[entityId]], [...entityPoseRef.current.position[entityId]]];
-                    creationPath[0] = [0, 0, 10];
+                    // By making this a high Z value the particle does not "hit" into other particles when falling into place
+                    creationPath[0] = [0, 0, 20];
                     return (
                         <EntityType
                             key={`${id}-${i}`}

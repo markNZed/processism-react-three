@@ -94,12 +94,13 @@ function SceneThree() {
                             id={"complex"}
                             color={"blue"}
                         />
-
-                        <Plane args={[50, 50]} position={[0, 0, -0.1]}>
+                        
+                        <Plane args={[50, 50]} position={[0, 0, -1]}>
                             <meshStandardMaterial attach="material" color="lightblue" />
                         </Plane>
 
                         <MyAxesHelper />
+                        
 
                     </>
                 </Physics>
