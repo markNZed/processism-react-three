@@ -91,3 +91,24 @@ export const stringifyCircular = (obj) => {
         return value;
     });
 }
+
+export const arraysEqual = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) {
+      return false; // Arrays of different lengths are not equal
+    }
+  
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false; // If any corresponding elements differ, arrays are not equal
+      }
+    }
+  
+    return true; // If no elements differ, arrays are equal
+}
+
+export const vectorsAlmostEqual = (vec1, vec2, epsilon = 1e-6) => {
+    return Math.abs(vec1.x - vec2.x) < epsilon &&
+           Math.abs(vec1.y - vec2.y) < epsilon &&
+           Math.abs(vec1.z - vec2.z) < epsilon;
+  }
+  

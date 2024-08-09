@@ -33,7 +33,7 @@ function SceneThree() {
     const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
 
     const cameraInitialState = {
-        position: [0, 0, 35],
+        position: [0, -20, 35],
         zoom: 35,
         left: window.innerWidth / -2,
         right: window.innerWidth / 2,

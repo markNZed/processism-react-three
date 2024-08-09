@@ -36,6 +36,10 @@ import useStore from '../../useStore'
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
 // The lower blob connections should be put in place before the higher
+// Make particles on boundary of visible blobs visible ?
+// Instead of setTranslation we could use velocity and/or impulse
+// There is a rotation in the 3,3 config of the last entity that does not make sense
+//   Maybe related to switching to dynamic ? Is the initial rotation accounted for in kinematic mode ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -230,7 +234,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
     // Position, orientation, and whether the entity is on the perimeter (outer) of the parent blob
     function entityPose(instantiateEntityId) {
-        //console.log("poseEntity", instantiateEntityId);
+        console.log("poseEntity", instantiateEntityId);
         const toInstantiateCount = entitiesToInstantiate.length;
         // If we have a shape then update the joints with new angles to allow for change in the number of entities
         let newPosition = [0, 0, 0];
@@ -517,6 +521,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 entityPose(nextEntityRef.current);
                 directResetParticlesHash();
                 frameStateRef.current = "replaceJoint";
+                //frameStateRef.current = "skipJoint";
+                break;
+            }
+            case "skipJoint": {
+                if (frameStateDurationRef.current < animDelay) break;
+                frameStateRef.current = "selectNextEntity";
                 break;
             }
             case "replaceJoint": {
@@ -524,6 +534,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Is the rigid body reference available
                 const particleRef = nextEntity.ref;
                 if (particleRef?.current?.current) {
+                    const visualConfig = particleRef.current.getVisualConfig();
+                    // Wait until particle is in place
+                    if (!visualConfig.isCreated) {
+                        directResetParticlesHash();
+                        break;
+                    }
                     frameStateRef.current = "replaceJoint";
                     node.particlesRef.current.push(particleRef);
                     const toInstantiateCount = entitiesToInstantiate.length;
@@ -642,11 +658,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     } else if (!jointsMapped) {
                         EntityType = Particle;
                     }
+                    // Array of positions potentially
+                    // Clone to allow for changes to individaul entries
+                    // Simulates a path where the particle "drops" down into the initialPosition
+                    const creationPath = [[0, 0 ,10], [...entityPoseRef.current.position[entityId]]];
                     return (
                         <EntityType
                             key={`${id}-${i}`}
                             id={`${entityId}`}
                             initialPosition={entityPoseRef.current.position[entityId]}
+                            creationPath={creationPath}
                             radius={entityRadius}
                             color={color}
                             ref={entity.ref}
