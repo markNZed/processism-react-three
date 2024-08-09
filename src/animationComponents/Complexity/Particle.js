@@ -159,7 +159,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 creationPositionRef.current.set(
                     currentTranslation.x,
                     currentTranslation.y,
-                    0, // FOrce into Z plane
+                    0, // Force into Z plane
                 );
                 groupRef.current.worldToLocal(creationPositionRef.current);
                 setCreated(true);
@@ -215,7 +215,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 ref={nodeRef}
                 position={[creationPositionRef.current.x, creationPositionRef.current.y, creationPositionRef.current.z]}
                 quaternion={initialQuaternion}
-                type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed"
+                type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed" "kinematicVelocity" "dynamic"
                 colliders={false}
                 linearDamping={damping}
                 angularDamping={damping}
@@ -226,7 +226,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 worldToLocal={worldToLocal}
                 id={id}
             >
-                <BallCollider args={[colliderRadius * 1.0] /*scaled to avoid contact*/} />
+                <BallCollider args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
             </ParticleRigidBody>
             {isDebug && (
                 <>

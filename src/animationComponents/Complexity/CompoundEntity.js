@@ -41,6 +41,8 @@ import useStore from '../../useStore'
 //   Could disable collider ?
 // Issue with particles not showing under lowest blob
 // Use Zustand to sync the prtical creation
+// Maybe can use rb.setBodyType(rigidBodyTypeFromString(value), true);
+//   nodeRef.current.current.setBodyType(0, true);
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -605,7 +607,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
                     nodeRef.current.worldToLocal(position);
-                    entityPoseRef.current.position[entityId] = [position.x, position.y, position.z];
+                    entityPoseRef.current.position[entityId] = [position.x, position.y, 0]; // Force Z to 0
                 })
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
