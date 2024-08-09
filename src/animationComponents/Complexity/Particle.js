@@ -126,11 +126,12 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 const xDirection = xDistance > 0 ? 1 : -1;
                 const yDirection = yDistance > 0 ? 1 : -1;
                 const zDirection = zDistance > 0 ? 1 : -1;
-                let xVelocity = xDirection * 5;
-                let yVelocity = yDirection * 5;
-                let zVelocity = zDirection * 5;
+                const velocityScale = 10;
+                let xVelocity = xDirection * velocityScale;
+                let yVelocity = yDirection * velocityScale;
+                let zVelocity = zDirection * velocityScale;
                 let nextPath = true;
-                const closeEnough = 0.1;
+                const closeEnough = 0.2;
                 if (Math.abs(xDistance) < closeEnough) {
                     xVelocity = 0;
                 } else {

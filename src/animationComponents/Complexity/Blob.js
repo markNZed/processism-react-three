@@ -148,7 +148,10 @@ const Blob = ({ color, node, entityNodes }) => {
             // Could make the boundary particles visible
             // Only once per blob
             blobData.current.refs.forEach(ref => {
-                ref.current.setVisualConfig(p => ({ ...p, visible: true, color: visualConfig.color}));
+                // compoundEntity will not have Particle ref
+                if (ref) {
+                    ref.current.setVisualConfig(p => ({ ...p, visible: true, color: visualConfig.color}));
+                }
             })
 
             if (blobPoints.length) {

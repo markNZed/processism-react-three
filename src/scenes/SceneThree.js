@@ -95,7 +95,7 @@ function SceneThree() {
                             color={"blue"}
                         />
                         
-                        <Plane args={[50, 50]} position={[0, 0, -1]}>
+                        <Plane args={[50, 50]} position={[0, 0, -5]}>
                             <meshStandardMaterial attach="material" color="lightblue" />
                         </Plane>
 

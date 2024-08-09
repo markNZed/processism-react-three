@@ -601,17 +601,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 directResetParticlesHash();
                 // Update the initialPositions based on current positions
                 // This was creating issues when "dropping" particles into place
-                /*
                 entitiesToInstantiate.forEach((entityId, i) => {
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
                     nodeRef.current.worldToLocal(position);
                     entityPoseRef.current.position[entityId] = [position.x, position.y, position.z];
                 })
-                */
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
-                    //setJointsMapped(true);
+                    setJointsMapped(true);
                     frameStateRef.current = "stableRoot";
                 } else {
                     frameStateRef.current = "done";
