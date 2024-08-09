@@ -101,8 +101,6 @@ function SceneThree() {
 
                         <MyAxesHelper />
 
-                        <DynamicSpeechSphere />
-
                     </>
                 </Physics>
             </AnimationController>
