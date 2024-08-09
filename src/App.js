@@ -51,7 +51,14 @@ export default function App() {
 
   const toggleOption = (option, value) => {
     setOption(option, !value);
- };
+  };
+
+  function handleSpeakClick(text) {
+    const utterance = new SpeechSynthesisUtterance("Enabled");
+    utterance.pitch = 1;
+    utterance.rate = 1;
+    window.speechSynthesis.speak(utterance);
+  }
 
   return (
     <>
@@ -74,6 +81,9 @@ export default function App() {
       </button>
       <button onClick={() => {toggleOption("hideBlobs", hideBlobs)}}>
         {hideBlobs ? 'Show Blobs' : 'Hide Blobs'}
+      </button>
+      <button onClick={handleSpeakClick}>
+        Enable Narration
       </button>
       <Canvas key={key} orthographic={isOrthographic} >
         {sceneComponent}

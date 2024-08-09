@@ -58,8 +58,28 @@ function SceneThree() {
         return <primitive object={new AxesHelper(5)} />;
     }
 
+    function Narration({ text }) {
+        useEffect(() => {
+          if ('speechSynthesis' in window) {
+            speak(text);
+          } else {
+            console.error("Speech Synthesis not supported in this browser.");
+          }
+        }, [text]);
+      
+        return null; // No visual component needed, just the speech
+    }
+      
+    function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.pitch = 1;
+        utterance.rate = 1;
+        window.speechSynthesis.speak(utterance);
+    }
+
     return (
         <>
+            <Narration text="Welcome to the virtual world. Enjoy your journey!" />
             <AnimationController animations={animationSequence} useStore={useStore}>
                 <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={physicsDebug} >
                     <Perf 
@@ -80,6 +100,8 @@ function SceneThree() {
                         </Plane>
 
                         <MyAxesHelper />
+
+                        <DynamicSpeechSphere />
 
                     </>
                 </Physics>
