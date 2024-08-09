@@ -37,11 +37,7 @@ import useStore from '../../useStore'
 // Test useAnimateImpulses
 // The lower blob connections should be put in place before the higher
 // Make particles on boundary of visible blobs visible ?
-// Instead of setTranslation we could use velocity and/or impulse
-// There is a rotation in the 3,3 config of the last entity that does not make sense
-//   Maybe related to switching to dynamic ? Is the initial rotation accounted for in kinematic mode ?
 // Need to spawn new particles in an order so they do not overlap/interact e.g .when multiple blobs forming
-//   Initial solution - spawn from above the center of the blob
 //   Could disable collider ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
@@ -602,12 +598,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 if (frameStateDurationRef.current < animDelay) break;
                 directResetParticlesHash();
                 // Update the initialPositions based on current positions
+                // This was creating issues when "dropping" particles into place
+                /*
                 entitiesToInstantiate.forEach((entityId, i) => {
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
                     nodeRef.current.worldToLocal(position);
                     entityPoseRef.current.position[entityId] = [position.x, position.y, position.z];
                 })
+                */
                 if (id == "root") {
                     console.log("useStoreEntity", useStoreEntity.getState());
                     setJointsMapped(true);
@@ -665,7 +664,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     // Clone to allow for changes to individaul entries
                     // Simulates a path where the particle "drops" down into the initialPosition
                     const creationPath = [[...entityPoseRef.current.position[entityId]], [...entityPoseRef.current.position[entityId]]];
-                    creationPath[0][2] = 10;
+                    creationPath[0] = [0, 0, 10];
                     return (
                         <EntityType
                             key={`${id}-${i}`}

@@ -34,7 +34,6 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     // Can't use groupRef because the particle may not be rendering and we still
     // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
-    const localToWorld = useCallback((localPos) => (parentNodeRef.current.localToWorld(localPos)) , [parentNodeRef]);
     const fixParticles = useStore((state) => state.getOption("fixParticles"));
     const [damping, setDamping] = useState(0.1);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
@@ -105,7 +104,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                     creationPath[creationPathIndexRef.current][1],
                     creationPath[creationPathIndexRef.current][2],
                 );
-                localToWorld(lastCreationPositionRef.current);
+                groupRef.current.localToWorld(lastCreationPositionRef.current);
                 if (creationPath.length > creationPathIndexRef.current + 1) {
                     const nextIndex = creationPathIndexRef.current + 1;
                     nextCreationPositionRef.current.set(
@@ -113,7 +112,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                         creationPath[nextIndex][1],
                         creationPath[nextIndex][2],
                     );
-                    localToWorld(nextCreationPositionRef.current);
+                    groupRef.current.localToWorld(nextCreationPositionRef.current);
                 } else {
                     created = true;
                 }
@@ -160,7 +159,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                     currentTranslation.y,
                     currentTranslation.z,
                 );
-                worldToLocal(creationPositionRef.current);
+                groupRef.current.worldToLocal(creationPositionRef.current);
                 setCreated(true);
                 // This seems to mess things up but assigning directly to rigidbody is OK
                 //setEnabledTranslations([true, true, false]);
