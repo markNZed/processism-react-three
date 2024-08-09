@@ -47,7 +47,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     const groupRef = useRef();
     const creationDurationRef = useRef(0);
     const [enabledTranslations, setEnabledTranslations] = useState([true, true, true]);
-    const creationPositionRef = useRef(creationPath[0] || initialPosition);
+    const creationPositionRef = useRef(new THREE.Vector3());
 
     // When scaling a Particle we need to modify the joint positions
     useFrame((_, deltaTime) => {
@@ -154,7 +154,12 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
             }
             if (created) {
                 nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
-                //creationPositionRef.current = [currentTranslation.x, currentTranslation.y, currentTranslation.z];
+                creationPositionRef.current.set(
+                    currentTranslation.x,
+                    currentTranslation.y,
+                    currentTranslation.z,
+                );
+                worldToLocal(creationPositionRef.current);
                 setCreated(true);
                 // This seems to mess things up 
                 //setEnabledTranslations([true, true, false]);
@@ -193,6 +198,11 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     useEffect(() => {
         console.log("Mounting Particle", id, initialPosition);
         groupRef.current.localToWorld(worldInitialPosition);
+        if (creationPath[0]) {
+            creationPositionRef.current.set(creationPath[0][0], creationPath[0][1], creationPath[0][2]);
+        } else {
+            creationPositionRef.current.set(initialPosition[0], initialPosition[1], initialPosition[2]);
+        }
     }, []);
 
     //console.log("Particle rendering", id, initialPosition, initialQuaternion);
@@ -201,7 +211,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
         <group ref={groupRef} >
             <ParticleRigidBody
                 ref={nodeRef}
-                position={creationPositionRef.current}
+                position={[creationPositionRef.current.x, creationPositionRef.current.y, creationPositionRef.current.z]}
                 quaternion={initialQuaternion}
                 type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed"
                 colliders={false}
