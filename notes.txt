@@ -1,3 +1,4 @@
+A distributed process - patterns of events (is that a final cause?) A notion of a distributed cause.
 A particle could go through 1st plane, through 2nd plane, loop back through 1st plane and modify structure of second plane. This is cpef. clef is where the 2nd plane modifies the 1st plane.
 
 Spent $350 as of 4/8/2024

@@ -99,8 +99,7 @@ function SceneThree() {
                             <meshStandardMaterial attach="material" color="lightblue" />
                         </Plane>
 
-                        <MyAxesHelper />
-                        
+                        <MyAxesHelper />   
 
                     </>
                 </Physics>
