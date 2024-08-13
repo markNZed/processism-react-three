@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useImperativeHandle, useState, useCa
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
-import { BallCollider, vec3 } from '@react-three/rapier';
+import { BallCollider, vec3, interactionGroups } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
 import useStore from './../../useStore';
@@ -44,6 +44,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     const nextPathRef = useRef(true);
     const worldInitialPosition = new THREE.Vector3(initialPosition[0], initialPosition[1], initialPosition[2]);
     const groupRef = useRef();
+    const colliderRef = useRef();
     const creationDurationRef = useRef(0);
     const [enabledTranslations, setEnabledTranslations] = useState([true, true, true]);
     const creationPositionRef = useRef(new THREE.Vector3());
@@ -90,10 +91,10 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
         }
         if (!created && nodeRef.current.current) {
             const currentTranslation = nodeRef.current.translation();
-            let created = false;
+            let create = false;
             // If not using creationPath
             if (creationPath.length === 0) {
-                created = true;
+                create = true;
             // If next path step or first path step
             } else if (nextPathRef.current) {
                 nextPathRef.current = false;
@@ -114,7 +115,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                     );
                     groupRef.current.localToWorld(nextCreationPositionRef.current);
                 } else {
-                    created = true;
+                    create = true;
                 }
                 creationPathIndexRef.current++;
             } else {
@@ -153,7 +154,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
             }
             // Could be a state machine so we can set creationPositionRef then setLinvel
-            if (created) {
+            if (create) {
                 nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
                 // It seems important to update creationPositionRef when changing enabledTranslations
                 creationPositionRef.current.set(
@@ -166,9 +167,12 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 // This seems to mess things up but assigning directly to rigidbody is OK
                 //setEnabledTranslations([true, true, false]);
                 nodeRef.current.current.setEnabledTranslations(true, true, false, true);
-                visualConfig.isCreated = true;
-                nodeRef.current.setVisualConfig(visualConfig);
+                //nodeRef.current.current.setBodyType(0, true); // dynamic
             }
+        } else if (!visualConfig.isCreated) {
+            colliderRef.current.setCollisionGroups(interactionGroups(0));
+            visualConfig.isCreated = true;
+            nodeRef.current.setVisualConfig(visualConfig);
         }
     });
 
@@ -226,7 +230,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 worldToLocal={worldToLocal}
                 id={id}
             >
-                <BallCollider args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
+                <BallCollider ref={colliderRef} collisionGroups={interactionGroups([1], 1)} args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
             </ParticleRigidBody>
             {isDebug && (
                 <>

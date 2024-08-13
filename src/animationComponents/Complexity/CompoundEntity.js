@@ -667,7 +667,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     // Simulates a path where the particle "drops" down into the initialPosition
                     const creationPath = [[...entityPoseRef.current.position[entityId]], [...entityPoseRef.current.position[entityId]]];
                     // By making this a high Z value the particle does not "hit" into other particles when falling into place
-                    creationPath[0] = [0, 0, 20];
+                    creationPath[0] = [0, 0, 10];
                     return (
                         <EntityType
                             key={`${id}-${i}`}
