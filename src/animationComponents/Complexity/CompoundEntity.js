@@ -40,9 +40,12 @@ import useStore from '../../useStore'
 // Need to spawn new particles in an order so they do not overlap/interact e.g .when multiple blobs forming
 //   Could disable collider ?
 // Issue with particles not showing under lowest blob
-// Use Zustand to sync the prtical creation
-// Maybe can use rb.setBodyType(rigidBodyTypeFromString(value), true);
-//   nodeRef.current.current.setBodyType(0, true);
+// Use Zustand to sync the partical creation
+// The position of new particle could be relative to the end of a joint
+//   Easier if relative to the position of a particle ?
+//   Coould update the position in Zustand - probably easiest
+// Pass a ref for the creationPath and can then update position vis useFrame 
+
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -111,6 +114,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         position: {},
         orientation: {},
         outer: {},
+        creationPathRefs: {},
     });
 
     const { deleteJoint, createJoint, updateJoint } = useJoints();
@@ -300,6 +304,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         entityPoseRef.current.orientation[instantiateEntityId] = entityInitialQuaternion;
         entityPoseRef.current.position[instantiateEntityId] = newPosition;
         entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: thisOuter};
+        entityPoseRef.current.creationPathRefs[instantiateEntityId] = React.createRef();
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), instantiateEntityId]);
     }
@@ -668,12 +673,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const creationPath = [[...entityPoseRef.current.position[entityId]], [...entityPoseRef.current.position[entityId]]];
                     // By making this a high Z value the particle does not "hit" into other particles when falling into place
                     creationPath[0] = [0, 0, 10];
+                    entityPoseRef.current.creationPathRefs[entityId].current = creationPath;
                     return (
                         <EntityType
                             key={`${id}-${i}`}
                             id={`${entityId}`}
                             initialPosition={entityPoseRef.current.position[entityId]}
-                            creationPath={creationPath}
+                            creationPathRef={entityPoseRef.current.creationPathRefs[entityId]}
                             radius={entityRadius}
                             color={color}
                             ref={entity.ref}

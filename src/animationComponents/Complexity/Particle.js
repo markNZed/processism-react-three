@@ -14,7 +14,7 @@ import * as THREE from 'three';
 // https://github.com/pmndrs/react-three-rapier/blob/main/demo/src/examples/kinematics/KinematicsExample.tsx
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPosition, initialQuaternion, radius, config, outer, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosition, initialQuaternion, radius, config, outer, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -46,7 +46,6 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     const groupRef = useRef();
     const colliderRef = useRef();
     const creationDurationRef = useRef(0);
-    const [enabledTranslations, setEnabledTranslations] = useState([true, true, true]);
     const creationPositionRef = useRef(new THREE.Vector3());
 
     // When scaling a Particle we need to modify the joint positions
@@ -89,90 +88,91 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
             //console.log("Damping changed", id, damping, visualConfig.damping);
             setDamping(visualConfig.damping);
         }
-        if (!created && nodeRef.current.current) {
-            const currentTranslation = nodeRef.current.translation();
-            let create = false;
-            // If not using creationPath
-            if (creationPath.length === 0) {
-                create = true;
-            // If next path step or first path step
-            } else if (nextPathRef.current) {
-                nextPathRef.current = false;
-                creationDurationRef.current = 0;
-                creationPathStepRef.current = 0;
-                lastCreationPositionRef.current.set(
-                    creationPath[creationPathIndexRef.current][0],
-                    creationPath[creationPathIndexRef.current][1],
-                    creationPath[creationPathIndexRef.current][2],
-                );
-                groupRef.current.localToWorld(lastCreationPositionRef.current);
-                if (creationPath.length > creationPathIndexRef.current + 1) {
-                    const nextIndex = creationPathIndexRef.current + 1;
-                    nextCreationPositionRef.current.set(
-                        creationPath[nextIndex][0],
-                        creationPath[nextIndex][1],
-                        creationPath[nextIndex][2],
-                    );
-                    groupRef.current.localToWorld(nextCreationPositionRef.current);
-                } else {
+        if (nodeRef.current.current) {
+            if (!created) {
+                const currentTranslation = nodeRef.current.translation();
+                let create = false;
+                // If not using creationPathRef
+                if (!creationPathRef.current) {
                     create = true;
-                }
-                creationPathIndexRef.current++;
-            } else {
-                creationPathStepRef.current++;
-                // Move creationPositionRef closer to the nextCreationPositionRef
-                const xDistance = nextCreationPositionRef.current.x - currentTranslation.x;
-                const yDistance = nextCreationPositionRef.current.y - currentTranslation.y;
-                const zDistance = nextCreationPositionRef.current.z - currentTranslation.z;
-                const xDirection = xDistance > 0 ? 1 : -1;
-                const yDirection = yDistance > 0 ? 1 : -1;
-                const zDirection = zDistance > 0 ? 1 : -1;
-                const velocityScale = 10;
-                let xVelocity = xDirection * velocityScale;
-                let yVelocity = yDirection * velocityScale;
-                let zVelocity = zDirection * velocityScale;
-                let nextPath = true;
-                const closeEnough = 0.2;
-                if (Math.abs(xDistance) < closeEnough) {
-                    xVelocity = 0;
+                // If next path step or first path step
+                } else if (nextPathRef.current) {
+                    nextPathRef.current = false;
+                    creationDurationRef.current = 0;
+                    creationPathStepRef.current = 0;
+                    lastCreationPositionRef.current.set(
+                        creationPathRef.current[creationPathIndexRef.current][0],
+                        creationPathRef.current[creationPathIndexRef.current][1],
+                        creationPathRef.current[creationPathIndexRef.current][2],
+                    );
+                    groupRef.current.localToWorld(lastCreationPositionRef.current);
+                    if (creationPathRef.current.length > creationPathIndexRef.current + 1) {
+                        const nextIndex = creationPathIndexRef.current + 1;
+                        nextCreationPositionRef.current.set(
+                            creationPathRef.current[nextIndex][0],
+                            creationPathRef.current[nextIndex][1],
+                            creationPathRef.current[nextIndex][2],
+                        );
+                        groupRef.current.localToWorld(nextCreationPositionRef.current);
+                    } else {
+                        create = true;
+                    }
+                    creationPathIndexRef.current++;
                 } else {
-                    nextPath = false;
+                    creationPathStepRef.current++;
+                    // Move creationPositionRef closer to the nextCreationPositionRef
+                    const xDistance = nextCreationPositionRef.current.x - currentTranslation.x;
+                    const yDistance = nextCreationPositionRef.current.y - currentTranslation.y;
+                    const zDistance = nextCreationPositionRef.current.z - currentTranslation.z;
+                    const xDirection = xDistance > 0 ? 1 : -1;
+                    const yDirection = yDistance > 0 ? 1 : -1;
+                    const zDirection = zDistance > 0 ? 1 : -1;
+                    const velocityScale = 10;
+                    let xVelocity = xDirection * velocityScale;
+                    let yVelocity = yDirection * velocityScale;
+                    let zVelocity = zDirection * velocityScale;
+                    let nextPath = true;
+                    const closeEnough = 0.2;
+                    if (Math.abs(xDistance) < closeEnough) {
+                        xVelocity = 0;
+                    } else {
+                        nextPath = false;
+                    }
+                    if (Math.abs(yDistance) < closeEnough) {
+                        yVelocity = 0;
+                    } else {
+                        nextPath = false;
+                    }
+                    if (Math.abs(zDistance) < closeEnough) {
+                        zVelocity = 0;
+                    } else {
+                        nextPath = false;
+                    }
+                    nextPathRef.current = nextPath;
+                    nodeRef.current.current.setLinvel({ x: xVelocity, y: yVelocity, z: zVelocity }, true);
+                    //console.log("setLinvel velocity", id, xVelocity, yVelocity, zVelocity);
+                    //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
                 }
-                if (Math.abs(yDistance) < closeEnough) {
-                    yVelocity = 0;
-                } else {
-                    nextPath = false;
+                // Could be a state machine so we can set creationPositionRef then setLinvel
+                if (create) {
+                    nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+                    // It seems important to update creationPositionRef when changing enabledTranslations
+                    creationPositionRef.current.set(
+                        currentTranslation.x,
+                        currentTranslation.y,
+                        0, // Force into Z plane
+                    );
+                    groupRef.current.worldToLocal(creationPositionRef.current);
+                    setCreated(true);
+                    // This seems to mess things up but assigning directly to rigidbody is OK
+                    nodeRef.current.current.setEnabledTranslations(true, true, false, true);
+                    //nodeRef.current.current.setBodyType(0, true); // dynamic
                 }
-                if (Math.abs(zDistance) < closeEnough) {
-                    zVelocity = 0;
-                } else {
-                    nextPath = false;
-                }
-                nextPathRef.current = nextPath;
-                nodeRef.current.current.setLinvel({ x: xVelocity, y: yVelocity, z: zVelocity }, true);
-                //console.log("setLinvel velocity", id, xVelocity, yVelocity, zVelocity);
-                //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
+            } else if (!visualConfig.isCreated) {
+                colliderRef.current.setCollisionGroups(interactionGroups(0));
+                visualConfig.isCreated = true;
+                nodeRef.current.setVisualConfig(visualConfig);
             }
-            // Could be a state machine so we can set creationPositionRef then setLinvel
-            if (create) {
-                nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
-                // It seems important to update creationPositionRef when changing enabledTranslations
-                creationPositionRef.current.set(
-                    currentTranslation.x,
-                    currentTranslation.y,
-                    0, // Force into Z plane
-                );
-                groupRef.current.worldToLocal(creationPositionRef.current);
-                setCreated(true);
-                // This seems to mess things up but assigning directly to rigidbody is OK
-                //setEnabledTranslations([true, true, false]);
-                nodeRef.current.current.setEnabledTranslations(true, true, false, true);
-                //nodeRef.current.current.setBodyType(0, true); // dynamic
-            }
-        } else if (!visualConfig.isCreated) {
-            colliderRef.current.setCollisionGroups(interactionGroups(0));
-            visualConfig.isCreated = true;
-            nodeRef.current.setVisualConfig(visualConfig);
         }
     });
 
@@ -204,8 +204,8 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
     useEffect(() => {
         console.log("Mounting Particle", id, initialPosition);
         groupRef.current.localToWorld(worldInitialPosition);
-        if (creationPath[0]) {
-            creationPositionRef.current.set(creationPath[0][0], creationPath[0][1], creationPath[0][2]);
+        if (creationPathRef.current && creationPathRef.current[0]) {
+            creationPositionRef.current.set(creationPathRef.current[0][0], creationPathRef.current[0][1], creationPathRef.current[0][2]);
         } else {
             creationPositionRef.current.set(initialPosition[0], initialPosition[1], initialPosition[2]);
         }
@@ -223,7 +223,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPath = [], initialPo
                 colliders={false}
                 linearDamping={damping}
                 angularDamping={damping}
-                enabledTranslations={enabledTranslations}
+                enabledTranslations={[true, true, true]}
                 enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
