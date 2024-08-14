@@ -230,7 +230,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 worldToLocal={worldToLocal}
                 id={id}
             >
-                <BallCollider ref={colliderRef} collisionGroups={interactionGroups([1], 1)} args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
+                <BallCollider ref={colliderRef} collisionGroups={interactionGroups([2], 1)} args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
             </ParticleRigidBody>
             {isDebug && (
                 <>

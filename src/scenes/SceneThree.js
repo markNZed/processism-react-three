@@ -79,7 +79,7 @@ function SceneThree() {
 
     return (
         <>
-            <Narration text="Welcome to the virtual world. Enjoy your journey!" />
+            {/*<Narration text="Welcome to the virtual world. Enjoy your journey!" />*/}
             <AnimationController animations={animationSequence} useStore={useStore}>
                 <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={physicsDebug} >
                     <Perf 

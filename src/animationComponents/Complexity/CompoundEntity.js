@@ -35,16 +35,10 @@ import useStore from '../../useStore'
 
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
-// The lower blob connections should be put in place before the higher
-// Make particles on boundary of visible blobs visible ?
-// Need to spawn new particles in an order so they do not overlap/interact e.g .when multiple blobs forming
-//   Could disable collider ?
+// The lower blob joints should be put in place before the higher
 // Issue with particles not showing under lowest blob
 // Use Zustand to sync the partical creation
-// The position of new particle could be relative to the end of a joint
-//   Easier if relative to the position of a particle ?
-//   Coould update the position in Zustand - probably easiest
-// Pass a ref for the creationPath and can then update position vis useFrame 
+// Pass a ref for the creationPath and can then update position via useFrame 
 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
@@ -98,6 +92,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const initialShowParticlesRef = useRef();
     const prevParticlesHash = useRef();
     const frameStateDurationRef = useRef(0);
+    const creationSource = new THREE.Vector3();
+    const initialCreationPath = [[0, 0, 20], [0, 0, 10]];
 
     const setOption = useStore((state) => state.setOption);
     const showParticles = useStore((state) => state.getOption("showParticles"));
@@ -304,7 +300,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         entityPoseRef.current.orientation[instantiateEntityId] = entityInitialQuaternion;
         entityPoseRef.current.position[instantiateEntityId] = newPosition;
         entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: thisOuter};
+
+        const creationPath = initialCreationPath;
+        creationPath.forEach((point, i) => {
+            creationSource.set(point[0], point[1], point[2]);
+            nodeRef.current.worldToLocal(creationSource);
+            creationPath[i] = [creationSource.x, creationSource.y, creationSource.z];
+        });
+        creationPath.push(newPosition);
         entityPoseRef.current.creationPathRefs[instantiateEntityId] = React.createRef();
+        entityPoseRef.current.creationPathRefs[instantiateEntityId].current = creationPath;
+
         // Strip out any id from entitiesToInstantiate that is not in entityNodes and add next entity
         setEntitiesToInstantiate(p => [...p.filter(id => node.childrenIds.includes(id)), instantiateEntityId]);
     }
@@ -667,13 +673,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     } else if (!jointsMapped) {
                         EntityType = Particle;
                     }
-                    // Array of positions potentially
-                    // Clone to allow for changes to individaul entries
-                    // Simulates a path where the particle "drops" down into the initialPosition
-                    const creationPath = [[...entityPoseRef.current.position[entityId]], [...entityPoseRef.current.position[entityId]]];
-                    // By making this a high Z value the particle does not "hit" into other particles when falling into place
-                    creationPath[0] = [0, 0, 10];
-                    entityPoseRef.current.creationPathRefs[entityId].current = creationPath;
                     return (
                         <EntityType
                             key={`${id}-${i}`}
