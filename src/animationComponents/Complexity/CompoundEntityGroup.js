@@ -2,7 +2,7 @@ import React, { forwardRef, useRef, useImperativeHandle, useMemo, useEffect } fr
 import PropTypes from 'prop-types';
 import * as THREE from 'three';
 
-const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion, id }, ref) => {
+const CompoundEntityGroup = forwardRef(({ children, position, quaternion, id}, ref) => {
     const internalRef = useRef();
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
@@ -11,11 +11,11 @@ const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion,
     // Convert position array to THREE.Vector3 instance
     const verifiedPosition = useMemo(() => new THREE.Vector3(...position), [position]);
 
-    // Memoize the initialization of the quaternion from the initialQuaternion prop
+    // Memoize the initialization of the quaternion from the quaternion prop
     // and apply a 90-degree clockwise rotation around the Z-axis
     const quaternionRef = useMemo(() => {
-        if (initialQuaternion) {
-            const initialQuat = new THREE.Quaternion(...initialQuaternion);
+        if (quaternion) {
+            const initialQuat = new THREE.Quaternion(...quaternion);
             const rotationQuat = new THREE.Quaternion();
             rotationQuat.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2); // 90 degrees clockwise
             initialQuat.multiply(rotationQuat); // Apply the rotation
@@ -23,7 +23,7 @@ const CompoundEntityGroup = forwardRef(({ children, position, initialQuaternion,
         } else {
             return new THREE.Quaternion();
         }
-    }, [initialQuaternion]);
+    }, [quaternion]);
     
     // Apply the quaternion to the group when it's available
     useEffect(() => {
