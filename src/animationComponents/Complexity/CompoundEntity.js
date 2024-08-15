@@ -37,10 +37,11 @@ import useStore from '../../useStore'
 // Test useAnimateImpulses
 // The lower blob joints should be put in place before the higher
 // Issue with particles not showing under lowest blob
-// Use Zustand to sync the partical creation
-// How to test updating of creation path ?
 // We could create different collisionGroup for particles with multiple joints to avoid violent joint creation?
 // We are rotating the compoundEntity using the group is this to avoid applying this rotation to particles ?
+// default in positionAndOuter is expensive
+// When replacing a particle with a compoundEntity we should reuse the particle ?
+//   Could use tha tposition as the start point for the first creation path
 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
@@ -73,7 +74,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.97, [radius, entityCount]);
     //const entityRadius = radius / entityCount;
     // Track the center of this CompoundEntity
-    const centerRef = useRef(new THREE.Vector3());
+    const centerRef = useRef(new THREE.Vector3(0, 0, 0));
     const worldCenterRef = useRef(new THREE.Vector3());
     // State machine that can distribute computation across frames
     const frameStateRef = useRef("init");
@@ -96,6 +97,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const frameStateDurationRef = useRef(0);
     const creationSource = new THREE.Vector3();
     const initialCreationPath = [[0, 0, 25], [0, 0, 20]];
+    const entityIdsCreatedRef = useRef([]);
 
     const setOption = useStore((state) => state.setOption);
     const showParticles = useStore((state) => state.getOption("showParticles"));
@@ -237,9 +239,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         jointsRef.current = jointsRef.current.filter(jointId => !jointsUpdated.includes(jointId));
     }
 
-    function newPositionOuter(toInstantiateCount) {
-        let newPosition = [0, 0, 0];
-        //let newPosition = [centerRef.current.x, centerRef.current.y, centerRef.current.z];
+    function positionAndOuter(toInstantiateCount) {
+        //let newPosition = [0, 0, 0];
+        let newPosition = [centerRef.current.x, centerRef.current.y, centerRef.current.z];
         let thisOuter = true;
         switch (toInstantiateCount) {
             case 0:
@@ -250,11 +252,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case 1: {
                 // Get position of first entity
                 // This is not accounting for the rotation of the compoundEntity ? 
-                //const node1 = directGetNode(entitiesToInstantiate[0]);
-                //const body1 = node1.ref.current;
-                //newPosition = vec3(body1.translation());
-                //nodeRef.current.worldToLocal(newPosition);
-                //newPosition[0] += entityRadius * 2;
                 newPosition[0] += entityRadius;
                 break;
             }
@@ -293,7 +290,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     // Position, orientation, and whether the entity is on the perimeter (outer) of the parent blob
     function entityPose(instantiateEntityId) {
         console.log("poseEntity", instantiateEntityId);
-        const { newPosition, thisOuter } = newPositionOuter(entitiesToInstantiate.length);
+        const { newPosition, thisOuter } = positionAndOuter(entitiesToInstantiate.length);
         const entityOrientation = centerRef.current.clone()
         entityOrientation.sub(new THREE.Vector3(...newPosition));
         // If zero vector, set to default direction
@@ -421,8 +418,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         if (activeEntities > 0) {
             worldCenterRef.current.divideScalar(activeEntities);
             centerRef.current = nodeRef.current.worldToLocal(worldCenterRef.current.clone());
-        } else {
-            centerRef.current = new THREE.Vector3(0, 0, 0);
         }
         
         nodeRef.current.setCenter(centerRef.current);
@@ -474,7 +469,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             if (!pausePhysics) frameStateDurationRef.current += deltaTime;
         }
 
-        calculateCenter(entitiesToInstantiate);
+        calculateCenter(entityIdsCreatedRef.current);
 
         if (prevFrameStateRef.current !== frameStateRef.current) {
             //console.log("FrameState", frameStateRef.current);
@@ -572,15 +567,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         // Update the position of where the new entity should end up
                         const creationPathRef = entityPoseRef.current.creationPathRefs[nextEntityIdRef.current];
                         if (creationPathRef.current.length) {
-                            // Because we have added an entity by now
-                            const { newPosition } = newPositionOuter(entitiesToInstantiate.length - 1);
+                            // Because we have added an entity by now so subtract 1
+                            const { newPosition } = positionAndOuter(entitiesToInstantiate.length - 1);
                             const lastPathIndex = creationPathRef.current.length - 1;
                             creationPathRef.current[lastPathIndex] = newPosition;
-                            console.log("new position", id, newPosition);
+                            //console.log("new position", id, newPosition);
                         }
                         directResetParticlesHash();
                         break;
                     }
+                    entityIdsCreatedRef.current.push(nextEntityIdRef.current);
                     frameStateRef.current = "replaceJoint";
                     node.particlesRef.current.push(particleRef);
                     const toInstantiateCount = entitiesToInstantiate.length;

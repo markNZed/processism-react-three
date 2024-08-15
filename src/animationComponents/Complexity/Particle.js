@@ -120,7 +120,6 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                     creationPathRef.current[creationPathIndexRef.current][2],
                 );
                 groupRef.current.localToWorld(nextCreationPositionRef.current);
-                //console.log("nextCreationPositionRef", id, JSON.stringify(nextCreationPositionRef.current));
                 // Move creationPositionRef closer to the nextCreationPositionRef
                 const xDistance = nextCreationPositionRef.current.x - currentTranslation.x;
                 const yDistance = nextCreationPositionRef.current.y - currentTranslation.y;
@@ -129,9 +128,9 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 const yDirection = yDistance > 0 ? 1 : -1;
                 const zDirection = zDistance > 0 ? 1 : -1;
                 const velocityScale = 10;
-                let xVelocity = xDirection * velocityScale; //Math.max(velocityScale, xDistance);
-                let yVelocity = yDirection * velocityScale; //Math.max(velocityScale, yDistance);
-                let zVelocity = zDirection * velocityScale; //Math.max(velocityScale, zDistance);
+                let xVelocity = xDirection * Math.max(velocityScale, xDistance);
+                let yVelocity = yDirection * Math.max(velocityScale, yDistance);
+                let zVelocity = zDirection * Math.max(velocityScale, zDistance);
                 let nextPath = true;
                 const closeEnough = 0.2;
                 if (Math.abs(xDistance) < closeEnough) {
@@ -230,7 +229,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 quaternion={quaternion}
                 type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed" "kinematicVelocity" "dynamic"
                 colliders={false}
-                linearVelocity={[2, 2, 0]}
+                //linearVelocity={[2, 2, 0]}
                 linearDamping={damping}
                 angularDamping={damping}
                 enabledTranslations={[true, true, true]}
