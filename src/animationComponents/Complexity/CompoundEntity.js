@@ -41,7 +41,8 @@ import useStore from '../../useStore'
 // We are rotating the compoundEntity using the group is this to avoid applying this rotation to particles ?
 // default in positionAndOuter is expensive
 // When replacing a particle with a compoundEntity we should reuse the particle ?
-//   Could use tha tposition as the start point for the first creation path
+//   Could use that position as the start point for the first creation path
+// Should we lock the translation of first entity while "growing" ?
 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
@@ -259,12 +260,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 newPosition[1] -= entityRadius * Math.sqrt(3);
                 break;
             }
-            case 3: {
-                newPosition[1] += entityRadius * Math.sqrt(3);
-                // Because at root everything is outer
-                thisOuter = false;
-                break;
-            }
             default: {
                 const replaceJointId = activeJointsQueueRef.current[0];
                 const {jointRef, body1Id} = directGetJoint(replaceJointId);
@@ -322,6 +317,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             nodeRef.current.worldToLocal(creationSource);
             creationPath[i] = [creationSource.x, creationSource.y, creationSource.z];
         });
+        creationPath.push([0, 0, 20]);
         creationPath.push(newPosition);
         entityPoseRef.current.creationPathRefs[instantiateEntityId] = React.createRef();
         entityPoseRef.current.creationPathRefs[instantiateEntityId].current = creationPath;
@@ -691,6 +687,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 {entitiesToInstantiate.map((entityId, i) => {
                     let entity = directGetNode(entityId);
                     let EntityType = CompoundEntity;
+                    let lockPose = (i === 0 && !jointsMapped) ? true : false
                     if (entity.childrenIds.length === 0) {
                         EntityType = Particle;
                     } else if (!jointsMapped) {
@@ -711,6 +708,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             jointsFrom={jointsFromRef.current[entity.id] || []}
                             quaternion={entityPoseRef.current.orientation[entityId]}
                             outer={entityPoseRef.current.outer[entityId]}
+                            lockPose={lockPose}
                         />
                     )
                 })}

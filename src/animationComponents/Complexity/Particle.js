@@ -14,7 +14,7 @@ import * as THREE from 'three';
 // https://github.com/pmndrs/react-three-rapier/blob/main/demo/src/examples/kinematics/KinematicsExample.tsx
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosition, quaternion, radius, config, outer, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -232,8 +232,10 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 //linearVelocity={[2, 2, 0]}
                 linearDamping={damping}
                 angularDamping={damping}
-                enabledTranslations={[true, true, true]}
-                enabledRotations={[false, false, true]}
+                enabledTranslations={[!lockPose, !lockPose, !lockPose]}
+                //enabledTranslations={[true, true, true]}
+                enabledRotations={[false, false, !lockPose]}
+                //enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
                 worldToLocal={worldToLocal}
@@ -243,12 +245,17 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                     collisionGroups set to 2 and collides only with empty group 1
                     After arriving at position collisionGroup will be set to 0
                 */}
-                <BallCollider ref={colliderRef} collisionGroups={interactionGroups([2], 1)} args={[colliderRadius * 0.99] /*scaled to avoid contact*/} />
+                <BallCollider 
+                    ref={colliderRef} 
+                    collisionGroups={interactionGroups([2], 1)} 
+                    args={[colliderRadius * 0.99] /*scaled to avoid contact*/} 
+                />
             </ParticleRigidBody>
             {isDebug && (
                 <>
                     <Text
-                        position={[initialPosition[0], initialPosition[1], initialPosition[2] + 0.1]} // Slightly offset in the z-axis to avoid z-fighting
+                        // Slightly offset in the z-axis to avoid z-fighting
+                        position={[initialPosition[0], initialPosition[1], initialPosition[2] + 0.1]} 
                         fontSize={radius / 2}
                         color="black"
                         anchorX="center"
