@@ -24,7 +24,7 @@ const SceneSelector = () => {
       <button onClick={() => initializeScene('SceneTwo')}>Go to Scene Two</button>
       <button onClick={() => initializeScene('SceneThree')}>Go to Scene Three</button>
       */}
-      <button onClick={() => initializeScene('SceneThree')}>Reload</button>
+      <button onClick={() => initializeScene('SceneFour')}>Reload</button>
     </div>
   )
 }

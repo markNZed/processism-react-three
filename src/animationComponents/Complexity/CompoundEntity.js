@@ -43,6 +43,8 @@ import useStore from '../../useStore'
 // When replacing a particle with a compoundEntity we should reuse the particle ?
 //   Could use that position as the start point for the first creation path
 // Should we lock the translation of first entity while "growing" ?
+// A better name might be "Cluster" rather than "Complexity"
+
 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
@@ -317,7 +319,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             nodeRef.current.worldToLocal(creationSource);
             creationPath[i] = [creationSource.x, creationSource.y, creationSource.z];
         });
-        creationPath.push([0, 0, 20]);
+        const zPos = creationPath[creationPath.length - 1][2];
+        creationPath.push([0, 0, zPos]);
         creationPath.push(newPosition);
         entityPoseRef.current.creationPathRefs[instantiateEntityId] = React.createRef();
         entityPoseRef.current.creationPathRefs[instantiateEntityId].current = creationPath;

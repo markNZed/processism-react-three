@@ -3,6 +3,7 @@ import useStore from './useStore'
 import SceneOne from './scenes/SceneOne'
 import SceneTwo from './scenes/SceneTwo'
 import SceneThree from './scenes/SceneThree'
+import SceneFour from './scenes/SceneFour'
 
 const useSceneManager = () => {
   const currentScene = useStore((state) => state.currentScene)
@@ -43,6 +44,11 @@ const useSceneManager = () => {
         break
       case 'SceneThree':
         sceneComponent = <SceneThree key={key} />
+        isOrthographic = true
+        setUsePhysics(true)
+        break
+      case 'SceneFour':
+        sceneComponent = <SceneFour key={key} />
         isOrthographic = true
         setUsePhysics(true)
         break
