@@ -7,7 +7,7 @@ import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import * as utils from './utils';
-import useAnimateComplexity from './useAnimateComplexity';
+import useAnimateCluster from './useAnimateCluster';
 
 /* Overview:
   Animation framework intended to provide a visual language for representing complexity.
@@ -28,7 +28,7 @@ import useAnimateComplexity from './useAnimateComplexity';
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
-const Complexity = React.forwardRef(({radius, color}, ref) => {
+const Cluster = React.forwardRef(({radius, color}, ref) => {
 
     const pausePhysics = useStore((state) => state.pausePhysics);
 
@@ -117,9 +117,9 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
         lastStepEnd.current = endTime;
     });
 
-    const {storeEntityReady} = useAnimateComplexity(config, internalRef);
+    const {storeEntityReady} = useAnimateCluster(config, internalRef);
     
-    console.log("Complexity rendering", storeEntityReady, config)
+    console.log("Cluster rendering", storeEntityReady, config)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity
     // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
@@ -140,4 +140,4 @@ const Complexity = React.forwardRef(({radius, color}, ref) => {
     );
 });
 
-export default withAnimationState(Complexity);
+export default withAnimationState(Cluster);

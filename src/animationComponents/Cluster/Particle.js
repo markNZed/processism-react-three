@@ -5,7 +5,7 @@ import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider, interactionGroups } from '@react-three/rapier';
 import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
-import useStore from './../../useStore';
+import useStore from '../../useStore';
 import * as THREE from 'three';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?

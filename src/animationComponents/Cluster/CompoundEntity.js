@@ -43,7 +43,7 @@ import useStore from '../../useStore'
 // When replacing a particle with a compoundEntity we should reuse the particle ?
 //   Could use that position as the start point for the first creation path
 // Should we lock the translation of first entity while "growing" ?
-// A better name might be "Cluster" rather than "Complexity"
+// A better name might be "Cluster" rather than "Cluster"
 
 
 
