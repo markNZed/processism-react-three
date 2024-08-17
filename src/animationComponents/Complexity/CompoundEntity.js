@@ -47,7 +47,6 @@ import useStore from '../../useStore'
 //   useAnimateComplexity assumes one root
 
 
-
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too

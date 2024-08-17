@@ -25,7 +25,7 @@ import useConfigPanel from './useConfigPanel';
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
-const Complexity = ({id, radius, color, initialPosition = [0, 0, 0]}) => {
+const Complexity = ({id, radius, color}) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const ref = useRef();
@@ -48,7 +48,7 @@ const Complexity = ({id, radius, color, initialPosition = [0, 0, 0]}) => {
                     id={"root"}
                     ref={ref}
                     radius={config.radius}
-                    initialPosition={initialPosition}
+                    initialPosition={[0, 0, 0]}
                     config={config}
                 />
             )}
