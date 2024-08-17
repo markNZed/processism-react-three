@@ -41,10 +41,9 @@ import useStore from '../../useStore'
 // default in positionAndOuter is expensive
 // When replacing a particle with a compoundEntity we should reuse the particle ?
 //   Could use that position as the start point for the first creation path
-// Not supporting multiple instances of Complexity
+// Not supporting multiple instances of compoundEntity
 //   Will need to re-organize the store
-//     Nodes for each Complexity
-//     Move physics to a higher level - maybe a component to instantiate in SceneFour
+//     Nodes for each hierarchy
 
 
 
@@ -477,7 +476,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
 
         prevFrameStateRef.current = frameStateRef.current
 
-        const animDelay = config.animDelayMs / 1000 * config.slowdown;
+        const animDelay = config.animDelayMs / 1000;
         
         // State machine can distribute computation across frames, reducing load on the physics engine
         // Also provides the "growth" algorithm for the compoundEntity
