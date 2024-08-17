@@ -44,6 +44,7 @@ import useStore from '../../useStore'
 // Not supporting multiple instances of compoundEntity
 //   Will need to re-organize the store
 //     Nodes for each hierarchy
+//   useAnimateComplexity assumes one root
 
 
 

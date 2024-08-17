@@ -25,15 +25,14 @@ import useConfigPanel from './useConfigPanel';
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
-const Complexity = React.forwardRef(({id, radius, color, initialPosition = [0, 0, 0]}, ref) => {
+const Complexity = ({id, radius, color, initialPosition = [0, 0, 0]}) => {
 
     // Using forwardRef and need to access the ref from inside this component too
-    const internalRef = useRef();
-    useImperativeHandle(ref, () => internalRef.current);
+    const ref = useRef();
 
     const config = useConfigPanel({ radius, color });
 
-    const {storeEntityReady} = useAnimateComplexity(config, internalRef);
+    const {storeEntityReady} = useAnimateComplexity(config, ref);
     
     console.log("Complexity rendering", id, storeEntityReady, config)
 
@@ -47,7 +46,7 @@ const Complexity = React.forwardRef(({id, radius, color, initialPosition = [0, 0
             {storeEntityReady && (
                 <CompoundEntity
                     id={"root"}
-                    ref={internalRef}
+                    ref={ref}
                     radius={config.radius}
                     initialPosition={initialPosition}
                     config={config}
@@ -55,6 +54,6 @@ const Complexity = React.forwardRef(({id, radius, color, initialPosition = [0, 0
             )}
         </>
     );
-});
+};
 
 export default withAnimationState(Complexity);

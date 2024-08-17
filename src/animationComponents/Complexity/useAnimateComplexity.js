@@ -1,7 +1,7 @@
-import { useEffect, useState ,useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import useStoreEntity from './useStoreEntity';
 
-function useAnimateComplexity(config, internalRef) {
+function useAnimateComplexity(config, ref) {
 
     const [storeEntityReady, setStoreEntityReady] = useState(false);
     // Avoid changes in store causing rerender
@@ -38,7 +38,7 @@ function useAnimateComplexity(config, internalRef) {
         //addNodesRecursively([9,9,21], rootNode);
         //addNodesRecursively([config.entityCounts[0]], rootNode);
         addNodesRecursively(config.entityCounts, rootNode);
-        directUpdateNode("root", { ref: internalRef });
+        directUpdateNode("root", { ref: ref });
         setStoreEntityReady(true);
         console.log("Nodes after initialization", useStoreEntity.getState().getAllNodes());
 
