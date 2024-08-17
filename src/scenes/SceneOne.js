@@ -2,7 +2,6 @@ import React from 'react';
 import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
-import useStore from '../useStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
 
 
@@ -53,7 +52,7 @@ function SceneOne() {
 
   return (
     <>
-        <AnimationController animations={animationSequence} useStore={useStore}>
+        <AnimationController animations={animationSequence} >
             <>
 
                 <EmergentEntity

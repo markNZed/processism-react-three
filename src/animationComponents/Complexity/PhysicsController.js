@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from '@react-three/rapier';
 import { useFrame } from '@react-three/fiber';
-import useStore from '../../useStore'
+import useAppStore from '../../useAppStore'
 
 const PhysicsController = ({ config }) => {
     const { step } = useRapier();
@@ -10,7 +10,7 @@ const PhysicsController = ({ config }) => {
     const AVERAGE_OVER = 1000;
     const stepCount = useRef(0); // Counter to track the number of steps
 
-    const pausePhysics = useStore((state) => state.pausePhysics);
+    const pausePhysics = useAppStore((state) => state.pausePhysics);
 
     const onPhysicsStepComplete = (averageDuration) => {
         if (stepCount.current >= AVERAGE_OVER) {

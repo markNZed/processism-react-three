@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import useStore from './useStore'
+import useAppStore from './useAppStore'
 import SceneOne from './scenes/SceneOne'
 import SceneTwo from './scenes/SceneTwo'
 import SceneThree from './scenes/SceneThree'
 
 const useSceneManager = () => {
-  const currentScene = useStore((state) => state.currentScene)
-  const reloadScene = useStore((state) => state.reloadScene)
-  const setReloadScene = useStore((state) => state.setReloadScene)
-  const setUsePhysics = useStore((state) => state.setUsePhysics)
+  const currentScene = useAppStore((state) => state.currentScene)
+  const reloadScene = useAppStore((state) => state.reloadScene)
+  const setReloadScene = useAppStore((state) => state.setReloadScene)
+  const setUsePhysics = useAppStore((state) => state.setUsePhysics)
   const [key, setKey] = useState(0)
   const [sceneInfo, setSceneInfo] = useState({ sceneComponent: null, isOrthographic: true })
 

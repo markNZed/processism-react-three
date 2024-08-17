@@ -3,7 +3,7 @@ import { Circle as CircleDrei } from '@react-three/drei';
 import { Circle } from '..';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
-import useStore from '../../useStore';
+import useAppStore from '../../useAppStore';
 
 const localJointPosition = (groupRef, particle) => {
     if (!particle) {
@@ -27,7 +27,7 @@ const localJointPosition = (groupRef, particle) => {
 };
 
 const DebugRender = ({ id, radius, color, initialPosition, newJointsRef, index, nodeRef, isDebug, centerRef }) => {
-    const getComponentRef = useStore((state) => state.getComponentRef);
+    const getComponentRef = useAppStore((state) => state.getComponentRef);
 
     useEffect(() => {
         if (isDebug) {

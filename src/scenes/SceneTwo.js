@@ -3,7 +3,7 @@ import { Physics } from '@react-three/rapier';
 import { Camera, DynamicDoubleArrow, EmergentEntity, TargetText } from '../animationComponents';
 import * as THREE from 'three';
 import { AnimationController } from '../AnimationController'; // Adjust import path as necessary
-import useStore from '../useStore'; // Adjust import path as necessary
+import useAppStore from '../useAppStore'; // Adjust import path as necessary
 import { Environment, OrbitControls } from '@react-three/drei';
 
 function SceneTwo() {
@@ -51,7 +51,7 @@ function SceneTwo() {
 
   return (
     <>
-        <AnimationController animations={animationSequence} useStore={useStore}>
+        <AnimationController animations={animationSequence}>
             <Physics gravity={[0, 0, 0]}>
                 <>
                     <EmergentEntity

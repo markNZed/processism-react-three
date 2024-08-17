@@ -1,8 +1,7 @@
 import React, { useRef, useEffect, useImperativeHandle, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import useStoreEntity from './useStoreEntity';
-import useStore from '../../useStore'
+import useAppStore from '../../useAppStore'
 import ParticleShader from './ParticleShader'
 const { createParticleShaderOriginalGeometry, createParticleShaderDiversityGeometry, createParticleShaderOriginalMaterial, createParticleShaderDiversityMaterial } = ParticleShader;
 
@@ -11,7 +10,7 @@ const SHADER_ORIG = 1;
 const SHADER_DIVERSE = 2;
 const USE_SHADER = SHADER_DIVERSE;
 
-const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) => {
 
     // We'll create the InstancedBufferGeometry for the particle shader with a max instance count based on how many particles were
     // set up in the config, with room to grow
@@ -21,7 +20,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const { getAllParticleRefs } = useStoreEntity.getState();
+    const { getAllParticleRefs } = entityStore.getState();
     const userColor = new THREE.Color();
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();
@@ -31,13 +30,13 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
     const invisibleScale = new THREE.Vector3(0.001, 0.001, 0.001);
     const instanceMatrix = new THREE.Matrix4();
     const [particleCount, setParticleCount] = useState(0);
-    const showParticles = useStore((state) => state.getOption("showParticles"));
+    const showParticles = useAppStore((state) => state.getOption("showParticles"));
     
     
     /** @type {{ current: { circleMaterial: THREE.ShaderMaterial, circleGeometry: THREE.InstancedBufferGeometry } }} */
     const renderBlobRef = useRef();
     const timeRef = useRef(0);
-    const pausePhysics = useStore((state) => state.pausePhysics);
+    const pausePhysics = useAppStore((state) => state.pausePhysics);
 
     useEffect(() => {
         switch (USE_SHADER) {

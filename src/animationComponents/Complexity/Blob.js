@@ -1,13 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import useStoreEntity from './useStoreEntity';
 
-const Blob = ({ color, node, entityNodes }) => {
+const Blob = ({ color, node, entityNodes, entityStore }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagateVisualConfigValue, getParticlesHash, getAllParticleRefs, updateNode } = useStoreEntity.getState();
+    const { getNode, propagateVisualConfigValue, getParticlesHash, getAllParticleRefs, updateNode } = entityStore.getState();
     const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const [pressStart, setPressStart] = useState(0);

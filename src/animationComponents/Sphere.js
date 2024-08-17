@@ -1,13 +1,13 @@
 import { RigidBody } from '@react-three/rapier';
 import { motion } from "framer-motion-3d";
 import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
-import useStore from '../useStore';
+import useAppStore from '../useAppStore';
 import withAnimationState from '../withAnimationState';
 
 const Sphere = React.forwardRef(({ id, animationState, onClick, onPointerOver, onPointerOut, ...props }, ref) => {
     const { scale = 1, color = 'blue', radius, visible = true, position } = animationState;
     const [simulationInit, setSimulationInit] = useState(true);
-    const usePhysics = useStore(state => state.usePhysics);
+    const usePhysics = useAppStore(state => state.usePhysics);
 
     const variants = {
         hidden: { opacity: 0 },

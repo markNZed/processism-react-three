@@ -1,11 +1,8 @@
-import * as THREE from 'three';
-import { useRapier, vec3 } from '@react-three/rapier';
-import useStoreEntity from './useStoreEntity';
-import * as utils from './utils';
+import { useRapier } from '@react-three/rapier';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
 
-const useJoints = () => {
+const useJoints = (entityStore) => {
 
     const { world, rapier } = useRapier();
     // Be careful not to have this sensitive to updates to nodes
@@ -14,7 +11,7 @@ const useJoints = () => {
             addJoint: directAddJoint, 
             deleteJoint: storeDeleteJoint,
             updateJoint: directUpdateJoint,
-            getAllParticleRefs: directGetAllParticleRefs } = useStoreEntity.getState();
+    } = entityStore.getState();
 
     const addLink = (chainRef, uniqueIdA, uniqueIdB) => {
         //console.log("Before addLink", JSON.stringify(chainRef.current), uniqueIdA, uniqueIdB);

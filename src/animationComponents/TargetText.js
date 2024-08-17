@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { motion } from "framer-motion-3d";
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import * as THREE from 'three';
-import useStore from '../useStore';
+import useAppStore from '../useAppStore';
 import useMonitorPosition from '../hooks/useMonitorPosition';
 import withAnimationState from '../withAnimationState';
 
@@ -26,7 +26,7 @@ const TargetText = React.forwardRef(({ id, targetId, offset = new THREE.Vector3(
     const { camera } = useThree();
     const [positions, setPositions] = useState({});
     
-    const getComponentRef = useStore((state) => state.getComponentRef);
+    const getComponentRef = useAppStore((state) => state.getComponentRef);
     const targetRef = getComponentRef(targetId);
 
     const updatePositions = (id, position) => {

@@ -12,7 +12,7 @@ const EntityStoreDemo = () => {
     flattenTree,
     traverseTreeDFS,
     copySubtree,
-  } = useStoreEntity();
+  } = useStoreEntity('demo');
 
   const [testResults, setTestResults] = useState([]);
   const [newNodeId, setNewNodeId] = useState('');
@@ -51,7 +51,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const updatedNodes = useStoreEntity.getState().nodes;
+      const updatedNodes = useStoreEntity.nodes;
       if (updatedNodes['node3'] && updatedNodes['node3'].name === 'Updated Node 3') {
         results.push('Test 2 Passed: Node updated successfully.');
       } else {
@@ -64,7 +64,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const movedNodes = useStoreEntity.getState().nodes;
+      const movedNodes = useStoreEntity.nodes;
       if (movedNodes['node2'] && movedNodes['node2'].childrenIds.includes('node3')) {
         results.push('Test 3 Passed: Node moved successfully.');
       } else {
@@ -77,7 +77,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const nodesAfterDelete = useStoreEntity.getState().nodes;
+      const nodesAfterDelete = useStoreEntity.nodes;
       if (!nodesAfterDelete['node3']) {
         results.push('Test 4 Passed: Node deleted successfully.');
       } else {
@@ -96,7 +96,7 @@ const EntityStoreDemo = () => {
       // Wait for the state to update
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const copiedNodes = useStoreEntity.getState().nodes;
+      const copiedNodes = useStoreEntity.nodes;
       if (copiedNodes['node2'] && copiedNodes['node2'].childrenIds.some(childId => copiedNodes[childId]?.name === 'Node 4')) {
         results.push('Test 5 Passed: Subtree copied successfully.');
       } else {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
-import useStore from '../useStore';
+import useAppStore from '../useAppStore';
 import withAnimationState from '../withAnimationState';
 import { Circle, DynamicDoubleArrow, FatArrow, Sphere } from './';
 
@@ -74,15 +74,15 @@ function getAnimationUpdates(id, variant) {
 
 const EmergentEntity = React.forwardRef(({ id, animationState, ...props }, ref) => {
 
-  const { updateAnimationState, batchUpdateAnimationStates } = useStore();
+  const { updateAnimationState, batchUpdateAnimationStates } = useAppStore();
 
   const { radius, visible, offset = new THREE.Vector3(0, 0, 0) } = animationState;
   // Clone the position to avoid mutating the original data.
   const position = new THREE.Vector3().copy(animationState.position);
   position.add(offset);
 
-  const causationAnimationState = useStore(state => state.getAnimationState(`${id}.causation`) || {});
-  const relationsAnimationState = useStore(state => state.getAnimationState(`${id}.relations`) || {});
+  const causationAnimationState = useAppStore(state => state.getAnimationState(`${id}.causation`) || {});
+  const relationsAnimationState = useAppStore(state => state.getAnimationState(`${id}.relations`) || {});
 
   const sphereRadius = radius / 4;
   const causationLength = radius / 2;

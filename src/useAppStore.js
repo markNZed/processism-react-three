@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
-const useStore = create(devtools(subscribeWithSelector((set, get) => ({
+const useAppStore = create(devtools(subscribeWithSelector((set, get) => ({
   currentScene: undefined,
   setCurrentScene: (currentScene) => set(() => ({ currentScene })),
   reloadScene: false,
@@ -85,14 +85,14 @@ const useStore = create(devtools(subscribeWithSelector((set, get) => ({
 }), { name: 'AnimationStore' }))); // Configure the naming for DevTools
 
 // Subscribe only to changes in animationStates
-useStore.subscribe(
+useAppStore.subscribe(
   state => state.animationStates,
   animationStates => {
-      const lastUpdateAnimationState = useStore.getState().lastUpdateAnimationState;
+      const lastUpdateAnimationState = useAppStore.getState().lastUpdateAnimationState;
       console.log("Animation:", lastUpdateAnimationState.why, lastUpdateAnimationState);
   }
 );
 
-export default useStore;
+export default useAppStore;
 
 

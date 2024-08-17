@@ -3,9 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import ParticleRigidBody from './ParticleRigidBody';
 import { BallCollider, interactionGroups } from '@react-three/rapier';
-import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
-import useStore from '../../useStore';
+import useAppStore from '../../useAppStore';
 import * as THREE from 'three';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
@@ -14,7 +13,7 @@ import * as THREE from 'three';
 // https://github.com/pmndrs/react-three-rapier/blob/main/demo/src/examples/kinematics/KinematicsExample.tsx
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, entityStore, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -22,8 +21,8 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
     const [colliderRadius, setColliderRadius] = useState(radius);
     const [initialize, setInitialize] = useState(true);
     // Direct access to the state outside of React's render flow
-    const { updateNode: directUpdateNode, getNode: directGetNode, getJoint: directGetJoint }  = useStoreEntity.getState();
-    const node = useStoreEntity(useCallback((state) => state.nodes[id], [id]));
+    const { updateNode: directUpdateNode, getNode: directGetNode, getJoint: directGetJoint }  = entityStore.getState();
+    const node = entityStore(useCallback((state) => state.nodes[id], [id]));
     const nodeRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
     const color = useMemo(() => utils.getColor(configColor, props.color));
@@ -34,7 +33,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
     // Can't use groupRef because the particle may not be rendering and we still
     // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
-    const fixParticles = useStore((state) => state.getOption("fixParticles"));
+    const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
     const [damping, setDamping] = useState(0.1);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
@@ -163,7 +162,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 creationPositionRef.current.set(
                     currentTranslation.x,
                     currentTranslation.y,
-                    0, // Force into Z plane
+                    currentTranslation.z,
                 );
                 groupRef.current.worldToLocal(creationPositionRef.current);
                 // This seems to mess things up but assigning directly to rigidbody is OK

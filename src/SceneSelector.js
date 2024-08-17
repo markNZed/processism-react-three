@@ -1,11 +1,11 @@
 // SceneSelector.js
 import React, { useEffect } from 'react'
-import useStore from './useStore' // Make sure the path is correct
+import useAppStore from './useAppStore' // Make sure the path is correct
 
 const SceneSelector = () => {
-  const setCurrentScene = useStore((state) => state.setCurrentScene)
-  const setReloadScene = useStore((state) => state.setReloadScene)
-  const clearAllAnimationStates = useStore((state) => state.clearAllAnimationStates)
+  const setCurrentScene = useAppStore((state) => state.setCurrentScene)
+  const setReloadScene = useAppStore((state) => state.setReloadScene)
+  const clearAllAnimationStates = useAppStore((state) => state.clearAllAnimationStates)
   const defaultScene = 'SceneThree';
 
   const initializeScene = (sceneName) => {

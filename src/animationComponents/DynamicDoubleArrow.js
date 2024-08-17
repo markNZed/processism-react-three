@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
-import useStore from '../useStore';
+import useAppStore from '../useAppStore';
 import { DoubleArrow } from './';
 import withAnimationState from '../withAnimationState';
 import * as THREE from 'three';
@@ -7,7 +7,7 @@ import useMonitorPosition from '../hooks/useMonitorPosition';
 
 const DynamicDoubleArrow = React.forwardRef(({ id, animationState, initialState, ...props }, ref) => {
     const { fromId, toId } = animationState;
-    const getComponentRef = useStore(state => state.getComponentRef);
+    const getComponentRef = useAppStore(state => state.getComponentRef);
     const localRef = useRef(); // So we can write to the ref
     useImperativeHandle(ref, () => localRef.current);
     const [positions, setPositions] = useState({});

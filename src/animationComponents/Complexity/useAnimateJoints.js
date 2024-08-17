@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
-import useStoreEntity from './useStoreEntity';
 import * as utils from './utils';
 
 // Remember custom hook can generate renders in the Component so be careful with Zustand stores
@@ -13,10 +12,11 @@ const useAnimateJoints = (
     createJoint,
     worldCenterRef,
     config,
+    entityStore
 ) => {
 
     // Direct access to the state outside of React's render flow
-    const { getNodeProperty, getJoint, getNode } = useStoreEntity.getState();
+    const { getNodeProperty, getJoint, getNode } = entityStore.getState();
     const id = node.id;
     const internalRef = node.ref;
     const entityRefs = entityNodes.map(entity => entity.ref);

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { useStore } from 'zustand';
+import useAppStore from './useAppStore'; 
 
-export function AnimationController({ children, animations, useStore }) {
-    const { updateAnimationState } = useStore(state => ({
+export function AnimationController({ children, animations }) {
+    const { updateAnimationState } = useAppStore(state => ({
         updateAnimationState: state.updateAnimationState,
     }));
 

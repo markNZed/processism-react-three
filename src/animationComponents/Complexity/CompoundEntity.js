@@ -14,10 +14,10 @@ import useAnimateImpulses from './useAnimateImpulses';
 import useAnimateJoints from './useAnimateJoints';
 import useJoints from './useJoints';
 import DebugRender from './DebugRender';
-import useStoreEntity from './useStoreEntity';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { vec3, quat } from '@react-three/rapier';
-import useStore from '../../useStore'
+import useAppStore from '../../useAppStore'
+import { useStore } from 'zustand';
 
 /*
 
@@ -45,9 +45,13 @@ import useStore from '../../useStore'
 //   Will need to re-organize the store
 //     Nodes for each hierarchy
 //   useAnimateComplexity assumes one root
+// entityStore is a function for creating a store
+//   const store = React.useMemo(() => createStore(), []);
+// entityStore should probably be a context to avoid passingeverywhere as a prop
+// z Axis of initialPosition is not respected
 
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -60,14 +64,15 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         getJoint: directGetJoint,
         resetParticlesHash: directResetParticlesHash,
         getParticlesHash: directGetParticlesHash,
-    } = useStoreEntity.getState();
+    } = entityStore.getState();
 
     // Select so we are only sensitive to changes of this node
-    const { node, entityNodes } = useStoreEntity(useCallback((state) => {
+    const { node, entityNodes } = useStore(entityStore, useCallback((state) => {
         const node = state.nodes[id];
         const entityNodes = (node.childrenIds || []).map(childId => state.nodes[childId]);
         return { node, entityNodes };
     }, [id]));
+
     const isDebug = node.debug || debug || config.debug;
     const entityCount = node.childrenIds.length;
     // Store the color in a a state so it is consistent across renders (when defined by a function)
@@ -99,13 +104,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const prevParticlesHash = useRef();
     const frameStateDurationRef = useRef(0);
     const creationSource = new THREE.Vector3();
-    const initialCreationPath = [[0, 0, 25], [0, 0, 20]];
     const entityIdsCreatedRef = useRef([]);
 
-    const setOption = useStore((state) => state.setOption);
-    const showParticles = useStore((state) => state.getOption("showParticles"));
-    const hideBlobs = useStore((state) => state.getOption("hideBlobs"));
-    const pausePhysics = useStore((state) => state.pausePhysics);
+    const setOption = useAppStore((state) => state.setOption);
+    const showParticles = useAppStore((state) => state.getOption("showParticles"));
+    const hideBlobs = useAppStore((state) => state.getOption("hideBlobs"));
+    const pausePhysics = useAppStore((state) => state.pausePhysics);
 
     const JOINT_EXPANSION = 1.1; // Slightly bigger to avoid "hitting" the surrounding particles
     const IN_INDEX = 0;
@@ -120,11 +124,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         creationPathRefs: {},
     });
 
-    const { deleteJoint, createJoint, updateJoint } = useJoints();
+    const { deleteJoint, createJoint, updateJoint } = useJoints(entityStore);
 
     useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
-    useAnimateRelations(jointsMapped, node, entityNodes, config);
-    useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config);
+    useAnimateRelations(jointsMapped, node, entityNodes, config, entityStore);
+    useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config, entityStore);
 
     // Mounting
     useEffect(() => {
@@ -139,8 +143,12 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         // Get parents To/From joints so they can be mapped to particles in lower level entities
         const inNode = entityNodes[IN_INDEX];
         const outNode = entityNodes[OUT_INDEX];
-        jointsFromRef.current[outNode.id] = props.jointsFrom;
-        jointsToRef.current[inNode.id] = props.jointsTo;
+        if (outNode?.id) {
+            jointsFromRef.current[outNode.id] = props.jointsFrom;
+        }
+        if (inNode?.id) {
+            jointsToRef.current[inNode.id] = props.jointsTo;
+        }
     }, []);
 
     function getClosestNodeId(worldpos, index) {
@@ -305,22 +313,16 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             entityInitialQuaternion.setFromUnitVectors(FORWARD, entityOrientation);
         }
 
-        //const rotationQuat = new THREE.Quaternion();
-        //rotationQuat.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2); // 90 degrees clockwise
-        //entityInitialQuaternion.multiply(rotationQuat); // Apply the rotation
-
         entityPoseRef.current.orientation[instantiateEntityId] = entityInitialQuaternion;
         entityPoseRef.current.position[instantiateEntityId] = newPosition;
         entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: thisOuter};
 
-        const creationPath = initialCreationPath;
+        const creationPath = [...initialCreationPath]; // Shallow copy
         creationPath.forEach((point, i) => {
             creationSource.set(point[0], point[1], point[2]);
             nodeRef.current.worldToLocal(creationSource);
             creationPath[i] = [creationSource.x, creationSource.y, creationSource.z];
         });
-        const zPos = creationPath[creationPath.length - 1][2];
-        creationPath.push([0, 0, zPos]);
         creationPath.push(newPosition);
         entityPoseRef.current.creationPathRefs[instantiateEntityId] = React.createRef();
         entityPoseRef.current.creationPathRefs[instantiateEntityId].current = creationPath;
@@ -643,7 +645,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     entityPoseRef.current.position[entityId] = [position.x, position.y, 0]; // Force Z to 0
                 })
                 if (id == "root") {
-                    console.log("useStoreEntity", useStoreEntity.getState());
+                    console.log("entityStore", entityStore);
                     setJointsMapped(true);
                     frameStateRef.current = "stableRoot";
                 } else {
@@ -712,6 +714,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             quaternion={entityPoseRef.current.orientation[entityId]}
                             outer={entityPoseRef.current.outer[entityId]}
                             lockPose={lockPose}
+                            entityStore={entityStore}
+                            initialCreationPath={initialCreationPath}
                         />
                     )
                 })}
@@ -721,11 +725,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         color={color}
                         node={node}
                         entityNodes={entityNodes}
+                        entityStore={entityStore}
                     />
                 )}
                 {id === "root" && config.showRelations && (
                     <Relations
                         node={node}
+                        entityStore={entityStore}
                     />
                 )}
                 {isDebug && (
@@ -746,6 +752,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     id={`${id}`}
                     ref={particlesInstanceRef}
                     config={config}
+                    entityStore={entityStore}
                 />
             )}
             {isDebug && (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import useStore from './useStore'
+import useAppStore from './useAppStore'
 import useSceneManager from './useSceneManager';
 import SceneSelector from './SceneSelector';
 import { EntityStoreDemo } from './animationComponents';
@@ -37,13 +37,13 @@ function CameraAdjuster({ isOrthographic }) {
 export default function App() {
   // This is a bit convoluted. One issue is that the button needs to be outside of the <Canvas>
   const { sceneComponent, isOrthographic, key } = useSceneManager();
-  const pausePhysics = useStore((state) => state.pausePhysics);
-  const setPausePhysics = useStore((state) => state.setPausePhysics);
-  const setOption = useStore((state) => state.setOption);
-  const fixParticles = useStore((state) => state.getOption("fixParticles"));
-  const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
-  const showParticles = useStore((state) => state.getOption("showParticles"));
-  const hideBlobs = useStore((state) => state.getOption("hideBlobs"));
+  const pausePhysics = useAppStore((state) => state.pausePhysics);
+  const setPausePhysics = useAppStore((state) => state.setPausePhysics);
+  const setOption = useAppStore((state) => state.setOption);
+  const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
+  const physicsDebug = useAppStore((state) => state.getOption("physicsDebug"));
+  const showParticles = useAppStore((state) => state.getOption("showParticles"));
+  const hideBlobs = useAppStore((state) => state.getOption("hideBlobs"));
   
   const toggleAnimation = () => {
     setPausePhysics(!pausePhysics); // Toggle animation state

@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { motion } from "framer-motion-3d";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import useStore from './useStore';
+import useAppStore from './useAppStore';
 
 function withAnimationState(Component) {
     const MotionComponent = motion(Component);
@@ -10,9 +10,9 @@ function withAnimationState(Component) {
         const initialState = useMemo(() => initialStateFromProp, [])
         const ref = useRef();
         const rigidBodyRef = useRef();
-        const registerComponent = useStore(state => state.registerComponent);
-        const unregisterComponent = useStore(state => state.unregisterComponent);
-        const animationState = useStore(state => state.getAnimationState(id) || {});
+        const registerComponent = useAppStore(state => state.registerComponent);
+        const unregisterComponent = useAppStore(state => state.unregisterComponent);
+        const animationState = useAppStore(state => state.getAnimationState(id) || {});
         const [simulationReady, setSimulationReady] = useState(false);
 
         // The MotionComponent calls this to pass the rigidBodyRef so it can be used in actions

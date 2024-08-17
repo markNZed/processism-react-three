@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Camera, Complexity } from '../animationComponents';
 import { AnimationController } from '../AnimationController';
-import useStore from '../useStore';
+import useAppStore from '../useAppStore';
 import { Environment, OrbitControls, Plane } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import { Perf } from 'r3f-perf'
@@ -31,7 +31,7 @@ function SceneThree() {
         //[0, 'emergent1', { variant: "default" }],
     ];
 
-    const physicsDebug = useStore((state) => state.getOption("physicsDebug"));
+    const physicsDebug = useAppStore((state) => state.getOption("physicsDebug"));
 
     const cameraInitialState = {
         position: [0, -20, 35],
@@ -80,7 +80,7 @@ function SceneThree() {
     return (
         <>
             {/*<Narration text="Welcome to the virtual world. Enjoy your journey!" />*/}
-            <AnimationController animations={animationSequence} useStore={useStore}>
+            <AnimationController animations={animationSequence}>
                 <Physics timeStep={"vary"} gravity={[0, 0, 0]} paused={true} debug={physicsDebug} >
                     <Perf 
                         position={"bottom-left"} 
@@ -94,10 +94,6 @@ function SceneThree() {
                             id={"complex"}
                             color={"blue"}
                         />
-                        
-                        <Plane args={[50, 50]} position={[0, 0, -5]}>
-                            <meshStandardMaterial attach="material" color="lightblue" />
-                        </Plane>
 
                         <MyAxesHelper />   
 

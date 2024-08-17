@@ -142,7 +142,7 @@ const debouncedResetParticlesHash = debounce((set) => {
     }));
 }, 500);
 
-const useStoreEntity = create((set, get) => {
+const useStoreEntity = () => create((set, get) => {
 
     const rootNode = createNode('root', { depth: 0, parentId: null, visible: false }, []);
 
@@ -323,7 +323,11 @@ const useStoreEntity = create((set, get) => {
 
         getPropertyAll: (prop) => get().propertyLookups[prop],
 
-        getPropertyAllKeys: (prop) => Object.keys(get().propertyLookups[prop]),
+        getPropertyAllKeys: (prop) => {
+            const allProperty = get().propertyLookups[prop];
+            console.log("getPropertyAllKeys", prop, allProperty);
+            return allProperty ? Object.keys(allProperty) : {}
+        },
 
         getNodeProperty: (nodeId, property) => {
             const node = get().getNode(nodeId);
@@ -661,6 +665,5 @@ const useStoreEntity = create((set, get) => {
     };
 
 });
-
 
 export default useStoreEntity;
