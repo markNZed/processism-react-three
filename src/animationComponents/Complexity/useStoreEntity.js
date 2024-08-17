@@ -161,19 +161,6 @@ const useStoreEntity = create((set, get) => {
         particleRefs: [],
         options: {},
 
-        getoption: (id) => {
-            return get().options[id];
-        },
-
-        setoption: (id) => set(() => {
-            return {
-                options: {
-                    ...get().options,
-                    [id]: true
-                }
-            };
-        }),
-
         getParticlesHash: (id) => {
             return get().particlesHash[id];
         },

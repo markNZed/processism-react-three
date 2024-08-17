@@ -6,6 +6,7 @@ const SceneSelector = () => {
   const setCurrentScene = useStore((state) => state.setCurrentScene)
   const setReloadScene = useStore((state) => state.setReloadScene)
   const clearAllAnimationStates = useStore((state) => state.clearAllAnimationStates)
+  const defaultScene = 'SceneThree';
 
   const initializeScene = (sceneName) => {
     clearAllAnimationStates()
@@ -14,7 +15,7 @@ const SceneSelector = () => {
   }
 
   useEffect(() => {
-    initializeScene('SceneThree');
+    initializeScene(defaultScene);
   },[])
 
   return (
@@ -24,7 +25,7 @@ const SceneSelector = () => {
       <button onClick={() => initializeScene('SceneTwo')}>Go to Scene Two</button>
       <button onClick={() => initializeScene('SceneThree')}>Go to Scene Three</button>
       */}
-      <button onClick={() => initializeScene('SceneFour')}>Reload</button>
+      <button onClick={() => initializeScene(defaultScene)}>Reload</button>
     </div>
   )
 }

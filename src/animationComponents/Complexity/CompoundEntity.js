@@ -36,14 +36,15 @@ import useStore from '../../useStore'
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
 // The lower blob joints should be put in place before the higher
-// Issue with particles not showing under lowest blob
 // We could create different collisionGroup for particles with multiple joints to avoid violent joint creation?
 // We are rotating the compoundEntity using the group is this to avoid applying this rotation to particles ?
 // default in positionAndOuter is expensive
 // When replacing a particle with a compoundEntity we should reuse the particle ?
 //   Could use that position as the start point for the first creation path
-// Should we lock the translation of first entity while "growing" ?
-// A better name might be "Cluster" rather than "Cluster"
+// Not supporting multiple instances of Complexity
+//   Will need to re-organize the store
+//     Nodes for each Complexity
+//     Move physics to a higher level - maybe a component to instantiate in SceneFour
 
 
 

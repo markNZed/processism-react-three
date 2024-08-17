@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useImperativeHandle, useCallback } from 'react';
+import React, {  useRef, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
 import withAnimationState from '../../withAnimationState';
 import { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from '@react-three/rapier';
@@ -7,7 +7,7 @@ import _ from 'lodash';
 import CompoundEntity from './CompoundEntity'
 import useStore from '../../useStore'
 import * as utils from './utils';
-import useAnimateCluster from './useAnimateCluster';
+import useAnimateComplexity from './useAnimateComplexity';
 
 /* Overview:
   Animation framework intended to provide a visual language for representing complexity.
@@ -28,7 +28,7 @@ import useAnimateCluster from './useAnimateCluster';
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
-const Cluster = React.forwardRef(({radius, color}, ref) => {
+const Complexity = React.forwardRef(({id, radius, color, initialPosition = [0, 0, 0]}, ref) => {
 
     const pausePhysics = useStore((state) => state.pausePhysics);
 
@@ -117,9 +117,9 @@ const Cluster = React.forwardRef(({radius, color}, ref) => {
         lastStepEnd.current = endTime;
     });
 
-    const {storeEntityReady} = useAnimateCluster(config, internalRef);
+    const {storeEntityReady} = useAnimateComplexity(config, internalRef);
     
-    console.log("Cluster rendering", storeEntityReady, config)
+    console.log("Complexity rendering", id, storeEntityReady, config)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity
     // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
@@ -129,10 +129,10 @@ const Cluster = React.forwardRef(({radius, color}, ref) => {
         <>
             {storeEntityReady && (
                 <CompoundEntity
-                    id="root"
+                    id={"root"}
                     ref={internalRef}
                     radius={config.radius}
-                    initialPosition={[0, 0, 0]}
+                    initialPosition={initialPosition}
                     config={config}
                 />
             )}
@@ -140,4 +140,4 @@ const Cluster = React.forwardRef(({radius, color}, ref) => {
     );
 });
 
-export default withAnimationState(Cluster);
+export default withAnimationState(Complexity);

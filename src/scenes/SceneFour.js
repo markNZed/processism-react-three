@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Camera, Cluster } from '../animationComponents';
+import { Camera, Complexity } from '../animationComponents';
 import { AnimationController } from '../AnimationController';
 import useStore from '../useStore';
 import { Environment, OrbitControls, Plane } from '@react-three/drei';
@@ -46,7 +46,7 @@ function SceneFour() {
 
     //timestep defaults to 1 / 60 timeStep={"vary"} 
     // Physics allowSleep={true} ?
-    // Physics is paused so we can manually control the step from Cluster
+    // Physics is paused so we can manually control the step from Complexity
     // numSolverIterations={2} numAdditionalFrictionIterations={2} erp={0.5} allowedLinearError={0.01}
     // numSolverIterations={2} numAdditionalFrictionIterations={2}
 
@@ -90,12 +90,23 @@ function SceneFour() {
                     />
                     <>
 
-                        <Cluster
-                            id={"complex"}
+                        <Complexity
+                            id={"one"}
                             color={"blue"}
+                            initialPosition={[0, 0, -50]}
+                        />
+
+                        <Plane args={[50, 50]} position={[0, 0, -55]}>
+                            <meshStandardMaterial attach="material" color="lightblue" />
+                        </Plane>
+
+                        <Complexity
+                            id={"two"}
+                            color={"red"}
+                            initialPosition={[0, 0, 50]}
                         />
                         
-                        <Plane args={[50, 50]} position={[0, 0, -5]}>
+                        <Plane args={[50, 50]} position={[0, 0, 45]}>
                             <meshStandardMaterial attach="material" color="lightblue" />
                         </Plane>
 

@@ -1,7 +1,7 @@
 import { useEffect, useState ,useCallback, useRef } from 'react';
 import useStoreEntity from './useStoreEntity';
 
-function useAnimateCluster(config, internalRef) {
+function useAnimateComplexity(config, internalRef) {
 
     const [storeEntityReady, setStoreEntityReady] = useState(false);
     // Avoid changes in store causing rerender
@@ -25,7 +25,7 @@ function useAnimateCluster(config, internalRef) {
 
     */
     useEffect(() => {
-        console.log("useAnimateCluster", config, startedRef.current);
+        console.log("useAnimateComplexity", config, startedRef.current);
         if (startedRef.current) return;
         if (!config.entityCounts) return;
         startedRef.current = true;
@@ -59,4 +59,4 @@ function useAnimateCluster(config, internalRef) {
     return {storeEntityReady}
 }
 
-export default useAnimateCluster;
+export default useAnimateComplexity;
