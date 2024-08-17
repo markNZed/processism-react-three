@@ -28,8 +28,8 @@ import useStoreEntity from './useStoreEntity';
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
 const Complexity = React.forwardRef(({id, radius, color}, ref) => {
 
-    const initialCreationPathOne = [[0, 0, 25], [0, 0, 5]];
-    const initialCreationPathTwo = [[0, 0, 25], [0, 0, -25]];
+    const initialCreationPathOne = [[0, 0, 50], [0, 0, 25]];
+    const initialCreationPathTwo = [[0, 0, 50], [0, 0, -25]];
 
     const storeOne = useMemo(() => useStoreEntity(), []);
     const storeTwo = useMemo(() => useStoreEntity(), []);
@@ -63,7 +63,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                     initialCreationPath={initialCreationPathOne}
                 />
             )}
-            {storeEntityTwoReady && (
+            {false && storeEntityTwoReady && (
                 <CompoundEntity
                     id={"root"}
                     ref={refTwo}

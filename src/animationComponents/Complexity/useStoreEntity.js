@@ -325,7 +325,6 @@ const useStoreEntity = () => create((set, get) => {
 
         getPropertyAllKeys: (prop) => {
             const allProperty = get().propertyLookups[prop];
-            console.log("getPropertyAllKeys", prop, allProperty);
             return allProperty ? Object.keys(allProperty) : {}
         },
 

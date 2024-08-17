@@ -13,7 +13,7 @@ import * as THREE from 'three';
 // https://github.com/pmndrs/react-three-rapier/blob/main/demo/src/examples/kinematics/KinematicsExample.tsx
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, entityStore, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, entityStore, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -34,7 +34,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
     // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
-    const [damping, setDamping] = useState(0.1);
+    const [damping, setDamping] = useState(1);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
     const creationPathIndexRef = useRef(0);
@@ -126,10 +126,10 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 const xDirection = xDistance > 0 ? 1 : -1;
                 const yDirection = yDistance > 0 ? 1 : -1;
                 const zDirection = zDistance > 0 ? 1 : -1;
-                const velocityScale = 10;
-                let xVelocity = xDirection * Math.max(velocityScale, xDistance);
-                let yVelocity = yDirection * Math.max(velocityScale, yDistance);
-                let zVelocity = zDirection * Math.max(velocityScale, zDistance);
+                const velocityScale = 40;
+                let xVelocity = xDirection * Math.min(velocityScale, Math.abs(xDistance) * velocityScale);
+                let yVelocity = yDirection * Math.min(velocityScale, Math.abs(yDistance) * velocityScale);
+                let zVelocity = zDirection * Math.min(velocityScale, Math.abs(zDistance) * velocityScale);
                 let nextPath = true;
                 const closeEnough = 0.2;
                 if (Math.abs(xDistance) < closeEnough) {
@@ -166,12 +166,13 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
                 );
                 groupRef.current.worldToLocal(creationPositionRef.current);
                 // This seems to mess things up but assigning directly to rigidbody is OK
-                nodeRef.current.current.setEnabledTranslations(true, true, false, true);
+                //nodeRef.current.current.setEnabledTranslations(true, true, false, true);
                 //nodeRef.current.current.setBodyType(0, true); // dynamic
                 colliderRef.current.setCollisionGroups(interactionGroups(0));
                 visualConfig.isCreated = true;
                 nodeRef.current.setVisualConfig(visualConfig);
                 frameStateRef.current = "done";
+                setDamping(0.1);
                 break;
             }
             case "done": {
@@ -218,7 +219,7 @@ const Particle = React.memo(React.forwardRef(({ id, creationPathRef, initialPosi
         }
     }, []);
 
-    //console.log("Particle rendering", id, initialPosition, quaternion);
+    //console.log("Particle rendering", index, id, initialPosition, lockPose);
 
     return (
         <group ref={groupRef} >
