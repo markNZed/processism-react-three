@@ -36,17 +36,13 @@ import { useStore } from 'zustand';
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
 // The lower blob joints should be put in place before the higher
-// We could create different collisionGroup for particles with multiple joints to avoid violent joint creation?
 // We are rotating the compoundEntity using the group is this to avoid applying this rotation to particles ?
 // default in positionAndOuter is expensive
-// When replacing a particle with a compoundEntity we should reuse the particle ?
-//   Could use that position as the start point for the first creation path
 // entityStore should probably be a context to avoid passing prop
-// Joints should not use damping but modify the anchor until they are aligned.
-//   Contract joints phase
-// Calculation of path is too slow with many particles
-// setContactsEnabled
-
+// Calculation of path is too slow with high number of particles
+// Keep the center of root at 0,0,0
+// Particles should start with the same size ?
+// Irregular Blob sizes
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
 
@@ -211,10 +207,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         });
     }
 
-    function fitJoints(jointIds) {
+    function contractJoints(jointIds) {
         let fitted = true;
         jointIds.forEach(jointId => {
             const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
+
+            if (!jointRef.current.isValid()) return;
+
             const node1Ref = directGetNode(body1Id).ref;
             const node2Ref = directGetNode(body2Id).ref;
 
@@ -222,6 +221,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const visualConfig2 = node2Ref.current.getVisualConfig();
             const radius1 = visualConfig1.radius;
             const radius2 = visualConfig2.radius;
+
+
 
             const anchor1 = jointRef.current.anchor1();
             const anchor2 = jointRef.current.anchor2();
@@ -679,11 +680,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 if (!jointsMapped) {
                     setJointsMapped(true);
                 }
-                frameStateRef.current = "fitJoints";
+                frameStateRef.current = "contractJoints";
                 break;
-            case "fitJoints": {
+            case "contractJoints": {
                 //if (frameStateDurationRef.current < animDelay) break;
-                if (fitJoints([...parentJointsToRef.current, ...parentJointsFromRef.current])) {
+                if (contractJoints([...parentJointsToRef.current, ...parentJointsFromRef.current])) {
                     frameStateRef.current = "done";
                 }
                 break;
@@ -707,7 +708,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 {entitiesToInstantiate.map((entityId, i) => {
                     let entity = directGetNode(entityId);
                     let EntityType = CompoundEntity;
-                    let lockPose = (i === 0 && !jointsMapped) ? true : false
+                    let lockPose = (i === 0 && !jointsMapped && id !== "root") ? true : false
                     if (entity.childrenIds.length === 0) {
                         EntityType = Particle;
                     } else if (!jointsMapped) {

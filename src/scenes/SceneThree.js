@@ -35,7 +35,7 @@ function SceneThree() {
 
     const cameraInitialState = {
         position: [0, -20, 35],
-        zoom: 35,
+        zoom: 5,
         left: window.innerWidth / -2,
         right: window.innerWidth / 2,
         top: window.innerHeight / 2,
