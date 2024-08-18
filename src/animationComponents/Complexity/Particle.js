@@ -17,6 +17,9 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
 
     useImperativeHandle(ref, () => nodeRef.current);
 
+    // Here we define a fixed particleRadius (could use radius but will have different radius at different depth)
+    const particleRadius = 1; // radius
+
     const isDebug = props.debug || config.debug;
     const [colliderRadius, setColliderRadius] = useState(radius);
     const [initialize, setInitialize] = useState(true);
@@ -197,8 +200,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             nodeRef.current.setVisualConfig({ 
                 color: localColor, 
                 uniqueId: id, 
-                radius: radius, 
-                origRadius: radius, 
+                radius: particleRadius, 
+                origRadius: particleRadius, 
                 outer: outer, 
                 damping: damping, 
                 isParticle: true,
@@ -256,7 +259,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                     <Text
                         // Slightly offset in the z-axis to avoid z-fighting
                         position={[initialPosition[0], initialPosition[1], initialPosition[2] + 0.1]} 
-                        fontSize={radius / 2}
+                        fontSize={particleRadius / 2}
                         color="black"
                         anchorX="center"
                         anchorY="middle"

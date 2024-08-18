@@ -2,8 +2,8 @@ import React, { useRef, useEffect, useImperativeHandle, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import useAppStore from '../../useAppStore'
-import ParticleShader from './ParticleShader'
-const { createParticleShaderOriginalGeometry, createParticleShaderDiversityGeometry, createParticleShaderOriginalMaterial, createParticleShaderDiversityMaterial } = ParticleShader;
+import { createParticleShaderOriginalGeometry,createParticleShaderOriginalMaterial} from './ParticleShaderOriginal'
+import { createParticleShaderDiversityGeometry, createParticleShaderDiversityMaterial } from './ParticleShaderDiversity'
 
 const SHADER_NONE = 0;
 const SHADER_ORIG = 1;

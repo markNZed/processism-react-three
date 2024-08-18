@@ -242,65 +242,8 @@ const Blob = ({ color, node, entityNodes, entityStore }) => {
 export default Blob;
 
 // Outside of component to avoid recreation on render
-
-function calculateCenter(points) {
-    let sum = new THREE.Vector3(0, 0, 0);
-    points.forEach(point => {
-        sum.add(point);
-    });
-    return sum.divideScalar(points.length);
-}
  
 const points_to_geometry = (points, radii) => {
-
-    // Function to calculate the normals that point outward
-    function calculateOutwardNormals(points, centroid) {
-        const normals = [];
-        for (let i = 0; i < points.length; i++) {
-            const prevPoint = points[i === 0 ? points.length - 1 : i - 1];
-            const currPoint = points[i];
-            const nextPoint = points[(i + 1) % points.length];
-
-            // Midpoints for more accurate normal calculation
-            const midPrev = new THREE.Vector3().addVectors(prevPoint, currPoint).multiplyScalar(0.5);
-            const midNext = new THREE.Vector3().addVectors(currPoint, nextPoint).multiplyScalar(0.5);
-
-            // Vector from midPrev to midNext
-            const edgeVector = new THREE.Vector3().subVectors(midNext, midPrev).normalize();
-
-            // Normal is perpendicular to edgeVector
-            let normal = new THREE.Vector3(-edgeVector.y, edgeVector.x, 0); // Rotate 90 degrees
-
-            // Ensure the direction of the normal is outward
-            const toCentroid = new THREE.Vector3().subVectors(centroid, currPoint).normalize();
-            if (normal.dot(toCentroid) > 0) {
-                normal.negate(); // Reverse the normal if it's pointing inward
-            }
-
-            normals.push(normal);
-        }
-        return normals;
-    }
-
-    // Function to expand points using normals
-    function expandPoints(points, normals, radii) {
-        return points.map((point, index) => {
-            const amount = radii[index];
-            //console.log("Adding amount", amount);
-            return point.clone().addScaledVector(normals[index], amount);
-        });
-    }
-
-    /*
-    // We calculate the center rather than using the entity center (which is more like a center of gravity than a geometric center)
-    const center = calculateCenter(points);
-
-    // Calculate normals
-    const normals = calculateOutwardNormals(points, center);
-
-    // Expand the points
-    const expandedPoints = expandPoints(points, normals, radii);
-    */
 
     // Offset the points before creating the curve
     const expandedPoints = points;

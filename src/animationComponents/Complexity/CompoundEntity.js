@@ -73,6 +73,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const color = useMemo(() => utils.getColor(configColor, props.color), [configColor, props.color]);
     // The entity radius fills the perimeter of CompoundEntity with a margin to avoid overlap
     const entityRadius = useMemo(() => Math.min(radius * Math.PI / (entityCount + Math.PI), radius / 2) * 0.97, [radius, entityCount]);
+    //const entityRadius = 0.2;
     // Track the center of this CompoundEntity
     const centerRef = useRef(new THREE.Vector3(0, 0, 0));
     const worldCenterRef = useRef(new THREE.Vector3());
@@ -708,13 +709,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 {entitiesToInstantiate.map((entityId, i) => {
                     let entity = directGetNode(entityId);
                     let EntityType = CompoundEntity;
-                    let lockPose = (i === 0 && !jointsMapped && id !== "root") ? true : false
+                    let lockPose = (i === 0 && !jointsMapped) ? true : false
                     if (entity.childrenIds.length === 0) {
                         EntityType = Particle;
                     } else if (!jointsMapped) {
                         EntityType = Particle;
                     }
-                    const creationPathRef = (i !== 0) ? entityPoseRef.current.creationPathRefs[entityId] : null;
+                    const creationPathRef = (i === 0 && id !== "root") ? null : entityPoseRef.current.creationPathRefs[entityId];
                     return (
                         <EntityType
                             key={`${id}-${i}`}
