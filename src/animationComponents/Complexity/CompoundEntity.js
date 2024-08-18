@@ -45,6 +45,7 @@ import { useStore } from 'zustand';
 // Joints should not use damping but modify the anchor until they are aligned.
 //   Contract joints phase
 // Calculation of path is too slow with many particles
+// setContactsEnabled
 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
@@ -169,7 +170,8 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         return closestNodeId;
     }
 
-    function dampenJoints(jointsRef, isTo) {
+    // Switch the origin/destination of a joint. Used to map parent joints to children.
+    function swapJoints(jointsRef, isTo) {
         jointsRef.current.forEach(jointId => {
             const {body1Id, body2Id} = directGetJoint(jointId);
             let node1Ref;
@@ -198,50 +200,67 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             }
             const visualConfig1 = node1Ref.current.getVisualConfig();
             const visualConfig2 = node2Ref.current.getVisualConfig();
-            visualConfig1.damping = Math.min(visualConfig1.damping * 2,  1);
-            visualConfig2.damping = Math.min(visualConfig2.damping * 2,  1);
-            node1Ref.current.setVisualConfig(visualConfig1);
-            node2Ref.current.setVisualConfig(visualConfig2);
+            // Find the distance between the nodes
+            const distance = node1Ref.current.getCenterWorld().distanceTo(node2Ref.current.getCenterWorld());
+            const radius1 = distance / 2;
+            const radius2 = distance / 2;
+            //const radius1 = visualConfig1.radius;
+            //const radius2 = visualConfig2.radius;
+            const { offset1, offset2 } = utils.calculateJointOffsets(node1Ref.current, node2Ref.current, radius1, radius2);
+            updateJoint(node.chainRef, jointId, node1Ref.current, offset1, node2Ref.current, offset2);
         });
     }
 
-    // Switch the origin/destination of a joint. Used to map parent joints to children.
-    function swapJoints(jointsRef, isTo) {
-        const jointsUpdated = [];
-        jointsRef.current.forEach(jointId => {
-            const {body1Id, body2Id} = directGetJoint(jointId);
-            let node1Ref;
-            let node2Ref;
-            if (isTo) {
-                node1Ref = directGetNode(body1Id).ref;
-                const node1Center = node1Ref.current.getCenterWorld();
-                let closestNodeId;
-                if (entitiesToInstantiate.length > 4) {
-                    closestNodeId = getClosestNodeId(node1Center, IN_INDEX);
-                } else {
-                    closestNodeId = entitiesToInstantiate[IN_INDEX];
-                }
-                node2Ref = directGetNode(closestNodeId).ref;
-            } else {
-                // Find the closest node to body2Id
-                node2Ref = directGetNode(body2Id).ref;
-                const node2Center = node2Ref.current.getCenterWorld();
-                let closestNodeId;
-                if (entitiesToInstantiate.length > 4) {
-                    closestNodeId = getClosestNodeId(node2Center, OUT_INDEX);
-                } else {
-                    closestNodeId = entitiesToInstantiate[OUT_INDEX];
-                }
-                node1Ref = directGetNode(closestNodeId).ref;
-            }
+    function fitJoints(jointIds) {
+        let fitted = true;
+        jointIds.forEach(jointId => {
+            const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
+            const node1Ref = directGetNode(body1Id).ref;
+            const node2Ref = directGetNode(body2Id).ref;
+
             const visualConfig1 = node1Ref.current.getVisualConfig();
             const visualConfig2 = node2Ref.current.getVisualConfig();
             const radius1 = visualConfig1.radius;
             const radius2 = visualConfig2.radius;
-            const { offset1, offset2 } = utils.calculateJointOffsets(node1Ref.current, node2Ref.current, radius1, radius2);
-            updateJoint(node.chainRef, jointId, node1Ref.current, offset1, node2Ref.current, offset2);
-            jointsUpdated.push(jointId);
+
+            const anchor1 = jointRef.current.anchor1();
+            const anchor2 = jointRef.current.anchor2();
+
+            const distance1 = vec3(anchor1).length();
+            const distance2 = vec3(anchor2).length();
+
+            const SCALE = 0.99;
+
+            const scaleAnchor = (anchor, scale) => ({
+                x: anchor.x * scale,
+                y: anchor.y * scale,
+                z: anchor.z * scale,
+            });
+
+            if (distance1 > radius1) {
+                const extended = (distance1 - radius1);
+                if (extended < 0.1) {
+                    const scale = radius1 / distance1;
+                    jointRef.current.setAnchor1(scaleAnchor(anchor1, scale));
+                } else {
+                    jointRef.current.setAnchor1(scaleAnchor(anchor1, SCALE));
+                    fitted = false;
+                }
+            }
+
+            if (distance2 > radius2) {
+                const extended = (distance2 - radius2);
+                if (extended < 0.1) {
+                    const scale = radius2 / distance2;
+                    jointRef.current.setAnchor2(scaleAnchor(anchor2, scale));
+                } else {
+                    jointRef.current.setAnchor2(scaleAnchor(anchor2, SCALE));
+                    fitted = false;
+                }
+            }
+
         });
+        return fitted;
     }
 
     function positionAndOuter(toInstantiateCount) {
@@ -589,7 +608,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         }
                     } 
                     if (toInstantiateCount == entityCount) {
-                        frameStateRef.current = "initialParticlesInstantiated";
+                        frameStateRef.current = "swapJoints";
                     } else {
                         if (toInstantiateCount > 2) {
                             // If we have a shape then update the joints with new angles to allow for change in the number of entities
@@ -608,14 +627,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 alignJointsToPolygon(toInstantiateCount);
                 directResetParticlesHash();
                 frameStateRef.current = "selectNextEntity";
-                break;
-            }
-            case "initialParticlesInstantiated": {
-                if (frameStateDurationRef.current < animDelay) break;
-                dampenJoints(parentJointsToRef, true);
-                dampenJoints(parentJointsFromRef, false);
-                directResetParticlesHash();
-                frameStateRef.current = "swapJoints";
                 break;
             }
             case "swapJoints": {
@@ -642,7 +653,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     setJointsMapped(true);
                     frameStateRef.current = "stableRoot";
                 } else {
-                    frameStateRef.current = "done";
+                    frameStateRef.current = "jointsMapped";
                 }
                 break;
             }
@@ -657,17 +668,27 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     console.log("showParticles", id, initialShowParticlesRef.current)
                     nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
                     directUpdateNode(id, {visible: true});
-                    frameStateRef.current = "done";
+                    frameStateRef.current = "jointsMapped";
                     //setOption("fixParticles", true);
                 }
                 break;
             }
-            case "done":
+            case "jointsMapped":
                 if (frameStateDurationRef.current < animDelay) break;
                 // The jointsMapped state may not be updated because not being rerendered
                 if (!jointsMapped) {
                     setJointsMapped(true);
                 }
+                frameStateRef.current = "fitJoints";
+                break;
+            case "fitJoints": {
+                //if (frameStateDurationRef.current < animDelay) break;
+                if (fitJoints([...parentJointsToRef.current, ...parentJointsFromRef.current])) {
+                    frameStateRef.current = "done";
+                }
+                break;
+            }
+            case "done":
                 break;
             default:
                 console.error("Unexpected state", id, frameStateRef.current)

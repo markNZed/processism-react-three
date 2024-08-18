@@ -62,6 +62,7 @@ const useJoints = (entityStore) => {
     };
 
     const updateJoint = (chainRef, jointId, aRef, aOffset, bRef, bOffset) => {
+        //console.log("updateJoint", jointId, aRef, aOffset, bRef, bOffset);
         const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
         const aVisualConfig = aRef.getVisualConfig();
         const bVisualConfig = bRef.getVisualConfig();
