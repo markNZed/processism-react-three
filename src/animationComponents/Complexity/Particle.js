@@ -37,7 +37,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
-    const [damping, setDamping] = useState(1);
+    const [damping, setDamping] = useState(5);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
     const creationPathIndexRef = useRef(0);

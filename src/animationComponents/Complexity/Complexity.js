@@ -32,7 +32,6 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
 
     const rootOneRef = useRef();
     const rootOneCenterRef = useRef(new THREE.Vector3());
-    const rootOneVisibleRef = useRef(false);
     const frameStateRef = useRef("init");
     const [showTwo, setShowTwo] = useState(false);
 
@@ -48,14 +47,109 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
 
     const config = useConfigPanel({ radius, color });
 
-    const {storeEntityReady: storeEntityOneReady} = useAnimateComplexity(config, refOne, storeOne);
-    const {storeEntityReady: storeEntityTwoReady} = useAnimateComplexity(config, refTwo, storeTwo);
+    // An array of array providing structure with number as the number of leaf nodes
+    const entityCountsOne = [
+        [  
+            [  
+                3
+            ],
+            [  
+                4
+            ],
+            [  
+                5
+            ],
+        ],
+        [  
+            [  
+                4
+            ],
+            [  
+                4
+            ],
+            [  
+                4
+            ],
+        ],
+        [  
+            [  
+                5
+            ],
+            [  
+                5
+            ],
+            [  
+                5
+            ],
+        ],
+    ];
+
+    /*
+    const entityCountsTwo = [
+        [  
+            [  
+                3
+            ],
+            [  
+                3
+            ],
+            [  
+                3
+            ],
+        ],
+        [  
+            [  
+                3
+            ],
+            [  
+                3
+            ],
+            [  
+                3
+            ],
+        ],
+        [  
+            [  
+                3
+            ],
+            [  
+                3
+            ],
+            [  
+                3
+            ],
+        ],
+    ];
+    */
+
+    const entityCountsTwo = [
+        [  
+            [  
+                3
+            ],
+        ],
+        [  
+            [  
+                3
+            ],
+        ],
+        [  
+            [  
+                3
+            ],
+        ],
+    ];
+
+    const configOne = {...config, entityCounts: entityCountsOne};
+    const configTwo = {...config, entityCounts: entityCountsTwo};
+
+    const {storeEntityReady: storeEntityOneReady} = useAnimateComplexity(configOne, refOne, storeOne);
+    const {storeEntityReady: storeEntityTwoReady} = useAnimateComplexity(configTwo, refTwo, storeTwo);
     
     console.log("Complexity rendering", id, storeEntityOneReady, storeOne.getState(), config)
 
     // Pass in radius so we can pass on new radius for child CompoundEntity
-    // Pass in initialPosition to avoid issues with prop being reinitialized with default value, 
-    // which might be an issue with useMemo?
+    // Pass in initialPosition to avoid issues with prop being reinitialized with default value
 
     useFrame(() => {
         // Get the center of 
@@ -107,9 +201,9 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                 <CompoundEntity
                     id={"root"}
                     ref={refOne}
-                    radius={config.radius}
+                    radius={configOne.radius}
                     initialPosition={[0, 0, 0]}
-                    config={config}
+                    config={configOne}
                     entityStore={storeOne}
                     initialCreationPath={initialCreationPathOne}
                 />
@@ -118,9 +212,9 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                 <CompoundEntity
                     id={"root"}
                     ref={refTwo}
-                    radius={config.radius}
-                    initialPosition={[0, 0, -50]}
-                    config={config}
+                    radius={configTwo.radius}
+                    initialPosition={[0, 0, -25]}
+                    config={configTwo}
                     entityStore={storeTwo}
                     initialCreationPath={initialCreationPathTwo}
                 />

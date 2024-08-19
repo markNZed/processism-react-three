@@ -31,6 +31,8 @@ import { useStore } from 'zustand';
 
   The behavior of the compoundEntity is centralized in a state machine that runs on each frame
 
+  https://rapier.rs/javascript3d/index.html for details on Rapier API
+
 */
 
 // Right click on particle could show top blob in the same color
@@ -40,9 +42,8 @@ import { useStore } from 'zustand';
 // default in positionAndOuter is expensive
 // entityStore should probably be a context to avoid passing prop
 // Calculation of path is too slow with high number of particles
-// Keep the center of root at 0,0,0
-// Particles should start with the same size ?
-// Irregular Blob sizes
+// Second compoundEntity is not in a Z plane - why?
+// Limit the max linVel ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
 
@@ -213,7 +214,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         jointIds.forEach(jointId => {
             const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
 
-            if (!jointRef.current.isValid()) return;
+            if (!jointRef.current || !jointRef.current.isValid()) return;
 
             const node1Ref = directGetNode(body1Id).ref;
             const node2Ref = directGetNode(body2Id).ref;

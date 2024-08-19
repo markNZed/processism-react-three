@@ -9,11 +9,13 @@ function useAnimateComplexity(config, ref, entityStore) {
     const startedRef = useRef(false);
 
     function addNodesRecursively(entityCounts, node) {
-        const [currentCount, ...restCounts] = entityCounts;      
-        for (let i = 0; i < currentCount; i++) {
+        const nodeCount = (Array.isArray(entityCounts)) ? entityCounts.length : entityCounts;
+        for (let i = 0; i < nodeCount; i++) {
             const newId = directAddNode(node.id);
             const newNode = directGetNode(newId);
-            addNodesRecursively(restCounts, newNode);
+            if (Array.isArray(entityCounts)) {
+                addNodesRecursively(entityCounts[i], newNode);
+            }
         }
     }
 

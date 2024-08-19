@@ -23,7 +23,6 @@ const useConfigPanel = (defaultSettings) => {
     // Configuration object for your simulation, does not include config that needs to remount
     const config = {
         debug: false,
-        entityCounts: [3, 3, 3],
         radius: controls.radius,
         animDelayMs: controls.animDelayMs,
         colors: [defaultSettings.color || null, utils.getRandomColorFn, null],
