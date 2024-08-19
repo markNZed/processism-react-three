@@ -4,11 +4,12 @@ import { useFrame } from '@react-three/fiber';
 import useAppStore from '../../useAppStore'
 import { createParticleShaderOriginalGeometry,createParticleShaderOriginalMaterial} from './ParticleShaderOriginal'
 import { createParticleShaderDiversityGeometry, createParticleShaderDiversityMaterial } from './ParticleShaderDiversity'
+import WebGL from 'three/addons/capabilities/WebGL.js';
 
 const SHADER_NONE = 0;
 const SHADER_ORIG = 1;
 const SHADER_DIVERSE = 2;
-const USE_SHADER = SHADER_DIVERSE;
+const USE_SHADER = WebGL.isWebGL2Available() ? SHADER_DIVERSE : SHADER_NONE;
 
 const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) => {
 

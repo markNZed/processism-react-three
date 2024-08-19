@@ -122,23 +122,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
     ];
     */
 
-    const entityCountsTwo = [
-        [  
-            [  
-                3
-            ],
-        ],
-        [  
-            [  
-                3
-            ],
-        ],
-        [  
-            [  
-                3
-            ],
-        ],
-    ];
+    const entityCountsTwo = [3, 3, 3]
 
     const configOne = {...config, entityCounts: entityCountsOne};
     const configTwo = {...config, entityCounts: entityCountsTwo};

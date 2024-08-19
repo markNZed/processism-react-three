@@ -1,12 +1,15 @@
 
-Equate complex systems with learning systems
+How to animate complexity ? 
+  A particle could go through 1st plane, through 2nd plane, loop back through 1st plane and modify structure of second plane. 
+    This is cpef. clef is where the 2nd plane modifies the 1st plane.
+  A state machine
+  A particle could go through 1st plane, rebound from 2nd plane and integrate into 1st plane
 
-A distributed process - patterns of events (is that a final cause?) A notion of a distributed cause.
-A particle could go through 1st plane, through 2nd plane, loop back through 1st plane and modify structure of second plane. This is cpef. clef is where the 2nd plane modifies the 1st plane.
+Does it make sense to have relations at the level of compoundEntities - these are abstractions (maybe a different form e.g. dotted line)
 
 Spent $350 as of 4/8/2024
 
-Instead of entities it may be better to refer to communities (as per Whitehead)
+Instead of entity it may be better to refer to communities (as per Whitehead) (no an entity it a community)
 
 WDS_SOCKET_PORT=0 only in CodeSpace ?
 The AnimationMixer in Three.js provides a robust and flexible way to handle animations
@@ -23,7 +26,9 @@ The entities form a new internal boundary as well as an external boundary. The i
 Top-down -> outside-in
 Bottom-up -> inside-out
 
-https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/
+Equate complex systems with learning systems
+
+A distributed process - patterns of events (is that a final cause?) A notion of a distributed cause.
 
 Process produce material change e.g a document materializes a history of process.
 
@@ -43,67 +48,23 @@ Process = sequence of relations that repeat (locally, abstractly, metaphorically
 
 Entities that transit other entities e.g. allowing for material causation
 
-Emergent substrate - processing particles to form entities in another dimension e.g. processor constructs objects/relations. Particle can traverse the "plane" and form objects - no it is the plan that traverses the particles back-and-forth. A bit like Turing machine. Stream of particles could generate objects. Impredicative if the planes are arranged into a loop - this could be end-to-end trained ? Can inset LLM and fine-tune
-
-Maybe the storeEntity will need a lock so we can perform transactions.
-
-Could vary the rigidity of joints to get more organic forms at last CompoundEntity
-
-Particle detaching is probably broken
-Attractor broken?
-
 Use opacity for blobs 
-
-Next major step is to "grow" the structure instead of using a static layout. useStoreEntity to control the entities dynamically.
-
-Currently CompoundEntity calculates the position of the entities via generateEntityPositions using the entityRadius. If it were to grow then it needs to decide where to place the new entity. We can modify the joint to "create" space for the new entity. Deal with special cases of 1,2, 3 entities anf from there is should be a general pattern (e.g. randomly select a child with only 2 joints and add new entity on random side after expanding joint). Perhaps need to use Particle until all the children are created then transform into CompoundEntity to "grow" next level.
-
-Maybe stop scaling particle impulse with area ?
 
 As a blob expands we could hide the relations that were going to/from it
 
-It will not get past init because it is waiting for all particles to be initialised. Maybe don't init in Complexity?
-
 Could automate lastCompoundEntity in storeEntity
-
-Physics debug could be config option
 
 isParticle could maintain a particle array rather than using isParticle
 
-CompoundEntity -> EntityCompound
-
 Because CompoundEntity can become Particle we do not know when we have the full tree ready.
-
-Each CompoundEntity is also a particle. When the particle becomes a CompoundEntity the parent holds the first particle.  The joint remains particle.
 
 chainRef should be a distinct entry ?
 
-CompoundEntity -> Node or Entity or Accumulaton (could be an accumulation of 1)
-
-Joint should probably store [id1, id2, ref]
-
-Creating a node for each particle creates dealys for th emounting of the React components, so we do not mount the lowest level as a CompoundEntity.
+Creating a node for each particle creates dealys for the mounting of the React components, so we do not mount the lowest level as a CompoundEntity.
 
 Eventually a CompoundEntity could become a Particle or vice-verca. In this case we would need to copy the properties ?
 
-useAnimateComplexity to start with [9] then move to [9,9] etc Could move the particle down or maybe just the joints. useAnimateComplexity would operate on storeEntity. use it from complexity, wait until Particles are present and then x seconds.
-
-If CompoundEntities are of different sizes then the outer algorithm will break.
-
-Instead of setCurrentScene, setReloadScene, setUsePhysics, setPausePhysics
-const setOption = useStore((state) => state.setOption);
-const getOption = useStore((state) => state.getOption);
-
-const entityNode = directGetNode(entitiesInstantiated[i]);
-// Create a quaternion representing a small rotation
-const quaternion = new THREE.Quaternion();
-const axis = new THREE.Vector3(0, 0, 1); // Rotate around the Z axis
-const angle = THREE.MathUtils.degToRad(rotation); // Rotate by degrees
-quaternion.setFromAxisAngle(axis, angle);
-entityNode.ref.current.current.lockRotations(false, true);
-entityNode.ref.current.current.setRotation(quaternion, true);
-entityNode.ref.current.current.lockRotations(true, true);
-
+-------------------------------
 A ref that causes a rerender:
 const [ref, setRef] = useState(null);
 
@@ -114,3 +75,8 @@ useEffect(() => {
 }, [ref]);
 
 <RigidBody ref={setRef}>
+-------------------------------
+
+https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/
+
+Emergent substrate - processing particles to form entities in another dimension e.g. processor constructs objects/relations. Particle can traverse the "plane" and form objects - no it is the plan that traverses the particles back-and-forth. A bit like Turing machine. Stream of particles could generate objects. Impredicative if the planes are arranged into a loop - this could be end-to-end trained ? Can insert LLM and fine-tune
