@@ -245,6 +245,7 @@ export const createParticleShaderDiversityGeometry = (radius, segmentsPer90, par
   // top to bottom, left to right
   const indices2d = [];
   let curIndex = 0;
+  let vertCount = 0;
   for (let i=0; i<points2d.length; ++i) {
     const pointsRow = points2d[i];
     const indexRow = [];
@@ -269,7 +270,8 @@ export const createParticleShaderDiversityGeometry = (radius, segmentsPer90, par
       let angle = Math.atan2(pt.y, pt.x);
       // Keep angle in 0 to 2*Math.PI range
       if (angle < 0.0) angle = angle + 2*Math.PI;
-      vertTimeOffs[i] = angle*4;
+      vertTimeOffs[vertCount] = angle*4;
+      vertCount++;
     }
   }
 

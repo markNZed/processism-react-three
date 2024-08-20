@@ -7,52 +7,10 @@ import debounce from 'lodash/debounce';
 
 /**
  * Zustand Tree Store
- * 
- * This module defines a Zustand store for managing a hierarchical tree structure. Each node in the tree can have dynamic properties and child nodes.
- * 
- * ### Key Functionalities:
- * - **Node Creation**: Create new nodes with dynamic properties and specify their parent nodes.
- * - **Node Manipulation**: Add, update, move, and delete nodes within the tree.
- * - **Property Lookups**: Maintain and update lookups for node properties to facilitate quick property-based queries.
- * - **Tree Traversal**: Traverse the tree using depth-first search (DFS) and flatten the tree structure into an array.
- * - **Subtree Operations**: Copy entire subtrees to new parent nodes.
- * 
- * ### Basic Usage:
- * ```javascript
- * import useStoreEntity from './path-to-store';
- * 
- * // Access the store
- * const store = useStoreEntity();
- * 
- * // Add a new node
- * store.addNode('root', { id: 'node1', name: 'Node 1' });
- * 
- * // Update a node's properties
- * store.updateNode('node1', { name: 'Updated Node 1' });
- * 
- * // Delete a node
- * store.deleteNode('node1');
- * 
- * // Move a node to a new parent
- * store.moveNode('node1', 'newParentId');
- * 
- * // Get nodes by property and depth
- * const nodes = store.getNodesByPropertyAndDepth('name', 'Node 1', 1);
- * 
- * // Flatten the tree into an array
- * const flatTree = store.flattenTree();
- * 
- * // Traverse the tree using DFS
- * store.traverseTreeDFS(node => console.log(node));
- * 
- * // Copy a subtree to a new parent node
- * store.copySubtree('nodeId', 'newParentId');
- * ```
- * 
- * This module provides a flexible and efficient way to manage hierarchical data structures with dynamic properties, making it suitable for various applications such as file systems, organizational charts, and more.
  */
 
 // Should distinguish operations that can change nodeCount
+// Maybe the storeEntity will need a lock so we can perform transactions.
 
 const nodeTemplate = {
     isParticle: false,

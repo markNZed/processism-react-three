@@ -5,17 +5,16 @@ import useAppStore from '../../useAppStore'
 import { createParticleShaderOriginalGeometry,createParticleShaderOriginalMaterial} from './ParticleShaderOriginal'
 import { createParticleShaderDiversityGeometry, createParticleShaderDiversityMaterial } from './ParticleShaderDiversity'
 import WebGL from 'three/addons/capabilities/WebGL.js';
+import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 const SHADER_NONE = 0;
 const SHADER_ORIG = 1;
 const SHADER_DIVERSE = 2;
 const USE_SHADER = WebGL.isWebGL2Available() ? SHADER_DIVERSE : SHADER_NONE;
+//const USE_SHADER = WebGPU.isAvailable() ? SHADER_DIVERSE : SHADER_NONE;
+//const USE_SHADER = SHADER_DIVERSE;
 
 const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) => {
-
-    // We'll create the InstancedBufferGeometry for the particle shader with a max instance count
-    const startingParticleCount = 2000;
-    
 
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
@@ -39,18 +38,22 @@ const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) =>
     const pausePhysics = useAppStore((state) => state.pausePhysics);
 
     useEffect(() => {
+        const allParticleRefs = getAllParticleRefs();
+        const count = allParticleRefs.length;
+        console.log("ParticlesInstance useEffect", id, count);
+
         switch (USE_SHADER) {
           case SHADER_NONE:
             break;
           case SHADER_ORIG:
             renderBlobRef.current = { };
             renderBlobRef.current.circleMaterial = createParticleShaderOriginalMaterial(1);
-            renderBlobRef.current.circleGeometry = createParticleShaderOriginalGeometry(1, startingParticleCount, startingParticleCount*2);
+            renderBlobRef.current.circleGeometry = createParticleShaderOriginalGeometry(1, count, count*2);
             break;
           case SHADER_DIVERSE:
             renderBlobRef.current = { };
             renderBlobRef.current.circleMaterial = createParticleShaderDiversityMaterial(1);
-            renderBlobRef.current.circleGeometry = createParticleShaderDiversityGeometry(1, 12, startingParticleCount, startingParticleCount*2)
+            renderBlobRef.current.circleGeometry = createParticleShaderDiversityGeometry(1, 12, count, count*2)
             break;
         }
     }, []);

@@ -4,6 +4,39 @@ How to animate complexity ?
     This is cpef. clef is where the 2nd plane modifies the 1st plane.
   A state machine
   A particle could go through 1st plane, rebound from 2nd plane and integrate into 1st plane
+  How to show hierarchical impredicativty
+    Needs distributed process ?
+    Concept of individuals in a relation
+    Could map to a concept of blue hat
+      Metacognition
+      Process Management (Facilitation ?)
+    The compoundEntity represents a hierarchy but it is not showing complexity
+      Relations between entities can modify structure
+      Could have relations between clusters that can be understood like particles
+        Show how a loop of entities can represent a loop of clusters
+  Perspective
+    Relations that allow for new entities ?
+    A "higher" entity that establihses relation from one cluster to a compoundEntity in a new cluster
+  Staged development
+    New levels of compoundEntity
+    New relationships which gives new perspectives
+  Heterarchy
+    Entity at boundary connects to multiple depths
+  Anticipation
+    One cluster that maintains a model of another cluster that it can speed up and use for prediction
+      Then intervene so a particular outcome occurs
+        Basic predict + act sequence
+          If the system being predicted is simple then it will continue to be accurate
+            Just keep the prediction x steps ahead of actual
+              Maybe we just have a delayed copy to simulate this
+  Intelligence
+    Learning to adapt to changes in the system - requires monitoring for changes
+      Could build a second model that learns about changes in dynamics
+      A "black blob" that provides the "common sense" of how to update the model
+  Life
+    Show repair (swap in an entity - could be a loop)
+
+Consciousness allows for the correlation of qualia which is a causal role
 
 Does it make sense to have relations at the level of compoundEntities - these are abstractions (maybe a different form e.g. dotted line)
 
@@ -80,3 +113,5 @@ useEffect(() => {
 https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/
 
 Emergent substrate - processing particles to form entities in another dimension e.g. processor constructs objects/relations. Particle can traverse the "plane" and form objects - no it is the plan that traverses the particles back-and-forth. A bit like Turing machine. Stream of particles could generate objects. Impredicative if the planes are arranged into a loop - this could be end-to-end trained ? Can insert LLM and fine-tune
+
+Facilitate staged development independent of the user's framework

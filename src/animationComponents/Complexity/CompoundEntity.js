@@ -44,7 +44,6 @@ import { useStore } from 'zustand';
 // Calculation of path is too slow with high number of particles
 // Second compoundEntity is not in a Z plane - why?
 // Limit the max linVel ?
-// Maybe the storeEntity will need a lock so we can perform transactions.
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
 
