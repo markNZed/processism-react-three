@@ -6,6 +6,7 @@ import { BallCollider, interactionGroups } from '@react-three/rapier';
 import * as utils from './utils';
 import useAppStore from '../../useAppStore';
 import * as THREE from 'three';
+import { set } from 'lodash';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
 // Coud store visualConfig only in node but would slow data access when rendering the instanced mesh of particles
@@ -18,7 +19,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     useImperativeHandle(ref, () => nodeRef.current);
 
     // Here we define a fixed particleRadius (could use radius but will have different radius at different depth)
-    const particleRadius = 1; // radius
+    const particleRadius = radius;
 
     const isDebug = props.debug || config.debug;
     const [colliderRadius, setColliderRadius] = useState(radius);
@@ -47,6 +48,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     const creationDurationRef = useRef(0);
     const creationPositionRef = useRef(new THREE.Vector3());
     const frameStateRef = useRef("init");
+    const [enabledTranslations, setEnabledTranslations] = useState([true, true, true]);
+    const [lockZ, setLockZ] = useState(false);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame((_, deltaTime) => {
@@ -170,6 +173,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 groupRef.current.worldToLocal(creationPositionRef.current);
                 // This seems to mess things up but assigning directly to rigidbody is OK
                 //nodeRef.current.current.setEnabledTranslations(true, true, false, true);
+                setLockZ(true);
                 //nodeRef.current.current.setBodyType(0, true); // dynamic
                 colliderRef.current.setCollisionGroups(interactionGroups(0));
                 visualConfig.isCreated = true;
@@ -222,6 +226,14 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         }
     }, []);
 
+    useEffect(() => {
+        if (lockPose) {
+            setEnabledTranslations([false, false, false]);
+        } else {
+            setEnabledTranslations([true, true, !lockZ]);
+        }
+    }, [lockPose, lockZ]);
+
     //console.log("Particle rendering", index, id, initialPosition, lockPose);
 
     return (
@@ -235,8 +247,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 //linearVelocity={[2, 2, 0]}
                 linearDamping={damping}
                 angularDamping={damping}
-                enabledTranslations={[!lockPose, !lockPose, !lockPose]}
-                //enabledTranslations={[true, true, true]}
+                enabledTranslations={enabledTranslations}
                 enabledRotations={[false, false, !lockPose]}
                 //enabledRotations={[false, false, true]}
                 restitution={config.particleRestitution}

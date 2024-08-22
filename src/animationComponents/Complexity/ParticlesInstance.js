@@ -4,15 +4,11 @@ import { useFrame } from '@react-three/fiber';
 import useAppStore from '../../useAppStore'
 import { createParticleShaderOriginalGeometry,createParticleShaderOriginalMaterial} from './ParticleShaderOriginal'
 import { createParticleShaderDiversityGeometry, createParticleShaderDiversityMaterial } from './ParticleShaderDiversity'
-import WebGL from 'three/addons/capabilities/WebGL.js';
-import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 const SHADER_NONE = 0;
 const SHADER_ORIG = 1;
 const SHADER_DIVERSE = 2;
-const USE_SHADER = WebGL.isWebGL2Available() ? SHADER_DIVERSE : SHADER_NONE;
-//const USE_SHADER = WebGPU.isAvailable() ? SHADER_DIVERSE : SHADER_NONE;
-//const USE_SHADER = SHADER_DIVERSE;
+const USE_SHADER = SHADER_DIVERSE;
 
 const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) => {
 
@@ -30,8 +26,7 @@ const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) =>
     const instanceMatrix = new THREE.Matrix4();
     const [particleCount, setParticleCount] = useState(0);
     const showParticles = useAppStore((state) => state.getOption("showParticles"));
-    
-    
+      
     /** @type {{ current: { circleMaterial: THREE.ShaderMaterial, circleGeometry: THREE.InstancedBufferGeometry } }} */
     const renderBlobRef = useRef();
     const timeRef = useRef(0);
@@ -75,28 +70,28 @@ const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) =>
         }
         
         if (renderBlobRef.current && (USE_SHADER === SHADER_ORIG || USE_SHADER === SHADER_DIVERSE)) {
-          let { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
+            let { circleMaterial: circleInstanceMaterial, circleGeometry: circleInstanceGeometry } = renderBlobRef.current;
 
-          circleInstanceMaterial.uniforms.time.value = timeRef.current;
+            circleInstanceMaterial.uniforms.time.value = timeRef.current;
 
-          // If the number of particles is greater than our max instance count, recreate the geometry with particleCount*2 max instance count
-          if (circleInstanceGeometry.userData.maxInstanceCount < particleCount) {
-            renderBlobRef.current.circleGeometry = USE_SHADER === SHADER_ORIG ? 
-              createParticleShaderOriginalGeometry(1, particleCount, particleCount*2) :
-              createParticleShaderDiversityGeometry(1, 12, particleCount, particleCount*2);
+            // If the number of particles is greater than our max instance count, recreate the geometry with particleCount*2 max instance count
+            if (circleInstanceGeometry.userData.maxInstanceCount < particleCount) {
+                renderBlobRef.current.circleGeometry = USE_SHADER === SHADER_ORIG ? 
+                createParticleShaderOriginalGeometry(1, particleCount, particleCount*2) :
+                createParticleShaderDiversityGeometry(1, 12, particleCount, particleCount*2);
 
-            circleInstanceGeometry.dispose();
-            circleInstanceGeometry = renderBlobRef.current.circleGeometry;
-          }
+                circleInstanceGeometry.dispose();
+                circleInstanceGeometry = renderBlobRef.current.circleGeometry;
+            }
 
-          // If the instance count of our geometry is not equal to particleCount, set it
-          if (circleInstanceGeometry.instanceCount !== particleCount) circleInstanceGeometry.instanceCount = particleCount;
-          //if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
-          
-          // If the InstancedMesh is not using our shader material and InstancedBufferGeometry, set it
-          if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
-          if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
-      }
+            // If the instance count of our geometry is not equal to particleCount, set it
+            if (circleInstanceGeometry.instanceCount !== particleCount) circleInstanceGeometry.instanceCount = particleCount;
+            //if (circleInstanceMaterial.uniforms.radius.value !== particleRadius) { circleInstanceMaterial.uniforms.radius.value = particleRadius; }
+            
+            // If the InstancedMesh is not using our shader material and InstancedBufferGeometry, set it
+            if (mesh.material !== circleInstanceMaterial) mesh.material = circleInstanceMaterial;
+            if (mesh.geometry !== circleInstanceGeometry) mesh.geometry = circleInstanceGeometry;
+        }
 
         //console.log("allParticleRefs", allParticleRefs)
 

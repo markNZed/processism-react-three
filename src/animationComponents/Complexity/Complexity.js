@@ -48,7 +48,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
     const config = useConfigPanel({ radius, color });
 
     // An array of array providing structure with number as the number of leaf nodes
-    const entityCountsOne = [
+    let entityCountsOne = [
         [  
             [  
                 3
@@ -84,8 +84,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
         ],
     ];
 
-    /*
-    const entityCountsTwo = [
+    let entityCountsTwo = [
         [  
             [  
                 3
@@ -120,9 +119,9 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
             ],
         ],
     ];
-    */
 
-    const entityCountsTwo = [3, 3, 3]
+    entityCountsOne = [3, 3, 3]
+    entityCountsTwo = [3, 3, 3]
 
     const configOne = {...config, entityCounts: entityCountsOne};
     const configTwo = {...config, entityCounts: entityCountsTwo};

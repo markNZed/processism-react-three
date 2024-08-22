@@ -14,6 +14,10 @@ How to animate complexity ?
       Relations between entities can modify structure
       Could have relations between clusters that can be understood like particles
         Show how a loop of entities can represent a loop of clusters
+  Distributed vs centralised process
+    Centralized is like having global variables
+    Distributed means the process has evolved without centralized coordination
+      Allows for uncoordinated processes
   Perspective
     Relations that allow for new entities ?
     A "higher" entity that establihses relation from one cluster to a compoundEntity in a new cluster
