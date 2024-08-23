@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import CompoundEntityGroup from './CompoundEntityGroup';
 import * as THREE from 'three';
-import _, { identity, isEqual } from 'lodash';
+import _ from 'lodash';
 import * as utils from './utils';
 import Particle from './Particle';
 import ParticlesInstance from './ParticlesInstance';
@@ -18,9 +18,7 @@ import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { vec3, quat } from '@react-three/rapier';
 import useAppStore from '../../useAppStore'
 import { useStore } from 'zustand';
-import { shallow } from 'zustand/shallow';
 import { diff} from 'deep-object-diff';
-
 
 /*
 
