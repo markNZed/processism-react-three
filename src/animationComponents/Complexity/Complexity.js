@@ -28,6 +28,7 @@ import * as THREE from 'three';
 */
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
+// Using forwardRef because withAnimationState expects this
 const Complexity = React.forwardRef(({id, radius, color}, ref) => {
 
     const rootOneRef = useRef();
@@ -41,7 +42,6 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
     const storeOne = useMemo(() => useStoreEntity(), []);
     const storeTwo = useMemo(() => useStoreEntity(), []);
 
-    // Using forwardRef and need to access the ref from inside this component too
     const refOne = useRef();
     const refTwo = useRef();
 
@@ -69,6 +69,28 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
             ],
             [  
                 4
+            ],
+        ],
+        [  
+            [  
+                5
+            ],
+            [  
+                5
+            ],
+            [  
+                5
+            ],
+        ],
+        [  
+            [  
+                5
+            ],
+            [  
+                5
+            ],
+            [  
+                5
             ],
         ],
         [  
@@ -120,7 +142,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
         ],
     ];
 
-    entityCountsOne = [3, 3, 3]
+    entityCountsOne = [4]
     entityCountsTwo = [3, 3, 3]
 
     const configOne = {...config, entityCounts: entityCountsOne};
@@ -163,7 +185,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                 const visualConfig = rootOneRef.current.current.getVisualConfig();
                 if (visualConfig.visible) {
                     frameStateRef.current = "done";
-                    setShowTwo(true);
+                    //setShowTwo(true);
                 }
                 break;
             }

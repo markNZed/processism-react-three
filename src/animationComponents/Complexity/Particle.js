@@ -6,7 +6,7 @@ import { BallCollider, interactionGroups } from '@react-three/rapier';
 import * as utils from './utils';
 import useAppStore from '../../useAppStore';
 import * as THREE from 'three';
-import { set } from 'lodash';
+import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
 // Coud store visualConfig only in node but would slow data access when rendering the instanced mesh of particles
@@ -19,7 +19,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     useImperativeHandle(ref, () => nodeRef.current);
 
     // Here we define a fixed particleRadius (could use radius but will have different radius at different depth)
-    const particleRadius = radius;
+    const particleRadius = radius > 1 ? 1 : radius;
 
     const isDebug = props.debug || config.debug;
     const [colliderRadius, setColliderRadius] = useState(radius);
@@ -39,6 +39,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
     const [damping, setDamping] = useState(5);
+    const dampingRef = useRef(5);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
     const creationPathIndexRef = useRef(0);
@@ -48,11 +49,15 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     const creationDurationRef = useRef(0);
     const creationPositionRef = useRef(new THREE.Vector3());
     const frameStateRef = useRef("init");
-    const [enabledTranslations, setEnabledTranslations] = useState([true, true, true]);
-    const [lockZ, setLockZ] = useState(false);
+    const frameCountRef = useRef(0);
+    const enabledTranslationsRef = useRef([!lockPose, !lockPose, !lockPose]);
+    const enabledRotationsRef = useRef([false, false, !lockPose]);
+    const currLockPoseRef = useRef(lockPose);
+    const lockZRef = useRef(false);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame((_, deltaTime) => {
+        frameCountRef.current++;
         if (!nodeRef.current) return;
         creationDurationRef.current += deltaTime;
         if (nodeRef.current.applyImpulses) {
@@ -68,6 +73,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             }
             const newRadius = relativeScale * colliderRadius
             setColliderRadius(newRadius);
+            visualConfig.colliderRadius = newRadius;
             nodeRef.current.setVisualConfig(visualConfig)
             node.jointsRef.current.forEach((jointId) => {
                 const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
@@ -89,7 +95,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         }
         if (visualConfig.damping && visualConfig.damping !== damping) {
             //console.log("Damping changed", id, damping, visualConfig.damping);
-            setDamping(visualConfig.damping);
+            // Need to force a rendering ?
+            dampingRef.current = visualConfig.damping;
         }
         switch (frameStateRef.current) {
             case "init": {
@@ -171,15 +178,15 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                     currentTranslation.z,
                 );
                 groupRef.current.worldToLocal(creationPositionRef.current);
-                // This seems to mess things up but assigning directly to rigidbody is OK
-                //nodeRef.current.current.setEnabledTranslations(true, true, false, true);
-                setLockZ(true);
-                //nodeRef.current.current.setBodyType(0, true); // dynamic
+                lockZRef.current = true;
+                if (!lockPose) {
+                    nodeRef.current.current.setEnabledTranslations(true, true, !lockZRef.current, true);
+                }
                 colliderRef.current.setCollisionGroups(interactionGroups(0));
                 visualConfig.isCreated = true;
                 nodeRef.current.setVisualConfig(visualConfig);
                 frameStateRef.current = "done";
-                setDamping(0.1);
+                dampingRef.current = 0.1;
                 break;
             }
             case "done": {
@@ -188,6 +195,21 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             default:
                 console.error("Unexpected state", id, frameStateRef.current)
                 break;
+        }
+        // Must use setEnabledTranslations in useFrame not useEffect
+        if (currLockPoseRef.current !== lockPose) {
+            currLockPoseRef.current = lockPose;
+            if (lockPose) {
+                nodeRef.current.current.setEnabledTranslations(false, false, false, true);
+                nodeRef.current.current.setEnabledRotations(false, false, false, true);
+                enabledTranslationsRef.current = [true, true, false];
+                enabledRotationsRef.current = [false, false, false];
+            } else {
+                nodeRef.current.current.setEnabledTranslations(true, true, !lockZRef.current, true);
+                nodeRef.current.current.setEnabledRotations(false, false, true, true);
+                enabledTranslationsRef.current = [true, true, false];
+                enabledRotationsRef.current = [false, false, true];
+            }
         }
     });
 
@@ -207,9 +229,10 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 radius: particleRadius, 
                 origRadius: particleRadius, 
                 outer: outer, 
-                damping: damping, 
+                damping: dampingRef.current, 
                 isParticle: true,
                 isCreated: false,
+                colliderRadius: colliderRadius,
             });
             directUpdateNode(id, {isParticle: true});
             setInitialize(false);
@@ -226,15 +249,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         }
     }, []);
 
-    useEffect(() => {
-        if (lockPose) {
-            setEnabledTranslations([false, false, false]);
-        } else {
-            setEnabledTranslations([true, true, !lockZ]);
-        }
-    }, [lockPose, lockZ]);
-
-    //console.log("Particle rendering", index, id, initialPosition, lockPose);
+    //console.log("Particle rendering", id, index, frameCountRef.current, initialPosition, radius, frameStateRef.current, creationPositionRef, creationPathRef);
+    //useWhyDidYouUpdate(`Particle ${id}`, {id, index, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, entityStore, ...props} );
 
     return (
         <group ref={groupRef} >
@@ -245,11 +261,10 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 type={fixParticles ? "fixed" : "dynamic"} // "kinematicPosition" "fixed" "kinematicVelocity" "dynamic"
                 colliders={false}
                 //linearVelocity={[2, 2, 0]}
-                linearDamping={damping}
-                angularDamping={damping}
-                enabledTranslations={enabledTranslations}
-                enabledRotations={[false, false, !lockPose]}
-                //enabledRotations={[false, false, true]}
+                linearDamping={dampingRef.current}
+                angularDamping={dampingRef.current}
+                enabledTranslations={enabledTranslationsRef.current}
+                enabledRotations={enabledRotationsRef.current}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
                 worldToLocal={worldToLocal}

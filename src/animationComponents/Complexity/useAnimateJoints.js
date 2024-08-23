@@ -108,8 +108,8 @@ const useAnimateJoints = (
                     const node2Ref = getNode(body2Id).ref;
                     const visualConfig1 = node1Ref.current.getVisualConfig();
                     const visualConfig2 = node2Ref.current.getVisualConfig();
-                    const radius1 = visualConfig1.radius;
-                    const radius2 = visualConfig2.radius;
+                    const radius1 = visualConfig1.colliderRadius;
+                    const radius2 = visualConfig2.colliderRadius;
                     const { offset1, offset2 } = utils.calculateJointOffsets(body1, body2, radius1, radius2);
                     // Offset needs to be in local coordinates - should be OK for 
                     jointsToCreate.push([node1Ref, offset1, node2Ref, offset2]);
