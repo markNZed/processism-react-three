@@ -52,13 +52,13 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     const frameCountRef = useRef(0);
     const enabledTranslationsRef = useRef([!lockPose, !lockPose, !lockPose]);
     const enabledRotationsRef = useRef([false, false, !lockPose]);
-    const currLockPoseRef = useRef(lockPose);
+    const currLockPoseRef = useRef();
     const lockZRef = useRef(false);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame((_, deltaTime) => {
         frameCountRef.current++;
-        if (!nodeRef.current) return;
+        if (!nodeRef.current?.current) return;
         creationDurationRef.current += deltaTime;
         if (nodeRef.current.applyImpulses) {
             nodeRef.current.applyImpulses();
@@ -120,7 +120,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 if (creationPathRef.current.length > creationPathIndexRef.current) {
                     frameStateRef.current = "move";
                 } else {
-                    frameStateRef.current = "inPosition";
+                    frameStateRef.current = "finalizePosition";
                 }
                 break;
             }
@@ -168,18 +168,24 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
                 break;
             }
-            case "inPosition": {
-                const currentTranslation = nodeRef.current.translation();
+            case "finalizePosition": {
                 nodeRef.current.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
                 // It seems important to update creationPositionRef when changing enabledTranslations
                 creationPositionRef.current.set(
-                    currentTranslation.x,
-                    currentTranslation.y,
-                    currentTranslation.z,
+                    nextCreationPositionRef.current.x,
+                    nextCreationPositionRef.current.y,
+                    nextCreationPositionRef.current.z,
                 );
+                // Need this so the setEnabledTranslations will eject the particles
+                nodeRef.current.current.setTranslation(nextCreationPositionRef.current, true);
                 groupRef.current.worldToLocal(creationPositionRef.current);
+                frameStateRef.current = "inPosition";
+                break;
+            }
+            case "inPosition": {
                 lockZRef.current = true;
                 if (!lockPose) {
+                    enabledTranslationsRef.current = [true, true, !lockZRef.current];
                     nodeRef.current.current.setEnabledTranslations(true, true, !lockZRef.current, true);
                 }
                 colliderRef.current.setCollisionGroups(interactionGroups(0));
@@ -263,8 +269,10 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 //linearVelocity={[2, 2, 0]}
                 linearDamping={dampingRef.current}
                 angularDamping={dampingRef.current}
-                enabledTranslations={enabledTranslationsRef.current}
-                enabledRotations={enabledRotationsRef.current}
+                //enabledTranslations={enabledTranslationsRef.current}
+                //enabledTranslations={[false, false, false]}
+                //enabledRotations={enabledRotationsRef.current}
+                //enabledRotations={[false, false, false]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
                 worldToLocal={worldToLocal}

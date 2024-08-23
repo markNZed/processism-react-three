@@ -142,8 +142,9 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
         ],
     ];
 
-    entityCountsOne = [4]
-    entityCountsTwo = [3, 3, 3]
+    //entityCountsOne = [3, 3, 3, 3];
+    //entityCountsTwo = [];
+    //entityCountsTwo = [3, 3, 3];
 
     const configOne = {...config, entityCounts: entityCountsOne};
     const configTwo = {...config, entityCounts: entityCountsTwo};
@@ -185,7 +186,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                 const visualConfig = rootOneRef.current.current.getVisualConfig();
                 if (visualConfig.visible) {
                     frameStateRef.current = "done";
-                    //setShowTwo(true);
+                    if (entityCountsTwo.length > 0) setShowTwo(true);
                 }
                 break;
             }

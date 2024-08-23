@@ -703,7 +703,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
                     nodeRef.current.worldToLocal(position);
-                    entityPoseRef.current.position[entityId] = [position.x, position.y, 0]; // Force Z to 0
+                    entityPoseRef.current.position[entityId] = [position.x, position.y, position.z]; // Force Z to 0
                 })
                 if (id === "root") {
                     console.log("entityStore", entityStore);
@@ -753,7 +753,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         }
     });
 
-    //console.log("CompoundEntity rendering", id, "frameState", frameStateRef.current, "entityCount", entityCount, "initialPosition", initialPosition, "outer", outer)
+    //console.log("CompoundEntity rendering", id, "frameState", frameStateRef.current, "initialPosition", initialPosition)
     //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, config, outer, entityStore, initialCreationPath, ...props} );
 
     return (
@@ -764,12 +764,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 {entitiesToInstantiate.map((entityId, i) => {
                     let entity = directGetNode(entityId);
                     let EntityType = CompoundEntity;
-                    let lockPose = (i === 0 && !jointsMapped) ? true : false
                     if (entity.childrenIds.length === 0) {
                         EntityType = Particle;
                     } else if (!jointsMapped) {
                         EntityType = Particle;
                     }
+                    let lockPose = (i === 0 && !jointsMapped) ? true : false;
+                    // First particle replaces the compoundEntity particle in-place
                     const creationPathRef = (i === 0 && id !== "root") ? null : entityPoseRef.current.creationPathRefs[entityId];
                     return (
                         <EntityType
