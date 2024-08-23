@@ -39,6 +39,9 @@ How to animate complexity ?
       A "black blob" that provides the "common sense" of how to update the model
   Life
     Show repair (swap in an entity - could be a loop)
+  Paradox
+    e.g. moral dilemma, behaving as if entities are stable
+    e.g. two perspectives that are valid and classify things in opposing ways - freedom vs security
 
   Family resemblance of process-centric philosophy
     Primacy of Change and Becoming

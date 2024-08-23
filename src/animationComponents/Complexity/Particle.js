@@ -38,7 +38,6 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
-    const [damping, setDamping] = useState(5);
     const dampingRef = useRef(5);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
@@ -93,8 +92,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             visualConfig.rigidScale = visualConfig.scale;
             nodeRef.current.setVisualConfig(visualConfig);
         }
-        if (visualConfig.damping && visualConfig.damping !== damping) {
-            //console.log("Damping changed", id, damping, visualConfig.damping);
+        if (visualConfig.damping && visualConfig.damping !== dampingRef.current) {
+            console.log("Damping changed", id, dampingRef.current, visualConfig.damping);
             // Need to force a rendering ?
             dampingRef.current = visualConfig.damping;
         }
@@ -269,10 +268,6 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 //linearVelocity={[2, 2, 0]}
                 linearDamping={dampingRef.current}
                 angularDamping={dampingRef.current}
-                //enabledTranslations={enabledTranslationsRef.current}
-                //enabledTranslations={[false, false, false]}
-                //enabledRotations={enabledRotationsRef.current}
-                //enabledRotations={[false, false, false]}
                 restitution={config.particleRestitution}
                 ccd={config.ccd}
                 worldToLocal={worldToLocal}
