@@ -41,14 +41,13 @@ import { diff} from 'deep-object-diff';
 // Right click on particle could show top blob in the same color
 // Test useAnimateImpulses
 // The lower blob joints should be put in place before the higher
-// We are rotating the compoundEntity using the group is this to avoid applying this rotation to particles ?
+// We are rotating the compoundEntity using the compoundEntityGroup is this to avoid applying this rotation to particles ?
 // entityStore should probably be a context to avoid passing prop
+//   Pass in with config ?
+//   Same with initialCreationPath
 // Calculation of path is too slow with high number of particles
 // Limit the max linVel ?
 // visualConfig1.colliderRadius should be in the node
-// Particle.js:237 nodeRef.current.current.setEnabledTranslations is breaking the position info
-//   lockZ causing it to be called again and that creates issues ? Maybe not aligned with frames
-// Enabling translations is perhaps re-reading initial rotations ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
 
