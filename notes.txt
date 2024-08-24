@@ -26,6 +26,8 @@ How to animate complexity ?
     New relationships which gives new perspectives
   Heterarchy
     Entity at boundary connects to multiple depths
+  Impredicativity
+  Hierarchical impredicativity
   Anticipation
     One cluster that maintains a model of another cluster that it can speed up and use for prediction
       Then intervene so a particular outcome occurs
@@ -45,13 +47,21 @@ How to animate complexity ?
 
   Family resemblance of process-centric philosophy
     Primacy of Change and Becoming
+      Balance with the importance of scale
     Relationality and Interconnectedness
+      Balance with notion of autonomy
     Temporal and Evolutionary Perspective
+      Balance with the present moment
     Creativity and Emergence
+      Balance with tradition and structure
     Holistic and Non-Reductionist Approach
+      Balance with the applicability of reductionism
     Emphasis on Experience and Perception
+      Balance with notion of non-subjective and unconscious ?
     Dynamic Ontology
+      Balance with the value of shared meaning
     Contextuality
+      Balance with the degree of stable/shared context
 
 
 Consciousness allows for the correlation of qualia which is a causal role

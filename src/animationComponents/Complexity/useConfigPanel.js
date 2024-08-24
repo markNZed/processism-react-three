@@ -5,7 +5,7 @@ const useConfigPanel = (defaultSettings) => {
     
     const controlsConfig = {
         radius: { value: defaultSettings.radius || 10, min: 1, max: 20 },
-        animDelayMs: { value: 100, min: 0, max: 1000, step: 1, label: "Animation Delay" },
+        animDelayMs: { value: 50, min: 0, max: 1000, step: 1, label: "Animation Delay" },
         impulsePerParticle: { value: 1.5, min: 0, max: 100, step: 0.1, label: "Impulse per Particle" },
         overshootScaling: { value: 1.0, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
         maxDisplacementScaling: { value: 1, min: 0.1, max: 3, step: 0.1, label: "Max Displacement Scaling" },

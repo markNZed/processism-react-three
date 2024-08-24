@@ -33,6 +33,7 @@ import { diff} from 'deep-object-diff';
   The behavior of the compoundEntity is centralized in a state machine that runs on each frame
 
   https://rapier.rs/javascript3d/index.html for details on Rapier API
+  RigidBodySet might be a way of managing particles
 
 */
 
@@ -46,6 +47,9 @@ import { diff} from 'deep-object-diff';
 // Calculation of path is too slow with high number of particles
 // Limit the max linVel ?
 // visualConfig1.colliderRadius should be in the node
+//   If we update the node then it will rerender
+//   Maybe rename to physicsConfig ?
+// We need directUpdateNode(id, {visible: true}); ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
 
@@ -120,6 +124,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     const creationSource = new THREE.Vector3();
     const entityIdsCreatedRef = useRef([]);
     const lastPositionAndOuterRef = useRef();
+    const unstable = useRef(true);
 
     const setOption = useAppStore((state) => state.setOption);
     const showParticles = useAppStore((state) => state.getOption("showParticles"));
@@ -537,6 +542,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             //console.log("FrameState", frameStateRef.current);
         }
 
+        if (unstable.current) {
+            directResetParticlesHash();
+        }
+
         prevFrameStateRef.current = frameStateRef.current
 
         const animDelay = config.animDelayMs / 1000;
@@ -558,8 +567,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case "selectNextEntity": {
                 // Add entities one by one
                 const toInstantiateCount = entitiesToInstantiate.length;
-                // Don't pause for the first entity
-                if (toInstantiateCount > 0 && frameStateDurationRef.current < animDelay) break;
                 for (let i = 0; i < entityNodes.length; i++) {
                     const entityNodeId = entityNodes[i].id;
                     if (entitiesToInstantiate.includes(entityNodeId)) continue;
@@ -574,7 +581,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     } else {
                         frameStateRef.current = "expandJoint";
                     }
-                    directResetParticlesHash();
                     break;
                 }
                 break;
@@ -596,20 +602,17 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 };
                 joint.setAnchor1(expandAnchor(vec3(joint.anchor1())));
                 joint.setAnchor2(expandAnchor(vec3(joint.anchor2())));
-                directResetParticlesHash();
                 frameStateRef.current = "waitForExpansion";
                 break;
             }
             case "waitForExpansion": {
                 if (frameStateDurationRef.current < animDelay) break;
-                directResetParticlesHash();
                 frameStateRef.current = "poseEntity";
                 break;
             }
             case "poseEntity": {
                 // After entityPose entitiesToInstantiate will have nextEntityIdRef.current appended
                 entityPose(nextEntityIdRef.current);
-                directResetParticlesHash();
                 frameStateRef.current = "waitForCreation";
                 break;
             }
@@ -635,7 +638,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             const lastPathIndex = creationPathRef.current.length - 1;
                             creationPathRef.current[lastPathIndex] = newPosition;
                         }
-                        directResetParticlesHash();
                     } else {
                         frameStateRef.current = "replaceJoint";
                     }
@@ -679,23 +681,19 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             case "alignJointsToPolygon": {
                 const toInstantiateCount = entitiesToInstantiate.length;
                 alignJointsToPolygon(toInstantiateCount);
-                directResetParticlesHash();
                 frameStateRef.current = "selectNextEntity";
                 break;
             }
             case "swapJoints": {
-                if (frameStateDurationRef.current < animDelay) break;
                 swapJoints(parentJointsToRef, true);
                 swapJoints(parentJointsFromRef, false);
-                directResetParticlesHash();
                 frameStateRef.current = "jointsSwapped";
                 break;
             }
             case "jointsSwapped": {
-                if (frameStateDurationRef.current < animDelay) break;
-                directResetParticlesHash();
                 // Update the initialPositions based on current positions
                 // This was creating issues when "dropping" particles into place
+                // When the particle becomes a compoundEntity it will be in place
                 entitiesToInstantiate.forEach((entityId, i) => {
                     const entityNode = directGetNode(entityId);
                     const position = vec3(entityNode.ref.current.translation());
@@ -709,14 +707,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 } else {
                     frameStateRef.current = "jointsMapped";
                 }
+                unstable.current = false;
                 break;
             }
             case "stableRoot": {
-                if (frameStateDurationRef.current < animDelay * 4) break;
                 const hash = directGetParticlesHash(id);
                 if (hash && prevParticlesHash.current !== hash) {
                     prevParticlesHash.current = hash;
-                    frameStateDurationRef.current = 0;
                 } else {
                     setOption("showParticles", initialShowParticlesRef.current);
                     console.log("showParticles", id, initialShowParticlesRef.current)
@@ -728,7 +725,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 break;
             }
             case "jointsMapped":
-                if (frameStateDurationRef.current < animDelay) break;
                 // The jointsMapped state may not be updated because not being rerendered
                 if (!jointsMapped) {
                     setJointsMapped(true);
@@ -736,8 +732,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 frameStateRef.current = "contractJoints";
                 break;
             case "contractJoints": {
-                //if (frameStateDurationRef.current < animDelay) break;
                 if (contractJoints([...parentJointsToRef.current, ...parentJointsFromRef.current])) {
+                    entitiesToInstantiate.forEach((entityId, i) => {
+                        const entityNode = directGetNode(entityId);
+                        entityNode.ref.current.setVisualConfig(p => ({ ...p, damping: 5 }));
+                    })
                     frameStateRef.current = "done";
                 }
                 break;

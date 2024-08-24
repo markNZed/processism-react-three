@@ -7,6 +7,7 @@ import * as utils from './utils';
 import useAppStore from '../../useAppStore';
 import * as THREE from 'three';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
+import { vec3 } from '@react-three/rapier';
 
 // Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
 // Coud store visualConfig only in node but would slow data access when rendering the instanced mesh of particles
@@ -38,7 +39,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     // want the center position converted to local coordinates
     const worldToLocal = useCallback((worldPos) => (parentNodeRef.current.worldToLocal(worldPos)) , [parentNodeRef]);
     const fixParticles = useAppStore((state) => state.getOption("fixParticles"));
-    const dampingRef = useRef(5);
+    const dampingRef = useRef(20);
     const nextCreationPositionRef = useRef(new THREE.Vector3());
     const lastCreationPositionRef = useRef(new THREE.Vector3());
     const creationPathIndexRef = useRef(0);
@@ -53,6 +54,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     const enabledRotationsRef = useRef([false, false, !lockPose]);
     const currLockPoseRef = useRef();
     const lockZRef = useRef(false);
+    const limitDampingRef = useRef(null);
 
     // When scaling a Particle we need to modify the joint positions
     useFrame((_, deltaTime) => {
@@ -62,7 +64,6 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         if (nodeRef.current.applyImpulses) {
             nodeRef.current.applyImpulses();
         }
-        //
         const visualConfig = nodeRef.current.getVisualConfig();
         // Could adjust scale over multiple frames
         if (visualConfig?.scale !== visualConfig?.rigidScale) {
@@ -96,6 +97,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             console.log("Damping changed", id, dampingRef.current, visualConfig.damping);
             // Need to force a rendering ?
             dampingRef.current = visualConfig.damping;
+            nodeRef.current.current.setLinearDamping(visualConfig.damping);
+            nodeRef.current.current.setAngularDamping(visualConfig.damping);
         }
         switch (frameStateRef.current) {
             case "init": {
@@ -138,33 +141,17 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 const xDirection = xDistance > 0 ? 1 : -1;
                 const yDirection = yDistance > 0 ? 1 : -1;
                 const zDirection = zDistance > 0 ? 1 : -1;
-                const velocityScale = 40;
-                let xVelocity = xDirection * Math.min(velocityScale, Math.abs(xDistance) * velocityScale);
-                let yVelocity = yDirection * Math.min(velocityScale, Math.abs(yDistance) * velocityScale);
-                let zVelocity = zDirection * Math.min(velocityScale, Math.abs(zDistance) * velocityScale);
-                let nextPath = true;
-                const closeEnough = 0.2;
-                if (Math.abs(xDistance) < closeEnough) {
-                    xVelocity = 0;
-                } else {
-                    nextPath = false;
-                }
-                if (Math.abs(yDistance) < closeEnough) {
-                    yVelocity = 0;
-                } else {
-                    nextPath = false;
-                }
-                if (Math.abs(zDistance) < closeEnough) {
-                    zVelocity = 0;
-                } else {
-                    nextPath = false;
-                }
-                if (nextPath) {
+                const step = 2;
+                let xNext = (Math.abs(xDistance) < step) ? nextCreationPositionRef.current.x : currentTranslation.x + step * xDirection;
+                let yNext = (Math.abs(yDistance) < step) ? nextCreationPositionRef.current.y : currentTranslation.y + step * yDirection;
+                let zNext = (Math.abs(zDistance) < step) ? nextCreationPositionRef.current.z : currentTranslation.z + step * zDirection;
+                nodeRef.current.current.setTranslation({ x: xNext, y: yNext, z: zNext }, true);
+                if (xNext === nextCreationPositionRef.current.x && 
+                    yNext === nextCreationPositionRef.current.y && 
+                    zNext === nextCreationPositionRef.current.z
+                ) {
                     frameStateRef.current = "nextPath";
                 }
-                nodeRef.current.current.setLinvel({ x: xVelocity, y: yVelocity, z: zVelocity }, true);
-                //console.log("setLinvel velocity", id, xVelocity, yVelocity, zVelocity);
-                //console.log("setLinvel", xDistance, yDistance, zDistance, creationPositionRef.current, currentTranslation);
                 break;
             }
             case "finalizePosition": {
@@ -191,10 +178,36 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 visualConfig.isCreated = true;
                 nodeRef.current.setVisualConfig(visualConfig);
                 frameStateRef.current = "done";
-                dampingRef.current = 0.1;
                 break;
             }
             case "done": {
+                if (false) {
+                    // Limit the angular & linear velocity
+                    const maxVel = 10;
+                    const angvel = nodeRef.current.current.angvel();
+                    const linvel = nodeRef.current.current.linvel();
+                    if (Math.abs(angvel.z) > maxVel || 
+                        Math.abs(linvel.x) > maxVel ||
+                        Math.abs(linvel.y) > maxVel ||
+                        Math.abs(linvel.z) > maxVel
+                    ) {
+                        if (visualConfig.damping === undefined) {
+                            visualConfig.damping = dampingRef.current;
+                        }
+                        if (limitDampingRef.current === null) {
+                            limitDampingRef.current = visualConfig.damping;
+                        }
+                        visualConfig.damping = visualConfig.damping * 2;
+                        //console.log("Limiting damping", id, angvel, linvel, visualConfig.damping)
+                    } else if (limitDampingRef.current !== null) {
+                        visualConfig.damping = visualConfig.damping / 2;
+                        if (visualConfig.damping < limitDampingRef.current) {
+                            visualConfig.damping = limitDampingRef.current;
+                            limitDampingRef.current = null;
+                        }
+                        //console.log("Unlimiting damping", id, visualConfig.damping, limitDampingRef.current)
+                    }
+                }
                 break;
             }
             default:
