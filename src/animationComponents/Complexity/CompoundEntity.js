@@ -41,13 +41,7 @@ import { diff} from 'deep-object-diff';
 // Test useAnimateImpulses
 // The lower blob joints should be put in place before the higher
 // We are rotating the compoundEntity using the compoundEntityGroup is this to avoid applying this rotation to particles ?
-// entityStore should probably be a context to avoid passing prop
-//   Pass in with config ?
-//   Same with config.initialCreationPath
-// Calculation of path is too slow with high number of particles
-// visualConfig1.colliderRadius should be in the node
-//   If we update the node then it will rerender
-//   Maybe rename to physicsConfig ?
+// Calculation of path is too slow with high number of particles ?
 // We need directUpdateNode(id, {visible: true}); ?
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
@@ -154,7 +148,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     useEffect(() => {
         directUpdateNode(id, { initialPosition });
         console.log(`Mounting CompoundEntity ${id} at depth ${node.depth}`);
-        node.ref.current.setVisualConfig({ color: color, uniqueId: id, radius: radius });
+        node.ref.current.setphysicsConfig({ color: color, uniqueId: id, radius: radius });
         if (node.childrenIds.length > 0 && node.isParticle) {
             // This is because we may be swaping the node from a Particle to a CompoundEntity
             // Need to correct this so the storeEntity maintains a valid list of Particles
@@ -241,10 +235,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
             const node1Ref = directGetNode(body1Id).ref;
             const node2Ref = directGetNode(body2Id).ref;
 
-            const visualConfig1 = node1Ref.current.getVisualConfig();
-            const visualConfig2 = node2Ref.current.getVisualConfig();
-            const radius1 = visualConfig1.colliderRadius;
-            const radius2 = visualConfig2.colliderRadius;
+            const physicsConfig1 = node1Ref.current.getphysicsConfig();
+            const physicsConfig2 = node2Ref.current.getphysicsConfig();
+            const radius1 = physicsConfig1.colliderRadius;
+            const radius2 = physicsConfig2.colliderRadius;
 
             const anchor1 = jointRef.current.anchor1();
             const anchor2 = jointRef.current.anchor2();
@@ -396,10 +390,10 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         const node2 = directGetNode(id2);
         const body1Ref = node1.ref.current;
         const body2Ref = node2.ref.current;
-        const visualConfig1 = node1.ref.current.getVisualConfig();
-        const body1radius = visualConfig1.colliderRadius;
-        const visualConfig2 = node2.ref.current.getVisualConfig();
-        const body2radius = visualConfig2.colliderRadius;
+        const physicsConfig1 = node1.ref.current.getphysicsConfig();
+        const body1radius = physicsConfig1.colliderRadius;
+        const physicsConfig2 = node2.ref.current.getphysicsConfig();
+        const body2radius = physicsConfig2.colliderRadius;
         const { offset1, offset2 } = utils.calculateJointOffsets(body1Ref, body2Ref, body1radius, body2radius);
         createJoint(node.chainRef, body1Ref, offset1, body2Ref, offset2);
         addActiveJoint(id1, id2);
@@ -626,9 +620,9 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Is the rigid body reference available
                 const particleRef = nextEntityRef.current.ref;
                 if (particleRef?.current?.current) {
-                    const visualConfig = particleRef.current.getVisualConfig();
+                    const physicsConfig = particleRef.current.getphysicsConfig();
                     // Wait until particle is in place
-                    if (!visualConfig.isCreated) {
+                    if (!physicsConfig.isCreated) {
                         // Update the position of where the new entity should end up
                         const creationPathRef = entityPoseRef.current.creationPathRefs[nextEntityIdRef.current];
                         if (creationPathRef.current.length) {
@@ -716,7 +710,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 } else {
                     setOption("showParticles", initialShowParticlesRef.current);
                     console.log("showParticles", id, initialShowParticlesRef.current)
-                    nodeRef.current.setVisualConfig(p => ({ ...p, visible: true }));
+                    nodeRef.current.setphysicsConfig(p => ({ ...p, visible: true }));
                     directUpdateNode(id, {visible: true});
                     frameStateRef.current = "jointsMapped";
                     //setOption("fixParticles", true);
@@ -734,7 +728,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 if (contractJoints([...parentJointsToRef.current, ...parentJointsFromRef.current])) {
                     entitiesToInstantiate.forEach((entityId, i) => {
                         const entityNode = directGetNode(entityId);
-                        entityNode.ref.current.setVisualConfig(p => ({ ...p, damping: 5 }));
+                        entityNode.ref.current.setphysicsConfig(p => ({ ...p, damping: 5 }));
                     })
                     frameStateRef.current = "done";
                 }

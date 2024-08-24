@@ -36,13 +36,13 @@ const useAnimateJoints = (
         // Generate a random number between 1000 and 10000 which determines the duration of relations
         const randomDuration = 1000; //Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         const interval = setInterval(() => {
-            // With "Scope-3" this is at scope 1 so visualConfig.uniqueId is e.g. "Scope-3-5" not a Particle index
+            // With "Scope-3" this is at scope 1 so physicsConfig.uniqueId is e.g. "Scope-3-5" not a Particle index
             if (initialized && id == "2") {
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 12; //Math.floor(Math.random() * entityCount);
                 const entityRef = entityRefs[randomIndexFrom];
-                const visualConfig = entityRef.current.getVisualConfig();
-                const entityUniqueId = visualConfig.uniqueId;
+                const physicsConfig = entityRef.current.getphysicsConfig();
+                const entityUniqueId = physicsConfig.uniqueId;
                 const jointsRef = getNodeProperty(entityUniqueId, `jointsRef`);
                 const entityJointIndexes = jointsRef.current;
                 let replacementBody;
@@ -58,7 +58,7 @@ const useAnimateJoints = (
                     const {jointRef, body1Id, body2Id} = getJoint(jointId);
                     const body1 = jointRef.current.body1();
                     const body2 = jointRef.current.body2();
-                    // Entity needs to store parent entity in visualConfig ?
+                    // Entity needs to store parent entity in physicsConfig ?
                     // Find the entity which is closest to the center of this CompoundEntity
                     function replaceEntity(body, bodyId, entityUniqueId) {
                         if (bodyId === entityUniqueId) return false;
@@ -84,9 +84,9 @@ const useAnimateJoints = (
                 });
                 console.log("Detach a random entity", id, entityUniqueId, entityRef, "replace with", replacementId);
                 const replacementNodeRef = getNode(entityUniqueId).ref;
-                const replacementVisualConfig = replacementNodeRef.current.getVisualConfig();
-                replacementVisualConfig.color = 'purple';
-                replacementNodeRef.current.setVisualConfig(replacementVisualConfig);
+                const replacementphysicsConfig = replacementNodeRef.current.getphysicsConfig();
+                replacementphysicsConfig.color = 'purple';
+                replacementNodeRef.current.setphysicsConfig(replacementphysicsConfig);
                 const jointsToCreate = [];
                 entityJointIndexes.forEach((jointId) => {
                     let {jointRef, body1Id, body2Id} = getJoint(jointId);
@@ -105,17 +105,17 @@ const useAnimateJoints = (
                     // The radius of the replacement may not be the same...
                     const node1Ref = getNode(body1Id).ref;
                     const node2Ref = getNode(body2Id).ref;
-                    const visualConfig1 = node1Ref.current.getVisualConfig();
-                    const visualConfig2 = node2Ref.current.getVisualConfig();
-                    const radius1 = visualConfig1.colliderRadius;
-                    const radius2 = visualConfig2.colliderRadius;
+                    const physicsConfig1 = node1Ref.current.getphysicsConfig();
+                    const physicsConfig2 = node2Ref.current.getphysicsConfig();
+                    const radius1 = physicsConfig1.colliderRadius;
+                    const radius2 = physicsConfig2.colliderRadius;
                     const { offset1, offset2 } = utils.calculateJointOffsets(body1, body2, radius1, radius2);
                     // Offset needs to be in local coordinates - should be OK for 
                     jointsToCreate.push([node1Ref, offset1, node2Ref, offset2]);
-                    visualConfig1.color = 'orange';
-                    node1Ref.current.setVisualConfig(visualConfig1);
-                    visualConfig2.color = 'orange';
-                    node2Ref.current.setVisualConfig(visualConfig2);
+                    physicsConfig1.color = 'orange';
+                    node1Ref.current.setphysicsConfig(physicsConfig1);
+                    physicsConfig2.color = 'orange';
+                    node2Ref.current.setphysicsConfig(physicsConfig2);
                 });
                 entityJointIndexes.forEach((jointId) => {
                     deleteJoint(node.chainRef, jointId);

@@ -9,8 +9,8 @@ import * as THREE from 'three';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
 import { vec3 } from '@react-three/rapier';
 
-// Should we maintian node.visualConfig syned with ParticleRigidBody visualConfig ?
-// Coud store visualConfig only in node but would slow data access when rendering the instanced mesh of particles
+// Should we maintian node.physicsConfig syned with ParticleRigidBody physicsConfig ?
+// Coud store physicsConfig only in node but would slow data access when rendering the instanced mesh of particles
 // At least keep uniqueId aligned with id
 // https://github.com/pmndrs/react-three-rapier/blob/main/demo/src/examples/kinematics/KinematicsExample.tsx
 
@@ -64,17 +64,17 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         if (nodeRef.current.applyImpulses) {
             nodeRef.current.applyImpulses();
         }
-        const visualConfig = nodeRef.current.getVisualConfig();
+        const physicsConfig = nodeRef.current.getphysicsConfig();
         // Could adjust scale over multiple frames
-        if (visualConfig?.scale !== visualConfig?.rigidScale) {
-            let relativeScale = visualConfig.scale;
-            if (visualConfig.rigidScale) {
-                relativeScale = visualConfig.scale / visualConfig.rigidScale;
+        if (physicsConfig?.scale !== physicsConfig?.rigidScale) {
+            let relativeScale = physicsConfig.scale;
+            if (physicsConfig.rigidScale) {
+                relativeScale = physicsConfig.scale / physicsConfig.rigidScale;
             }
             const newRadius = relativeScale * colliderRadius
             setColliderRadius(newRadius);
-            visualConfig.colliderRadius = newRadius;
-            nodeRef.current.setVisualConfig(visualConfig)
+            physicsConfig.colliderRadius = newRadius;
+            nodeRef.current.setphysicsConfig(physicsConfig)
             node.jointsRef.current.forEach((jointId) => {
                 const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
                 const joint = jointRef.current;
@@ -90,15 +90,15 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                     joint.setAnchor2(scaleAnchor(joint.anchor2()));
                 }
             })
-            visualConfig.rigidScale = visualConfig.scale;
-            nodeRef.current.setVisualConfig(visualConfig);
+            physicsConfig.rigidScale = physicsConfig.scale;
+            nodeRef.current.setphysicsConfig(physicsConfig);
         }
-        if (visualConfig.damping && visualConfig.damping !== dampingRef.current) {
-            console.log("Damping changed", id, dampingRef.current, visualConfig.damping);
+        if (physicsConfig.damping && physicsConfig.damping !== dampingRef.current) {
+            console.log("Damping changed", id, dampingRef.current, physicsConfig.damping);
             // Need to force a rendering ?
-            dampingRef.current = visualConfig.damping;
-            nodeRef.current.current.setLinearDamping(visualConfig.damping);
-            nodeRef.current.current.setAngularDamping(visualConfig.damping);
+            dampingRef.current = physicsConfig.damping;
+            nodeRef.current.current.setLinearDamping(physicsConfig.damping);
+            nodeRef.current.current.setAngularDamping(physicsConfig.damping);
         }
         switch (frameStateRef.current) {
             case "init": {
@@ -175,8 +175,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                     nodeRef.current.current.setEnabledTranslations(true, true, !lockZRef.current, true);
                 }
                 colliderRef.current.setCollisionGroups(interactionGroups(0));
-                visualConfig.isCreated = true;
-                nodeRef.current.setVisualConfig(visualConfig);
+                physicsConfig.isCreated = true;
+                nodeRef.current.setphysicsConfig(physicsConfig);
                 frameStateRef.current = "done";
                 break;
             }
@@ -191,21 +191,21 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                         Math.abs(linvel.y) > maxVel ||
                         Math.abs(linvel.z) > maxVel
                     ) {
-                        if (visualConfig.damping === undefined) {
-                            visualConfig.damping = dampingRef.current;
+                        if (physicsConfig.damping === undefined) {
+                            physicsConfig.damping = dampingRef.current;
                         }
                         if (limitDampingRef.current === null) {
-                            limitDampingRef.current = visualConfig.damping;
+                            limitDampingRef.current = physicsConfig.damping;
                         }
-                        visualConfig.damping = visualConfig.damping * 2;
-                        //console.log("Limiting damping", id, angvel, linvel, visualConfig.damping)
+                        physicsConfig.damping = physicsConfig.damping * 2;
+                        //console.log("Limiting damping", id, angvel, linvel, physicsConfig.damping)
                     } else if (limitDampingRef.current !== null) {
-                        visualConfig.damping = visualConfig.damping / 2;
-                        if (visualConfig.damping < limitDampingRef.current) {
-                            visualConfig.damping = limitDampingRef.current;
+                        physicsConfig.damping = physicsConfig.damping / 2;
+                        if (physicsConfig.damping < limitDampingRef.current) {
+                            physicsConfig.damping = limitDampingRef.current;
                             limitDampingRef.current = null;
                         }
-                        //console.log("Unlimiting damping", id, visualConfig.damping, limitDampingRef.current)
+                        //console.log("Unlimiting damping", id, physicsConfig.damping, limitDampingRef.current)
                     }
                 }
                 break;
@@ -231,7 +231,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         }
     });
 
-    // Set the initial visualConfig, don't do this in JSX (it would overwrite on renders)
+    // Set the initial physicsConfig, don't do this in JSX (it would overwrite on renders)
     useEffect(() => {
         if (initialize && nodeRef.current) {
             // Must set outer before isParticle
@@ -241,7 +241,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 // For debugging the outer map
                 //localColor = "pink";
             }
-            nodeRef.current.setVisualConfig({ 
+            nodeRef.current.setphysicsConfig({ 
                 color: localColor, 
                 uniqueId: id, 
                 radius: particleRadius, 

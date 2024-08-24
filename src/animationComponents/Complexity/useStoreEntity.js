@@ -309,7 +309,7 @@ const useStoreEntity = () => create((set, get) => {
                 };
                 traverse(nodes[id]);
                 let concatenatedIds = particles.reduce((acc, particle) => {
-                    let uniqueId = particle.current.getVisualConfig().uniqueId;
+                    let uniqueId = particle.current.getphysicsConfig().uniqueId;
                     return acc + uniqueId; // Concatenate all uniqueIds
                 }, "");
                 // We include the date so resetting particlesHash will force a refresh
@@ -602,13 +602,13 @@ const useStoreEntity = () => create((set, get) => {
             return { nodes };
         }),
 
-        propagateVisualConfigValue: (nodeId, property, value) => set(state => {
+        propagatephysicsConfigValue: (nodeId, property, value) => set(state => {
             const nodes = { ...state.nodes };
 
             const updateSubtree = (currentId) => {
                 // If a node has not appeared yet then the ref will be null
                 if (nodes[currentId]['ref']['current']) {
-                    nodes[currentId]['ref']['current'].setVisualConfig(p => ({ ...p, [property]: value }));
+                    nodes[currentId]['ref']['current'].setphysicsConfig(p => ({ ...p, [property]: value }));
                     if (nodes[currentId].childrenIds && Array.isArray(nodes[currentId].childrenIds)) {
                         nodes[currentId].childrenIds.forEach(childId => updateSubtree(childId));
                     }

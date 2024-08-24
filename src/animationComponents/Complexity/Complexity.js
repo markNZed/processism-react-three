@@ -17,7 +17,7 @@ import * as THREE from 'three';
 
   useStoreEntity has a node for each entity/Particle 
     node.ref is a pointer to the Three group of a CompoundEntity or Rapier RigidBody of a Particle
-    node.ref.current.visualConfig holds information that impact the rendering
+    node.ref.current.physicsConfig holds information that impact the rendering
       This is under the ref so we can access this information when dealing with Rapier particles
 
 */
@@ -183,8 +183,8 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                 break;
             }
             case "waitRootOne": {
-                const visualConfig = rootOneRef.current.current.getVisualConfig();
-                if (visualConfig.visible) {
+                const physicsConfig = rootOneRef.current.current.getphysicsConfig();
+                if (physicsConfig.visible) {
                     frameStateRef.current = "done";
                     if (entityCountsTwo.length > 0) setShowTwo(true);
                 }

@@ -30,8 +30,8 @@ const useJoints = (config) => {
     }
 
     const createJoint = (chainRef, aRef, aOffset, bRef, bOffset, batch=false) => {
-        const aVisualConfig = aRef.getVisualConfig();
-        const bVisualConfig = bRef.getVisualConfig();
+        const aphysicsConfig = aRef.getphysicsConfig();
+        const bphysicsConfig = bRef.getphysicsConfig();
         const jointRef = { current: null }; // Create a plain object to hold the reference
         jointRef.current = world.createImpulseJoint(
             rapier.JointData.spherical(aOffset, bOffset),
@@ -39,11 +39,11 @@ const useJoints = (config) => {
             bRef.current,
             true
         );
-        addLink(chainRef, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
+        addLink(chainRef, aphysicsConfig.uniqueId, bphysicsConfig.uniqueId);
         if (!batch) {
-            directAddJoint(aVisualConfig.uniqueId, bVisualConfig.uniqueId, jointRef);
+            directAddJoint(aphysicsConfig.uniqueId, bphysicsConfig.uniqueId, jointRef);
         }
-        //console.log("createJoint", `${aVisualConfig.uniqueId}-${bVisualConfig.uniqueId}`, jointRef.current)
+        //console.log("createJoint", `${aphysicsConfig.uniqueId}-${bphysicsConfig.uniqueId}`, jointRef.current)
         return jointRef;
     };
     
@@ -64,9 +64,9 @@ const useJoints = (config) => {
     const updateJoint = (chainRef, jointId, aRef, aOffset, bRef, bOffset) => {
         //console.log("updateJoint", jointId, aRef, aOffset, bRef, bOffset);
         const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
-        const aVisualConfig = aRef.getVisualConfig();
-        const bVisualConfig = bRef.getVisualConfig();
-        //console.log("updateJoint", jointId, body1Id, body2Id, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
+        const aphysicsConfig = aRef.getphysicsConfig();
+        const bphysicsConfig = bRef.getphysicsConfig();
+        //console.log("updateJoint", jointId, body1Id, body2Id, aphysicsConfig.uniqueId, bphysicsConfig.uniqueId);
         //console.log("updateJoint ref", jointId, aRef.current, bRef.current);
         if (jointRef.current) {
             const joint = jointRef.current;
@@ -87,8 +87,8 @@ const useJoints = (config) => {
             //console.warn("No aRef or bRef for updateJoint", jointId, aRef.current.type, bRef.current.type);
         }
         removeLink(chainRef, body1Id, body2Id);
-        addLink(chainRef, aVisualConfig.uniqueId, bVisualConfig.uniqueId);
-        directUpdateJoint(jointId, aVisualConfig.uniqueId, bVisualConfig.uniqueId, newJointRef);
+        addLink(chainRef, aphysicsConfig.uniqueId, bphysicsConfig.uniqueId);
+        directUpdateJoint(jointId, aphysicsConfig.uniqueId, bphysicsConfig.uniqueId, newJointRef);
     };
     return {deleteJoint, createJoint, updateJoint, addLink};
 };

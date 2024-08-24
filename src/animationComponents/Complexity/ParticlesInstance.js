@@ -103,14 +103,14 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
             mesh.getMatrixAt(i, instanceMatrix);
             instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
  
-            const visualConfig = particle.getVisualConfig();
+            const physicsConfig = particle.getphysicsConfig();
 
             const particlePos = particle.translation();
-            let scale = visualConfig.scale || 1;
+            let scale = physicsConfig.scale || 1;
 
             const RADIUS_MULT = USE_SHADER === SHADER_DIVERSE ? 0.85 : 1.0;
-            const radius = visualConfig.radius * RADIUS_MULT;
-            const origRadius = visualConfig.origRadius;
+            const radius = physicsConfig.radius * RADIUS_MULT;
+            const origRadius = physicsConfig.origRadius;
             //console.log("radius", i, radius, origRadius);
             if (radius !== origRadius) {
                 scale = scale * (radius / origRadius);
@@ -123,7 +123,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
             userScale.set(scale, scale, scale);
 
-            const color = visualConfig.color || 'red';
+            const color = physicsConfig.color || 'red';
             userColor.set(color);
 
             if (!currentPos.equals(particlePos)) {
@@ -131,7 +131,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
                 matrixChanged = true;
             }
 
-            const visible = visualConfig.visible || showParticles;
+            const visible = physicsConfig.visible || showParticles;
             if (!visible) {
                 currentScale.copy(invisibleScale);
                 matrixChanged = true;
@@ -183,11 +183,11 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
         if (instanceId === undefined) return;
         event.stopPropagation();
         const allParticleRefs = getAllParticleRefs();
-        const visualConfig = allParticleRefs[instanceId].current.getVisualConfig();
-        const currentScale = visualConfig.scale;
-        visualConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
-        visualConfig.color = 'pink';
-        console.log("ParticlesInstance handlePointerDown", id, event, visualConfig);
+        const physicsConfig = allParticleRefs[instanceId].current.getphysicsConfig();
+        const currentScale = physicsConfig.scale;
+        physicsConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
+        physicsConfig.color = 'pink';
+        console.log("ParticlesInstance handlePointerDown", id, event, physicsConfig);
     };
 
     // Use a fixed radius and scale this for particle size

@@ -8,7 +8,7 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
     const impulseRef = useRef(new THREE.Vector3());
     const centerRef = useRef(new THREE.Vector3());
     const centerWorldRef = useRef(new THREE.Vector3());
-    const visualConfigRef = useRef({});
+    const physicsConfigRef = useRef({});
 
     const handle = useMemo(() => ({
         get current() {
@@ -64,18 +64,18 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
                 return null;
             }
         },
-        getVisualConfig: () => {
-            if (visualConfigRef.current) {
-                return visualConfigRef.current;
+        getphysicsConfig: () => {
+            if (physicsConfigRef.current) {
+                return physicsConfigRef.current;
             } else {
                 return null;
             }
         },
-        setVisualConfig: (update) => {
+        setphysicsConfig: (update) => {
             if (typeof update === 'function') {
-                visualConfigRef.current = update(visualConfigRef.current);
+                physicsConfigRef.current = update(physicsConfigRef.current);
             } else {
-                visualConfigRef.current = update;
+                physicsConfigRef.current = update;
             }
         },
     }), [internalRef, impulseRef, centerRef, centerWorldRef, children, worldToLocal ]);
@@ -83,7 +83,7 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
     useImperativeHandle(ref, () => handle, [handle]);;
 
     return (
-        <RapierRigidBody ref={internalRef} visualConfig={{id: id}} {...props} >
+        <RapierRigidBody ref={internalRef} physicsConfig={{id: id}} {...props} >
             {children}
         </RapierRigidBody>
     );
