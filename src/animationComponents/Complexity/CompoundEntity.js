@@ -43,14 +43,14 @@ import { diff} from 'deep-object-diff';
 // We are rotating the compoundEntity using the compoundEntityGroup is this to avoid applying this rotation to particles ?
 // entityStore should probably be a context to avoid passing prop
 //   Pass in with config ?
-//   Same with initialCreationPath
+//   Same with config.initialCreationPath
 // Calculation of path is too slow with high number of particles
 // visualConfig1.colliderRadius should be in the node
 //   If we update the node then it will rerender
 //   Maybe rename to physicsConfig ?
 // We need directUpdateNode(id, {visible: true}); ?
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, initialCreationPath, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -368,7 +368,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         entityPoseRef.current.position[instantiateEntityId] = newPosition;
         entityPoseRef.current.outer[instantiateEntityId] = {...outer, [node.depth]: thisOuter};
 
-        const creationPath = [...initialCreationPath]; // Shallow copy
+        const creationPath = [...config.initialCreationPath]; // Shallow copy
         creationPath.forEach((points, i) => {
             creationSource.set(points[0], points[1], points[2]);
             nodeRef.current.worldToLocal(creationSource);
@@ -749,7 +749,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     });
 
     //console.log("CompoundEntity rendering", id, "frameState", frameStateRef.current, "initialPosition", initialPosition)
-    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, config, outer, initialCreationPath, ...props} );
+    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, config, outer, config.initialCreationPath, ...props} );
 
     return (
         <group>
@@ -783,7 +783,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             quaternion={entityPoseRef.current.orientation[entityId]}
                             outer={entityPoseRef.current.outer[entityId]}
                             lockPose={lockPose}
-                            initialCreationPath={initialCreationPath}
                             index={i}
                         />
                     )

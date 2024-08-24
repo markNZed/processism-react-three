@@ -146,8 +146,8 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
     //entityCountsTwo = [];
     //entityCountsTwo = [3, 3, 3];
 
-    const configOne = {...config, entityCounts: entityCountsOne, entityStore: storeOne};
-    const configTwo = {...config, entityCounts: entityCountsTwo, entityStore: storeTwo};
+    const configOne = {...config, entityCounts: entityCountsOne, entityStore: storeOne, initialCreationPath: initialCreationPathOne};
+    const configTwo = {...config, entityCounts: entityCountsTwo, entityStore: storeTwo, initialCreationPath: initialCreationPathOne};
 
     const {storeEntityReady: storeEntityOneReady} = useAnimateComplexity(configOne, refOne);
     const {storeEntityReady: storeEntityTwoReady} = useAnimateComplexity(configTwo, refTwo);
@@ -210,7 +210,6 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                     radius={configOne.radius}
                     initialPosition={[0, 0, 0]}
                     config={configOne}
-                    initialCreationPath={initialCreationPathOne}
                 />
             )}
             {showTwo && storeEntityTwoReady && (
@@ -220,7 +219,6 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                     radius={configTwo.radius}
                     initialPosition={[0, 0, -25]}
                     config={configTwo}
-                    initialCreationPath={initialCreationPathTwo}
                 />
             )}
         </group>
