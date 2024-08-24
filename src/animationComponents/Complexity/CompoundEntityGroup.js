@@ -81,14 +81,14 @@ const CompoundEntityGroup = forwardRef(({ children, position, quaternion, id}, r
         getWorldPosition: (vector) => {
             return internalRef.current.getWorldPosition(vector);
         },
-        getphysicsConfig: () => {
+        getPhysicsConfig: () => {
             if (physicsConfigRef.current) {
                 return physicsConfigRef.current;
             } else {
                 return null;
             }
         },
-        setphysicsConfig: (update) => {
+        setPhysicsConfig: (update) => {
             if (typeof update === 'function') {
                 physicsConfigRef.current = update(physicsConfigRef.current);
             } else {

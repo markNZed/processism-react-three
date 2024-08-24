@@ -64,14 +64,14 @@ const ParticleRigidBody = forwardRef(({ children, worldToLocal, id, ...props }, 
                 return null;
             }
         },
-        getphysicsConfig: () => {
+        getPhysicsConfig: () => {
             if (physicsConfigRef.current) {
                 return physicsConfigRef.current;
             } else {
                 return null;
             }
         },
-        setphysicsConfig: (update) => {
+        setPhysicsConfig: (update) => {
             if (typeof update === 'function') {
                 physicsConfigRef.current = update(physicsConfigRef.current);
             } else {

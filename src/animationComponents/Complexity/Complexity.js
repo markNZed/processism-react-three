@@ -183,7 +183,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
                 break;
             }
             case "waitRootOne": {
-                const physicsConfig = rootOneRef.current.current.getphysicsConfig();
+                const physicsConfig = rootOneRef.current.current.getPhysicsConfig();
                 if (physicsConfig.visible) {
                     frameStateRef.current = "done";
                     if (entityCountsTwo.length > 0) setShowTwo(true);

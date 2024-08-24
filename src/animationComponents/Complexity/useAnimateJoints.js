@@ -41,7 +41,7 @@ const useAnimateJoints = (
                 // Randomly select an entity from this CompoundEntity
                 const randomIndexFrom = 12; //Math.floor(Math.random() * entityCount);
                 const entityRef = entityRefs[randomIndexFrom];
-                const physicsConfig = entityRef.current.getphysicsConfig();
+                const physicsConfig = entityRef.current.getPhysicsConfig();
                 const entityUniqueId = physicsConfig.uniqueId;
                 const jointsRef = getNodeProperty(entityUniqueId, `jointsRef`);
                 const entityJointIndexes = jointsRef.current;
@@ -84,9 +84,9 @@ const useAnimateJoints = (
                 });
                 console.log("Detach a random entity", id, entityUniqueId, entityRef, "replace with", replacementId);
                 const replacementNodeRef = getNode(entityUniqueId).ref;
-                const replacementphysicsConfig = replacementNodeRef.current.getphysicsConfig();
+                const replacementphysicsConfig = replacementNodeRef.current.getPhysicsConfig();
                 replacementphysicsConfig.color = 'purple';
-                replacementNodeRef.current.setphysicsConfig(replacementphysicsConfig);
+                replacementNodeRef.current.setPhysicsConfig(replacementphysicsConfig);
                 const jointsToCreate = [];
                 entityJointIndexes.forEach((jointId) => {
                     let {jointRef, body1Id, body2Id} = getJoint(jointId);
@@ -105,17 +105,17 @@ const useAnimateJoints = (
                     // The radius of the replacement may not be the same...
                     const node1Ref = getNode(body1Id).ref;
                     const node2Ref = getNode(body2Id).ref;
-                    const physicsConfig1 = node1Ref.current.getphysicsConfig();
-                    const physicsConfig2 = node2Ref.current.getphysicsConfig();
+                    const physicsConfig1 = node1Ref.current.getPhysicsConfig();
+                    const physicsConfig2 = node2Ref.current.getPhysicsConfig();
                     const radius1 = physicsConfig1.colliderRadius;
                     const radius2 = physicsConfig2.colliderRadius;
                     const { offset1, offset2 } = utils.calculateJointOffsets(body1, body2, radius1, radius2);
                     // Offset needs to be in local coordinates - should be OK for 
                     jointsToCreate.push([node1Ref, offset1, node2Ref, offset2]);
                     physicsConfig1.color = 'orange';
-                    node1Ref.current.setphysicsConfig(physicsConfig1);
+                    node1Ref.current.setPhysicsConfig(physicsConfig1);
                     physicsConfig2.color = 'orange';
-                    node2Ref.current.setphysicsConfig(physicsConfig2);
+                    node2Ref.current.setPhysicsConfig(physicsConfig2);
                 });
                 entityJointIndexes.forEach((jointId) => {
                     deleteJoint(node.chainRef, jointId);

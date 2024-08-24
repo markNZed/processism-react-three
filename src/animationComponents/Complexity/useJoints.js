@@ -30,8 +30,8 @@ const useJoints = (config) => {
     }
 
     const createJoint = (chainRef, aRef, aOffset, bRef, bOffset, batch=false) => {
-        const aphysicsConfig = aRef.getphysicsConfig();
-        const bphysicsConfig = bRef.getphysicsConfig();
+        const aphysicsConfig = aRef.getPhysicsConfig();
+        const bphysicsConfig = bRef.getPhysicsConfig();
         const jointRef = { current: null }; // Create a plain object to hold the reference
         jointRef.current = world.createImpulseJoint(
             rapier.JointData.spherical(aOffset, bOffset),
@@ -64,8 +64,8 @@ const useJoints = (config) => {
     const updateJoint = (chainRef, jointId, aRef, aOffset, bRef, bOffset) => {
         //console.log("updateJoint", jointId, aRef, aOffset, bRef, bOffset);
         const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
-        const aphysicsConfig = aRef.getphysicsConfig();
-        const bphysicsConfig = bRef.getphysicsConfig();
+        const aphysicsConfig = aRef.getPhysicsConfig();
+        const bphysicsConfig = bRef.getPhysicsConfig();
         //console.log("updateJoint", jointId, body1Id, body2Id, aphysicsConfig.uniqueId, bphysicsConfig.uniqueId);
         //console.log("updateJoint ref", jointId, aRef.current, bRef.current);
         if (jointRef.current) {

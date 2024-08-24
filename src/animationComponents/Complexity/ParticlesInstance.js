@@ -103,7 +103,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
             mesh.getMatrixAt(i, instanceMatrix);
             instanceMatrix.decompose(currentPos, currentQuaternion, currentScale);
  
-            const physicsConfig = particle.getphysicsConfig();
+            const physicsConfig = particle.getPhysicsConfig();
 
             const particlePos = particle.translation();
             let scale = physicsConfig.scale || 1;
@@ -183,7 +183,7 @@ const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
         if (instanceId === undefined) return;
         event.stopPropagation();
         const allParticleRefs = getAllParticleRefs();
-        const physicsConfig = allParticleRefs[instanceId].current.getphysicsConfig();
+        const physicsConfig = allParticleRefs[instanceId].current.getPhysicsConfig();
         const currentScale = physicsConfig.scale;
         physicsConfig.scale = (currentScale && currentScale !== 1) ? 1.0 : 2.0;
         physicsConfig.color = 'pink';

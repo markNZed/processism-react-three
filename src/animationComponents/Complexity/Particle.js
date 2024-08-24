@@ -64,7 +64,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
         if (nodeRef.current.applyImpulses) {
             nodeRef.current.applyImpulses();
         }
-        const physicsConfig = nodeRef.current.getphysicsConfig();
+        const physicsConfig = nodeRef.current.getPhysicsConfig();
         // Could adjust scale over multiple frames
         if (physicsConfig?.scale !== physicsConfig?.rigidScale) {
             let relativeScale = physicsConfig.scale;
@@ -74,7 +74,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             const newRadius = relativeScale * colliderRadius
             setColliderRadius(newRadius);
             physicsConfig.colliderRadius = newRadius;
-            nodeRef.current.setphysicsConfig(physicsConfig)
+            nodeRef.current.setPhysicsConfig(physicsConfig)
             node.jointsRef.current.forEach((jointId) => {
                 const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
                 const joint = jointRef.current;
@@ -91,7 +91,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 }
             })
             physicsConfig.rigidScale = physicsConfig.scale;
-            nodeRef.current.setphysicsConfig(physicsConfig);
+            nodeRef.current.setPhysicsConfig(physicsConfig);
         }
         if (physicsConfig.damping && physicsConfig.damping !== dampingRef.current) {
             console.log("Damping changed", id, dampingRef.current, physicsConfig.damping);
@@ -176,7 +176,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 }
                 colliderRef.current.setCollisionGroups(interactionGroups(0));
                 physicsConfig.isCreated = true;
-                nodeRef.current.setphysicsConfig(physicsConfig);
+                nodeRef.current.setPhysicsConfig(physicsConfig);
                 frameStateRef.current = "done";
                 break;
             }
@@ -241,7 +241,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                 // For debugging the outer map
                 //localColor = "pink";
             }
-            nodeRef.current.setphysicsConfig({ 
+            nodeRef.current.setPhysicsConfig({ 
                 color: localColor, 
                 uniqueId: id, 
                 radius: particleRadius, 

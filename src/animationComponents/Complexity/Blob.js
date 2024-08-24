@@ -6,7 +6,7 @@ const Blob = ({ color, node, entityNodes, config }) => {
     const worldVector = new THREE.Vector3();
     const blobRef = useRef()
     const blobData = useRef()
-    const { getNode, propagatephysicsConfigValue, getParticlesHash, getAllParticleRefs, updateNode } = config.entityStore.getState();
+    const { getNode, propagatePhysicsConfigValue, getParticlesHash, getAllParticleRefs, updateNode } = config.entityStore.getState();
     const { chainRef, id} = node;
     const worldToLocalFn = node.ref.current.worldToLocal;
     const [pressStart, setPressStart] = useState(0);
@@ -38,8 +38,8 @@ const Blob = ({ color, node, entityNodes, config }) => {
                 console.warn(`particles[i] ${i}, was empty`);
                 continue;
             }
-            const uniqueId = particles[i].current.getphysicsConfig().uniqueId;
-            let outer = particles[i].current.getphysicsConfig().outer;
+            const uniqueId = particles[i].current.getPhysicsConfig().uniqueId;
+            let outer = particles[i].current.getPhysicsConfig().outer;
             if (outer) {
                 let outerDepth = true;//outer[node.depth];
                 // if this is a child then it is outer at this level
@@ -61,7 +61,7 @@ const Blob = ({ color, node, entityNodes, config }) => {
                 if (outerDepth) { 
                     blobOuterUniqueIds.push(uniqueId);
                     mapIdToIndex[uniqueId] = i;
-                    radii.push(particles[i].current.getphysicsConfig().origRadius);
+                    radii.push(particles[i].current.getPhysicsConfig().origRadius);
                     refs.push(particles[i]);
                     //console.log("buildBlobData Outer", uniqueId)
                 } else {
@@ -77,7 +77,7 @@ const Blob = ({ color, node, entityNodes, config }) => {
             // This no longer works as there can be an intermediate state where blobOuterUniqueIds.length is < 3 but the
             // number of entities wil lbe more thean three.
             if (entityNodes.length < 3) {
-                entityNodes.forEach(e => e.ref.current.setphysicsConfig(p => ({ ...p, visible: false })));
+                entityNodes.forEach(e => e.ref.current.setPhysicsConfig(p => ({ ...p, visible: false })));
             }
         }
 
@@ -115,7 +115,7 @@ const Blob = ({ color, node, entityNodes, config }) => {
 
     useFrame(() => {
 
-        const physicsConfig = node.ref.current.getphysicsConfig();
+        const physicsConfig = node.ref.current.getPhysicsConfig();
 
         if (physicsConfig.visible) {
 
@@ -149,7 +149,7 @@ const Blob = ({ color, node, entityNodes, config }) => {
             blobData.current.refs.forEach(ref => {
                 // compoundEntity will not have Particle ref
                 if (ref) {
-                    ref.current.setphysicsConfig(p => ({ ...p, visible: true, color: physicsConfig.color}));
+                    ref.current.setPhysicsConfig(p => ({ ...p, visible: true, color: physicsConfig.color}));
                 }
             })
 
@@ -183,22 +183,22 @@ const Blob = ({ color, node, entityNodes, config }) => {
             let ancestorId = node.parentId;
             for (let i = node.depth - 1; i >= 0; i--) {
                 const ancestorNode = getNode(ancestorId);
-                if (ancestorNode.ref.current.getphysicsConfig().visible) {
+                if (ancestorNode.ref.current.getPhysicsConfig().visible) {
                     //console.log(`Blob handleOnClick return because ${ancestorId} visible`, id);
                     return;
                 }
                 ancestorId = ancestorNode.parentId;
             }
             // If the node is about to become invisible
-            if (node.ref.current.getphysicsConfig().visible) {
+            if (node.ref.current.getPhysicsConfig().visible) {
                 //console.log("Blob handleOnClick visible", id);
                 event.stopPropagation();
                 entityNodes.forEach(nodeEntity => {
                     console.log("Blob handleOnClick set visible", nodeEntity.id);
-                    nodeEntity.ref.current.setphysicsConfig(p => ({ ...p, visible: true }));
+                    nodeEntity.ref.current.setPhysicsConfig(p => ({ ...p, visible: true }));
                     updateNode(nodeEntity.id, {visible: true});
                 });
-                node.ref.current.setphysicsConfig(p => ({ ...p, visible: false }));
+                node.ref.current.setPhysicsConfig(p => ({ ...p, visible: false }));
                 updateNode(id, {visible: true});
             // If the number of overlapping blobs (intersections) is equal to the depth of this blob
             // then we will show this blob
@@ -207,12 +207,12 @@ const Blob = ({ color, node, entityNodes, config }) => {
                 event.stopPropagation();
                 // The order of the blob rendering means everything will disappear
                 // causing a "flashing" effect
-                node.ref.current.setphysicsConfig(p => ({ ...p, visible: true }));
+                node.ref.current.setPhysicsConfig(p => ({ ...p, visible: true }));
                 console.log("Blob handleOnClick set visible", node.id);
                 updateNode(id, {visible: true});
                 setTimeout(() => {
                     entityNodes.forEach(nodeEntity => {
-                        propagatephysicsConfigValue(nodeEntity.id, 'visible', false);
+                        propagatePhysicsConfigValue(nodeEntity.id, 'visible', false);
                     });
                 }, 0); // Introduce a slight delay to avoid flashing
             } else {
@@ -221,7 +221,7 @@ const Blob = ({ color, node, entityNodes, config }) => {
         }
     };
 
-    const handleOnContextMenu = handleOnContextMenuFn(getNode, propagatephysicsConfigValue);
+    const handleOnContextMenu = handleOnContextMenuFn(getNode, propagatePhysicsConfigValue);
 
     const handlePointerDown = (event) => {
         //console.log("Blob handlePointerDown", event);
@@ -258,15 +258,15 @@ const points_to_geometry = (points, radii) => {
     return shape_geometry;
 };
 
-function handleOnContextMenuFn(getNode, propagatephysicsConfigValue) {
+function handleOnContextMenuFn(getNode, propagatePhysicsConfigValue) {
     return (event) => {
         //console.log("Blob handleOnContextMenuFn", event);
         event.stopPropagation();
         const rootNode = getNode("root");
-        rootNode.ref.current.setphysicsConfig(p => ({ ...p, visible: true }));
+        rootNode.ref.current.setPhysicsConfig(p => ({ ...p, visible: true }));
         setTimeout(() => {
             rootNode.childrenIds.forEach(childId => {
-                propagatephysicsConfigValue(childId, 'visible', false);
+                propagatePhysicsConfigValue(childId, 'visible', false);
             });
         }, 0); // Introduce a slight delay to avoid flashing
     };
