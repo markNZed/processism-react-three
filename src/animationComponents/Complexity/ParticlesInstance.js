@@ -10,12 +10,12 @@ const SHADER_ORIG = 1;
 const SHADER_DIVERSE = 2;
 const USE_SHADER = SHADER_DIVERSE;
 
-const ParticlesInstance = React.forwardRef(({ id, config, entityStore }, ref) => {
+const ParticlesInstance = React.forwardRef(({ id, config }, ref) => {
 
     const internalRef = useRef();
     useImperativeHandle(ref, () => internalRef.current);
 
-    const { getAllParticleRefs } = entityStore.getState();
+    const { getAllParticleRefs } = config.entityStore.getState();
     const userColor = new THREE.Color();
     const userScale = new THREE.Vector3();
     const currentPos = new THREE.Vector3();

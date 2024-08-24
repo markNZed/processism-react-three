@@ -12,11 +12,10 @@ const useAnimateJoints = (
     createJoint,
     worldCenterRef,
     config,
-    entityStore
 ) => {
 
     // Direct access to the state outside of React's render flow
-    const { getNodeProperty, getJoint, getNode } = entityStore.getState();
+    const { getNodeProperty, getJoint, getNode } = config.entityStore.getState();
     const id = node.id;
     const internalRef = node.ref;
     const entityRefs = entityNodes.map(entity => entity.ref);

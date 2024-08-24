@@ -45,13 +45,12 @@ import { diff} from 'deep-object-diff';
 //   Pass in with config ?
 //   Same with initialCreationPath
 // Calculation of path is too slow with high number of particles
-// Limit the max linVel ?
 // visualConfig1.colliderRadius should be in the node
 //   If we update the node then it will rerender
 //   Maybe rename to physicsConfig ?
 // We need directUpdateNode(id, {visible: true}); ?
 
-const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, entityStore, initialCreationPath, ...props }, ref) => {
+const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, initialCreationPath, ...props }, ref) => {
 
     // Using forwardRef and need to access the ref from inside this component too
     const nodeRef = useRef();
@@ -64,13 +63,13 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         getJoint: directGetJoint,
         resetParticlesHash: directResetParticlesHash,
         getParticlesHash: directGetParticlesHash,
-    } = entityStore.getState();
+    } = config.entityStore.getState();
 
     const selectNode = useCallback((state, id) => {
         return state.nodes[id];
     }, [id]);
     
-    const node = useStore(entityStore, state => selectNode(state, id)); 
+    const node = useStore(config.entityStore, state => selectNode(state, id)); 
 
     const selectEntityNodes = useCallback((state, id) => {
         const node = state.nodes[id];
@@ -88,7 +87,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     }, []);
 
     const prevEntityNodes = useRef();
-    const entityNodes = useStore(entityStore, state => selectEntityNodes(state, id));
+    const entityNodes = useStore(config.entityStore, state => selectEntityNodes(state, id));
 
     const isDebug = node.debug || debug || config.debug;
     const entityCount = node.childrenIds.length;
@@ -145,11 +144,11 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
         radius: {},
     });
 
-    const { deleteJoint, createJoint, updateJoint } = useJoints(entityStore);
+    const { deleteJoint, createJoint, updateJoint } = useJoints(config);
 
     useAnimateImpulses(jointsMapped, node, entityNodes, initialPosition, radius, config);
-    useAnimateRelations(jointsMapped, node, entityNodes, config, entityStore);
-    useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config, entityStore);
+    useAnimateRelations(jointsMapped, node, entityNodes, config);
+    useAnimateJoints(jointsMapped, node, entityNodes, deleteJoint, createJoint, worldCenterRef, config);
 
     // Mounting
     useEffect(() => {
@@ -701,7 +700,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     entityPoseRef.current.position[entityId] = [position.x, position.y, position.z]; // Force Z to 0
                 })
                 if (id === "root") {
-                    console.log("entityStore", entityStore);
+                    console.log("entityStore", config.entityStore);
                     setJointsMapped(true);
                     frameStateRef.current = "stableRoot";
                 } else {
@@ -750,7 +749,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
     });
 
     //console.log("CompoundEntity rendering", id, "frameState", frameStateRef.current, "initialPosition", initialPosition)
-    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, config, outer, entityStore, initialCreationPath, ...props} );
+    //useWhyDidYouUpdate(`CompoundEntity ${id}`, {id, initialPosition, radius, debug, config, outer, initialCreationPath, ...props} );
 
     return (
         <group>
@@ -784,7 +783,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                             quaternion={entityPoseRef.current.orientation[entityId]}
                             outer={entityPoseRef.current.outer[entityId]}
                             lockPose={lockPose}
-                            entityStore={entityStore}
                             initialCreationPath={initialCreationPath}
                             index={i}
                         />
@@ -796,14 +794,14 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                         color={color}
                         node={node}
                         entityNodes={entityNodes}
-                        entityStore={entityStore}
+                        config={config}
                     />
                 )}
 
                 {id === "root" && config.showRelations && (
                     <Relations
                         node={node}
-                        entityStore={entityStore}
+                        config={config}
                     />
                 )}
 
@@ -827,7 +825,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     id={`${id}`}
                     ref={particlesInstanceRef}
                     config={config}
-                    entityStore={entityStore}
                 />
             )}
 

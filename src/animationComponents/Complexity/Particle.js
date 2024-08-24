@@ -15,7 +15,7 @@ import { vec3 } from '@react-three/rapier';
 // https://github.com/pmndrs/react-three-rapier/blob/main/demo/src/examples/kinematics/KinematicsExample.tsx
 
 // The Particle uses ParticleRigidBody which extends RigidBody to allow for impulses to be accumulated before being applied
-const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, entityStore, ...props }, ref) => {
+const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, ...props }, ref) => {
 
     useImperativeHandle(ref, () => nodeRef.current);
 
@@ -26,8 +26,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     const [colliderRadius, setColliderRadius] = useState(radius);
     const [initialize, setInitialize] = useState(true);
     // Direct access to the state outside of React's render flow
-    const { updateNode: directUpdateNode, getNode: directGetNode, getJoint: directGetJoint }  = entityStore.getState();
-    const node = entityStore(useCallback((state) => state.nodes[id], [id]));
+    const { updateNode: directUpdateNode, getNode: directGetNode, getJoint: directGetJoint }  = config.entityStore.getState();
+    const node = config.entityStore(useCallback((state) => state.nodes[id], [id]));
     const nodeRef = node.ref; // because we forwardRef and want to use the ref locally too
     const configColor = config.colors[node.depth];
     const color = useMemo(() => utils.getColor(configColor, props.color));
@@ -268,7 +268,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     }, []);
 
     //console.log("Particle rendering", id, index, frameCountRef.current, initialPosition, radius, frameStateRef.current, creationPositionRef, creationPathRef);
-    //useWhyDidYouUpdate(`Particle ${id}`, {id, index, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, entityStore, ...props} );
+    //useWhyDidYouUpdate(`Particle ${id}`, {id, index, creationPathRef, initialPosition, quaternion, radius, config, outer, lockPose, ...props} );
 
     return (
         <group ref={groupRef} >

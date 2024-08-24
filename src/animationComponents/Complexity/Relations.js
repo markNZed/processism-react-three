@@ -2,18 +2,18 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-function Relations({node, entityStore}) {
+function Relations({ node, config }) {
     const segmentIndexRef = useRef({}); // Keeps track of the current segment index
     const numPoints = 12;
     const [linesUpdate, setLinesUpdate] = useState(0);
     const linesRef = useRef({});
     const newLinesRef = useRef({});
-    const { getNode, getRelations } = entityStore.getState();
-    const getPropertyAllKeys = entityStore.getState().getPropertyAllKeys;
+    const { getNode, getRelations } = config.entityStore.getState();
+    const getPropertyAllKeys = config.entityStore.getState().getPropertyAllKeys;
     const maxDepth = getPropertyAllKeys('depth').length;
     const nodeRef = node.ref;
     // Access relationRefs and make the component re-render when it changes
-    //const relations = entityStore(state => state.relations);
+    //const relations = config.entityStore(state => state.relations);
 
     useEffect(() => {
         console.log(`Mounting Relations ${node.id}`);

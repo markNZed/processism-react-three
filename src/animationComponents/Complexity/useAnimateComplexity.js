@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 
-function useAnimateComplexity(config, ref, entityStore) {
+function useAnimateComplexity(config, ref) {
 
     const [storeEntityReady, setStoreEntityReady] = useState(false);
     // Avoid changes in store causing rerender
     // Direct access to the state outside of React's render flow
-    const {addNode: directAddNode, updateNode: directUpdateNode, getNode: directGetNode } = entityStore.getState();
+    const {addNode: directAddNode, updateNode: directUpdateNode, getNode: directGetNode } = config.entityStore.getState();
     const startedRef = useRef(false);
 
     function addNodesRecursively(entityCounts, node) {
@@ -30,13 +30,13 @@ function useAnimateComplexity(config, ref, entityStore) {
         startedRef.current = true;
     
         // Blow away the storesremountConfigState
-        entityStore.getState().reset();
+        config.entityStore.getState().reset();
         const rootNode = directGetNode("root");
         // We have 2 nodes at top that should have a joint - but the joint is not between two particles at this level
         addNodesRecursively(config.entityCounts, rootNode);
         directUpdateNode("root", { ref: ref });
         setStoreEntityReady(true);
-        console.log("Nodes after initialization", entityStore.getState());    
+        console.log("Nodes after initialization", config.entityStore.getState());    
     }, [config]);
 
     return {storeEntityReady}

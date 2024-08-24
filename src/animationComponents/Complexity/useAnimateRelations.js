@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useRef } from 'react';
 
-function useAnimateRelations(initialized, node, entityNodes, config, entityStore) {
+function useAnimateRelations(initialized, node, entityNodes, config) {
 
-    const { getNode, getPropertyAllKeys, deleteRelation, addRelation, getRelationCount } = entityStore.getState();
+    const { getNode, getPropertyAllKeys, deleteRelation, addRelation, getRelationCount } = config.entityStore.getState();
     const entityCount = node.childrenIds.length;
     const maxDepth = getPropertyAllKeys('depth').length;
     const intervalRef = useRef(null);
