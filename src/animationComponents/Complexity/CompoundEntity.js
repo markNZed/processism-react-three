@@ -42,9 +42,6 @@ import { diff} from 'deep-object-diff';
 // The lower blob joints should be put in place before the higher
 // We are rotating the compoundEntity using the compoundEntityGroup is this to avoid applying this rotation to particles ?
 // Calculation of path is too slow with high number of particles ?
-// We need directUpdateNode(id, {visible: true}); ?
-//   Used in Blob.js
-//     propagatePhysicsConfigValue 
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 
@@ -713,9 +710,7 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                     setOption("showParticles", initialShowParticlesRef.current);
                     console.log("showParticles", id, initialShowParticlesRef.current)
                     nodeRef.current.setPhysicsConfig(p => ({ ...p, visible: true }));
-                    directUpdateNode(id, {visible: true});
                     frameStateRef.current = "jointsMapped";
-                    //setOption("fixParticles", true);
                 }
                 break;
             }

@@ -147,7 +147,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
     //entityCountsTwo = [3, 3, 3];
 
     const configOne = {...config, entityCounts: entityCountsOne, entityStore: storeOne, initialCreationPath: initialCreationPathOne};
-    const configTwo = {...config, entityCounts: entityCountsTwo, entityStore: storeTwo, initialCreationPath: initialCreationPathOne};
+    const configTwo = {...config, entityCounts: entityCountsTwo, entityStore: storeTwo, initialCreationPath: initialCreationPathTwo};
 
     const {storeEntityReady: storeEntityOneReady} = useAnimateComplexity(configOne, refOne);
     const {storeEntityReady: storeEntityTwoReady} = useAnimateComplexity(configTwo, refTwo);

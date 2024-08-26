@@ -102,7 +102,7 @@ const debouncedResetParticlesHash = debounce((set) => {
 
 const useStoreEntity = () => create((set, get) => {
 
-    const rootNode = createNode('root', { depth: 0, parentId: null, visible: false }, []);
+    const rootNode = createNode('root', { depth: 0, parentId: null }, []);
 
     return {
             
@@ -345,7 +345,7 @@ const useStoreEntity = () => create((set, get) => {
                 }
 
                 const nodeDepth = (parentNode.depth || 0) + 1;
-                const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId, visible: false }, node.childrenIds || []);
+                const newNode = createNode(id, { ...node, depth: nodeDepth, parentId: parentId }, node.childrenIds || []);
                 newNodeId = newNode.id;
                 state.nodeCount++;
 

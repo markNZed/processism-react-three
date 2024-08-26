@@ -196,10 +196,8 @@ const Blob = ({ color, node, entityNodes, config }) => {
                 entityNodes.forEach(nodeEntity => {
                     console.log("Blob handleOnClick set visible", nodeEntity.id);
                     nodeEntity.ref.current.setPhysicsConfig(p => ({ ...p, visible: true }));
-                    updateNode(nodeEntity.id, {visible: true});
                 });
                 node.ref.current.setPhysicsConfig(p => ({ ...p, visible: false }));
-                updateNode(id, {visible: true});
             // If the number of overlapping blobs (intersections) is equal to the depth of this blob
             // then we will show this blob
             } else if (event.intersections.length === (node.depth + 1)) { 
@@ -209,7 +207,6 @@ const Blob = ({ color, node, entityNodes, config }) => {
                 // causing a "flashing" effect
                 node.ref.current.setPhysicsConfig(p => ({ ...p, visible: true }));
                 console.log("Blob handleOnClick set visible", node.id);
-                updateNode(id, {visible: true});
                 setTimeout(() => {
                     entityNodes.forEach(nodeEntity => {
                         propagatePhysicsConfigValue(nodeEntity.id, 'visible', false);
