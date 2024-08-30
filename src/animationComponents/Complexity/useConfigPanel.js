@@ -2,9 +2,12 @@ import { useControls } from 'leva';
 import * as utils from './utils';
 
 const useConfigPanel = (defaultSettings) => {
+
+    const PARTICLE_RADIUS = 1;
     
     const controlsConfig = {
-        radius: { value: defaultSettings.radius || 10, min: 1, max: 20 },
+        radius: { value: defaultSettings.radius || 10, min: 1, max: 100 },
+        particleRadius: { value: PARTICLE_RADIUS, min: 0.01, max: 1, step: 0.01, label: "Particle Radius" },
         animDelayMs: { value: 50, min: 0, max: 1000, step: 1, label: "Animation Delay" },
         impulsePerParticle: { value: 1.5, min: 0, max: 100, step: 0.1, label: "Impulse per Particle" },
         overshootScaling: { value: 1.0, min: 1, max: 10, step: 1, label: "Overshoot Scaling" },
@@ -24,6 +27,7 @@ const useConfigPanel = (defaultSettings) => {
     const config = {
         debug: false,
         radius: controls.radius,
+        particleRadius: controls.particleRadius,
         animDelayMs: controls.animDelayMs,
         colors: [defaultSettings.color || null, utils.getRandomColorFn, null],
         impulsePerParticle: controls.impulsePerParticle / 1000,

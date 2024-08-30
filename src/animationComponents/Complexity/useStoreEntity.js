@@ -118,6 +118,13 @@ const useStoreEntity = () => create((set, get) => {
         particlesHash: {},
         particleRefs: [],
         options: {},
+        // Allows for calls like: setOption('fitParticles', (prev) => !prev);
+        setOption: (key, value) => set((state) => ({
+            ...state,
+            [key]: typeof value === 'function' ? value(state[key]) : value,
+        })),
+        // Generic getter
+        getOption: (key) => get()[key],
 
         getParticlesHash: (id) => {
             return get().particlesHash[id];

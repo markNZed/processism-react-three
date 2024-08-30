@@ -29,7 +29,7 @@ import * as THREE from 'three';
 
 // Be careful with just using props because the HOC adds props e.g. simulationReady which will cause rerendering
 // Using forwardRef because withAnimationState expects this
-const Complexity = React.forwardRef(({id, radius, color}, ref) => {
+const Complexity = React.forwardRef(({id}, ref) => {
 
     const rootOneRef = useRef();
     const rootOneCenterRef = useRef(new THREE.Vector3());
@@ -45,7 +45,7 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
     const refOne = useRef();
     const refTwo = useRef();
 
-    const config = useConfigPanel({ radius, color });
+    const config = useConfigPanel({ radius: 50, color: "blue" });
 
     // An array of array providing structure with number as the number of leaf nodes
     let entityCountsOne = [
@@ -142,9 +142,30 @@ const Complexity = React.forwardRef(({id, radius, color}, ref) => {
         ],
     ];
 
-    //entityCountsOne = [3, 3, 3, 3];
+    entityCountsOne = [3, 3, 3, 3];
     //entityCountsTwo = [];
     //entityCountsTwo = [3, 3, 3];
+
+    // Build entityCountsOne from symmetrical config
+    let entityCountsSymmetricalOne;
+    entityCountsSymmetricalOne = [3, 3, 3]
+    
+    function buildEntityCounts(entityCountsSymmetrical) { 
+        const entityCountsOne = [];   
+        if (entityCountsSymmetrical.length === 1) {
+            return entityCountsSymmetrical[0];
+        } else {
+            let top = entityCountsSymmetrical.shift();
+            for (let i = 0; i < top; i++) {
+                entityCountsOne.push(buildEntityCounts([...entityCountsSymmetrical]));
+            }
+        }
+        return entityCountsOne;
+    }
+    if (entityCountsSymmetricalOne) {
+        entityCountsOne = buildEntityCounts(entityCountsSymmetricalOne);
+        console.log("buildEntityCounts:", entityCountsOne);
+    }
 
     const configOne = {...config, entityCounts: entityCountsOne, entityStore: storeOne, initialCreationPath: initialCreationPathOne};
     const configTwo = {...config, entityCounts: entityCountsTwo, entityStore: storeTwo, initialCreationPath: initialCreationPathTwo};

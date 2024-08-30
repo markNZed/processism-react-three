@@ -7,7 +7,6 @@ import * as utils from './utils';
 import useAppStore from '../../useAppStore';
 import * as THREE from 'three';
 import useWhyDidYouUpdate from './useWhyDidYouUpdate';
-import { vec3 } from '@react-three/rapier';
 
 // Should we maintian node.physicsConfig syned with ParticleRigidBody physicsConfig ?
 // Coud store physicsConfig only in node but would slow data access when rendering the instanced mesh of particles
@@ -20,7 +19,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
     useImperativeHandle(ref, () => nodeRef.current);
 
     // Here we define a fixed particleRadius (could use radius but will have different radius at different depth)
-    const particleRadius = radius > 1 ? 1 : radius;
+    const particleRadius = config.particleRadius;
 
     const isDebug = props.debug || config.debug;
     const [colliderRadius, setColliderRadius] = useState(radius);
@@ -65,6 +64,7 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             nodeRef.current.applyImpulses();
         }
         const physicsConfig = nodeRef.current.getPhysicsConfig();
+        //const colliderShape = colliderRef.current.shape;
         // Could adjust scale over multiple frames
         if (physicsConfig?.scale !== physicsConfig?.rigidScale) {
             let relativeScale = physicsConfig.scale;
@@ -74,7 +74,8 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
             const newRadius = relativeScale * colliderRadius
             setColliderRadius(newRadius);
             physicsConfig.colliderRadius = newRadius;
-            nodeRef.current.setPhysicsConfig(physicsConfig)
+            physicsConfig.rigidScale = physicsConfig.scale;
+            nodeRef.current.setPhysicsConfig(physicsConfig);
             node.jointsRef.current.forEach((jointId) => {
                 const {jointRef, body1Id, body2Id} = directGetJoint(jointId);
                 const joint = jointRef.current;
@@ -90,8 +91,6 @@ const Particle = React.memo(React.forwardRef(({ id, index, creationPathRef, init
                     joint.setAnchor2(scaleAnchor(joint.anchor2()));
                 }
             })
-            physicsConfig.rigidScale = physicsConfig.scale;
-            nodeRef.current.setPhysicsConfig(physicsConfig);
         }
         if (physicsConfig.damping && physicsConfig.damping !== dampingRef.current) {
             console.log("Damping changed", id, dampingRef.current, physicsConfig.damping);

@@ -34,7 +34,7 @@ function SceneThree() {
     const physicsDebug = useAppStore((state) => state.getOption("physicsDebug"));
 
     const cameraInitialState = {
-        position: [0, -20, 35],
+        position: [0, -200, 350],
         zoom: 5,
         left: window.innerWidth / -2,
         right: window.innerWidth / 2,
@@ -92,7 +92,6 @@ function SceneThree() {
 
                         <Complexity
                             id={"complex"}
-                            color={"blue"}
                         />
 
                         <MyAxesHelper />   
