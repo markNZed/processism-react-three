@@ -42,8 +42,6 @@ import { diff} from 'deep-object-diff';
 // The lower blob joints should be put in place before the higher
 // We are rotating the compoundEntity using the compoundEntityGroup is this to avoid applying this rotation to particles ?
 // Slow to build with more particles
-// Could go back to a dynamic particle radius
-//   Could update the collider radius once root is in place
 
 const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 0, 0], radius, debug, config, outer = {}, ...props }, ref) => {
 

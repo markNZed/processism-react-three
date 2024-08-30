@@ -1,0 +1,16 @@
+Tools:
+  OBS for screen capture
+  Shotcut for editing
+Scene: Overview
+  Objective: Overview of this presentation
+  Tooling: Text overlay with OBS
+  Video: Text: "A visual language for processism"
+  Audio:
+  Narration: Welcome to our visual exploration of processism. Processism is a belief system or ideology that has a long but marginal history in Western philosophy.  We will consider processism as an alternative to essentialism. Essentialism looks for the unchanging core or essence of things. Processism emphasizes the primacy of processes over static entities or states. Western culture is dominated by essentialism and is a deep assumption in our way of life. 
+Scene: Entity
+  Objetive: Introduce "entity" concept.
+  Tooling:
+  Video: A single particle
+  Audio:
+  Narration: 
+  Animation: Particle has irregular oscillating boundary
