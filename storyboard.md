@@ -29,7 +29,6 @@ This storyboard represents a structured approach to introducing Processism. Howe
 
 Thank you for your time and insights.
 
-
 # 1. Context: 
 This is a storyboard for a video presentation of processsim.
 
@@ -277,18 +276,17 @@ General adult public in Western countries
 - [60. Scene: Conclusion](#60-scene-conclusion)
   - [60.1. Objective](#601-objective)
 
-
 # 6. Scene: Overview
 ## 6.1. Objective
 Overview of this presentation
 ## 6.2. Animation
 Text: "A visual language for processism"
 ## 6.3. Narration
-Welcome to our visual journey into processism. Processism is a way of thinking that’s been around for a long time, but it’s not as well-known in Western philosophy. It offers an alternative to essentialism, which is the idea that things have a fixed, unchanging core or essence.
+Welcome to our animated journey into processism. Processism is a way of thinking that’s been around for a long time, but it’s not well-known in Western culture. It offers an alternative to essentialism, which is the idea that things have a fixed, unchanging core or essence.
 
-In contrast, processism focuses on how everything is constantly changing and evolving. Our culture tends to lean heavily on essentialism, so understanding processism can be challenging. This presentation is designed to help you start seeing the world in a new way.
+In contrast, processism focuses on how everything is constantly changing and evolving. Our culture tends to lean heavily on essentialism, so understanding processism can be challenging. This presentation is designed to help you see the world in a new way.
 
-We’ll be building a visual language to explain the concepts of processism. This visual language will be abstract, but we’ll use real-life examples to make things clearer. As you follow along, try to think about how these ideas might apply to different areas of your life.
+We’ll be building a visual language to explain the concepts of processism. This visual language will be abstract, but we’ll use real-life examples to make things clearer. As you follow along, we hope you'll think about how these ideas might be useful for you.
 
 # 7. Scene: Entity
 ## 7.1. Objective
@@ -298,11 +296,11 @@ A single particle with an irregular oscillating boundary
 ## 7.3. Narration
 Here, we have a simple visual of an entity. Although, in reality, nothing exists entirely on its own, we’ll start with this idea to help us build our understanding.
 
-This entity is shown as a two-dimensional shape, but it could represent anything—a physical object, an idea, or even a person. Notice how its boundary isn’t fixed; it’s constantly shifting. This shows that the entity isn’t static.
+This entity is shown as a two-dimensional shape, but it could represent anything — a physical object, an idea, or even a person. Notice how its boundary isn’t fixed; it’s constantly shifting. This shows that the entity isn’t static.
 
 For example, if this were a particle, it would be affected by quantum forces. If it were a concept, its meaning could change over time. If it represents a person, they are growing, learning, and aging.
 
-In processism, entities like this aren’t considered the most fundamental part of reality. Instead, we’ll see that the processes these entities go through are what really matter.
+In processism, entities like this aren’t considered the most fundamental aspect of reality. Instead, we’ll see that the processes generating entities that are more important.
 
 # 8. Scene: Second Entity
 ## 8.1. Objective
@@ -312,11 +310,11 @@ A second particle appears in a different color (purple) next to the original blu
 ## 8.3. Narration
 Now, let’s add a second entity, this time in purple, next to the original blue one. The color here represents a property of the entity. For example, we might imagine that purple represents electrons and blue represents protons.
 
-It’s important to note that we’re using a limited number of visual features—like color and shape—to represent the properties of these entities. In reality, entities might have many more properties than we can show visually.
+We only have a limited number of visual features — like color and shape — to represent the properties of these entities. In reality, entities might have many more properties than we can show visually.
 
 You’ll notice that while the two entities look similar, they’re not identical. This difference reflects that they represent different processes, so they can’t be exactly the same.
 
-Also, these entities are moving together on the same plane. This movement is another way to show their behavior. For instance, the distance between them could represent how similar they are, rather than just physical space.
+Also, these entities are moving together on the same plane. This movement is another way to show their properties. For instance, the distance between them could represent how similar they are, rather than just physical distance.
 
 # 9. Scene: Introduction to Relations
 ## 9.1. Objective
@@ -324,9 +322,9 @@ Introduce the basic concept of a relation between two entities.
 ## 9.2. Animation
 An arc in the Z plane connects the centers of both entities, growing from the blue entity to the purple entity. An arc grows from the blue entity to the purple entity, with an arrow indicating the direction of the relation.
 ## 9.3. Narration
-Let’s introduce the idea of a relation between two entities. Watch as a line extends from the blue entity to the purple entity. This line represents the relationship from the blue entity to the purple entity.
+Let’s introduce the idea of a relation between two entities. Watch as an arc extends from the blue entity to the purple entity. This arc represents the relationship from the blue entity to the purple entity.
 
-Notice the arrow at one end, showing the direction of this connection. The line curves through the third dimension, reminding us that a relation is different from the entities it connects. While the blue and purple shapes represent entities, this line represents how they interact with each other.
+Notice the arrow at one end, showing the direction of this connection. The arc curves through the third dimension, reminding us that a relation is different from the entities it connects. While the blue and purple shapes represent entities, this arc represents how they interact with each other.
 
 A relation isn’t an entity by itself; instead, it’s how we observe and understand interactions within a system. These relations illustrate the interconnectedness of entities. In processism, entities do not stand alone; they are interdependent.
 
@@ -336,13 +334,13 @@ Delve into the properties of relations, using the example of awareness and sensi
 ## 10.2. Animation
 A second arc, this time a dotted line, grows from the purple entity back to the blue entity. A dotted line grows from the purple entity to the blue entity, following the same path as the previous arc.
 ## 10.3. Narration
-Now, let’s explore the properties of this relation. Imagine the blue entity is a person who sees the purple person. The solid line represents this awareness—the blue person sees the purple person, but not the other way around.
+Now, let’s explore the properties of this relation. Imagine the blue entity is a person who sees the purple person. The solid arc represents this awareness — the blue person sees the purple person, but not the other way around.
 
 To make this clearer, we’ll add a dotted line from the purple entity back to the blue one. This dotted line represents the light reflecting from the purple person to the blue person’s eyes.
 
 The different types of lines help us visualize different aspects of the relationship. In this case, the solid line represents observation, while the dotted line represents the physical process of light reflection.
 
-One important point is that the blue person can relate to the purple person because they are aware of them. However, if the purple person isn’t aware of the blue one, they can’t share the same relationship. This shows that our ability to form relations depends on our sensitivity to other entities, which can change over time.
+One important point is that the blue person can relate to the purple person because they are aware of them. However, if the purple person isn’t aware of the blue one, they can’t enter into a relationship. This shows that our ability to form relations depends on our sensitivity to other entities.
 
 # 11. Scene: Accumulation
 ## 11.1. Objective
@@ -354,7 +352,7 @@ Now, let’s explore the idea of accumulation. Watch as five more blue entities 
 
 First, our original blue entity is now surrounded by other blue entities. Each of these surrounding entities could potentially interact with the original one, creating what we can call internal relations. Meanwhile, these outer entities could also relate to other entities outside this group, which we can think of as external relations.
 
-There’s a significant difference between a single blue entity and a group of blue entities. A single entity has no internal relations—there’s nothing else to interact with. But when we have a group, we suddenly have both internal and external relations.
+There’s a significant difference between a single blue entity and a group of blue entities. A single entity has no internal relations — there’s nothing else to interact with. But when we have a group, we suddenly have both internal and external relations.
 
 This accumulation changes the potential of the system. For example, a single H2O molecule can’t form a water drop. But when many H2O molecules come together, they can form a drop of water. This is what we call strong emergence — the behavior of the water drop isn’t found in just one H2O molecule but appears when many molecules accumulate together.
 
@@ -368,12 +366,11 @@ Fill in the space between the pentagon of blue entities to form a new blue shape
 ## 12.3. Narration
 When we notice an accumulation of entities, we often start thinking of them as a single, more abstract concept. For example, instead of focusing on each individual person, we might think of the group as a whole.
 
-In our visualization, we now remove the representation of the individual entities within the group and connect those on the boundary to form a new, single blue shape. This illustrates the concept of abstraction, where a new level of entity emerges through the relations within the group.
+In our visualization, we now remove the representation of the individual entities within the group and join those entities on the boundary to form a new, single blue shape. This illustrates the concept of abstraction, where a new level of entity emerges through the relations within the group.
 
 Now, we can choose to see this new entity as a single, unified shape or as a collection of smaller entities interacting with each other. This highlights an important idea: every entity can be seen as being composed of a process. This was true for the first entity we looked at, and it will be true for any entity we depict.
 
 This leads us to a deeper question: Is there a fundamental layer to all these processes? We’ll return to that question after we’ve explored more concepts. For now, let’s keep in mind that, for all practical purposes, we can think of reality as being made up of processes all the way down.
-Problems: The new entity should be a different color from the particles that compose it
 
 # 13. Scene: Levels
 ## 13.1. Objective
@@ -381,9 +378,9 @@ Illustrate the concept of multiple levels of abstraction emerging through the ac
 ## 13.2. Animation
 Particles flow from a point above the plane, forming 8 new entities, each composed of between 5 and 20 particles. Each group of particles forms a single entity of a different color, representing distinct new entities. These new entities then combine with the original blue entity, resulting in a larger, more complex entity that encompasses all particles.
 ## 13.3. Narration
-In the process of accumulation, new levels of abstraction can arise. Here, we start with individual particles flowing from above the plane, each forming into distinct entities. These new entities, each with their unique color, represent groups that have emerged through the accumulation of smaller parts.
+In the process of accumulation, new levels of abstraction can arise. Here, we start with individual particles flowing from above, each forming into distinct entities. These new entities, each with their unique color, represent groups that have emerged through the accumulation of smaller parts.
 
-As these entities come together, they form a larger and more complex entity, symbolizing how smaller groups can merge into a new, cohesive system. This could be likened to people forming families, which then come together to form a tribe.
+As these entities come together, they form a larger and more complex entity, symbolizing how smaller groups can merge into a new, cohesive system. This could be likened to people forming families, which also form a tribe.
 
 Notice that the final entity is not merely a sum of its parts but represents a new level of abstraction. This larger entity has its own identity and properties, distinct from those of the individual particles or smaller groups that formed it. This process highlights the concept of emergence, where new properties and levels of reality come into being through the relationships and interactions between simpler entities.
 
@@ -395,9 +392,9 @@ The large red blob representing the highest level entity gradually becomes trans
 ## 14.3. Narration
 Now, we see a single entity represented by this large red shape. However, this entity isn't just a standalone object; it's a more complicated process composed of lower-level entities interacting with one another. As we peel back the layers, notice how each level of abstraction gives way to the next, revealing the underlying processes at play.
 
-We often reach a practical limit to how far we can go in breaking down these levels. For example, a sociologist might consider an individual person as the fundamental entity, while a doctor might focus on cells within the body. Here, we treat the entities we’ve uncovered as fundamental, recognizing that what we perceive is a reflection of our attention and how we relate to the processes at different levels.
+We often reach a practical limit to how far we go in breaking down these levels. For example, a sociologist might consider an individual person as the fundamental entity, while a doctor might focus on cells within the body. At some elvel we treat the entities we’ve uncovered as fundamental. We can also note that what we perceive is a reflection of our attention and how we relate to the different levels.
 
-This exploration of levels reminds us that each entity we observe is part of a larger process, and what we consider 'fundamental' is often just a matter of perspective.
+This exploration of levels reminds us that each entity we observe is part of a larger process, and what we consider 'fundamental' is just a matter of perspective.
 
 # 15. Scene: Scale of Processes
 ## 15.1. Objective
@@ -405,9 +402,9 @@ Illustrate the observation of relations at different scales.
 ## 15.2. Animation
 Lines representing relations dynamically appear and disappear across different levels of entities.
 ## 15.3. Narration
-Let's imagine we have our fundamental entities in place. Now, we can observe the dynamic of their relationships. As we explained earlier, there are internal relations within the boundary of an entity, and there are external relations with entities outside that boundary.
+Let's imagine we have chosen our fundamental entities. Now, we can observe the dynamic of their relationships. As we explained earlier, there are internal relations within the boundary of an entity, and there are external relations with entities outside that boundary.
 
-First, let’s focus on the external relations of our fundamental entities. Watch as lines appear between these fundamental entities, representing their external connections. Now, we’ll shift our perspective to the intermediate entities. Notice how the internal relations within these intermediate entities are highlighted, forming a network of interactions within each entity. Finally, let’s look at our topmost entity. Here, the internal relations within this entity are displayed, which also serve as external relations for the intermediate entities.
+First, let’s focus on the external relations of our fundamental entities. Watch as arcs appear between these fundamental entities, representing their external connections. Now, we’ll shift our perspective to the intermediate entities. Notice how the internal relations within these intermediate entities are highlighted, forming a network of interactions within each entity. Finally, let’s look at our topmost entity. Here, the internal relations within this entity are displayed, which also serve as external relations for the intermediate entities.
 
 What we see now are three distinct scales of processes, each with its own set of relations. These scales remind us that processes can operate on multiple levels simultaneously, and each level has its own dynamics. By understanding these different scales, we can better appreciate the complexity and interconnectedness of the systems we observe.
 
@@ -417,13 +414,13 @@ Introduce the concept of a "system" as a set of processes encompassing multiple 
 ## 16.2. Animation
 The largest entity in the scene becomes opaque, filling the screen. The opacity transition emphasizes the whole entity as a system composed of various levels of entities interacting through processes.
 ## 16.3. Narration
-In our exploration, we've been gradually building up from a single entity to more complicated arrangements. Now, let’s consider the entire structure we’ve developed as a 'system.'
+In our exploration of processism, we've been gradually building up from a single entity to more complicated arrangements. A structure like this represents a system.
 
-At first glance, this large, opaque entity might appear as just another standalone object. But, as we've seen, this entity is actually a system—a collection of entities and relations at different levels, all interacting in a dynamic process.
+At first glance, this large, opaque entity might appear as just another standalone object. But, as we've seen, this entity is actually a system — a collection of entities and relations at different levels, all interacting in a dynamic process.
 
 Although nothing in reality exists in complete isolation, we will use this concept of a system to help us better understand the relationships and processes we’re observing. By considering this entity as a system, we can appreciate how it is composed of many interconnected processes, each occurring at different levels. These processes collectively give rise to the entity's behavior and properties.
 
-As we continue, keep in mind that when we refer to a 'system,' we're talking about this multi-leveled structure of interconnected processes, rather than just a single, isolated entity.
+As we continue, keep in mind that when we refer to a 'system', we're talking about this multi-leveled structure of interconnected processes, rather than just a single, isolated entity.
 
 # 17. Scene: Reductionism
 ## 17.1. Objective
@@ -431,15 +428,15 @@ Demonstrate the limits of reductionist analysis.
 ## 17.2. Animation
 Gradually zoom in on the large entity until only one of the intermediate entities is visible. Then, further zoom into the internal components of that intermediate entity, showing only a single fundamental entity. Finally, zoom out quickly to reveal the entire system, highlighting the previously hidden relations.
 ## 17.3. Narration
-When we use a reductionist approach, our focus shifts to the individual components that make up a system. By zooming in on the largest entity, we start to see the intermediate entities that form part of it. This allows us to study these components in isolation, gaining a detailed understanding of their properties and behaviors.
+When we use a reductionist approach, our focus shifts to the individual components that make up a system. By zooming into on the largest entity, we see the intermediate entities that form parts of it. This allows us to study these components in isolation, gaining a detailed understanding of their properties and behaviors.
 
-As we continue to zoom in, eventually focusing on a single fundamental entity within an intermediate entity, we gain even more precision in our analysis. However, by doing this, we lose sight of how these individual parts interact with each other within the broader system.
+As we continue to zoom in, eventually focusing on a single fundamental entity, we gain even more precision in our analysis. However, by doing this, we lose sight of how these individual parts interact with other entities in the broader system.
 
 The strength of reductionism lies in its ability to simplify a complicated system by breaking it down into smaller, more manageable parts. This approach works particularly well when dealing with predictable systems where the behavior of the whole can be understood by studying its parts.
 
-However, the limitation of reductionism becomes apparent when we try to reassemble these parts to understand the entire system. By focusing so closely on the components, we may overlook the interactions and processes that connect them, which can lead to an incomplete understanding of the system as a whole. 
+However, the limitation of reductionism becomes apparent when we try to reassemble these parts to understand the entire system. By focusing so closely on the components, we will overlook the interactions and processes that connect them, which leads to an incomplete understanding of the system as a whole. 
 
-Holism contrasts with reductionism. In holistic thinking, the interactions and interdependencies between the parts are crucial and often lead to emergent properties—qualities or behaviors that only manifest when the system operates as a whole.
+Holism contrasts with reductionism. In holistic thinking, the interactions and interdependencies between the parts are crucial and often highlight emergent properties — qualities or behaviors that only manifest when the system operates as a whole.
 
 In summary, while reductionism provides valuable insights into the individual parts of a system, it often falls short when it comes to understanding the complicated processes that emerge from the interactions between these parts. Holism is an alternative view that exapnds our sensitivity toward processes and relations.
 
@@ -449,13 +446,13 @@ Demonstrate how relations between abstract entities can involve multiple compone
 ## 18.2. Animation
 Zoom into two intermediate entities that have multiple lines representing their relationship. These lines are synchronized, originating from various fundamental entities within each intermediate entity. Then, a single, thicker line appears from the center of each intermediate entity to represent the abstract, overarching relationship between them.
 ## 18.3. Narration
-Let’s explore the relationships between two intermediate entities. As we zoom in, you’ll notice that their interaction isn’t represented by just a single, simple connection. Instead, multiple lines appear, each one representing a different process occurring within these entities, but all of them are synchronized.
+Let’s explore the relationships between two intermediate entities. As we zoom in, you’ll notice that their interaction isn’t represented by just a single, simple connection. Instead, multiple lines appear, each one representing a different process occurring within these entities, but all these processes are synchronized.
 
-These synchronized lines reflect the coordination happening inside each entity. For example, when two people interact, their relationship might involve spoken language, gestures, and even shared memories—all different aspects working together to form a connection.
+These synchronized arcs reflect the coordination happening inside each entity. For example, when two people interact, their relationship might involve spoken language, gestures, and even shared memories — all different aspects working together to form a connection.
 
-To help us visualize this more complicated relationship, we introduce a thicker line originating from the center of each intermediate entity. This thicker line represents the overarching connection between them, abstracting the multiple synchronized processes into a single, unified relationship.
+To help us visualize this more complicated relationship, we introduce a thicker line originating from the center of each intermediate entity. This thicker line represents the overarching connection between them, abstracting the multiple synchronized processes into a single relationship.
 
-It’s important to understand that these complicated relations, represented by the thicker lines, don’t replace the simpler, more fundamental interactions. Instead, they emerge from the coordination of these basic processes. The relations of the intermediate entities are always also external relations of the fundamental entities within them.
+It’s important to understand that these complicated relations, represented by the thicker lines, don’t replace the simpler, more fundamental interactions. Instead, they emerge from the coordination of these basic processes. The relations of the intermediate entities are also external relations of the more fundamental entities within them.
 
 This layered coordination reminds us that even the most abstract relationships between entities are built upon more basic, synchronized processes. By understanding these multiple levels of interaction, we gain insight into how complicated systems function in the real world. Each entity is not just connected but interdependent. The actions and states of one influence the others, creating a web of interconnectedness where the whole system's behavior emerges from these interwoven relations.
 
@@ -465,16 +462,15 @@ Introduce heterarchy as an alternative to hierarchy, emphasizing the possibility
 ## 19.2. Animation
 The word "Heterarchy" appears at the top of the screen. Highlight all the fundamental entities at the boundary of the topmost entity by coloring them white. Then, zoom in to show a connection between two intermediate entities, each involving a fundamental entity that is part of the topmost entity. Show a new external fundamental entity entering the scene and forming a relation with one of the highlighted fundamental entities, influencing both the intermediate and topmost entities.
 ## 19.3. Narration
-
 It might be tempting to think of the levels we’ve described as forming a simple hierarchy, where higher levels control or influence the lower ones. While this view isn’t wrong, it doesn’t capture the full picture.
 
-To expand our understanding, let’s introduce the concept of heterarchy. Imagine all the fundamental entities at the boundary of our topmost entity—they’re now colored white. These fundamental entities are connected not just within their immediate level but also across different levels.
+To expand our understanding, we'll introduce the concept of heterarchy. Imagine all the fundamental entities at the boundary of our topmost entity — they’re now colored white. These fundamental entities are connected not just within their immediate level but also across different levels.
 
 As we zoom in, we see a connection between two intermediate entities. Notice how this connection involves fundamental entities that are part of the topmost entity. Now, let’s introduce a new external fundamental entity. This new entity forms a relation with one of the highlighted fundamental entities, which in turn affects the intermediate entity and ultimately impacts the topmost entity as well.
 
 This illustrates how relations can cross different levels, bypassing the hierarchical structure. For example, consider a single member of a tribe who befriends someone from another tribe. This personal connection can lead to an alliance between the tribes, showing how individual actions can influence higher-level structures.
 
-Conversely, we’ve all experienced how decisions made by higher-level entities, like governments or organizations, can affect us directly, even if we’re just one part of a larger system. Heterarchy, therefore, acknowledges that relations can move in multiple directions and across different levels, complicating our analysis and expanding our sensitivity to potential connections. The concept of heterarchy is represented in the rhizome which is a type of plant structure, like ginger or bamboo, that spreads underground horizontally and can produce new shoots and roots from any point. Unlike a hierarchy, in the heterarchy a path may connect from any point to any other point.
+Conversely, we’ve all experienced how decisions made by higher-level entities, like governments or organizations, can affect us directly. Heterarchy acknowledges that relations can move in multiple directions and across different levels, complicating our analysis and expanding our sensitivity to potential connections. The concept of heterarchy is represented in the rhizome which is a type of plant structure, like ginger or bamboo, that spreads underground horizontally and can produce new shoots and roots from any point. Unlike a hierarchy, in the heterarchy a path connects from any point to any other point.
 
 While the concept of hierarchy is useful, especially when systems are simple and predictable, heterarchy allows us to consider all potential relations, including those that might skip levels or involve multiple levels at once. This broader perspective helps us understand the interconnectedness and dynamic nature of the systems we observe. In a heterarchy, relations cross boundaries, illustrating the profound interconnectedness and interdependence within a system. Here, influence flows in multiple directions, reflecting the dynamic and interwoven nature of reality.
 
@@ -484,17 +480,17 @@ Illustrate the concepts of "inside-out" and "outside-in" as alternative ways to 
 ## 20.2. Animation
 Visualize a hierarchical system with a large entity at the top and smaller entities below. Show arrows indicating top-down causation (from the large entity to the smaller entities) and bottom-up causation (from the smaller entities to the large entity). Transition to arrows that move from inside an entity outward (inside-out), affecting both other entities at the same level and entities at higher levels, including instances where the influence skips levels entirely. Finally, show arrows moving from outside an entity inward (outside-in), again crossing different levels, sometimes skipping levels.
 ## 20.3. Narration
-When we think about hierarchical systems, we often describe relationships in terms of top-down or bottom-up causation. For example, a falling water drop exerts a top-down influence on the H2O molecules within it, causing them to move downward. Conversely, the properties of the H2O molecules, like surface tension, create bottom-up effects that shape the behavior of the water drop as a whole.
+When we think about hierarchical systems, we often describe relationships in terms of top-down or bottom-up causation. For example, a falling water drop exerts a top-down influence on the H2O molecules within it, causing them to fall together. Conversely, the properties of the H2O molecules, like surface tension, create bottom-up effects that shape the behavior of the water drop as a whole.
 
-While these concepts are useful, they don’t fully capture the diverse ways in which entities interact within a system. To expand our understanding, we introduce the concepts of "inside-out" and "outside-in".
+While these concepts are useful, they don’t fully capture the diverse ways in which entities interact within a system. To expand our understanding, we'll introduce the concepts of "inside-out relation" and "outside-in relation".
 
-Let’s start with inside-out relations. These occur when an internal process within an entity causes changes that can influence other entities at the same level, entities at higher levels, or even skip levels entirely. For instance, an individual’s actions might directly affect their peers, lead to changes in a broader social structure, or even bypass intermediate levels to influence an entire organization. This inside-out relation moves from the center of the entity outward, demonstrating how influence can travel through and across different levels, sometimes skipping levels altogether, as seen in heterarchical systems.
+Let’s start with inside-out relations. These occur when an internal process within an entity causes changes that can influence other entities beyond its boundary, for example, at the same level, entities at higher levels, or even skip levels entirely. For instance, an individual’s actions might directly affect their peers, lead to changes in a broader social structure, or even bypass intermediate levels to influence an entire organization. This inside-out relation moves from the center of the entity outward, demonstrating how influence can travel through and across different levels, sometimes skipping levels altogether, as seen in heterarchical systems.
 
 Now, consider outside-in relations. These happen when external factors influence the internal processes of an entity. For example, a new policy might affect individuals directly or might influence an intermediate entity like a community, which then affects the individual. In some cases, these outside-in relations can also skip levels, impacting an entity directly without necessarily affecting all the intermediate levels in between.
 
 By using these inside-out and outside-in perspectives, we can better understand how relations not only move across different levels of a system but also how they can skip levels, reflecting the complexity of heterarchical interactions. This approach gives us a more flexible and comprehensive understanding of the multidirectional and non-linear interactions that shape systems.
 
-In summary, while top-down and bottom-up are traditional ways to think about causation, inside-out and outside-in offer a broader perspective that includes the possibility of skipping levels, consistent with the concept of heterarchy. This allows us to appreciate the dynamic and interconnected nature of entities within a system.
+In summary, while top-down and bottom-up are traditional ways to think about causation, inside-out and outside-in offer a broader perspective that includes the possibility of skipping levels, consistent with the concept of heterarchy. This allows us to further appreciate the dynamic and interconnected nature of entities within a system.
 
 # 21. Scene: Process
 ## 21.1. Objective
@@ -504,13 +500,13 @@ Start with a single large entity becoming transparent to reveal the smaller enti
 ## 21.3. Narration
 In processism, a process is understood as a sequence of relations that we are sensitive to. Let’s explore what this means by examining how these relations play out within and between entities.
 
-First, we begin with a single large entity. As it becomes transparent, we reveal the smaller entities that make up this larger one. These smaller entities are connected by lines, representing their relationships. As these connections start to move in a repeating pattern, we see an example of a coordinated process. This could be likened to the regular beating of a heart, where the cells work together in harmony to maintain a consistent rhythm.
+First, we begin with a single large entity. As it becomes transparent, we reveal the smaller entities that make up this larger one. These smaller entities are connected by arcs, representing their relationships. As these connections start to move in a repeating pattern, we see an example of a coordinated process. This could be likened to the regular beating of a heart, where the cells work together in harmony to maintain a consistent rhythm.
 
-However, not all processes are so neatly coordinated. As we continue, some of these lines fade or disconnect, representing uncoordinated processes. Here, the movement becomes more chaotic, reflecting situations where the entities are not synchronized. For instance, this might occur in a market where individual actions are not perfectly aligned, leading to unpredictable outcomes.
+However, not all processes are so neatly coordinated. As we continue, some of these lines fade or disconnect, representing uncoordinated processes. Here, the movement becomes more chaotic, reflecting situations where the entities are not synchronized. For instance, this might occur in a market where individual actions are not synchronized, leading to unpredictable outcomes.
 
-Finally, as we zoom out, we observe the entire system, where multiple processes—both coordinated and uncoordinated—are happening simultaneously. This broader view helps us understand that a process can involve various levels of organization and synchronization, depending on the relationships between the entities involved.
+Finally, as we zoom out, we observe the entire system, where multiple processes — both coordinated and uncoordinated — are happening simultaneously. This broader view helps us understand that a process can involve various levels of organization and synchronization, depending on the relationships between the entities involved.
 
-It’s important to remember that in processism, an entity itself can be seen as a process. The movement in our visual language reminds us that these processes are not static; they are continually evolving, shaped by the interactions within and between the entities involved.
+It’s important to remember that in processism, an entity itselfis understood as a process. The movement in our visual language reminds us that these processes are not static; they are continually evolving, shaped by the interactions within and between the entities involved.
 
 In summary, processes are sequences of relations that can be either coordinated, leading to predictable patterns, or uncoordinated, resulting in more unpredictable behavior. Recognizing these processes helps us understand the dynamic nature of the systems we observe.
 
@@ -520,15 +516,15 @@ Distinguish between centralized and emergent processes, illustrating how systems
 ## 22.2. Animation
 Start with a large entity that becomes transparent, revealing the smaller entities within. These smaller entities then begin to separate, showing the individual processes within them. Some of these processes appear to be centrally coordinated, with clear direction and pattern, while others seem to emerge naturally as the smaller entities interact independently, forming patterns without a clear central control.
 ## 22.3. Narration
-Processes within a system can take on different forms, depending on how they are organized and how they arise. Let’s explore the distinction between centralized and emergent processes.
+Processes within a system can arise in different ways. Let’s explore the distinction between centralized and emergent processes.
 
-First, we begin with a large entity that becomes transparent, revealing the smaller entities inside. As these smaller entities separate, we start to see the individual processes that occur within them. Some of these processes are centrally coordinated, where a clear pattern or direction is maintained, much like how a manager might coordinate tasks within an organization. For example, a building's maintenance services—such as water, electricity, and waste management—are typically managed by a central authority to ensure everything functions smoothly.
+First, we begin with a large entity that becomes transparent, revealing the smaller entities inside. As these smaller entities separate, we start to see the individual processes that occur within them. Some of these processes are centrally coordinated, where a clear pattern or direction is maintained, much like how a manager might coordinate tasks within an organization. For example, a building's maintenance services — such as water, electricity, and waste management — are typically managed by a central authority to ensure everything functions smoothly.
 
-However, not all processes are directed by a central authority. As we observe further, other processes begin to emerge naturally from the interactions between these smaller entities. These emergent processes arise without a single entity directing them; instead, they form from the collective dynamics of all the parts involved. This could be likened to the way culture evolves within a country—no one person or organization controls it entirely, yet it develops over time as a result of countless individual actions and interactions.
+However, not all processes are directed by a central authority. As we observe further, other processes begin to emerge naturally from the interactions between these smaller entities. These emergent processes arise without a single entity directing them; instead, they form from the collective dynamics of all the parts involved. This could be likened to the way culture evolves within a country — no one person or organization controls it entirely, yet it develops over time as a result of countless individual actions and interactions.
 
 As we zoom out to view the entire system, we can see how both centralized and emergent processes can exist simultaneously within a system. The behavior of the system as a whole can be shaped by both directed actions and spontaneous, unplanned interactions.
 
-In summary, centralized processes are driven by a single coordinating entity, while emergent processes arise from the collective interactions of many entities, without a clear central control. Understanding the difference between these two types of processes helps us appreciate the diverse ways in which systems can operate and evolve.
+In summary, centralized processes are driven by a coordinating entity, while emergent processes arise from the collective interactions of many entities, without a clear central control. Understanding the difference between these two types of processes helps us appreciate the diverse ways in which systems can operate and evolve.
 
 # 23. Scene: Stability
 ## 23.1. Objective
@@ -536,16 +532,15 @@ Explain how entities can appear static or stable over time, highlighting how per
 ## 23.2. Animation
 Start with the slow movement of the boundary of a large central entity. Gradually zoom in until only the blue color of the entity fills the screen, making it appear stable and unchanging. Then, slowly zoom out and move the entity off-screen to reveal its motion, illustrating both scale and relativity.
 ## 23.3. Narration
-In processism, reality is seen as a continuous flow of change, which contrasts with the essentialist view that emphasizes fixed, unchanging essences. However, in our everyday experience, certain entities can appear stable or static. Let’s explore how this perception of stability arises, focusing first on the concept of scale.
+In processism, reality is perceived as a continuous flow of change, which contrasts with the essentialist view that emphasizes fixed, unchanging essences. However, in our everyday experience, certain entities can appear stable or static. Let’s explore how this perception of stability arises, focusing first on the concept of scale.
 
 We begin with the boundary of a large central entity, moving very slowly. From a distance, this movement might seem imperceptible, giving the illusion that the entity is stable and unchanging. This is because, at a larger scale or over a longer time frame, the changes are too gradual for us to notice. For example, consider the erosion of a mountain. The process happens so slowly that, within the span of a human lifetime, the mountain seems immovable and constant.
 
-As we zoom in closer to the entity, the boundaries fade from view, and all we see is a uniform blue color filling the screen. Without visible boundaries or motion, the entity appears entirely static—much like how, before understanding the broader context, people once thought the earth was flat and unchanging.
+As we zoom in closer to the entity, the boundaries fade from view, and all we see is a uniform blue color filling the display. Without visible boundaries or motion, the entity appears entirely static — much like how, before understanding the broader context, people once thought the earth was flat and unchanging.
 
-Now, let’s shift our focus from scale to relativity. As we slowly zoom out and move the entity off-screen, its motion becomes evident. This change in perspective illustrates how what we perceive as stable can actually be in motion, but we might not notice this movement if we are moving with it. For example, we don’t feel the earth’s rotation because we are rotating along with it. This relative motion creates an illusion of stability, where change exists, but our perspective masks it.
+Now, let’s shift our focus from scale to our relation as observer. As we slowly zoom out and move the entity off-screen, its motion at its boundary becomes evident. This change in perspective illustrates how what we perceive as stable can actually be in motion, but we might not notice this movement if we are moving with it. For example, we don’t feel the earth’s rotation because we are rotating along with it. This relative motion creates an illusion of stability, where change exists, but our perspective masks it.
 
-
-In summary, the perception of stability can be influenced by two key factors: scale and relativity. When changes occur slowly or at a scale beyond our immediate experience, they might seem static. Additionally, relative stability can arise when we move along with a process, making it appear as though nothing is changing. By becoming more sensitive to these factors, we can gain a deeper understanding of the dynamic nature of reality.  
+In summary, the perception of stability can be influenced by two key factors: scale and relativity. When changes occur slowly or at a scale beyond our immediate experience, entities might seem static. Additionally, relative stability can arise when we move along with a process, making it appear as though nothing is changing. By becoming more sensitive to these factors, we can gain a deeper understanding of the dynamic nature of reality.  
 
 # 24. Scene: Change and Continuity
 ## 24.1. Objective
@@ -555,41 +550,39 @@ The animation begins with a sequence of entities arranged in a series, each one 
 ## 24.3. Narration
 In the previous animation, we explored the concept of stability and how it can be perceived. Now, let’s delve into the closely related concept of continuity.
 
-Here, we observe a system maintaining a process — particles moving from one entity to another in a repeating sequence. On the surface, this system appears continuous, with each entity seemingly passing on energy to the next in an unbroken chain. However, as we watch closely, we notice that the particle entering the system is eventually consumed, with no particle leaving. This subtle detail highlights a crucial point processes that seem continuous are battling against the relentless force of the Second Law of Thermodynamics.
+Here, we observe a system maintaining a process — particles moving from one entity to another in a repeating sequence. On the surface, this system appears continuous, with each entity seemingly passing on energy to the next in an unbroken chain. However, as we watch closely, we notice that the particle entering the system is eventually consumed, with no particle leaving. This subtle detail highlights a crucial point, processes that seem continuous are battling against the relentless force of the Second Law of Thermodynamics.
 
-This law, which governs the increase of entropy or disorder in the universe, reminds us that energy is always being dissipated. Over time, this dissipation leads to a loss of order, a natural tendency toward equilibrium where distinctions between states fade away. A famous proverb tells us we can never step in the same river twice, emphasizing the ever-changing nature of reality. The Second Law of Thermodynamics tells us that this river inevitably flows downstream, moving towards greater entropy.
+This law, which describes the increase of entropy or disorder in the universe, reminds us that energy is always being dissipated. Over time, this dissipation leads to a loss of order, a natural tendency toward equilibrium where distinctions between states fade away. A famous proverb tells us we can never step in the same river twice, emphasizing the ever-changing nature of reality. The Second Law of Thermodynamics tells us that this river inevitably flows downstream, moving towards greater entropy.
 
 Continuity within a system often emerges from the delicate balance of interdependent processes. Each process contributes to and relies on the others, creating a network of interconnectedness that sustains the system over time.
 
-In this scene, we see continuity not as a static state, but as a dynamic process — one that requires energy input to maintain. Thus, what appears as a stable process is, in reality, continuously renewed.
+In this scene, we see continuity not as a static state, but as a dynamic process — one that requires energy to maintain it. Thus, what appears as a stable process is, in reality, continuously renewed.
 
 # 25. Scene: Process vs. Structure
 ## 25.1. Objective
 Disintguish process and structure
 ## 25.2. Animation
-
 The video begins with particles being emitted from a source and gradually assembling into a plane of interconnected 2D entities. The process is fluid, showing how the particles come together to form a stable structure.
 Once the plane is established, the source continues to emit particles. These new particles pass through the plane, and as they do, they change in size and color, demonstrating that the structure is actively transforming the particles it interacts with.
 The video may briefly show what the scene would look like if the viewer had started watching after the plane was already formed, emphasizing the difference in perception.
 The video ends by zooming out, showing the plane within a broader context, hinting at its connection to even larger processes.
 ## 25.3. Narration
-In this scene, we begin by witnessing the formation of a stable structure — a plane composed of many smaller entities.
+In this scene, we begin by witnessing the formation of a stable structure — a flat plane composed of many smaller entities.
 
-Once this structure is established new particles continue to enter, and as they pass through the plane, they are transformed—changing in size and color. The structure, which itself was formed by a process, now plays an active role processing entities.
+Once this structure is established new particles continue to enter, and as they pass through the plane, they are transformed — changing in size and color. The structure, which itself was formed by a process, now plays an active role in processing particles.
 
-Imagine if we had started watching this animation after the structure was already in place. We might focus only on what the structure does — how it processes and transforms the particles passing through. But by seeing the full sequence, we’re reminded that this structure is not an isolated, static entity. It's the product of past processes that have shaped it into what it is today.
+Imagine if we had started watching this animation after the structure was already in place. We might focus only on what the structure does — how it processes and transforms the particles passing through it. By witnessing the full sequence, we’re reminded that this structure is not an isolated, static entity. It's the product of past processes that have shaped it into what it is today.
 
 This brings us to an important consideration: the structures we encounter in our world — whether they are physical, like a building, social, like a community, or immaterial, like an idea — are not permanent fixtures. They are the outcomes of continuous, often unseen processes. This structure is the product of interdependent processes. Each process contributes to maintaining the whole, and the structure, in turn, influences these processes, highlighting the continuous flow of interconnectedness.
 
 Being sensitive to these underlying processes can change our perspective. A historian, for example, understands that the social structures of today are the result of countless human actions over time. Similarly, a geologist sees a landscape as a record of earth's processes, shaped over millions of years.
 
-We are all part of these unfolding stories, influencing and being influenced by the structures around us. Yet, we may not always be aware of the roles we’re playing within them.
+We are all part of these unfolding stories, influencing and being influenced by the structures around us. Yet, we may not always be aware of the roles we’re playing in maintaining them.
 
 # 26. Scene: Time and Process Relativity
 ## 26.1. Objective
 Illustrate how time is relative to processes, demonstrating that different entities experience and measure time differently based on the speed and nature of their internal processes.
 ## 26.2. Animation
-
 Introduction of Two Blobs (Entities):
 Visuals: Begin with two distinct blobs, each representing a different entity. The first blob is larger, with intricate patterns that move slowly, while the second blob is smaller and has simpler, faster-moving patterns. These oscillations signify the internal processes of each entity.
 Purpose: The slower oscillations of the larger blob represent a process that unfolds at a slower rate, whereas the faster oscillations of the smaller blob represent a quicker process. This sets up the idea that different entities experience time differently, relative to the dynamics of their internal processes.
@@ -606,29 +599,27 @@ Zoom Out to System Level:
 Visuals: Gradually zoom out to reveal that these blobs are part of a larger, more complex entity composed of multiple blobs and relations. This larger entity oscillates even more slowly, encompassing and influencing the smaller blobs within it.
 Purpose: The zoom-out illustrates how different processes, each with its own sense of time, fit into a broader system. This reinforces the idea that time is contextual, shaped by the dynamics of processes within a larger framework.
 ## 26.3. Narration
-In processism, time is not a uniform, independent measure; it is intimately tied to the processes that define it. Consider these two entities—represented by oscillating blobs. Each follows the same sequence of states, but at different rates. From the perspective of the smaller, faster-oscillating blob, the larger one appears to move more slowly, and vice versa.
+In processism, time is not a uniform, independent measure; it is intimately tied to the processes that define it. Consider these two entities — represented by oscillating blobs. Each follows the same sequence of states, but at different rates. From the perspective of the smaller, faster-oscillating blob, the larger one appears to move more slowly, and vice versa.
 
-These blobs are connected by dynamic relations, which change as their internal processes unfold. Time, in this context, is relative to the speed of each process. As we align their states, we see that while the rhythm differs, the sequence remains consistent—a reflection of how time is experienced differently by each process.
+Time, in this context, is relative to the speed of each process. As we align their states, we see that while the rhythm differs, the sequence remains consistent — a reflection of how time is experienced differently by each process.
 
-Zooming out, we observe that these entities are part of a larger system, where multiple processes occur simultaneously, each with its own sense of time. This layered understanding of time challenges the conventional view of time as a uniform flow and instead presents it as something shaped by the dynamics of the processes we observe.
+Zooming out, we observe that these entities are part of a larger system, where multiple processes occur simultaneously, each with its own time. This layered understanding of time challenges the conventional view of time as a uniform flow and instead presents it as something shaped by the processes of observation.
 
 # 27. Scene: Boundaries and Permeability
 ## 27.1. Objective
-
 To explore how boundaries are defined, maintained, and perceived in processism, emphasizing their dynamic and permeable nature.
 ## 27.2. Animation
-
 A collection of particles connected by dynamic arcs representing relationships between them. These particles first assemble into distinct entities with clear boundaries. Afterward, the particles disassemble and then reassemble into a different set of entities, showing how boundaries shift depending on the relations that are emphasized.
 ## 27.3. Narration
 In processism, boundaries are not fixed or absolute but are instead reflections of the relationships we focus on and the sensitivity we bring to those relationships. For example, imagine grouping people by race, religion, or gender. Depending on which characteristics we highlight, different boundaries emerge, defining distinct entities.
 
-In material relations, boundaries are often more rigid. Consider the air inside a ball; it's distinct from the air outside, clearly separated by the ball's surface. Here, the boundary is material and less permeable.
+In material relations, boundaries are more rigid. Consider the air inside a ball; it's distinct from the air outside, clearly separated by the ball's surface. Here, the boundary is material and less permeable.
 
-However, when we shift our focus to immaterial entities—like social groups, ideas, or concepts—boundaries become more fluid and permeable. The internal elements of one group might also belong to another. For instance, gender and religion can overlap, leading to shared internal relations across different boundaries.
+However, when we shift our focus to immaterial entities — like social groups, ideas, or concepts — boundaries become fluid and permeable. The internal elements of one group might also belong to another. For instance, gender and religion overlap, leading to shared internal relations across different boundaries.
 
 In these cases, boundaries are not just about physical separation but are also shaped by how we perceive and attend to the relations between entities. The permeability of these boundaries allows for complex interactions across different systems, reflecting both the nature of the relations and our own sensitivity to them.
 
-The concept of boundaries in processism challenges us to consider how our focus on certain relations defines the entities we observe and how permeable those boundaries can be. This understanding encourages a more nuanced view of the world, where the separation between entities is not always as clear-cut as it might first appear.
+The concept of boundaries in processism challenges us to consider how our focus on certain relations defines the entities we observe and how permeable those boundaries can be. This understanding encourages a more nuanced view of the world, where the separation between entities is not as clear-cut as it might first appear.
 
 # 28. Scene: Perspectives
 ## 28.1. Objective
@@ -642,20 +633,18 @@ Here, we observe a central set of entities, each interconnected through dynamic 
 
 For example, when we focus on social categories like race, religion, or gender, different structures arise, each with its own boundaries and entities. Some of these perspectives may share common boundaries, while others may conflict, revealing contradictions in how we perceive the same set of entities.
 
-As we layer these perspectives, the structures become increasingly complex, demonstrating how different perspectives can coexist, but also how they can create confusion if not carefully managed.
+As we layer these perspectives, the structures become increasingly complex, demonstrating how different perspectives can coexist, but also how they can create confusion.
 
-In reality, it’s impossible to attend to every possible relation simultaneously. There's a tradeoff between sensitivity—how finely we perceive relationships—and intelligibility—how clearly we can make sense of the structures we observe. In a world of black and white, decisions might seem simpler, but this lack of sensitivity can lead to poor outcomes.
+In reality, it’s impossible to attend to every possible relation simultaneously. There's a tradeoff between sensitivity — how finely we perceive relationships — and intelligibility — how clearly we can make sense of the structures we observe. In a world of black and white, decisions might seem simpler, but this lack of sensitivity leads to unexpected outcomes.
 
-With practice, we learn to navigate multiple perspectives, selecting the most relevant ones for any given context. The perspectives we choose, and when we choose them, shape the available choices and our understanding of the system.
+With practice, we learn to navigate multiple perspectives, selecting the most relevant ones for any given context. The perspectives we choose, and when we choose them, shapes the available choices and our understanding of the system.
 
 In processism, this ability to shift between perspectives allows us to appreciate the complex relations within the systems we observe, while also recognizing the limitations imposed by our own perceptions.
 
 # 29. Scene: Feedback Loops
 ## 29.1. Objective
-
 To illustrate the role of feedback loops in processism, explaining how positive feedback loops amplify changes within a system, while negative feedback loops stabilize or regulate the system.
 ## 29.2. Animation
-
 Start with a simple process involving a few entities connected by dynamic relations. Introduce a positive feedback loop by showing one of these relations intensifying as it cycles back into the system, causing other relations to similarly intensify, eventually leading to a dramatic change in the system. Then, contrast this with a negative feedback loop where a relation initially intensifies but is then met with a balancing counter-relation that dampens the intensity, stabilizing the system.
 ## 29.3. Narration
 In processism, feedback loops play a crucial role in how processes evolve and self-regulate. Feedback loops can be understood as the cyclical effects of an action or change within a system, where the output of a process feeds back into the system, influencing future outputs.
@@ -668,10 +657,8 @@ Both positive and negative feedback loops are fundamental to understanding how p
 
 # 30. Scene: Competition and Collaboration
 ## 30.1. Objective
-
 To illustrate how feedback loops operate within the dynamics of competition and collaboration, and how these interactions at a lower level contribute to stability or change at a higher level.
 ## 30.2. Animation
-
 The scene begins with a set of entities engaged in competition, each trying to outperform the others, symbolizing a competitive feedback loop where entities intensify their efforts in response to others. This competition initially appears chaotic, with entities pushing and pulling against each other. As the scene progresses, some entities begin to collaborate, forming alliances or groups that work together more efficiently. These collaborative groups create stabilizing feedback loops, where mutual support dampens the chaotic competition, leading to a more stable system at a higher level.
 To make the connection explicit:
 
@@ -685,7 +672,7 @@ In processism, the dynamics of competition and collaboration are deeply intercon
 
 We begin by observing entities engaged in competition, each trying to outperform the others. This competition creates a feedback loop, where the success of one entity drives others to intensify their efforts. As competition escalates, it can lead to fluctuations and instability within the system, reflecting the dynamic but often chaotic nature of competitive feedback loops.
 
-However, within this competitive landscape, collaboration also emerges. Some entities form alliances, sharing resources and working together. These collaborative efforts create a different type of feedback loop—one that stabilizes the system. As entities collaborate, they provide mutual support, dampening the extremes of competition and leading to a more balanced and stable environment.
+However, within this competitive landscape, collaboration also emerges. Some entities form alliances, sharing resources and working together. These collaborative efforts create a different type of feedback loop — one that stabilizes the system. As entities collaborate, they provide mutual support, dampening the extremes of competition and leading to a more balanced and stable environment.
 
 By zooming out, we see how these lower-level dynamics contribute to the system’s stability at a higher level. The competitive feedback loops drive innovation and change, while the collaborative feedback loops provide stability and resilience. Together, they create a dynamic balance that ensures the survival and success of the system as a whole.
 
@@ -693,11 +680,9 @@ This interplay between competition and collaboration, driven by feedback loops, 
 
 # 31. Scene: Nonlinearity and Unpredictability
 ## 31.1. Objective
-
 To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in processism.
 ## 31.2. Animation
-
-Start with the entities from the "Competition and Collaboration" scene, showing how their interactions—now influenced by both competitive and collaborative dynamics—lead to nonlinear outcomes. Begin with a small change, such as one entity making a minor adjustment or a new entity entering the system. This triggers a series of cascading effects, with the system's behavior becoming increasingly complex and less predictable. Visualize this through a series of escalating events, where initially small interactions rapidly grow in intensity, eventually leading to a significant, unexpected change in the system’s overall state.
+Start with the entities from the "Competition and Collaboration" scene, showing how their interactions — now influenced by both competitive and collaborative dynamics — lead to nonlinear outcomes. Begin with a small change, such as one entity making a minor adjustment or a new entity entering the system. This triggers a series of cascading effects, with the system's behavior becoming increasingly complex and less predictable. Visualize this through a series of escalating events, where initially small interactions rapidly grow in intensity, eventually leading to a significant, unexpected change in the system’s overall state.
 ## 31.3. Narration
 In processism, systems often exhibit nonlinear behavior, where small changes can lead to disproportionately large and sometimes unpredictable effects. This nonlinearity challenges our ability to predict outcomes, even when we understand the initial conditions.
 
@@ -713,21 +698,19 @@ By recognizing the nonlinear nature of these processes, we gain a deeper appreci
 
 # 32. Scene: Resilience and Adaptation
 ## 32.1. Objective
-
 To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in processism.
 ## 32.2. Animation
-
-Start with the system from the "Nonlinearity and Unpredictability" scene, now showing how it responds to the significant change triggered by cascading effects. Highlight different parts of the system as they either break down, resist, or adapt to the change. Show how some entities or relationships might fail or be eliminated, while others evolve or reorganize to cope with the new conditions. The video ends by zooming out to show the system achieving a new, stable state—different from its original state but resilient and adapted to the changes.
+Start with the system from the "Nonlinearity and Unpredictability" scene, now showing how it responds to the significant change triggered by cascading effects. Highlight different parts of the system as they either break down, resist, or adapt to the change. Show how some entities or relationships might fail or be eliminated, while others evolve or reorganize to cope with the new conditions. The video ends by zooming out to show the system achieving a new, stable state — different from its original state but resilient and adapted to the changes.
 ## 32.3. Narration
 In processism, resilience is the ability of a system to absorb disturbances, adapt to change, and continue functioning. This resilience is crucial in a world where nonlinearity and unpredictability are the norm.
 
-After experiencing significant change, systems must respond—some parts may break down, while others adapt and evolve. Here, we see how different entities within the system react to the disturbances caused by nonlinear interactions. Some entities or relationships may fail, unable to withstand the intensity of change.
+After experiencing significant change, systems must respond — some parts may break down, while others adapt and evolve. Here, we see how different entities within the system react to the disturbances caused by nonlinear interactions. Some entities or relationships may fail, unable to withstand the intensity of change.
 
 But within this challenge lies the opportunity for adaptation. Certain entities reorganize, forming new connections or evolving their roles to cope with the new conditions. This adaptability is key to the system's resilience, allowing it to recover and continue functioning even after significant disturbances.
 
-As the system adjusts, it eventually achieves a new, stable state. This state is different from what it was before, but it reflects the system's resilience—its capacity to absorb change, reorganize, and emerge transformed but still viable.
+As the system adjusts, it eventually achieves a new, stable state. This state is different from what it was before, but it reflects the system's resilience — its capacity to absorb change, reorganize, and emerge transformed but still viable.
 
-In processism, resilience is not about returning to an original state but about evolving to meet new challenges. It’s about flexibility, adaptation, and the ongoing capacity to navigate change. By understanding resilience in this way, we gain insight into how systems—whether ecological, social, or economic—can survive and thrive in an ever-changing world.
+In processism, resilience is not about returning to an original state but about evolving to meet new challenges. It’s about flexibility, adaptation, and the ongoing capacity to navigate change. By understanding resilience in this way, we gain insight into how systems — whether ecological, social, or economic — can survive and thrive in an ever-changing world.
 
 # 33. Scene: Meta-process
 ## 33.1. Objective
@@ -735,7 +718,7 @@ Introduce the general concept of meta and abstraction
 ## 33.2. Animation
 Zoom out and show new relations that form a new entity
 ## 33.3. Narration
-As our exploration of processism progresses, we observe a general strategy at play—a movement from the specific to the abstract, from individual entities to the structures they form when viewed together. This movement is the process of abstraction in action.
+As our exploration of processism progresses, we observe a general strategy at play — a movement from the specific to the abstract, from individual entities to the structures they form when viewed together. This movement is the process of abstraction in action.
 
 When entities accumulate and interact, they generate new patterns and structures. By zooming out and identifying these patterns, we engage in the process of abstraction.
 
@@ -753,7 +736,7 @@ To distinguish between relationalism and relativism in processism, emphasizing h
 ## 34.2. Narration
 When we explore different perspectives, it's easy to forget that we, too, are observing the system from a particular perspective. This unawareness can create the illusion that we have found the ultimate perspective, leading us to believe we see things as they truly are, free from bias.
 
-This can lead to a dangerous fallacy: imagining that we have a 'view from nowhere,' where all perspectives are seen as relative and therefore beyond judgment. This is a common misconception, especially in naive interpretations of post-modernity, where the idea that 'everything is relative' can result in a kind of nihilism—a belief that no perspective has any real value or truth.
+This can lead to a dangerous fallacy: imagining that we have a 'view from nowhere,' where all perspectives are seen as relative and therefore beyond judgment. This is a common misconception, especially in naive interpretations of post-modernity, where the idea that 'everything is relative' can result in a kind of nihilism — a belief that no perspective has any real value or truth.
 
 However, there is an alternative to this relativism: relationalism.
 
@@ -765,12 +748,11 @@ By embracing relationalism, we maintain a meaningful and coherent approach to un
 
 # 35. Scene: Aristotle's Four Causes
 ## 35.1. Objective
-
-To introduce and explain Aristotle's four causes—formal, material, efficient, and final—highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of processism.
+To introduce and explain Aristotle's four causes — formal, material, efficient, and final — highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of processism.
 ## 35.2. Narration
-In pre-modern science, Aristotle's four causes provided a comprehensive framework for understanding causation. These causes—formal, material, efficient, and final—were central to how people explained the world around them.
+In pre-modern science, Aristotle's four causes provided a comprehensive framework for understanding causation. These causes — formal, material, efficient, and final — were central to how people explained the world around them.
 
-As modern science developed, three of these causes—formal, material, and efficient—were integrated into scientific practice. Formal causation refers to the blueprint or plan behind an object or process. Material causation describes the substance or material that makes up something. Efficient causation explains the actions or processes that bring something into being.
+As modern science developed, three of these causes — formal, material, and efficient — were integrated into scientific practice. Formal causation refers to the blueprint or plan behind an object or process. Material causation describes the substance or material that makes up something. Efficient causation explains the actions or processes that bring something into being.
 
 However, final causation, which relates to the purpose or goal behind something, was largely excluded from modern science. This exclusion stemmed from its association with teleology, the idea that a higher purpose, often linked to divine will, directs outcomes. As modern science emerged, it did so through a process that included questioning and often rejecting religious explanations, leading to a division that, while reducing conflict between science and religion, also resulted in the creation of independent echo chambers.
 
@@ -778,12 +760,12 @@ In our presentation, we can find all these causes:
 
 * Formal causation is the plan that guided the construction of this presentation. It’s the blueprint that determined its structure and flow.
 * Efficient causation involves the actions of those who wrote the software, edited the video, and narrated the content. These are the processes that brought the presentation into existence.
-* Material causation refers to the medium through which this presentation is delivered—whether it's the storage of the video, the transmission across networks, or the computer screen on which you're watching.
+* Material causation refers to the medium through which this presentation is delivered — whether it's the storage of the video, the transmission across networks, or the computer screen on which you're watching.
 * Final causation is the intention behind creating this presentation, the goal of introducing you to processism.
 
 If we ignore any of these four causes, we miss a full explanation of how and why this presentation exists.
 
-Modern science has traditionally shied away from 'why' questions, which would necessitate consideration of final causation. However, in the 20th century, this approach became increasingly inadequate as science struggled to define or explain systems demonstrating intelligence, life, or consciousness—areas where final causation plays a crucial role.
+Modern science has traditionally shied away from 'why' questions, which would necessitate consideration of final causation. However, in the 20th century, this approach became increasingly inadequate as science struggled to define or explain systems demonstrating intelligence, life, or consciousness — areas where final causation plays a crucial role.
 
 In 1985, Robert Rosen published the first book on Anticipatory Systems, providing a scientific formalism for reintroducing final causation into modern science. Rosen’s work in relational biology forms much of the foundation for the ideas presented here, helping us bridge the gap between the material and the purposeful, and offering a fuller understanding of complex systems.
 
@@ -799,7 +781,7 @@ In relational biology, the modeling relation provides a formal framework for und
 
 Functors are special types of mappings that preserve the structure and behavior of the system as they are translated into the model. They ensure that the relationships and processes observed in the natural system are accurately reflected in the abstract model, allowing us to analyze and predict the system's dynamics with mathematical precision. In our diagram, we represent these functors as arrows between the system and the model.
 
-Imagine a biological organism on one side and its abstract model on the other. Through the modeling relation, functors map the states and processes of the organism to corresponding elements in the model. This mapping allows us to understand the system in a new way—simplifying its complexity while retaining its essential features.
+Imagine a biological organism on one side and its abstract model on the other. Through the modeling relation, functors map the states and processes of the organism to corresponding elements in the model. This mapping allows us to understand the system in a new way — simplifying its complexity while retaining its essential features.
 
 Importantly, the modeling relation is bidirectional. Insights or predictions derived from the model can inform our understanding of the system, guiding further study or experimentation.
 
@@ -813,9 +795,9 @@ This could be explored more explicitly as self-referential processes within the 
 ## 37.2. Animation
 Visualize an entity where its output continuously becomes its own input, creating a self-referential loop. This can be represented by an arrow looping back on itself or an entity feeding into its own creation. Then, illustrate this further by showing an organism that, through a process, generates a component of itself that is necessary for its own repair. Highlight how this self-referential cycle is more complex than a typical feedback loop and involves the concept of impredicativity.
 ## 37.3. Narration
-In relational biology, the modeling relation helps clarify the role of models in understanding complex systems. A model is pure syntax—a formal description that requires a decoding process to translate it into meaningful predictions about the system it represents.
+In relational biology, the modeling relation helps clarify the role of models in understanding complex systems. A model is pure syntax — a formal description that requires a decoding process to translate it into meaningful predictions about the system it represents.
 
-Relational biology focuses particularly on living systems, where we encounter the limits of traditional models. Unlike machines, all living systems have a fundamental ability to repair themselves. This ability to self-repair is a critical difference between living organisms and the machines we can build. Despite advances in science, creating a system that can repair itself remains beyond our reach—we cannot create a truly living system. However, we can use the mathematics of relational biology to describe such systems through a formal model.
+Relational biology focuses particularly on living systems, where we encounter the limits of traditional models. Unlike machines, all living systems have a fundamental ability to repair themselves. This ability to self-repair is a critical difference between living organisms and the machines we can build. Despite advances in science, creating a system that can repair itself remains beyond our reach — we cannot create a truly living system. However, we can use the mathematics of relational biology to describe such systems through a formal model.
 
 This formal model uses the concept of impredicativity to describe the relationships that enable self-repair. Impredicativity is similar to self-referencing but involves a unique dynamic, where a system or process refers to itself in a way that can seem paradoxical. Specifically, impredicativity describes a situation where a system anticipates its own state and uses this prediction to create a component of itself.
 
@@ -827,16 +809,15 @@ As we continue our exploration, we will build on this concept of impredicativity
 
 # 38. Scene: Complex and Simple Systems
 ## 38.1. Objective
-
 To draw a fundamental distinction between complex systems, which involve impredicative processes, and simple systems, which do not. The scene will explain how relational biology categorizes systems and how modern science has historically been more successful in modeling simple systems due to the limitations in mathematics and the exclusion of final causation.
 ## 38.2. Narration
 A key insight of relational biology is the recognition that systems with impredicative processes represent a fundamentally different kind of system. These systems, characterized by their self-referential dynamics, are what we will refer to as complex systems.
 
-In contrast, systems that do not involve an impredicative loop are considered simple systems. Even if these systems have many parts, they remain simple in nature. When such systems become large or intricate, we refer to them as complicated systems—not complex. The distinction here is crucial: complicated systems may be detailed and multifaceted, but they lack the self-referential, impredicative processes that define true complexity.
+In contrast, systems that do not involve an impredicative loop are considered simple systems. Even if these systems have many parts, they remain simple in nature. When such systems become large or intricate, we refer to them as complicated systems — not complex. The distinction here is crucial: complicated systems may be detailed and multifaceted, but they lack the self-referential, impredicative processes that define true complexity.
 
 Modern science has been remarkably effective at modeling simple systems, largely because these systems can be accurately described and predicted using the mathematics of Newton’s calculus. Simple systems follow predictable patterns, and their behavior can often be reduced to straightforward cause-and-effect relationships.
 
-However, our understanding and modeling of complex systems have lagged behind. This is partly because we did not have the mathematical tools to describe impredicativity until the mid-20th century. Moreover, the founding of modern science included a deliberate banishment of final causation—the concept of purpose or goal-directed processes—from scientific explanations. Without considering final causation, traditional scientific methods struggled to fully capture the dynamics of complex, self-referential systems.
+However, our understanding and modeling of complex systems have lagged behind. This is partly because we did not have the mathematical tools to describe impredicativity until the mid-20th century. Moreover, the founding of modern science included a deliberate banishment of final causation — the concept of purpose or goal-directed processes — from scientific explanations. Without considering final causation, traditional scientific methods struggled to fully capture the dynamics of complex, self-referential systems.
 
 As we move forward, understanding this distinction between simple and complex systems will be essential. It will help us appreciate the limitations of traditional models and the necessity of new approaches, particularly in the study of living organisms and other systems where self-referential processes play a critical role.
 
@@ -858,18 +839,15 @@ The system’s ability to learn and adapt to changes
 ## 40.2. Animation
 Introduce a "black blob" entity that represents an adaptive process, monitoring changes and updating the system’s models. This entity could be shown interacting with different parts of the system, making adjustments in response to observed changes.
 ## 40.3. Narration
-Intelligence in a system is its ability to learn and adapt to changes in its environment. This is achieved through ongoing monitoring and updating of internal models. Here, we see an adaptive process—represented by a 'black blob'—actively interacting with different parts of the system, making adjustments in response to observed changes.
+Intelligence in a system is its ability to learn and adapt to changes in its environment. This is achieved through ongoing monitoring and updating of internal models. Here, we see an adaptive process — represented by a 'black blob'—actively interacting with different parts of the system, making adjustments in response to observed changes.
 
 In the earlier example of the deciduous tree, we can expand the timescale of the processes we consider to observe this adaptive intelligence at work through the evolution of the tree species. For instance, as climate change alters environmental conditions, species of trees may modify their behavior to continue predicting autumn accurately, ensuring their survival. This illustrates how intelligence, as an adaptive process, enables systems to remain resilient and responsive to new challenges. 
 
 # 41. Scene: Evolution as Learning
 ## 41.1. Objective
 To illustrate the analogy between the process of intelligence (learning) and the process of evolution, highlighting how learning can occur across various scales and levels, from individual organisms to entire species.
-
 ## 41.2. Animation
-
 Begin by showing an entity, such as a small plant or organism, that seeds another entity, which then grows, seeds another, and gradually fades away. Over several cycles of this process, introduce a subtle change in color or form with each new generation, symbolizing adaptation and learning. As the process continues, zoom out to reveal that the color changes represent a broader, evolving pattern.
-
 ## 41.3. Narration
 The example of the tree species adapting to its environment introduces a key insight from Robert Rosen's work on anticipatory systems: many of the major breakthroughs in science can be attributed to the method of analogy.
 
@@ -887,7 +865,7 @@ To convey the idea that information is a process rather than a static essence.
 ## 42.2. Animation
 Two similar particles are sent to two different entities. Upon receiving the particles, the entities change to different colors, illustrating how they interpret the same "information" differently.
 ## 42.3. Narration
-The discussions around intelligence and learning provide a natural segue into the concept of information. From the perspective of processism, information is not something static or intrinsic—it's not a state, but a process.
+The discussions around intelligence and learning provide a natural segue into the concept of information. From the perspective of processism, information is not something static or intrinsic — it's not a state, but a process.
 
 Consider two similar particles, each carrying what we might assume to be the same information. These particles are sent to two different entities. But rather than reacting in the same way, each entity processes the information differently, resulting in them changing to different colors.
 
@@ -898,11 +876,8 @@ This reveals that information is not just a static essence that exists independe
 # 43. Scene: Hierarchical Impredicativity
 ## 43.1. Objective
 To illustrate the connection between post-structuralism and the concept of impredicativity, particularly in the context of understanding complex, self-referential systems.
-
 ## 43.2. Animation
-
 The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
-
 ## 43.3. Narration
 In the late 20th century, philosophy developed a concept known as post-structuralism. Post-structuralism emerged during a time of great debate in academia, particularly around whether human behavior is primarily conditioned by the environment or governed by innate, universal capacities, such as language, that develop in all healthy individuals.
 
@@ -914,28 +889,27 @@ For example, consider an individual within a society. The individual's behavior 
 
 In this visual metaphor, we see how an entity exists within another entity, each influencing the other in a self-referential cycle. This hierarchical impredicativity echoes the post-structuralist view that structures are not fixed but are constantly being redefined by the very elements they contain.
 
-Post-structuralism and the concept of hierarchical impredicativity both challenge traditional, linear models of causation. They invite us to consider how complex systems—whether social, biological, or cognitive—are shaped by recursive, self-referential processes. These ideas expand our understanding of how entities relate to one another within hierarchies and how these relationships are far more intricate and interdependent than they might first appear. This opens up possibilities for resolving paradox such as individual agency within society, and extended cognition where the process of thinking extends beyond the boundary of an embodied brain.  
+Post-structuralism and the concept of hierarchical impredicativity both challenge traditional, linear models of causation. They invite us to consider how complex systems — whether social, biological, or cognitive — are shaped by recursive, self-referential processes. These ideas expand our understanding of how entities relate to one another within hierarchies and how these relationships are far more intricate and interdependent than they might first appear. This opens up possibilities for resolving paradox such as individual agency within society, and extended cognition where the process of thinking extends beyond the boundary of an embodied brain.  
 
 # 44. Scene: Agency
 ## 44.1. Objective
 Expand on the concept of agency
 ## 44.2. Animation
-
 Visuals that represent different scales of systems, from the microscopic (e.g., cellular processes) to the macroscopic (e.g., societal structures).
 A dynamic animation that shows an individual as both influenced by and influencing these multiple levels, moving fluidly between them.
 Visuals that shift from cosmic scales to the personal, illustrating the interconnectedness of all things from stardust to individual experiences.
 ## 44.3. Narration
 The concept of hierarchical impredicativity offers profound insights into how we can reimagine the notion of agency. We can even expand this concept to heterarchical impredicativity, accounting for the diverse levels of systems in which we participate and the intricate web of relations that emerge from these interactions.
 
-Consider that the structure of our present context is a reflection of processes from the past. We can choose to see ourselves as active participants in processes that predate our physical birth—processes that stretch back through generations, even to the origins of life itself. Every animal on this planet is literally part of the same family tree, sharing a common ancestry that connects us all.
+Consider that the structure of our present context is a reflection of processes from the past. We can choose to see ourselves as active participants in processes that predate our physical birth — processes that stretch back through generations, even to the origins of life itself. Every animal on this planet is literally part of the same family tree, sharing a common ancestry that connects us all.
 
 This perspective extends beyond the physical to the metaphysical: we are part of processes that will continue long after our physical bodies cease to exist. These processes span across time, connecting us to both our ancestors and our descendants, linking the present moment to a vast continuum of existence.
 
-Yet, within this vast network, there are also processes unique to our personal experience—moments of spontaneity and creativity that are unpredictable and unique to each individual. These personal processes are a source of freedom that cannot be fully controlled or predicted, offering us a form of agency that is deeply personal and intimately connected to the larger systems we inhabit.
+Yet, within this vast network, there are also processes unique to our personal experience — moments of spontaneity and creativity that are unpredictable and unique to each individual. These personal processes are a source of freedom that cannot be fully controlled or predicted, offering us a form of agency that is deeply personal and intimately connected to the larger systems we inhabit.
 
 By understanding agency through the lens of hierarchical and heterarchical impredicativity, we can appreciate the complex interplay between the deterministic forces that shape us and the freedom we exercise within those constraints. Our actions are not merely the product of external forces; they are also the result of our participation in a dynamic, evolving network of relationships that spans the micro to the macro, the personal to the universal.
 
-In this way, agency is not just about conscious experience—it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence.
+In this way, agency is not just about conscious experience — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence.
 
 # 45. Scene: Role of Observation and Participation
 ## 45.1. Objective
@@ -951,23 +925,23 @@ Without delving into the complexities of quantum mechanics, we can still recogni
 
 In most human systems, the very act of observing is already a form of participation. Just as every performer needs an audience, the observer’s presence influences the system. The observer and the observed are intertwined, their interactions forming a dynamic, participatory process.
 
-By understanding this, we can appreciate that our observations are not just passive acts of recording reality—they are active engagements that shape and are shaped by the systems we observe. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
+By understanding this, we can appreciate that our observations are not just passive acts of recording reality — they are active engagements that shape and are shaped by the systems we observe. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
 
 # 46. Scene: Conscious vs Unconscious
 ## 46.1. Objective
 Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of processism.
 ## 46.2. Animation
-Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible—lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
+Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible — lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
 ## 46.3. Narration
 Consciousness is a subject of intense debate, especially in fields like philosophy and neuroscience. We won’t attempt to solve the 'hard problem of consciousness' here, but we can explore a useful way to distinguish between conscious and unconscious processes within the framework of processism.
 
-Imagine that this circular view represents our conscious awareness. Inside this circle, we can see relationships and processes clearly—they are within our conscious focus. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
+Imagine that this circular view represents our conscious awareness. Inside this circle, we can see relationships and processes clearly — they are within our conscious focus. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
 
-Most of the processes we participate in are unconscious. These include the automatic functions within our bodies, the habitual behaviors in our relationships, and the broader dynamics within society and the environment. We’re often unaware of these processes unless something draws them into our conscious focus—such as a sudden change or a deliberate act of attention.
+Most of the processes we participate in are unconscious. These include the automatic functions within our bodies, the habitual behaviors in our relationships, and the broader dynamics within society and the environment. We’re often unaware of these processes unless something draws them into our conscious focus — such as a sudden change or a deliberate act of attention.
 
-Our sensitivity to these processes, whether conscious or unconscious, determines the range of options available to us. When we expand our awareness—enlarging the circle, so to speak—we increase our sensitivity to more processes, allowing us to engage with a broader range of relationships and influences. Conversely, when our focus narrows, we become more limited in what we can perceive and respond to.
+Our sensitivity to these processes, whether conscious or unconscious, determines the range of options available to us. When we expand our awareness — enlarging the circle, so to speak — we increase our sensitivity to more processes, allowing us to engage with a broader range of relationships and influences. Conversely, when our focus narrows, we become more limited in what we can perceive and respond to.
 
-This brings us to the idea of the 'self.' We can define the self narrowly, consisting only of the ego and the stories we tell ourselves about who we are. In this view, consciousness is limited to a small set of personal narratives and immediate concerns. But we can also define the self more broadly, as encompassing all the processes we are sensitive to—both conscious and unconscious.
+This brings us to the idea of the 'self.' We can define the self narrowly, consisting only of the ego and the stories we tell ourselves about who we are. In this view, consciousness is limited to a small set of personal narratives and immediate concerns. But we can also define the self more broadly, as encompassing all the processes we are sensitive to — both conscious and unconscious.
 
 By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding consciousness. It's not just about what we are aware of at any given moment, but about how we navigate the vast network of processes that make up our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
 
@@ -975,17 +949,16 @@ By recognizing the fluid boundary between conscious and unconscious processes, w
 ## 47.1. Objective
 Distinguish between subjective and unsubjective experiences, highlighting their implications for our understanding of the self.
 ## 47.2. Animation
-
 ## 47.3. Narration
-Our everyday conscious experience typically includes a sensation of subjectivity—the awareness that the experience I am having is uniquely my own. This is a fundamental aspect of what most of us consider to be consciousness: an experience of being present in relation to things that are distinctly not me.
+Our everyday conscious experience typically includes a sensation of subjectivity — the awareness that the experience I am having is uniquely my own. This is a fundamental aspect of what most of us consider to be consciousness: an experience of being present in relation to things that are distinctly not me.
 
 For many, this sense of subjectivity is so intrinsic to their experience that it might seem strange to even mention it. Conscious experience is usually synonymous with the feeling of being an 'I'—a distinct observer, interacting with the world.
 
-However, if we examine the process of conscious experience in great detail—using, for example, specific meditation techniques designed to give insight into the nature of awareness—we may stumble upon an extraordinary discovery. It is possible to have an experience without the sensation of subjectivity.
+However, if we examine the process of conscious experience in great detail — using, for example, specific meditation techniques designed to give insight into the nature of awareness — we may stumble upon an extraordinary discovery. It is possible to have an experience without the sensation of subjectivity.
 
-In such an unsubjective experience, there is still awareness, but the usual sense of 'I'—the feeling of being a separate observer—is absent. This isn't a case of simply not noticing subjectivity; rather, in the moment, the distinction between self and other, observer and observed, dissolves. Only upon reflecting on the experience afterward might one realize that something was profoundly different—that the experience lacked the usual subject-object distinction.
+In such an unsubjective experience, there is still awareness, but the usual sense of 'I'—the feeling of being a separate observer — is absent. This isn't a case of simply not noticing subjectivity; rather, in the moment, the distinction between self and other, observer and observed, dissolves. Only upon reflecting on the experience afterward might one realize that something was profoundly different — that the experience lacked the usual subject-object distinction.
 
-This phenomenon has profound implications for our understanding of the self. It suggests that subjectivity—the sense of being a distinct 'I'—is not a necessary condition for conscious experience. Instead, it may be one possible mode of experience among others.
+This phenomenon has profound implications for our understanding of the self. It suggests that subjectivity — the sense of being a distinct 'I'—is not a necessary condition for conscious experience. Instead, it may be one possible mode of experience among others.
 
 By recognizing that consciousness can exist without subjectivity, we open the door to a deeper exploration of what it means to be aware and how we construct our sense of self. This challenges the conventional view that the self is a fixed, central observer and instead invites us to consider the self as a more fluid and dynamic process, capable of both subjective and unsubjective experiences.
 
@@ -993,11 +966,10 @@ By recognizing that consciousness can exist without subjectivity, we open the do
 ## 48.1. Objective
 To present the self as an emergent process rather than a fixed essence, challenging the notion of an "authentic self".
 ## 48.2. Animation
-
 ## 48.3. Narration
 Our exploration of processism brings us to one of its most profound insights: the understanding of the self not as a fixed essence but as a complex, emergent process.
 
-The idea of the 'authentic self' is a powerful and pervasive concept in many cultures. It suggests that within each of us lies a core, unchanging identity—something pure and true that defines who we really are. This concept can be comforting, offering a sense of stability and purpose. It’s easy to see how someone could have an experience that feels deeply aligned with their conception of an 'authentic self.'
+The idea of the 'authentic self' is a powerful and pervasive concept in many cultures. It suggests that within each of us lies a core, unchanging identity — something pure and true that defines who we really are. This concept can be comforting, offering a sense of stability and purpose. It’s easy to see how someone could have an experience that feels deeply aligned with their conception of an 'authentic self.'
 
 However, processism invites us to question this notion. If the self is a process, constantly shaped and reshaped by our interactions, experiences, and relationships, then the 'authentic self' is not a fixed entity waiting to be discovered. Instead, it is something that emerges and evolves over time, influenced by the contexts we inhabit.
 
@@ -1009,7 +981,6 @@ By embracing the self as an emergent process, we open ourselves to a more fluid 
 ## 49.1. Objective
 Introduce the concept of "non-self" as a nuanced understanding of the self, reflecting its emergent and interconnected nature.
 ## 49.2. Animation
-
 ## 49.3. Narration
 If we understand the self as an emergent process, shaped by complex, heterarchical impredicativities, it may seem incoherent to speak of 'the self' as a singular, static entity. At the same time, we cannot ignore the reality of our habits, biases, strengths, and weaknesses, which seem to define our identity. This apparent contradiction raises the question: How can we reconcile the fluid nature of the self with the tangible experience of being an individual?
 
@@ -1017,7 +988,7 @@ Several philosophical and spiritual traditions offer a concept that captures thi
 
 In these traditions, the self is seen as an aspect of the many processes we are participating in, rather than a separate, independent entity. The self is not an isolated 'thing' but a dynamic intersection of relationships, continuously influenced by and influencing the processes around it.
 
-This concept of non-self invites us to shift our perspective—from seeing the self as the protagonist of our story to recognizing it as one of many interconnected elements within a larger, ever-changing narrative. It encourages us to let go of the idea that the self is something to be preserved or defended at all costs and to embrace the reality that we are part of something much larger and more fluid than we often realize.
+This concept of non-self invites us to shift our perspective — from seeing the self as the protagonist of our story to recognizing it as one of many interconnected elements within a larger, ever-changing narrative. It encourages us to let go of the idea that the self is something to be preserved or defended at all costs and to embrace the reality that we are part of something much larger and more fluid than we often realize.
 
 By embracing non-self, we can begin to see ourselves not as isolated individuals but as participants in a vast network of relationships, where our identity is not fixed but constantly evolving in response to the world around us. This shift in perspective can lead to a deeper understanding of our place in the world, fostering a sense of connection and interdependence that transcends the limitations of the individual self.
 
@@ -1029,7 +1000,7 @@ The video starts with a few distinct entities connected by lines representing re
 ## 50.3. Narration
 Building on our exploration of the self as an emergent process, we can generalize this concept to understand how relations between entities can modify the very structure of a system, influencing its identity and contributing to emergent behavior.
 
-In traditional machines, identity is fixed. The structure of the machine is determined by engineering plans—this is the formal cause. The machine is constructed through the efficient cause of the technicians' efforts and operates through material causes that constrain the system to its predetermined function.
+In traditional machines, identity is fixed. The structure of the machine is determined by engineering plans — this is the formal cause. The machine is constructed through the efficient cause of the technicians' efforts and operates through material causes that constrain the system to its predetermined function.
 
 However, in a complex system, the identity of the system is not fixed but is continuously reshaped by the processes within it. For example, a complex system can change its structure through processes like learning and repair, which are impredicative in nature. This means that the system's identity evolves as it interacts with its environment and as relationships within the system change.
 
@@ -1037,7 +1008,7 @@ This is a fundamental difference between simple and complex systems. In a simple
 
 As the relationships between entities evolve, they can lead to the emergence of new structures, new identities, and new behaviors that were not predictable from the original configuration of the system. This dynamic nature of complex systems challenges our traditional understanding of identity, suggesting that who or what something 'is' can change over time, influenced by the relationships it forms and the processes it undergoes.
 
-In this view, identity is not a fixed essence but a process—one that is continually shaped and reshaped by the relationships and interactions within a system. This understanding of identity as fluid and emergent opens up new possibilities for how we understand and engage with complex systems, whether in biology, society, or our own sense of self.
+In this view, identity is not a fixed essence but a process — one that is continually shaped and reshaped by the relationships and interactions within a system. This understanding of identity as fluid and emergent opens up new possibilities for how we understand and engage with complex systems, whether in biology, society, or our own sense of self.
 
 # 51. Scene: Staged Development
 ## 51.1. Objective
@@ -1045,11 +1016,11 @@ Illustrate the concept that systems evolve through stages, with each stage intro
 ## 51.2. Animation
 The video begins with a simple compound entity composed of a few basic parts. As the entity evolves, new layers of entities and relationships are added in stages, each time making the system more complex. Initially, the entity's structure is straightforward, but as it moves through each stage, additional components and connections emerge, forming new patterns. These stages are visually represented by layers of increasing complexity, each building on the previous one. The final image shows a highly intricate system that has evolved through multiple stages, with each layer representing a new level of abstraction and integration.
 ## 51.3. Narration
-Consider a system that evolves or learns. As it progresses, it doesn’t simply accumulate more parts or experiences—it undergoes a transformation through distinct stages of development. Each stage introduces new levels of complexity, abstraction, and perspectives.
+Consider a system that evolves or learns. As it progresses, it doesn’t simply accumulate more parts or experiences — it undergoes a transformation through distinct stages of development. Each stage introduces new levels of complexity, abstraction, and perspectives.
 
 In the early stages, the system might focus on mastering basic skills, acquiring experiences, and forming foundational concepts. This phase of accumulation builds the groundwork for future growth. As these elements accumulate, they reach a point where they can be restructured into new patterns, leading to the emergence of a higher level of abstraction.
 
-At this new level, the system can now categorize, coordinate, and integrate the previously acquired skills, experiences, and concepts in novel ways. The system is no longer just a collection of parts—it has become something more, with new capabilities and perspectives that were not possible in the earlier stages.
+At this new level, the system can now categorize, coordinate, and integrate the previously acquired skills, experiences, and concepts in novel ways. The system is no longer just a collection of parts — it has become something more, with new capabilities and perspectives that were not possible in the earlier stages.
 
 While the specific content of each stage is not pre-determined, and development is not entirely predictable, we can observe a meta-pattern of staged development. This understanding can guide us in our own growth and in fostering the development of others.
 
@@ -1063,7 +1034,7 @@ Introduce the concept of different paradigms as distinct epistemologies, emphasi
 ## 52.2. Animation
 The video begins by showing a central entity with multiple lines branching out, each representing different perspectives. These perspectives, while varied, are all within the same paradigm and do not contradict each other. As the scene progresses, the image splits into two separate sections, each representing a different paradigm. The perspectives within each section are coherent internally but contradictory when compared across paradigms. The final visual shows these paradigms side by side, with a line illustrating the tension between them.
 ## 52.3. Narration
-In our exploration of processism, we've seen how different perspectives can emerge within a system. Within a single paradigm—an overarching framework that shapes how we understand the world—many different perspectives can coexist. These perspectives might focus on different aspects of a system or entity, and while they highlight different roles or features, they do not fundamentally contradict each other. For example, within a single scientific paradigm, different theories may complement one another, providing various insights into a complex system.
+In our exploration of processism, we've seen how different perspectives can emerge within a system. Within a single paradigm — an overarching framework that shapes how we understand the world — many different perspectives can coexist. These perspectives might focus on different aspects of a system or entity, and while they highlight different roles or features, they do not fundamentally contradict each other. For example, within a single scientific paradigm, different theories may complement one another, providing various insights into a complex system.
 
 However, the situation changes when we shift from one paradigm to another. Paradigms are distinct epistemologies, each providing a different set of assumptions, values, and methods for understanding reality. When perspectives emerge from different paradigms, they can appear contradictory, not because one is right and the other is wrong, but because they are coherent within different frameworks.
 
@@ -1083,7 +1054,7 @@ In any complex system, not all processes operate in isolation. Some processes pl
 
 Metacognition can be understood as a higher-order process, one that monitors and adjusts other processes to maintain harmony within the system. Just as we might reflect on our thoughts and behaviors to make better decisions, metacognition within a system reflects on the dynamics of the system itself, making adjustments as needed.
 
-Imagine an entity within this system, distinct in its role, perhaps represented by a blue color. This entity moves through the system, observing the interactions between other entities. When it identifies an imbalance or a potential issue, it steps in to facilitate changes—redirecting energy, adjusting connections, or guiding interactions. This oversight helps to ensure that the system continues to operate smoothly, even as it adapts to new conditions or challenges.
+Imagine an entity within this system, distinct in its role, perhaps represented by a blue color. This entity moves through the system, observing the interactions between other entities. When it identifies an imbalance or a potential issue, it steps in to facilitate changes — redirecting energy, adjusting connections, or guiding interactions. This oversight helps to ensure that the system continues to operate smoothly, even as it adapts to new conditions or challenges.
 
 Process management is closely related to metacognition. It involves the intentional facilitation of processes to ensure that they achieve their intended outcomes. Just as a conductor guides an orchestra to create harmonious music, process management within a system involves guiding and adjusting the various processes to maintain overall coherence and effectiveness.
 
@@ -1093,11 +1064,10 @@ By understanding metacognition and process management, we gain insight into how 
 ## 54.1. Objective
 Introduce dynamic ontology
 ## 54.2. Animation
-
 ## 54.3. Narration
-As we interact with others, the symbols and words we use are not static—they evolve, adapt, and transform, influencing how we perceive the world and ourselves. The language we use is not merely a collection of fixed meanings; it is a dynamic process that shapes and reshapes our experience and our reality.
+As we interact with others, the symbols and words we use are not static — they evolve, adapt, and transform, influencing how we perceive the world and ourselves. The language we use is not merely a collection of fixed meanings; it is a dynamic process that shapes and reshapes our experience and our reality.
 
-Language is more than just words. It encompasses any use of symbols for communication—body language, dress codes, dance, music, mathematics, and more. These forms of language are deeply connected to our shared experiences and practices, influencing how we relate to one another and to the world.
+Language is more than just words. It encompasses any use of symbols for communication — body language, dress codes, dance, music, mathematics, and more. These forms of language are deeply connected to our shared experiences and practices, influencing how we relate to one another and to the world.
 
 Our language directs our attention and mediates our experience. English, for example, is well-suited for describing reality from an essentialist perspective, where things have fixed, unchanging essences. However, it is less equipped to express the fluid, dynamic nature of reality as seen through a process-centric lens.
 
@@ -1111,7 +1081,6 @@ By acknowledging the dynamic and evolving nature of language, we can better appr
 ## 55.1. Objective
 Non-foundationalism challenges the idea of a single, unchanging foundation for knowledge or reality.
 ## 55.2. Animation
-
 ## 55.3. Narration
 Non-foundationalism rejects the idea of a single, unchanging foundation. Instead, it embraces the notion that stability and coherence can emerge from the interactions between parts, rather than from an unchanging base. By letting go of the need for a fixed foundation, non-foundationalism allows us to understand complex systems in a more flexible and dynamic way.
 
@@ -1127,11 +1096,10 @@ By embracing non-foundationalism, we open ourselves to the richness and complexi
 ## 56.1. Objective
 Address paradox and introduce not-knowing
 ## 56.2. Animation
-
 ## 56.3. Narration
 Paradoxes highlight the limits of a paradigm. Take, for example, the statement, "I always lie." If this statement is true, it contradicts itself, revealing the paradox. This type of paradox arises when we attempt to confine language and thought to strict, binary logic, where something must either be true or false.
 
-From a process-centric perspective, we see a different dynamic at play. Paradoxes emerge when we encounter the boundaries of a foundational paradigm—one that assumes there is an absolute truth or essence to be found. For instance, consider the question, "If the universe began with the Big Bang, where did the energy for the Big Bang come from?" This question seems coherent within certain paradigms, but it may be meaningless if the paradigm itself assumes that the universe began with the Big Bang.
+From a process-centric perspective, we see a different dynamic at play. Paradoxes emerge when we encounter the boundaries of a foundational paradigm — one that assumes there is an absolute truth or essence to be found. For instance, consider the question, "If the universe began with the Big Bang, where did the energy for the Big Bang come from?" This question seems coherent within certain paradigms, but it may be meaningless if the paradigm itself assumes that the universe began with the Big Bang.
 
 To resolve a paradox, we need to shift our paradigm. In a non-foundational, process-centric paradigm, the very concept of a paradox changes. Here, we are not expecting a coherent foundation that explains everything. When we encounter a paradox, it is not a failure but an invitation to explore other paradigms that might offer different insights.
 
@@ -1145,11 +1113,11 @@ By becoming comfortable in this stance of not-knowing, we free ourselves from th
 ## 57.1. Objective
 Relational ethics and the value of sensitviity
 ## 57.2. Narration
-The idea that moral decisions are shaped by dynamic processes rather than fixed rules is particularly thought-provoking. In traditional ethical frameworks, decisions are often guided by predetermined principles or laws, seen as universal truths that apply across all situations. However, process philosophy offers a different perspective—one that emphasizes the importance of relationships and the fluid nature of our interactions.
+The idea that moral decisions are shaped by dynamic processes rather than fixed rules is particularly thought-provoking. In traditional ethical frameworks, decisions are often guided by predetermined principles or laws, seen as universal truths that apply across all situations. However, process philosophy offers a different perspective — one that emphasizes the importance of relationships and the fluid nature of our interactions.
 
 Non-foundationalism, as we've explored, is not the end of the journey but a stage of development that opens the door to new ways of thinking, including relational ethics. In this view, our understanding and actions are not guided by fixed rules or eternal truths but by the dynamic relationships we are part of.
 
-Relational ethics suggests that ethical decisions emerge from the ongoing processes and interactions we engage in, recognizing that what is "right" or "good" may vary depending on the context and the relationships involved. This approach values sensitivity—being attuned to the needs, experiences, and perspectives of others, as well as the broader system in which we operate.
+Relational ethics suggests that ethical decisions emerge from the ongoing processes and interactions we engage in, recognizing that what is "right" or "good" may vary depending on the context and the relationships involved. This approach values sensitivity — being attuned to the needs, experiences, and perspectives of others, as well as the broader system in which we operate.
 
 By embracing relational ethics, we move away from rigid, one-size-fits-all rules and instead cultivate an awareness of the ever-changing dynamics of our relationships. We become more responsive, adaptable, and compassionate in our decision-making, acknowledging that our actions are part of a larger, interconnected process. Relational ethics can help create the space to address conflicts between different paradigms. 
 
@@ -1161,7 +1129,7 @@ Bridge between the natural sciences and the humanities
 ## 58.2. Animation
 Modeling relation with the personified encoding and decoding
 ## 58.3. Narration
-There has long been an artificial divide between the natural sciences and the humanities—a divide that processism can bridge. The natural sciences have traditionally focused on simple systems that can be described with formal models and quantitative methods. In contrast, the humanities explore human systems, using primarily qualitative methods to understand them.
+There has long been an artificial divide between the natural sciences and the humanities — a divide that processism can bridge. The natural sciences have traditionally focused on simple systems that can be described with formal models and quantitative methods. In contrast, the humanities explore human systems, using primarily qualitative methods to understand them.
 
 Here, we visualize the modeling relation in more detail, emphasizing the roles humans play in encoding and decoding the model. This process is not just a technical task; it is deeply embedded in a social context. The ability to map between the natural system and its abstract model is a skill that is socially acquired, informed by cultural and intellectual traditions. It is through this social context that meaning is imparted to the models we create.
 
@@ -1171,7 +1139,7 @@ This is where the natural sciences and the humanities can find common ground. Th
 
 It wasn't until the mid-20th century that the formal modeling of complex systems was even considered feasible. The most sophisticated formalism for understanding complexity was developed in the field of relational biology, a discipline that aligns closely with the principles of processism.
 
-Today, there is a profound opportunity for the natural sciences and the humanities to collaborate. By combining quantitative and qualitative approaches, we can develop more comprehensive theories of complex human systems. Moreover, through action research—where theory is applied in real-world contexts—we can ensure that our models are not only intellectually rigorous but also practically relevant.
+Today, there is a profound opportunity for the natural sciences and the humanities to collaborate. By combining quantitative and qualitative approaches, we can develop more comprehensive theories of complex human systems. Moreover, through action research — where theory is applied in real-world contexts — we can ensure that our models are not only intellectually rigorous but also practically relevant.
 
 In this way, processism encourages a dialogue between the natural sciences and the humanities, recognizing that both are essential for understanding the rich complexity of the world we inhabit.
 
@@ -1181,15 +1149,15 @@ Explain this presentation as one perspective on processism, acknowledging its st
 ## 59.2. Animation
 Begin with a zoom-out from the final scene of the presentation, revealing the entire sequence of scenes as part of a larger, interconnected network. This network forms a web of relations, with each scene represented as a node connected by lines (representing the flow of concepts). Gradually, the view shifts to highlight the presentation itself as a single node within an even broader context, suggesting that this presentation is one of many possible perspectives on processism. The scene ends with the presentation’s visual elements morphing into different styles, illustrating their adaptability to other contexts and perspectives.
 ## 59.3. Narration
-As we conclude this journey through processism, it's important to recognize that what you've just experienced is one perspective—a particular way of exploring and understanding the rich and complex ideas of processism.
+As we conclude this journey through processism, it's important to recognize that what you've just experienced is one perspective — a particular way of exploring and understanding the rich and complex ideas of processism.
 
 This presentation is not a definitive or final statement on processism but rather a stepping stone, offering a structured approach to exploring these concepts. The strengths of this presentation lie in its ability to visualize abstract ideas, making them more accessible and engaging. By using a consistent visual language, we’ve aimed to build a coherent narrative that guides you through the intricate relationships and processes at the heart of processism.
 
-However, like any perspective, this presentation has its limitations. It focuses on specific aspects of processism, potentially overlooking others. The visual language we’ve developed here, while useful, is also an abstraction—it simplifies complex ideas to make them easier to grasp, but in doing so, it inevitably leaves out nuances and details that are crucial in a full exploration of processism.
+However, like any perspective, this presentation has its limitations. It focuses on specific aspects of processism, potentially overlooking others. The visual language we’ve developed here, while useful, is also an abstraction — it simplifies complex ideas to make them easier to grasp, but in doing so, it inevitably leaves out nuances and details that are crucial in a full exploration of processism.
 
-This leads us to the opportunities that lie ahead. The visual elements and concepts we've introduced are not fixed—they can be adapted, expanded, or even entirely reimagined to suit different contexts and perspectives. Processism itself encourages us to embrace change, to see each perspective as part of a larger, evolving process.
+This leads us to the opportunities that lie ahead. The visual elements and concepts we've introduced are not fixed — they can be adapted, expanded, or even entirely reimagined to suit different contexts and perspectives. Processism itself encourages us to embrace change, to see each perspective as part of a larger, evolving process.
 
-This presentation has provided a framework—a visual language—for engaging with processism. But like all frameworks, it is a tool, not a truth. Use it to guide your exploration, but don't hesitate to modify it, challenge it, or even set it aside in pursuit of your own path.
+This presentation has provided a framework — a visual language — for engaging with processism. But like all frameworks, it is a tool, not a truth. Use it to guide your exploration, but don't hesitate to modify it, challenge it, or even set it aside in pursuit of your own path.
 
 # 60. Scene: Conclusion
 ## 60.1. Objective
