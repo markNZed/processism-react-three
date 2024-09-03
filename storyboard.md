@@ -2,11 +2,11 @@ Dear Reviewer,
 
 Thank you for taking the time to review this draft storyboard for an animated presentation on Processism. This presentation aims to introduce the general adult public, particularly those in Western countries, to the complex and often abstract concepts of Processism. Processism offers a dynamic alternative to essentialist thinking, emphasizing the continuous evolution of entities and relationships rather than fixed, unchanging essences.
 
-Objective: The primary goal of this presentation is to build a visual language that makes these abstract concepts accessible and engaging. By leveraging tools like OBS for screen capture and Shotcut for editing, the presentation incorporates real-life examples and interactive elements to foster a deeper understanding of Processism. The final product will be wrapped in an app that allows users to pause the presentation and discuss key points with an LLM, creating opportunities for reflection and deeper engagement.
+The primary goal of this presentation is to build a visual language that makes these abstract concepts accessible and engaging. The presentation incorporates real-life examples and interactive elements to foster a deeper understanding of Processism. The final product will be wrapped in an app that allows users to pause the presentation and discuss key points with an LLM, creating opportunities for reflection and deeper engagement.
 
-Audience: This presentation is tailored for a general adult audience. However, given the abstract nature of some concepts, like "Non-Foundationalism" and "Paradox vs Not-knowing," the presentation strategically revisits more concrete examples before diving into these ideas. This approach aims to ground the audience in familiar territory before challenging them with more complex notions.
+This presentation is tailored for a general adult audience. However, given the abstract nature of some concepts, this approach aims to ground the audience in familiar territory before challenging them with more complex notions.
 
-Feedback Considerations: Your feedback will be invaluable in refining this presentation. Here are a few specific areas where your input would be particularly beneficial
+Your feedback will be invaluable in refining this presentation. Here are a few specific areas where your input would be particularly beneficial
 
 * Summary and Reflection Points
 The presentation currently includes dense sections, such as those on "Emergent Process" and "Heterarchy." Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
