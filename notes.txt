@@ -1,4 +1,7 @@
 
+Prompt: This storyboard is in development. Align the style of "Scene: "  with the precedent scenes. I will be adding further scenes later. Focus on explaining the conceptual mapping from the visual scene to the objective of the scene, rather than describing the visual itself. Maintain the order of the sections in the scene description. 
+
+Wrap the final animation in an App that allows pausing the presentation and discussing with an LLM
 How to animate complexity ? 
   A particle could go through 1st plane, through 2nd plane, loop back through 1st plane and modify structure of second plane. 
     This is cpef. clef is where the 2nd plane modifies the 1st plane.
@@ -14,20 +17,9 @@ How to animate complexity ?
       Relations between entities can modify structure
       Could have relations between clusters that can be understood like particles
         Show how a loop of entities can represent a loop of clusters
-  Distributed vs centralised process
-    Centralized is like having global variables
-    Distributed means the process has evolved without centralized coordination
-      Allows for uncoordinated processes
-  Perspective
-    Relations that allow for new entities ?
-    A "higher" entity that establihses relation from one cluster to a compoundEntity in a new cluster
   Staged development
     New levels of compoundEntity
     New relationships which gives new perspectives
-  Heterarchy
-    Entity at boundary connects to multiple depths
-  Impredicativity
-  Hierarchical impredicativity
   Anticipation
     One cluster that maintains a model of another cluster that it can speed up and use for prediction
       Then intervene so a particular outcome occurs
@@ -41,12 +33,6 @@ How to animate complexity ?
       A "black blob" that provides the "common sense" of how to update the model
   Life
     Show repair (swap in an entity - could be a loop)
-  Paradox
-    e.g. moral dilemma, behaving as if entities are stable
-    e.g. two perspectives that are valid and classify things in opposing ways - freedom vs security
-    But that is not paradox it is just a dilemma ?
-    Non-foundationalism can avoid internal paradox
-  Scale
 
   Family resemblance of process-centric philosophy
     Primacy of Change and Becoming
