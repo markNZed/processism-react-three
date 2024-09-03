@@ -17,7 +17,7 @@ The presentation aims to strengthen transitions by explicitly connecting how eac
 * Abstract Concepts
 Some concepts might be too abstract for a general audience. We've introduced these ideas by revisiting more concrete examples earlier in the presentation. Does this approach effectively prepare the audience, or do you have suggestions for further grounding these abstract concepts?
 
-    Interactive Elements
+Interactive Elements
 The storyboard is designed to be largely didactic but considers incorporating more interactive elements to engage viewers. How might we further enhance interactivity or invite viewers to reflect on their understanding?
 
 * Sectioning
@@ -52,9 +52,9 @@ General adult public in Western countries
 * Consider breaking the presentation into smaller, more digestible sections. 
 * At the end of the presentation, offer a brief recap of the key concepts
 * Potential further concepts:
-  *    Co-evolution
-  *    Intra-action
-  *    Reality is that which we do not want to change
+  *Co-evolution
+  *Intra-action
+  *Reality is that which we do not want to change
 
 # Scene: Overview
 ## Objective
@@ -151,7 +151,7 @@ In our visualization, we now remove the representation of the individual entitie
 Now, we can choose to see this new entity as a single, unified shape or as a collection of smaller entities interacting with each other. This highlights an important idea: every entity can be seen as being composed of a process. This was true for the first entity we looked at, and it will be true for any entity we depict.
 
 This leads us to a deeper question: Is there a fundamental layer to all these processes? We’ll return to that question after we’ve explored more concepts. For now, let’s keep in mind that, for all practical purposes, we can think of reality as being made up of processes all the way down.
-    Problems: The new entity should be a different color from the particles that compose it
+Problems: The new entity should be a different color from the particles that compose it
 
 # Scene: Levels
 ## Objective
@@ -369,20 +369,20 @@ Illustrate how time is relative to processes, demonstrating that different entit
 ## Video
 
 Introduction of Two Blobs (Entities):
-    Visuals: Begin with two distinct blobs, each representing a different entity. The first blob is larger, with intricate patterns that move slowly, while the second blob is smaller and has simpler, faster-moving patterns. These oscillations signify the internal processes of each entity.
-    Purpose: The slower oscillations of the larger blob represent a process that unfolds at a slower rate, whereas the faster oscillations of the smaller blob represent a quicker process. This sets up the idea that different entities experience time differently, relative to the dynamics of their internal processes.
+Visuals: Begin with two distinct blobs, each representing a different entity. The first blob is larger, with intricate patterns that move slowly, while the second blob is smaller and has simpler, faster-moving patterns. These oscillations signify the internal processes of each entity.
+Purpose: The slower oscillations of the larger blob represent a process that unfolds at a slower rate, whereas the faster oscillations of the smaller blob represent a quicker process. This sets up the idea that different entities experience time differently, relative to the dynamics of their internal processes.
 Relations Between Blobs:
-    Visuals: Draw dynamic lines connecting the two blobs. These lines pulsate and change color in sync with the oscillations of the blobs, showing the interactions between them.
-    Purpose: The changing lines represent the varying nature of their interactions, indicating that the timing of these interactions is relative to each entity’s internal processes.
+Visuals: Draw dynamic lines connecting the two blobs. These lines pulsate and change color in sync with the oscillations of the blobs, showing the interactions between them.
+Purpose: The changing lines represent the varying nature of their interactions, indicating that the timing of these interactions is relative to each entity’s internal processes.
 Time Relativity Visualization:
-    Visuals: Place synchronized clocks beside each blob. The clock next to the larger blob ticks slowly, while the clock next to the smaller blob ticks faster, directly correlating with their oscillation speeds.
-    Purpose: This visual comparison underscores that time, as experienced by each entity, is tied to the specific dynamics of their internal processes, rather than being a uniform constant.
+Visuals: Place synchronized clocks beside each blob. The clock next to the larger blob ticks slowly, while the clock next to the smaller blob ticks faster, directly correlating with their oscillation speeds.
+Purpose: This visual comparison underscores that time, as experienced by each entity, is tied to the specific dynamics of their internal processes, rather than being a uniform constant.
 Alignment of States:
-    Visuals: Periodically, the states of the two blobs align visually. When this happens, the connecting lines between the blobs glow or pulse together, highlighting these moments of synchronization despite their different rates of change.
-    Purpose: This demonstrates that while the blobs operate on different timescales, they can still align and interact at specific points, indicating that processes with varying temporal dynamics can synchronize.
+Visuals: Periodically, the states of the two blobs align visually. When this happens, the connecting lines between the blobs glow or pulse together, highlighting these moments of synchronization despite their different rates of change.
+Purpose: This demonstrates that while the blobs operate on different timescales, they can still align and interact at specific points, indicating that processes with varying temporal dynamics can synchronize.
 Zoom Out to System Level:
-    Visuals: Gradually zoom out to reveal that these blobs are part of a larger, more complex entity composed of multiple blobs and relations. This larger entity oscillates even more slowly, encompassing and influencing the smaller blobs within it.
-    Purpose: The zoom-out illustrates how different processes, each with its own sense of time, fit into a broader system. This reinforces the idea that time is contextual, shaped by the dynamics of processes within a larger framework.
+Visuals: Gradually zoom out to reveal that these blobs are part of a larger, more complex entity composed of multiple blobs and relations. This larger entity oscillates even more slowly, encompassing and influencing the smaller blobs within it.
+Purpose: The zoom-out illustrates how different processes, each with its own sense of time, fit into a broader system. This reinforces the idea that time is contextual, shaped by the dynamics of processes within a larger framework.
 ## Narration
 In processism, time is not a uniform, independent measure; it is intimately tied to the processes that define it. Consider these two entities—represented by oscillating blobs. Each follows the same sequence of states, but at different rates. From the perspective of the smaller, faster-oscillating blob, the larger one appears to move more slowly, and vice versa.
 
@@ -393,10 +393,10 @@ Zooming out, we observe that these entities are part of a larger system, where m
 # Scene: Boundaries and Permeability
 ## Objective
 
-    To explore how boundaries are defined, maintained, and perceived in processism, emphasizing their dynamic and permeable nature.
+To explore how boundaries are defined, maintained, and perceived in processism, emphasizing their dynamic and permeable nature.
 ## Video
 
-    A collection of particles connected by dynamic arcs representing relationships between them. These particles first assemble into distinct entities with clear boundaries. Afterward, the particles disassemble and then reassemble into a different set of entities, showing how boundaries shift depending on the relations that are emphasized.
+A collection of particles connected by dynamic arcs representing relationships between them. These particles first assemble into distinct entities with clear boundaries. Afterward, the particles disassemble and then reassemble into a different set of entities, showing how boundaries shift depending on the relations that are emphasized.
 ## Narration
 In processism, boundaries are not fixed or absolute but are instead reflections of the relationships we focus on and the sensitivity we bring to those relationships. For example, imagine grouping people by race, religion, or gender. Depending on which characteristics we highlight, different boundaries emerge, defining distinct entities.
 
@@ -431,10 +431,10 @@ In processism, this ability to shift between perspectives allows us to appreciat
 # Scene: Feedback Loops
 ## Objective
 
-    To illustrate the role of feedback loops in processism, explaining how positive feedback loops amplify changes within a system, while negative feedback loops stabilize or regulate the system.
+To illustrate the role of feedback loops in processism, explaining how positive feedback loops amplify changes within a system, while negative feedback loops stabilize or regulate the system.
 ## Video
 
-    Start with a simple process involving a few entities connected by dynamic relations. Introduce a positive feedback loop by showing one of these relations intensifying as it cycles back into the system, causing other relations to similarly intensify, eventually leading to a dramatic change in the system. Then, contrast this with a negative feedback loop where a relation initially intensifies but is then met with a balancing counter-relation that dampens the intensity, stabilizing the system.
+Start with a simple process involving a few entities connected by dynamic relations. Introduce a positive feedback loop by showing one of these relations intensifying as it cycles back into the system, causing other relations to similarly intensify, eventually leading to a dramatic change in the system. Then, contrast this with a negative feedback loop where a relation initially intensifies but is then met with a balancing counter-relation that dampens the intensity, stabilizing the system.
 ## Narration
 In processism, feedback loops play a crucial role in how processes evolve and self-regulate. Feedback loops can be understood as the cyclical effects of an action or change within a system, where the output of a process feeds back into the system, influencing future outputs.
 
@@ -447,11 +447,11 @@ Both positive and negative feedback loops are fundamental to understanding how p
 # Scene: Competition and Collaboration
 ## Objective
 
-    To illustrate how feedback loops operate within the dynamics of competition and collaboration, and how these interactions at a lower level contribute to stability or change at a higher level.
+To illustrate how feedback loops operate within the dynamics of competition and collaboration, and how these interactions at a lower level contribute to stability or change at a higher level.
 ## Video
 
-    The scene begins with a set of entities engaged in competition, each trying to outperform the others, symbolizing a competitive feedback loop where entities intensify their efforts in response to others. This competition initially appears chaotic, with entities pushing and pulling against each other. As the scene progresses, some entities begin to collaborate, forming alliances or groups that work together more efficiently. These collaborative groups create stabilizing feedback loops, where mutual support dampens the chaotic competition, leading to a more stable system at a higher level.
-    To make the connection explicit:
+The scene begins with a set of entities engaged in competition, each trying to outperform the others, symbolizing a competitive feedback loop where entities intensify their efforts in response to others. This competition initially appears chaotic, with entities pushing and pulling against each other. As the scene progresses, some entities begin to collaborate, forming alliances or groups that work together more efficiently. These collaborative groups create stabilizing feedback loops, where mutual support dampens the chaotic competition, leading to a more stable system at a higher level.
+To make the connection explicit:
 
 Competitive Feedback Loop: Start by showing entities in direct competition, with feedback loops amplifying their efforts (e.g., resources gained by one entity lead to it becoming stronger and more competitive, forcing others to intensify their efforts). The competition might cause fluctuations in the system, reflecting the instability of unchecked competition.
 
@@ -472,10 +472,10 @@ This interplay between competition and collaboration, driven by feedback loops, 
 # Scene: Nonlinearity and Unpredictability
 ## Objective
 
-    To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in processism.
+To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in processism.
 ## Video
 
-    Start with the entities from the "Competition and Collaboration" scene, showing how their interactions—now influenced by both competitive and collaborative dynamics—lead to nonlinear outcomes. Begin with a small change, such as one entity making a minor adjustment or a new entity entering the system. This triggers a series of cascading effects, with the system's behavior becoming increasingly complex and less predictable. Visualize this through a series of escalating events, where initially small interactions rapidly grow in intensity, eventually leading to a significant, unexpected change in the system’s overall state.
+Start with the entities from the "Competition and Collaboration" scene, showing how their interactions—now influenced by both competitive and collaborative dynamics—lead to nonlinear outcomes. Begin with a small change, such as one entity making a minor adjustment or a new entity entering the system. This triggers a series of cascading effects, with the system's behavior becoming increasingly complex and less predictable. Visualize this through a series of escalating events, where initially small interactions rapidly grow in intensity, eventually leading to a significant, unexpected change in the system’s overall state.
 ## Narration
 In processism, systems often exhibit nonlinear behavior, where small changes can lead to disproportionately large and sometimes unpredictable effects. This nonlinearity challenges our ability to predict outcomes, even when we understand the initial conditions.
 
@@ -492,10 +492,10 @@ By recognizing the nonlinear nature of these processes, we gain a deeper appreci
 # Scene: Resilience and Adaptation
 ## Objective
 
-    To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in processism.
+To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in processism.
 ## Video
 
-    Start with the system from the "Nonlinearity and Unpredictability" scene, now showing how it responds to the significant change triggered by cascading effects. Highlight different parts of the system as they either break down, resist, or adapt to the change. Show how some entities or relationships might fail or be eliminated, while others evolve or reorganize to cope with the new conditions. The video ends by zooming out to show the system achieving a new, stable state—different from its original state but resilient and adapted to the changes.
+Start with the system from the "Nonlinearity and Unpredictability" scene, now showing how it responds to the significant change triggered by cascading effects. Highlight different parts of the system as they either break down, resist, or adapt to the change. Show how some entities or relationships might fail or be eliminated, while others evolve or reorganize to cope with the new conditions. The video ends by zooming out to show the system achieving a new, stable state—different from its original state but resilient and adapted to the changes.
 ## Narration
 In processism, resilience is the ability of a system to absorb disturbances, adapt to change, and continue functioning. This resilience is crucial in a world where nonlinearity and unpredictability are the norm.
 
@@ -527,8 +527,7 @@ This concept of meta and abstraction expands our thinking about processes, allow
 
 # Scene: Relationalism vs relativism
 ## Objective
-
-    To distinguish between relationalism and relativism in processism, emphasizing how relationalism avoids the pitfalls of nihilism and the paradox of imposing a singular perspective while maintaining a coherent and meaningful approach to understanding systems.
+To distinguish between relationalism and relativism in processism, emphasizing how relationalism avoids the pitfalls of nihilism and the paradox of imposing a singular perspective while maintaining a coherent and meaningful approach to understanding systems.
 ## Narration
 When we explore different perspectives, it's easy to forget that we, too, are observing the system from a particular perspective. This unawareness can create the illusion that we have found the ultimate perspective, leading us to believe we see things as they truly are, free from bias.
 
@@ -545,7 +544,7 @@ By embracing relationalism, we maintain a meaningful and coherent approach to un
 # Scene: Aristotle's Four Causes
 ## Objective
 
-    To introduce and explain Aristotle's four causes—formal, material, efficient, and final—highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of processism.
+To introduce and explain Aristotle's four causes—formal, material, efficient, and final—highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of processism.
 ## Narration
 In pre-modern science, Aristotle's four causes provided a comprehensive framework for understanding causation. These causes—formal, material, efficient, and final—were central to how people explained the world around them.
 
@@ -607,7 +606,7 @@ As we continue our exploration, we will build on this concept of impredicativity
 # Scene: Complex and Simple Systems
 ## Objective
 
-    To draw a fundamental distinction between complex systems, which involve impredicative processes, and simple systems, which do not. The scene will explain how relational biology categorizes systems and how modern science has historically been more successful in modeling simple systems due to the limitations in mathematics and the exclusion of final causation.
+To draw a fundamental distinction between complex systems, which involve impredicative processes, and simple systems, which do not. The scene will explain how relational biology categorizes systems and how modern science has historically been more successful in modeling simple systems due to the limitations in mathematics and the exclusion of final causation.
 ## Narration
 A key insight of relational biology is the recognition that systems with impredicative processes represent a fundamentally different kind of system. These systems, characterized by their self-referential dynamics, are what we will refer to as complex systems.
 
@@ -647,7 +646,7 @@ To illustrate the analogy between the process of intelligence (learning) and the
 
 ## Video
 
-    Begin by showing an entity, such as a small plant or organism, that seeds another entity, which then grows, seeds another, and gradually fades away. Over several cycles of this process, introduce a subtle change in color or form with each new generation, symbolizing adaptation and learning. As the process continues, zoom out to reveal that the color changes represent a broader, evolving pattern.
+Begin by showing an entity, such as a small plant or organism, that seeds another entity, which then grows, seeds another, and gradually fades away. Over several cycles of this process, introduce a subtle change in color or form with each new generation, symbolizing adaptation and learning. As the process continues, zoom out to reveal that the color changes represent a broader, evolving pattern.
 
 ## Narration
 The example of the tree species adapting to its environment introduces a key insight from Robert Rosen's work on anticipatory systems: many of the major breakthroughs in science can be attributed to the method of analogy.
@@ -680,7 +679,7 @@ To illustrate the connection between post-structuralism and the concept of impre
 
 ## Video
 
-    The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
+The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
 
 ## Narration
 In the late 20th century, philosophy developed a concept known as post-structuralism. Post-structuralism emerged during a time of great debate in academia, particularly around whether human behavior is primarily conditioned by the environment or governed by innate, universal capacities, such as language, that develop in all healthy individuals.
@@ -731,7 +730,7 @@ Without delving into the complexities of quantum mechanics, we can still recogni
 In most human systems, the very act of observing is already a form of participation. Just as every performer needs an audience, the observer’s presence influences the system. The observer and the observed are intertwined, their interactions forming a dynamic, participatory process.
 
 By understanding this, we can appreciate that our observations are not just passive acts of recording reality—they are active engagements that shape and are shaped by the systems we observe. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
-    
+
 # Scene: Conscious vs Unconscious
 ## Objective
 Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of processism.
@@ -749,7 +748,7 @@ Our sensitivity to these processes, whether conscious or unconscious, determines
 This brings us to the idea of the 'self.' We can define the self narrowly, consisting only of the ego and the stories we tell ourselves about who we are. In this view, consciousness is limited to a small set of personal narratives and immediate concerns. But we can also define the self more broadly, as encompassing all the processes we are sensitive to—both conscious and unconscious.
 
 By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding consciousness. It's not just about what we are aware of at any given moment, but about how we navigate the vast network of processes that make up our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
-    
+
 # Scene: Subjective vs Unsubjective
 ## Objective
 Distinguish between subjective and unsubjective experiences, highlighting their implications for our understanding of the self.
@@ -953,7 +952,7 @@ It wasn't until the mid-20th century that the formal modeling of complex systems
 Today, there is a profound opportunity for the natural sciences and the humanities to collaborate. By combining quantitative and qualitative approaches, we can develop more comprehensive theories of complex human systems. Moreover, through action research—where theory is applied in real-world contexts—we can ensure that our models are not only intellectually rigorous but also practically relevant.
 
 In this way, processism encourages a dialogue between the natural sciences and the humanities, recognizing that both are essential for understanding the rich complexity of the world we inhabit.
-    
+
 # Scene: Meta-presentation
 ## Objective
 Explain this presentation as one perspective on processism, acknowledging its strengths, weaknesses, and opportunities. Introduce the idea that the visual language used can be adapted to other process-centric perspectives.
@@ -973,7 +972,7 @@ This presentation has provided a framework—a visual language—for engaging wi
 # Scene: Conclusion
 ## Objective
 Provide potential next steps
-    Narrative: 
+Narrative: 
 We have reached the end of this presentation on processism, one more step in your journey. You may choose to re-watch parts of the presentation and further explore the concepts with the AI tutor. You might also seek out other perspectives and paradigms on processism, and the AI tutor may help you find resources that best suit your context. 
 
 Remember, processism is far more than an intellectual understanding — it can lead to a new experience of self and a heightened sensitivity to relationships and processes that were previously hidden. This presentation can only point toward processism. True understanding comes through practice — engaging with the world in a process-centric way. Like learning to ride a bike, theory cannot replace hands-on experience. 
