@@ -8,19 +8,19 @@ Audience: This presentation is tailored for a general adult audience. However, g
 
 Feedback Considerations: Your feedback will be invaluable in refining this presentation. Here are a few specific areas where your input would be particularly beneficial
 
-    Summary and Reflection Points
+* Summary and Reflection Points
 The presentation currently includes dense sections, such as those on "Emergent Process" and "Heterarchy." Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
 
-    Transitions
+* Transitions
 The presentation aims to strengthen transitions by explicitly connecting how each new concept builds on or is informed by the previous one. We are curious if the narrative bridges effectively tie together the emerging complexities of structure and the relativity of processes in time.
 
-    Abstract Concepts
+* Abstract Concepts
 Some concepts might be too abstract for a general audience. We've introduced these ideas by revisiting more concrete examples earlier in the presentation. Does this approach effectively prepare the audience, or do you have suggestions for further grounding these abstract concepts?
 
     Interactive Elements
 The storyboard is designed to be largely didactic but considers incorporating more interactive elements to engage viewers. How might we further enhance interactivity or invite viewers to reflect on their understanding?
 
-    Sectioning
+* Sectioning
 The presentation is extensive, with numerous complex topics covered. Would you suggest breaking the presentation into smaller, more digestible sections? If so, how would you recommend structuring these sections?
 
 We also invite feedback on whether these additional concepts would add value to the presentation.
