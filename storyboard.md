@@ -9,7 +9,7 @@ This presentation is tailored for a general adult audience. However, given the a
 Your feedback will be invaluable in refining this presentation. Here are a few specific areas where your input would be particularly beneficial
 
 * Summary and Reflection Points
-The presentation currently includes dense sections, such as those on "Emergent Process" and "Heterarchy." Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
+The presentation currently includes dense sections, such as those on "Heterarchy" and "Emergent Process". Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
 
 * Transitions
 The presentation aims to strengthen transitions by explicitly connecting how each new concept builds on or is informed by the previous one. We are curious if the narrative bridges effectively tie together the emerging complexities of structure and the relativity of processes in time.
@@ -175,10 +175,12 @@ General adult public in Western countries
   - [33.3. Narration](#333-narration)
 - [34. Scene: Relationalism vs relativism](#34-scene-relationalism-vs-relativism)
   - [34.1. Objective](#341-objective)
-  - [34.2. Narration](#342-narration)
+  - [34.2. Animation](#342-animation)
+  - [34.3. Narration](#343-narration)
 - [35. Scene: Aristotle's Four Causes](#35-scene-aristotles-four-causes)
   - [35.1. Objective](#351-objective)
-  - [35.2. Narration](#352-narration)
+  - [35.2. Animation](#352-animation)
+  - [35.3. Narration](#353-narration)
 - [36. Scene: Modeling Relation](#36-scene-modeling-relation)
   - [36.1. Objective](#361-objective)
   - [36.2. Animation](#362-animation)
@@ -275,6 +277,8 @@ General adult public in Western countries
   - [59.3. Narration](#593-narration)
 - [60. Scene: Conclusion](#60-scene-conclusion)
   - [60.1. Objective](#601-objective)
+  - [60.2. Animation](#602-animation)
+  - [60.3. Narration](#603-narration)
 
 # 6. Scene: Overview
 ## 6.1. Objective
@@ -659,20 +663,21 @@ Both positive and negative feedback loops are fundamental to understanding how p
 ## 30.1. Objective
 To illustrate how feedback loops operate within the dynamics of competition and collaboration, and how these interactions at a lower level contribute to stability or change at a higher level.
 ## 30.2. Animation
-The scene begins with a set of entities engaged in competition, each trying to outperform the others, symbolizing a competitive feedback loop where entities intensify their efforts in response to others. This competition initially appears chaotic, with entities pushing and pulling against each other. As the scene progresses, some entities begin to collaborate, forming alliances or groups that work together more efficiently. These collaborative groups create stabilizing feedback loops, where mutual support dampens the chaotic competition, leading to a more stable system at a higher level.
-To make the connection explicit:
+The scene begins with a set of entities engaged in competition, each trying to outperform the others, symbolizing a competitive feedback loop where entities intensify their efforts in response to others. 
 
-Competitive Feedback Loop: Start by showing entities in direct competition, with feedback loops amplifying their efforts (e.g., resources gained by one entity lead to it becoming stronger and more competitive, forcing others to intensify their efforts). The competition might cause fluctuations in the system, reflecting the instability of unchecked competition.
+Competitive Feedback Loop: There are different colored particles arriving into a system. The particles are drawn to an entity of the same color. 
 
-Collaborative Feedback Loop: Next, introduce collaboration as entities form alliances. These alliances create stabilizing feedback loops, where collaborative efforts lead to shared resources, mutual support, and a balancing effect on the system. The scene shows how these collaborative feedback loops dampen the extremes of competition, reducing fluctuations and contributing to overall system stability.
-
-Multi-Level Interaction: Finally, zoom out to reveal that the system's higher-level stability (e.g., a balanced ecosystem, a stable economy) is the result of the interplay between competitive and collaborative feedback loops at a lower level. The system's resilience and stability are shown to emerge from this dynamic balance.
+Collaborative Feedback Loop: Each particle generates particle sof multiple colors. When the stream of particles lacks a color then the collaborative system continues and the competitive system slowly disapppears as the particles that arrive oscillate in color and entities fade.
 ## 30.3. Narration
 In processism, the dynamics of competition and collaboration are deeply interconnected with feedback loops, shaping the stability and evolution of systems.
 
-We begin by observing entities engaged in competition, each trying to outperform the others. This competition creates a feedback loop, where the success of one entity drives others to intensify their efforts. As competition escalates, it can lead to fluctuations and instability within the system, reflecting the dynamic but often chaotic nature of competitive feedback loops.
+We begin by observing entities engaged in competition which encourages specialization. Competition optimizes.
 
-However, within this competitive landscape, collaboration also emerges. Some entities form alliances, sharing resources and working together. These collaborative efforts create a different type of feedback loop — one that stabilizes the system. As entities collaborate, they provide mutual support, dampening the extremes of competition and leading to a more balanced and stable environment.
+Collaboration allows for resilience as we see a collaborative system that continues under changes in inputs to the system.
+
+There is a process at one time scale where competition is beneficial and a process at another time scales where collaboration is beneficial. Depending on where we place our attention we see the dynamics of competition or collaboration.
+
+What is competition at one level of abstraction can be seen as collaboration at another. For example, our immune system is competing and learning through that competition, at the scale of our body this leads to resilience.
 
 By zooming out, we see how these lower-level dynamics contribute to the system’s stability at a higher level. The competitive feedback loops drive innovation and change, while the collaborative feedback loops provide stability and resilience. Together, they create a dynamic balance that ensures the survival and success of the system as a whole.
 
@@ -682,13 +687,13 @@ This interplay between competition and collaboration, driven by feedback loops, 
 ## 31.1. Objective
 To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in processism.
 ## 31.2. Animation
-Start with the entities from the "Competition and Collaboration" scene, showing how their interactions — now influenced by both competitive and collaborative dynamics — lead to nonlinear outcomes. Begin with a small change, such as one entity making a minor adjustment or a new entity entering the system. This triggers a series of cascading effects, with the system's behavior becoming increasingly complex and less predictable. Visualize this through a series of escalating events, where initially small interactions rapidly grow in intensity, eventually leading to a significant, unexpected change in the system’s overall state.
+Two systems in parallel that evolve identically under identical inputs e.g .assembling and interacting from a stream of particles. Make a single change to that stream and see the effect being amplified.
 ## 31.3. Narration
 In processism, systems often exhibit nonlinear behavior, where small changes can lead to disproportionately large and sometimes unpredictable effects. This nonlinearity challenges our ability to predict outcomes, even when we understand the initial conditions.
 
-Building on the dynamics of competition and collaboration, let’s explore how a small change can ripple through a system, leading to significant, unexpected outcomes. Here, we see a minor adjustment — perhaps a slight shift in an entity’s behavior or the introduction of a new entity into the system. At first, the effect seems minimal, barely noticeable.
+Our animation shows two systems that develop under an identical stream of particles. We see thebehavior is very similar. Now if we repeat the experiment but change a single particle, we see how the systems radically diverge.
 
-But as this change interacts with other entities, it triggers a chain reaction. The initial disturbance amplifies, spreading throughout the system. What began as a small, localized event rapidly grows in intensity, leading to a dramatic transformation in the system’s overall state.
+As this small change interacts with other entities, it triggers a chain reaction. The initial disturbance amplifies, spreading throughout the system. What began as a small, localized event rapidly grows in intensity, leading to a dramatic transformation in the system’s overall state.
 
 This illustrates the concept of nonlinearity, where the relationships between entities are not straightforward or proportional. Instead, small actions or changes can have cascading effects, resulting in outcomes that are far larger and more complex than anticipated. This is often referred to as the 'butterfly effect,' where the flap of a butterfly’s wings could theoretically set off a chain of events leading to a storm across the world.
 
@@ -700,9 +705,8 @@ By recognizing the nonlinear nature of these processes, we gain a deeper appreci
 ## 32.1. Objective
 To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in processism.
 ## 32.2. Animation
-Start with the system from the "Nonlinearity and Unpredictability" scene, now showing how it responds to the significant change triggered by cascading effects. Highlight different parts of the system as they either break down, resist, or adapt to the change. Show how some entities or relationships might fail or be eliminated, while others evolve or reorganize to cope with the new conditions. The video ends by zooming out to show the system achieving a new, stable state — different from its original state but resilient and adapted to the changes.
 ## 32.3. Narration
-In processism, resilience is the ability of a system to absorb disturbances, adapt to change, and continue functioning. This resilience is crucial in a world where nonlinearity and unpredictability are the norm.
+Resilience is the ability of a system to absorb disturbances, adapt to change, and continue functioning. This resilience is crucial in a world where nonlinearity and unpredictability are the norm.
 
 After experiencing significant change, systems must respond — some parts may break down, while others adapt and evolve. Here, we see how different entities within the system react to the disturbances caused by nonlinear interactions. Some entities or relationships may fail, unable to withstand the intensity of change.
 
@@ -728,48 +732,50 @@ In processism, a 'meta-process' directs our attention to the processes through w
 
 We can imagine a meta-process as a process for choosing new perspectives, one that governs how we move from one way of seeing the world to another. By recognizing and understanding these meta-processes, we gain deeper insights into the underlying dynamics that shape the systems we observe.
 
-This concept of meta and abstraction expands our thinking about processes, allowing us to explore the intricate layers of reality that emerge as we shift our focus from the specific to the general, from the concrete to the abstract.
+This concept of meta and abstraction expands our thinking about processes, allowing us to explore the levels of reality that emerge as we shift our focus from the specific to the general, from the concrete to the abstract.
 
 # 34. Scene: Relationalism vs relativism
 ## 34.1. Objective
 To distinguish between relationalism and relativism in processism, emphasizing how relationalism avoids the pitfalls of nihilism and the paradox of imposing a singular perspective while maintaining a coherent and meaningful approach to understanding systems.
-## 34.2. Narration
+## 34.2. Animation
+## 34.3. Narration
 When we explore different perspectives, it's easy to forget that we, too, are observing the system from a particular perspective. This unawareness can create the illusion that we have found the ultimate perspective, leading us to believe we see things as they truly are, free from bias.
 
-This can lead to a dangerous fallacy: imagining that we have a 'view from nowhere,' where all perspectives are seen as relative and therefore beyond judgment. This is a common misconception, especially in naive interpretations of post-modernity, where the idea that 'everything is relative' can result in a kind of nihilism — a belief that no perspective has any real value or truth.
+This can lead to a dangerous fallacy: imagining that we have a 'view from nowhere,' where all perspectives are seen as relative and therefore beyond judgment. This is a common misconception in naive interpretations of post-modernity, where the idea that 'everything is relative' can result in a kind of nihilism — a belief that no perspective has any real value or truth.
 
-However, there is an alternative to this relativism: relationalism.
+However, there is an alternative to relativism and that is relationalism.
 
-Relationalism acknowledges that while we always see the world from a particular perspective, these perspectives are not isolated or meaningless. Instead, they are deeply interconnected and meaningful within the web of relations that form our reality. Relationalism allows us to understand that our perspectives are shaped by our relationships and interactions with others, and that these relationships give our perspectives context, meaning, and validity.
+Relationalism acknowledges that while we always see the world from a particular perspective, these perspectives are not isolated or meaningless. Instead, they are deeply interconnected and meaningful within the web of relations that form our reality. Relationalism allows us to understand that our perspectives are shaped by our relationships and interactions, and that these relationships give our perspectives context, meaning, and validity.
 
 In relationalism, we avoid the trap of believing all perspectives are equally valid in a vacuum. Instead, we recognize that perspectives are valuable within the relational networks that connect us. This approach avoids the nihilism of relativism and the paradox of imposing a supposedly 'neutral' or 'liberal' perspective as the ultimate truth. Relationalism underscores the interconnectedness of our perspectives, showing that meaning emerges from the web of interdependent relationships rather than from isolated, relative viewpoints.
 
-By embracing relationalism, we maintain a meaningful and coherent approach to understanding systems. We acknowledge the importance of different perspectives while understanding that they exist within a broader context of relationships, where meaning and truth are co-constructed from the story of the past, the present constraints, and future potential.
+By embracing relationalism, we maintain a meaningful and coherent approach to understanding systems. We acknowledge the importance of different perspectives while understanding that they exist within a broader context of relationships, where meaning and truth are co-constructed from stories of the past, present constraints, and stories of our future.
 
 # 35. Scene: Aristotle's Four Causes
 ## 35.1. Objective
 To introduce and explain Aristotle's four causes — formal, material, efficient, and final — highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of processism.
-## 35.2. Narration
+## 35.2. Animation
+## 35.3. Narration
 In pre-modern science, Aristotle's four causes provided a comprehensive framework for understanding causation. These causes — formal, material, efficient, and final — were central to how people explained the world around them.
 
 As modern science developed, three of these causes — formal, material, and efficient — were integrated into scientific practice. Formal causation refers to the blueprint or plan behind an object or process. Material causation describes the substance or material that makes up something. Efficient causation explains the actions or processes that bring something into being.
 
-However, final causation, which relates to the purpose or goal behind something, was largely excluded from modern science. This exclusion stemmed from its association with teleology, the idea that a higher purpose, often linked to divine will, directs outcomes. As modern science emerged, it did so through a process that included questioning and often rejecting religious explanations, leading to a division that, while reducing conflict between science and religion, also resulted in the creation of independent echo chambers.
+However, final causation, which relates to the purpose or goal behind something, was largely excluded from modern science. This exclusion stemmed from its association with teleology, the idea that a higher purpose, often linked to divine will, directs outcomes. As modern science emerged, it did so through a process that included questioning and rejecting religious explanations. The rejection of teleology left final causation largely absent from modern science.
 
-In our presentation, we can find all these causes:
+In this presentation, we can find all these four causes:
 
-* Formal causation is the plan that guided the construction of this presentation. It’s the blueprint that determined its structure and flow.
-* Efficient causation involves the actions of those who wrote the software, edited the video, and narrated the content. These are the processes that brought the presentation into existence.
-* Material causation refers to the medium through which this presentation is delivered — whether it's the storage of the video, the transmission across networks, or the computer screen on which you're watching.
+* Formal causation is the planning of this presentation. It’s the storyboard that determined its structure and flow.
+* Efficient causation involves the actions of those who wrote the software, edited the video, and narrated the content. These are the processes that molded the presentation.
+* Material causation is the medium through which this presentation is delivered — including the storage of the video, the transmission across networks, and the screen in front of you.
 * Final causation is the intention behind creating this presentation, the goal of introducing you to processism.
 
-If we ignore any of these four causes, we miss a full explanation of how and why this presentation exists.
+If we ignore any of these four causes, we miss a critical aspect of how and why this presentation exists.
 
-Modern science has traditionally shied away from 'why' questions, which would necessitate consideration of final causation. However, in the 20th century, this approach became increasingly inadequate as science struggled to define or explain systems demonstrating intelligence, life, or consciousness — areas where final causation plays a crucial role.
+Modern science has traditionally shied away from 'why' questions, which necessitate consideration of final causation. In the 20th century, this approach became increasingly inadequate as science struggled to define or explain systems demonstrating intelligence, life, and consciousness — areas where final causation plays a crucial role.
 
-In 1985, Robert Rosen published the first book on Anticipatory Systems, providing a scientific formalism for reintroducing final causation into modern science. Rosen’s work in relational biology forms much of the foundation for the ideas presented here, helping us bridge the gap between the material and the purposeful, and offering a fuller understanding of complex systems.
+In 1985, Robert Rosen published the first book on Anticipatory Systems, providing a scientific formalism for reintroducing final causation into modern science. Rosen’s work in relational biology forms much of the foundation for the ideas presented here, helping to bridge the gap between the material and the purposeful, and offering a fuller understanding of complex systems.
 
-By reintegrating final causation into our understanding, we can move beyond the limitations of a purely mechanistic view of the world and embrace a more comprehensive approach to science — one that includes purpose and intention as key elements in explaining the processes we observe.
+By reintegrating final causation into our understanding, we can move beyond the limitations of a purely mechanistic view of the world and embrace a more comprehensive approach — one that includes purpose and intention as key elements in explaining the processes we observe.
 
 # 36. Scene: Modeling Relation
 ## 36.1. Objective
@@ -779,7 +785,7 @@ Visualize a natural system (such as a biological organism) on one side and its a
 ## 36.3. Narration
 In relational biology, the modeling relation provides a formal framework for understanding how a system, such as a biological organism or a machine, corresponds to its abstract model. This relationship is established through mathematical mappings known as functors.
 
-Functors are special types of mappings that preserve the structure and behavior of the system as they are translated into the model. They ensure that the relationships and processes observed in the natural system are accurately reflected in the abstract model, allowing us to analyze and predict the system's dynamics with mathematical precision. In our diagram, we represent these functors as arrows between the system and the model.
+Functors are special types of mappings that preserve the structure and behavior of the system as they are translated into the model. They ensure that the relationships and processes observed in the system are accurately reflected in the abstract model, allowing us to analyze and predict the system's dynamics with mathematical precision. In our diagram, we represent these functors as arrows between the system and the model.
 
 Imagine a biological organism on one side and its abstract model on the other. Through the modeling relation, functors map the states and processes of the organism to corresponding elements in the model. This mapping allows us to understand the system in a new way — simplifying its complexity while retaining its essential features.
 
@@ -787,21 +793,21 @@ Importantly, the modeling relation is bidirectional. Insights or predictions der
 
 The modeling relation diagram is deceptively simple, and it's important to note that the process of finding the encoding and decoding functors is not elaborated here. We will expand upon this point in a later scene.
 
-Additionally, it’s important to recognize that the model is a formal model that correlates efficient causation in the system with logical implication in the model. This description aligns with the algorithmic formalisms that are often sought in the natural sciences.
+Additionally, it’s important to recognize that the model is a formal model that correlates efficient causation in the system with logical implication in the model. This description assumes the model is a formalisms like those sought in the natural sciences.
 
 # 37. Scene: Impredicativity
 ## 37.1. Objective
 This could be explored more explicitly as self-referential processes within the system, where entities or processes refer back to themselves.
 ## 37.2. Animation
-Visualize an entity where its output continuously becomes its own input, creating a self-referential loop. This can be represented by an arrow looping back on itself or an entity feeding into its own creation. Then, illustrate this further by showing an organism that, through a process, generates a component of itself that is necessary for its own repair. Highlight how this self-referential cycle is more complex than a typical feedback loop and involves the concept of impredicativity.
+Visualize an entity where its output continuously becomes its own input, creating a self-referential loop. This can be represented by an arrow looping back on itself or an entity feeding into its own creation. Then, illustrate this further by showing a system that, through a process, generates a component of itself that is necessary for its own repair. Highlight how this self-referential cycle is more complex than a typical feedback loop and involves the concept of impredicativity.
 ## 37.3. Narration
 In relational biology, the modeling relation helps clarify the role of models in understanding complex systems. A model is pure syntax — a formal description that requires a decoding process to translate it into meaningful predictions about the system it represents.
 
-Relational biology focuses particularly on living systems, where we encounter the limits of traditional models. Unlike machines, all living systems have a fundamental ability to repair themselves. This ability to self-repair is a critical difference between living organisms and the machines we can build. Despite advances in science, creating a system that can repair itself remains beyond our reach — we cannot create a truly living system. However, we can use the mathematics of relational biology to describe such systems through a formal model.
+Relational biology focuses particularly on living systems, where we encounter the limits of traditional models. Unlike machines, all living systems have a fundamental ability to repair themselves. This ability to self-repair is a critical difference between living organisms and the machines we can build. Despite advances in science, creating a system that can repair itself remains beyond our reach — we cannot create a living system. However, we can use the mathematics of relational biology to describe such systems through a formal model.
 
-This formal model uses the concept of impredicativity to describe the relationships that enable self-repair. Impredicativity is similar to self-referencing but involves a unique dynamic, where a system or process refers to itself in a way that can seem paradoxical. Specifically, impredicativity describes a situation where a system anticipates its own state and uses this prediction to create a component of itself.
+Theis formal model of a living systemuses the concept of impredicativity to describe the relationships that allow for self-repair. Impredicativity is similar to self-referencing but involves a unique dynamic, where a system or process refers to itself in a way that can seem paradoxical. Specifically, impredicativity describes a situation where a system anticipates its own state and uses this prediction to create a component of itself.
 
-For example, consider an organism's repair mechanism. This mechanism does not simply reference the organism; it actively participates in creating a part of the organism necessary for its survival. In this sense, the process of the repair mechanism is itself generated by a process that includes the component that will eventually fail. This cycle of creation and anticipation is what makes impredicativity distinct and more complex than a simple self-referencing feedback loop.
+For example, consider an organism's repair mechanism. This mechanism does not simply reference the organism; it actively participates in creating a part of the organism necessary for its survival. In this sense, the process of the repair mechanism is itself generated by a process that includes the component that will eventually fail. This cycle of anticipation and creation is what makes impredicativity distinct and more complex than a self-referencing feedback loop.
 
 In terms of Aristotle’s causes, we can see final causation at work, where the organism anticipates its own failure. We also observe a unique cycle of efficient causation, where the process that generates a component is itself generated by a process that involves that very component. This dynamic, self-referential process is formally described as impredicative.
 
@@ -811,15 +817,15 @@ As we continue our exploration, we will build on this concept of impredicativity
 ## 38.1. Objective
 To draw a fundamental distinction between complex systems, which involve impredicative processes, and simple systems, which do not. The scene will explain how relational biology categorizes systems and how modern science has historically been more successful in modeling simple systems due to the limitations in mathematics and the exclusion of final causation.
 ## 38.2. Narration
-A key insight of relational biology is the recognition that systems with impredicative processes represent a fundamentally different kind of system. These systems, characterized by their self-referential dynamics, are what we will refer to as complex systems.
+A key insight of relational biology is the recognition that systems with impredicative processes are a fundamentally different kind of system. These systems, characterized by their self-referential dynamics, are what we will refer to as complex systems.
 
-In contrast, systems that do not involve an impredicative loop are considered simple systems. Even if these systems have many parts, they remain simple in nature. When such systems become large or intricate, we refer to them as complicated systems — not complex. The distinction here is crucial: complicated systems may be detailed and multifaceted, but they lack the self-referential, impredicative processes that define true complexity.
+In contrast, systems that do not involve an impredicative loop are considered simple systems. Even if these systems have many parts, they remain simple in nature. When such systems become large or intricate, we refer to them as complicated — not complex. The distinction here is crucial: complicated systems may be detailed and multifaceted, but they lack the self-referential, impredicative processes that define true complexity.
 
 Modern science has been remarkably effective at modeling simple systems, largely because these systems can be accurately described and predicted using the mathematics of Newton’s calculus. Simple systems follow predictable patterns, and their behavior can often be reduced to straightforward cause-and-effect relationships.
 
-However, our understanding and modeling of complex systems have lagged behind. This is partly because we did not have the mathematical tools to describe impredicativity until the mid-20th century. Moreover, the founding of modern science included a deliberate banishment of final causation — the concept of purpose or goal-directed processes — from scientific explanations. Without considering final causation, traditional scientific methods struggled to fully capture the dynamics of complex, self-referential systems.
+However, our understanding and modeling of complex systems has lagged behind. This is partly because we did not have the math to describe impredicativity until the mid-20th century. Moreover, the founding of modern science included a deliberate banishment of final causation — the concept of purpose or goal-directed processes — from scientific explanations. Without considering final causation, traditional scientific methods struggled to fully capture the dynamics of complex, self-referential systems.
 
-As we move forward, understanding this distinction between simple and complex systems will be essential. It will help us appreciate the limitations of traditional models and the necessity of new approaches, particularly in the study of living organisms and other systems where self-referential processes play a critical role.
+As we move forward, understanding this distinction between simple and complex systems will be essential. It will help us appreciate the limitations of traditional ways of thinking and the necessity of new approaches, particularly in the study of living systems and other systems where self-referential processes play a critical role.
 
 # 39. Scene: Anticipation 
 ## 39.1. Objective
@@ -827,11 +833,11 @@ The ability of a system to predict future states and act accordingly, through ma
 ## 39.2. Animation
 Show one cluster maintaining a smaller, faster-moving model of another cluster. This model could simulate future states and then feed back into the system to influence real-time decisions.
 ## 39.3. Narration
-Anticipation is the process by which a system predicts future states and acts based on these predictions. Here, we see a cluster maintaining an internal model of another part of the system. This model simulates potential outcomes, guiding the cluster's actions to ensure it remains adaptive and responsive to changes.
+Anticipation is the process by which a system predicts future states of a system and acts based on these predictions. In this animation we see a cluster maintaining an internal model of another system. This model simulates potential outcomes and guides the cluster's actions to ensure it remains adaptive and responsive to changes.
 
-An example of this behavior is seen in deciduous trees, which measure the average duration of daylight to predict the arrival of autumn. This internal mechanism allows the tree to shed its leaves before the cold weather arrives, conserving energy. A comprehensive model of the tree would include this anticipatory mechanism, illustrating how the tree prepares for seasonal changes.
+An example of this behavior is seen in deciduous trees, which measure the average duration of daylight to predict the arrival of autumn. This internal mechanism allows the tree to shed its leaves before the cold weather arrives, conserving energy. A comprehensive model of the tree would include this anticipatory mechanism, illustrating how the tree anticipates seasonal changes.
 
-Robert Rosen's book Anticipatory Systems (1985) was the first trans-disciplinary study that formalized the generic nature of anticipation across various domains, such as complexity, artificial intelligence, sociology, and biology. Rosen's relational biology provides a formal model of anticipation that explains how mechanisms can rehabilitate Aristotle's concept of final causation without appealing to supernatural powers.
+Robert Rosen's book Anticipatory Systems, published in 1985, was the first trans-disciplinary study that formalized a generic concept of anticipation. Rosen draws analogies across domains, such as complexity, artificial intelligence, sociology, and biology. Rosen uses relational biology to provide a formal model of anticipation. This explains how mechanisms realize anticipation and rehabilitates Aristotle's concept of final causation into fields of science without appealing to supernatural powers.
 
 # 40. Scene: Intelligence
 ## 40.1. Objective
@@ -839,9 +845,9 @@ The system’s ability to learn and adapt to changes
 ## 40.2. Animation
 Introduce a "black blob" entity that represents an adaptive process, monitoring changes and updating the system’s models. This entity could be shown interacting with different parts of the system, making adjustments in response to observed changes.
 ## 40.3. Narration
-Intelligence in a system is its ability to learn and adapt to changes in its environment. This is achieved through ongoing monitoring and updating of internal models. Here, we see an adaptive process — represented by a 'black blob'—actively interacting with different parts of the system, making adjustments in response to observed changes.
+Intelligence in a system is an ability to learn and adapt to changes in the system's environment. This is achieved through ongoing monitoring and updating of internal models. Here, we see an adaptive process — represented by a 'black blob' — actively interacting with different parts of the system, making adjustments in response to observed changes.
 
-In the earlier example of the deciduous tree, we can expand the timescale of the processes we consider to observe this adaptive intelligence at work through the evolution of the tree species. For instance, as climate change alters environmental conditions, species of trees may modify their behavior to continue predicting autumn accurately, ensuring their survival. This illustrates how intelligence, as an adaptive process, enables systems to remain resilient and responsive to new challenges. 
+In the earlier example of the deciduous tree, we can expand the timescale of the processes we consider. Froma  broader timescale we see intelligence at work through the evolution of the deciduous tree species. For instance, as climate change alters environmental conditions, species of trees may modify their behavior to continue predicting autumn accurately to ensure their survival. This illustrates how intelligence, as an adaptive process, enables systems to remain resilient and responsive to new challenges. 
 
 # 41. Scene: Evolution as Learning
 ## 41.1. Objective
@@ -849,13 +855,13 @@ To illustrate the analogy between the process of intelligence (learning) and the
 ## 41.2. Animation
 Begin by showing an entity, such as a small plant or organism, that seeds another entity, which then grows, seeds another, and gradually fades away. Over several cycles of this process, introduce a subtle change in color or form with each new generation, symbolizing adaptation and learning. As the process continues, zoom out to reveal that the color changes represent a broader, evolving pattern.
 ## 41.3. Narration
-The example of the tree species adapting to its environment introduces a key insight from Robert Rosen's work on anticipatory systems: many of the major breakthroughs in science can be attributed to the method of analogy.
+The example of the tree species adapting to its environment introduces a key insight in Robert Rosen's work on anticipatory systems: many of the major breakthroughs in science can be attributed to the method of analogy.
 
-One of the most famous examples of analogical thinking in science is Albert Einstein's development of the theory of relativity. Einstein was deeply influenced by James Clerk Maxwell's equations, which described how electric and magnetic fields propagate as waves at the speed of light. By drawing an analogy between these equations and the nature of space and time, Einstein revolutionized our understanding of the universe.
+One of the most famous examples of analogical thinking in science is Albert Einstein's development of the theory of relativity. Einstein was deeply influenced by James Maxwell's equations, which described how electric and magnetic fields propagate as waves at the speed of light. By drawing an analogy between these equations and the nature of space and time, Einstein revolutionized our understanding of the universe.
 
-In relational biology, the focus is on modeling the structure of relations and processes, rather than material composition. This perspective allows us to see the process of learning occurring at diverse scales and levels. Just as we see a tree species 'learning' to anticipate seasonal changes, we can observe similar processes of learning in cultures, organizations, individual organisms, and even simple creatures like worms.
+In relational biology, the focus is on modeling the structure of relations and processes, rather than the material composition of systems. This perspective allows us to see the process of learning occurring at diverse scales and levels. Just as we see a tree species 'learning' to anticipate seasonal changes, we can observe similar processes of learning in cultures, organizations, individual organisms, and even simple creatures like worms.
 
-For instance, the gradual color changes in our visual metaphor reflect how a species evolves over time, learning to better adapt to its environment. Similarly, a culture or an organization learns and adapts to changing circumstances, much like how an individual learns from experience.
+For instance, the gradual color changes in our animation reflect how a species evolves over time, learning to better adapt to its environment. Similarly, a culture or an organization learns and adapts to changing circumstances, much like how an individual learns from experience.
 
 By understanding the processes of complex systems in one domain, we can potentially transfer that learning to another domain. The parallels between evolution and learning demonstrate how intelligence itself can be seen as an emergent property of systems, evolving over time and across different scales.
 
@@ -865,13 +871,13 @@ To convey the idea that information is a process rather than a static essence.
 ## 42.2. Animation
 Two similar particles are sent to two different entities. Upon receiving the particles, the entities change to different colors, illustrating how they interpret the same "information" differently.
 ## 42.3. Narration
-The discussions around intelligence and learning provide a natural segue into the concept of information. From the perspective of processism, information is not something static or intrinsic — it's not a state, but a process.
+The earlier discussion about intelligence and learning provides a segway into the concept of information. From the perspective of processism, information is not something static or intrinsic — it's not a state, but a process.
 
 Consider two similar particles, each carrying what we might assume to be the same information. These particles are sent to two different entities. But rather than reacting in the same way, each entity processes the information differently, resulting in them changing to different colors.
 
-If we limit our attention to the present moment, we might think the information is simply in the particles themselves. However, if we expand the scale of our consideration, we see that information is far more dynamic. The information was encoded by an intelligence, and it must be decoded by an intelligence as well. Furthermore, these intelligences have participated in processes that allow them to interpret the information in analogous but not identical ways.
+If we limit our attention to the present moment, we might think the information is simply in the particles themselves. However, if we expand the boundary of our atetntion, we see that information is far more dynamic. The information was encoded by an intelligence, and it must be decoded by an intelligence as well. Furthermore, these intelligences have participated in processes that allow them to interpret the information in analogous but not identical ways.
 
-This reveals that information is not just a static essence that exists independently; it’s a process that unfolds over time, involving encoding, transmission, and decoding. The meaning of the information emerges from the interactions between the entities and their histories, rather than being inherent in the particles themselves. This understanding shifts our view from seeing information as a fixed quantity to recognizing it as an ongoing, dynamic process that evolves as it moves through different systems and contexts.
+This reveals that information is not a static essence that exists independently; it’s a process that unfolds over time, involving encoding, transmission, and decoding. The meaning of the information emerges from the interactions between the entities and their histories, rather than being inside a particular entity. This understanding shifts our view from seeing information as a fixed quantity to recognizing it as an ongoing, dynamic process.
 
 # 43. Scene: Hierarchical Impredicativity
 ## 43.1. Objective
@@ -879,17 +885,15 @@ To illustrate the connection between post-structuralism and the concept of impre
 ## 43.2. Animation
 The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
 ## 43.3. Narration
-In the late 20th century, philosophy developed a concept known as post-structuralism. Post-structuralism emerged during a time of great debate in academia, particularly around whether human behavior is primarily conditioned by the environment or governed by innate, universal capacities, such as language, that develop in all healthy individuals.
+In the late 20th century, philosophy developed a concept known as post-structuralism. Post-structuralism emerged during a time of great debate in academia, the debate centered on human behavior as conditioned by the environment or governed by innate, universal capacities, such as language.
 
-Post-structuralism challenged the notion of fixed structures, whether in language, society, or the mind. Instead, it introduced the idea that these structures are fluid, dynamic, and often self-referential, leading to a more complex understanding of human behavior and social systems.
+Post-structuralism challenged the notion of fixed structures, whether in language, society, or the mind. Instead os looking for internal or external structures, post-structuralism introduced the idea that structures are fluid, dynamic, and often self-referential, leading to a more complex understanding of human behavior and social systems.
 
-This idea of fluid, self-referential structures aligns with the concept of impredicativity in relational biology. Impredicativity describes situations where a process or entity is defined in terms of itself, creating a hierarchical loop. In such a loop, higher-level structures are influenced by and simultaneously shape lower-level processes, resulting in a dynamic, recursive relationship.
-
-For example, consider an individual within a society. The individual's behavior is shaped by social norms, but these norms are themselves influenced by the collective behaviors of individuals. This creates a loop of influence, where society and the individual continuously redefine each other.
+This idea of fluid, self-referential structures aligns with the concept of impredicativity in relational biology. Impredicativity describes situations where a process or entity is defined in terms of itself. Multiple impredicative loops can form hierarchies. For example, consider an individual within a society. The individual's behavior is shaped by social norms, but these norms are themselves influenced by the collective behaviors of individuals. This creates a loop of influence, where society and the individual continuously redefine each other.
 
 In this visual metaphor, we see how an entity exists within another entity, each influencing the other in a self-referential cycle. This hierarchical impredicativity echoes the post-structuralist view that structures are not fixed but are constantly being redefined by the very elements they contain.
 
-Post-structuralism and the concept of hierarchical impredicativity both challenge traditional, linear models of causation. They invite us to consider how complex systems — whether social, biological, or cognitive — are shaped by recursive, self-referential processes. These ideas expand our understanding of how entities relate to one another within hierarchies and how these relationships are far more intricate and interdependent than they might first appear. This opens up possibilities for resolving paradox such as individual agency within society, and extended cognition where the process of thinking extends beyond the boundary of an embodied brain.  
+Post-structuralism and the concept of hierarchical impredicativity both challenge traditional, linear models of causation. They invite us to consider how complex systems — whether social, biological, or cognitive — are shaped by recursive, self-referential processes. These ideas expand our understanding of how entities relate to one another within hierarchies and how these relationships are far more interdependent than they might first appear. This opens up possibilities for resolving paradox such as individual agency within society, and extended cognition where the process of thinking extends beyond the boundary of an embodied brain.
 
 # 44. Scene: Agency
 ## 44.1. Objective
@@ -899,17 +903,17 @@ Visuals that represent different scales of systems, from the microscopic (e.g., 
 A dynamic animation that shows an individual as both influenced by and influencing these multiple levels, moving fluidly between them.
 Visuals that shift from cosmic scales to the personal, illustrating the interconnectedness of all things from stardust to individual experiences.
 ## 44.3. Narration
-The concept of hierarchical impredicativity offers profound insights into how we can reimagine the notion of agency. We can even expand this concept to heterarchical impredicativity, accounting for the diverse levels of systems in which we participate and the intricate web of relations that emerge from these interactions.
+The concept of hierarchical impredicativity offers profound insights for reimagining the notion of agency. We can even expand this concept to heterarchical impredicativity, accounting for the diverse levels of systems in which we participate and the intricate web of relations that emerge from these interactions.
 
-Consider that the structure of our present context is a reflection of processes from the past. We can choose to see ourselves as active participants in processes that predate our physical birth — processes that stretch back through generations, even to the origins of life itself. Every animal on this planet is literally part of the same family tree, sharing a common ancestry that connects us all.
+Consider that the structure of our present context is a reflection of past processes. We can choose to see ourselves as active participants in processes that predate our physical birth — processes that stretch back through generations, even to the origins of life itself. Every animal on this planet is literally part of the same family tree, sharing a common ancestry that connects us all.
 
-This perspective extends beyond the physical to the metaphysical: we are part of processes that will continue long after our physical bodies cease to exist. These processes span across time, connecting us to both our ancestors and our descendants, linking the present moment to a vast continuum of existence.
+This perspective extends beyond the physical to the immaterial: we are part of processes that will continue long after our physical bodies cease to exist. These processes span across time, connecting us to both our ancestors and our descendants, linking the present moment to a vast continuum of existence.
 
 Yet, within this vast network, there are also processes unique to our personal experience — moments of spontaneity and creativity that are unpredictable and unique to each individual. These personal processes are a source of freedom that cannot be fully controlled or predicted, offering us a form of agency that is deeply personal and intimately connected to the larger systems we inhabit.
 
-By understanding agency through the lens of hierarchical and heterarchical impredicativity, we can appreciate the complex interplay between the deterministic forces that shape us and the freedom we exercise within those constraints. Our actions are not merely the product of external forces; they are also the result of our participation in a dynamic, evolving network of relationships that spans the micro to the macro, the personal to the universal.
+By understanding agency through the lens of hierarchical impredicativity, we can appreciate the complex interplay between the deterministic forces that shape us and the freedom we exercise within those constraints. Our actions are not merely the product of external forces; they are also the result of our participation in a dynamic, evolving network of relationships that spans the micro to the macro, the personal to the universal.
 
-In this way, agency is not just about conscious experience — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence.
+In this way, agency is not just about conscious decisions — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence.
 
 # 45. Scene: Role of Observation and Participation
 ## 45.1. Objective
@@ -917,15 +921,13 @@ Illustrate how the observer is inherently part of the system they observe, empha
 ## 45.2. Animation
 The scene begins with an entity positioned outside of a system, observing it from a distance. The system under observation is initially presented as a closed loop of interacting entities. As the observation continues, additional entities and relations fade into view, revealing a larger system that includes both the observer and the system being observed. The observer is now shown as an active participant within this larger, interconnected system.
 ## 45.3. Narration
-Modern science has long relied on the concept of the independent observer, someone who stands apart from the system they study, analyzing it from an objective distance. For much of history, this perspective left human experience and consciousness beyond the reach of scientific inquiry. However, with the emergence of fields like consciousness studies, our understanding has begun to evolve, challenging the notion of the truly independent observer.
+Modern science has long relied on the concept of the independent observer, someone who stands apart from the system they study, analyzing it from an objective distance. For much of history, this perspective left human experience and consciousness beyond the reach of scientific inquiry. However, with the emergence of fields like social psychology, our understanding has begun to evolve, challenging the notion of the truly independent observer.
 
-In the early 20th century, quantum theory revolutionized physics by demonstrating that the act of observation can fundamentally alter the behavior of particles. Contemporary physics has come to accept phenomena that seem to defy common sense, where the observer’s role cannot be easily separated from the system under observation.
+The idea of an independent observer is largely an illusion. In reality, it is only by ignoring broader processes that we can even imagine such independence. As we fade in the broader context in this scene, it becomes clear that what we observe, how we observe it, the language we use to describe it, and what we choose to omit all play a role in shaping the observations we make.
 
-Without delving into the complexities of quantum mechanics, we can still recognize that the idea of an independent observer is largely an illusion. In reality, it is only by ignoring the intricate web of relationships that we can even imagine such independence. As we fade in the broader context in this scene, it becomes clear that what we observe, how we observe it, the language we use to describe it, and what we choose to omit all play a role in shaping the observation itself.
+In most human systems, the very act of observing is already a form of participation. Just as every performer needs an audience, the observer’s presence influences the system. If we take one step back we can see these processses at work in our own lives.
 
-In most human systems, the very act of observing is already a form of participation. Just as every performer needs an audience, the observer’s presence influences the system. The observer and the observed are intertwined, their interactions forming a dynamic, participatory process.
-
-By understanding this, we can appreciate that our observations are not just passive acts of recording reality — they are active engagements that shape and are shaped by the systems we observe. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
+We can appreciate that our observations are not just passive acts of recording reality — they are active engagements that shape and are shaped by the systems we particpate in. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
 
 # 46. Scene: Conscious vs Unconscious
 ## 46.1. Objective
@@ -935,15 +937,15 @@ Begin with a circular "viewfinder" in the center of the screen. Inside this circ
 ## 46.3. Narration
 Consciousness is a subject of intense debate, especially in fields like philosophy and neuroscience. We won’t attempt to solve the 'hard problem of consciousness' here, but we can explore a useful way to distinguish between conscious and unconscious processes within the framework of processism.
 
-Imagine that this circular view represents our conscious awareness. Inside this circle, we can see relationships and processes clearly — they are within our conscious focus. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
+Imagine that this circular area represents our conscious awareness. Inside this circle, we can see relationships and processes clearly — they are within our conscious awareness. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
 
 Most of the processes we participate in are unconscious. These include the automatic functions within our bodies, the habitual behaviors in our relationships, and the broader dynamics within society and the environment. We’re often unaware of these processes unless something draws them into our conscious focus — such as a sudden change or a deliberate act of attention.
 
 Our sensitivity to these processes, whether conscious or unconscious, determines the range of options available to us. When we expand our awareness — enlarging the circle, so to speak — we increase our sensitivity to more processes, allowing us to engage with a broader range of relationships and influences. Conversely, when our focus narrows, we become more limited in what we can perceive and respond to.
 
-This brings us to the idea of the 'self.' We can define the self narrowly, consisting only of the ego and the stories we tell ourselves about who we are. In this view, consciousness is limited to a small set of personal narratives and immediate concerns. But we can also define the self more broadly, as encompassing all the processes we are sensitive to — both conscious and unconscious.
+This brings us to the idea of the 'self.' We can define the self narrowly, consisting only of the ego and the stories we tell ourselves about who we are. In this view, consciousness is limited to a small set of personal narratives and immediate concerns. But we can also define the self more broadly, as encompassing all the processes we are sensitive to — both consciously and unconsciously.
 
-By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding consciousness. It's not just about what we are aware of at any given moment, but about how we navigate the vast network of processes that make up our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
+By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding oursleves. It's not just about what we are aware of at any given moment, but about how we navigate the vast network of processes that make up our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
 
 # 47. Scene: Subjective vs Unsubjective
 ## 47.1. Objective
@@ -952,13 +954,13 @@ Distinguish between subjective and unsubjective experiences, highlighting their 
 ## 47.3. Narration
 Our everyday conscious experience typically includes a sensation of subjectivity — the awareness that the experience I am having is uniquely my own. This is a fundamental aspect of what most of us consider to be consciousness: an experience of being present in relation to things that are distinctly not me.
 
-For many, this sense of subjectivity is so intrinsic to their experience that it might seem strange to even mention it. Conscious experience is usually synonymous with the feeling of being an 'I'—a distinct observer, interacting with the world.
+For many, this sense of subjectivity is so intrinsic to experience that it might seem strange to distinguish it. Conscious experience is usually synonymous with the feeling of being someone — a distinct observer, interacting with the world.
 
-However, if we examine the process of conscious experience in great detail — using, for example, specific meditation techniques designed to give insight into the nature of awareness — we may stumble upon an extraordinary discovery. It is possible to have an experience without the sensation of subjectivity.
+However, if we examine the process of conscious experience in great detail — using, for example, specific meditation techniques intended to provide insight into the process of awareness — we stumble upon an extraordinary fact. It is possible to have an experience without the sensation of subjectivity.
 
-In such an unsubjective experience, there is still awareness, but the usual sense of 'I'—the feeling of being a separate observer — is absent. This isn't a case of simply not noticing subjectivity; rather, in the moment, the distinction between self and other, observer and observed, dissolves. Only upon reflecting on the experience afterward might one realize that something was profoundly different — that the experience lacked the usual subject-object distinction.
+In an unsubjective experience, there is still awareness, but the usual sense of 'I' — the feeling of being a separate observer — is absent. This isn't a case of simply not noticing subjectivity; rather, in the moment, the distinction between self and other, observer and observed, dissolves. Only upon reflecting on the experience afterward might one realize that something was profoundly different — that the experience lacked the usual subject-object distinction.
 
-This phenomenon has profound implications for our understanding of the self. It suggests that subjectivity — the sense of being a distinct 'I'—is not a necessary condition for conscious experience. Instead, it may be one possible mode of experience among others.
+This phenomenon has profound implications for our understanding of the self. It suggests that subjectivity — the sense of being a distinct 'I' — is not a necessary condition for conscious experience. Instead, it is one mode of experience among others.
 
 By recognizing that consciousness can exist without subjectivity, we open the door to a deeper exploration of what it means to be aware and how we construct our sense of self. This challenges the conventional view that the self is a fixed, central observer and instead invites us to consider the self as a more fluid and dynamic process, capable of both subjective and unsubjective experiences.
 
@@ -967,30 +969,30 @@ By recognizing that consciousness can exist without subjectivity, we open the do
 To present the self as an emergent process rather than a fixed essence, challenging the notion of an "authentic self".
 ## 48.2. Animation
 ## 48.3. Narration
-Our exploration of processism brings us to one of its most profound insights: the understanding of the self not as a fixed essence but as a complex, emergent process.
+Our exploration of processism brings us to a profound insight: the understanding of the self not as a fixed essence but as a complex, emergent process.
 
-The idea of the 'authentic self' is a powerful and pervasive concept in many cultures. It suggests that within each of us lies a core, unchanging identity — something pure and true that defines who we really are. This concept can be comforting, offering a sense of stability and purpose. It’s easy to see how someone could have an experience that feels deeply aligned with their conception of an 'authentic self.'
+The idea of the 'authentic self' is a powerful and pervasive concept in Western culture. It suggests that within each of us lies a core, unchanging identity — something pure and true that defines who we really are. This concept can be comforting, offering a sense of stability and purpose. We can have experiences that are deeply aligned with our conception of an 'authentic self.'
 
 However, processism invites us to question this notion. If the self is a process, constantly shaped and reshaped by our interactions, experiences, and relationships, then the 'authentic self' is not a fixed entity waiting to be discovered. Instead, it is something that emerges and evolves over time, influenced by the contexts we inhabit.
 
-As the context changes, so too does the self. The pursuit of an unchanging 'authentic self' can become a never-ending quest, leading to frustration and disappointment when the self inevitably shifts in response to new circumstances. The idea that we must find something that will not stand still may even lead to a sense of failure or depression when that stability proves elusive.
+As the context changes, so too does the self. The pursuit of an unchanging 'authentic self' can become a never-ending quest, leading to frustration and disappointment when the self inevitably shifts in response to new circumstances. The idea that we must find something may even lead to a sense of failure or depression when that stability proves elusive.
 
-By embracing the self as an emergent process, we open ourselves to a more fluid and dynamic understanding of identity. This perspective allows us to appreciate the richness and diversity of our experiences without the pressure to conform to a static idea of who we are supposed to be. Instead of searching for a fixed 'authentic self,' we can explore the ongoing process of becoming, recognizing that our identity is continuously co-created through our interactions with the world around us. It may refelct more about our context and our practices.
+By embracing the self as an emergent process, we open ourselves to a more fluid and dynamic understanding of identity. This perspective allows us to appreciate the richness and diversity of our experiences without the pressure to conform to a static idea of who we are supposed to be. Instead of searching for a fixed 'authentic self,' we can explore the ongoing process of becoming, recognizing that our identity is continuously co-created through our interactions with the world around us. Our self is a reflection of our context and our practices.
 
 # 49. Scene: Non-Self
 ## 49.1. Objective
 Introduce the concept of "non-self" as a nuanced understanding of the self, reflecting its emergent and interconnected nature.
 ## 49.2. Animation
 ## 49.3. Narration
-If we understand the self as an emergent process, shaped by complex, heterarchical impredicativities, it may seem incoherent to speak of 'the self' as a singular, static entity. At the same time, we cannot ignore the reality of our habits, biases, strengths, and weaknesses, which seem to define our identity. This apparent contradiction raises the question: How can we reconcile the fluid nature of the self with the tangible experience of being an individual?
+If we understand the self as an emergent process, shaped by complex, heterarchical impredicativities, it may seem incoherent to speak of 'the self' as a singular, static entity. At the same time, we cannot ignore the reality of our habits, biases, strengths, and weaknesses, which seem to define an identity. This apparent contradiction raises the question: How can we reconcile the fluid nature of the self with the tangible experience of subjectivity?
 
-Several philosophical and spiritual traditions offer a concept that captures this nuance: 'non-self.' The idea of non-self does not deny the existence of individual characteristics or experiences, but it challenges the notion that the self is the center of the universe, the fixed point around which everything else revolves.
+Several philosophical and spiritual traditions offer a concept that captures this nuance: that of 'non-self.' The idea of non-self does not deny the existence of individual characteristics and experiences, but it challenges the notion that the self is the center of the universe, the fixed point around which everything else revolves.
 
-In these traditions, the self is seen as an aspect of the many processes we are participating in, rather than a separate, independent entity. The self is not an isolated 'thing' but a dynamic intersection of relationships, continuously influenced by and influencing the processes around it.
+In these traditions, the self is understood as a perspective on the many processes we are participating in, rather than a separate, independent entity. The self is not an isolated 'thing' but a dynamic intersection of relationships, continuously influenced by and influencing the processes around it.
 
-This concept of non-self invites us to shift our perspective — from seeing the self as the protagonist of our story to recognizing it as one of many interconnected elements within a larger, ever-changing narrative. It encourages us to let go of the idea that the self is something to be preserved or defended at all costs and to embrace the reality that we are part of something much larger and more fluid than we often realize.
+This concept of non-self invites us to shift our perspective — from seeing the self as the protagonist of our story to recognizing it as one of many interconnected elements within a larger, ever-changing reality. It encourages us to let go of the idea that the self is something to be preserved or defended at all costs and to embrace the reality that we are part of something much larger and more fluid than we realized.
 
-By embracing non-self, we can begin to see ourselves not as isolated individuals but as participants in a vast network of relationships, where our identity is not fixed but constantly evolving in response to the world around us. This shift in perspective can lead to a deeper understanding of our place in the world, fostering a sense of connection and interdependence that transcends the limitations of the individual self.
+By embracing non-self, we can begin to see ourselves not as isolated individuals but as participants in a vast network of relationships, where our identity is not fixed but constantly evolving in response to the world around us. This shift in perspective can lead to a deeper understanding of our place in the world, fostering a sense of connection and interdependence that transcends the limitations of the individual isolated self.
 
 # 50. Scene: Relations Modifying Structure (Identity)
 ## 50.1. Objective
@@ -1000,15 +1002,17 @@ The video starts with a few distinct entities connected by lines representing re
 ## 50.3. Narration
 Building on our exploration of the self as an emergent process, we can generalize this concept to understand how relations between entities can modify the very structure of a system, influencing its identity and contributing to emergent behavior.
 
-In traditional machines, identity is fixed. The structure of the machine is determined by engineering plans — this is the formal cause. The machine is constructed through the efficient cause of the technicians' efforts and operates through material causes that constrain the system to its predetermined function.
+In traditional machines, identity is fixed. The structure of the machine is determined by engineering plans — this is the formal cause. The machine is built through the efficient cause of the technicians' efforts and operates through material causes that constrain the system to its predetermined function.
 
-However, in a complex system, the identity of the system is not fixed but is continuously reshaped by the processes within it. For example, a complex system can change its structure through processes like learning and repair, which are impredicative in nature. This means that the system's identity evolves as it interacts with its environment and as relationships within the system change.
+In a complex system, the identity of the system is not fixed but is continuously reshaped by the processes that maintain it. For example, a complex system can change its structure through processes like learning and repair, which are impredicative in nature. This means that the system's identity evolves as it interacts with its environment and as relationships within the system change.
 
-This is a fundamental difference between simple and complex systems. In a simple system, identity is stable and predictable; the system's behavior is a direct outcome of its fixed structure. But in a complex system, where the structure can change, identity is not stable, and predictability is always in question. One way to define complexity is to recognize the profound implications of a system composed of parts with unstable identities.
+This is a fundamental difference between simple and complex systems. In a simple system, identity is stable and predictable; the system's behavior is a direct outcome of its fixed structure. But in a complex system, where the structure can change, identity is not stable, and predictability is always in doubt.
 
 As the relationships between entities evolve, they can lead to the emergence of new structures, new identities, and new behaviors that were not predictable from the original configuration of the system. This dynamic nature of complex systems challenges our traditional understanding of identity, suggesting that who or what something 'is' can change over time, influenced by the relationships it forms and the processes it undergoes.
 
-In this view, identity is not a fixed essence but a process — one that is continually shaped and reshaped by the relationships and interactions within a system. This understanding of identity as fluid and emergent opens up new possibilities for how we understand and engage with complex systems, whether in biology, society, or our own sense of self.
+In this view, identity is not a fixed essence but a process — one that is continually shaped and reshaped by the relationships and interactions within a system. This understanding of identity as fluid and emergent opens up new possibilities for how we understand and engage with complex systems, whether in biology, society, or our own sense of self. 
+
+The risks of treating a comlpex system as a simple system become apparent. We know that our modelsof complex systems are themeselves simepl, so we know our actions will have unforseen consequences. Therefore large actions based on simple models risk large unpredicatable consequences. We would be wise to act in such as way that sees undesirable consequences before they become dominant.
 
 # 51. Scene: Staged Development
 ## 51.1. Objective
@@ -1018,15 +1022,15 @@ The video begins with a simple compound entity composed of a few basic parts. As
 ## 51.3. Narration
 Consider a system that evolves or learns. As it progresses, it doesn’t simply accumulate more parts or experiences — it undergoes a transformation through distinct stages of development. Each stage introduces new levels of complexity, abstraction, and perspectives.
 
-In the early stages, the system might focus on mastering basic skills, acquiring experiences, and forming foundational concepts. This phase of accumulation builds the groundwork for future growth. As these elements accumulate, they reach a point where they can be restructured into new patterns, leading to the emergence of a higher level of abstraction.
+In the early stages, a person might focus on mastering basic skills, acquiring experiences, and forming foundational concepts. This phase of accumulation builds the groundwork for future growth. As these elements accumulate, they reach a point where they can be restructured into new patterns, leading to the emergence of a higher level of abstraction.
 
-At this new level, the system can now categorize, coordinate, and integrate the previously acquired skills, experiences, and concepts in novel ways. The system is no longer just a collection of parts — it has become something more, with new capabilities and perspectives that were not possible in the earlier stages.
+At this new level, the system can now categorize, coordinate, and integrate the previously acquired skills, experiences, and concepts in novel ways. The system has become something more, with new capabilities and perspectives that were not possible in the earlier stages.
 
 While the specific content of each stage is not pre-determined, and development is not entirely predictable, we can observe a meta-pattern of staged development. This understanding can guide us in our own growth and in fostering the development of others.
 
-Recognizing stages of development helps us appreciate that complexity and higher-order thinking do not emerge all at once. They are the result of a process, where each stage builds on the previous one, leading to increasingly sophisticated levels of understanding and capability.
+Recognizing stages of development helps us appreciate that complexity and higher-order thinking do not emerge all at once. They are the result of a process, where each stage builds upon the previous stages, leading to increasingly sophisticated levels of understanding and capability.
 
-This concept of staged development not only applies to individual learning and growth but also to the evolution of systems in nature, society, and technology. By understanding this process, we can better navigate the complexities of our own development and contribute to the growth of the systems we are part of.
+This concept of staged development not only applies to individual learning and growth but also to the evolution of systems in nature and society. By understanding this process, we can better navigate the complexities of our own development and contribute to the growth of the systems we are part of.
 
 # 52. Scene: Paradigm
 ## 52.1. Objective
@@ -1034,13 +1038,13 @@ Introduce the concept of different paradigms as distinct epistemologies, emphasi
 ## 52.2. Animation
 The video begins by showing a central entity with multiple lines branching out, each representing different perspectives. These perspectives, while varied, are all within the same paradigm and do not contradict each other. As the scene progresses, the image splits into two separate sections, each representing a different paradigm. The perspectives within each section are coherent internally but contradictory when compared across paradigms. The final visual shows these paradigms side by side, with a line illustrating the tension between them.
 ## 52.3. Narration
-In our exploration of processism, we've seen how different perspectives can emerge within a system. Within a single paradigm — an overarching framework that shapes how we understand the world — many different perspectives can coexist. These perspectives might focus on different aspects of a system or entity, and while they highlight different roles or features, they do not fundamentally contradict each other. For example, within a single scientific paradigm, different theories may complement one another, providing various insights into a complex system.
+In our exploration of processism, we've seen how different perspectives can emerge within a system. Now we can introduce the concept of a paradigm. Within a single paradigm — an overarching framework that shapes how we understand the world — many different perspectives can coexist. These perspectives might focus on different aspects of a system or entity, and while they highlight different roles or features, they do not fundamentally contradict each other. For example, within a single scientific paradigm, different theories may complement one another, providing various insights into a complex system.
 
-However, the situation changes when we shift from one paradigm to another. Paradigms are distinct epistemologies, each providing a different set of assumptions, values, and methods for understanding reality. When perspectives emerge from different paradigms, they can appear contradictory, not because one is right and the other is wrong, but because they are coherent within different frameworks.
+However, the situation changes when we shift from one paradigm to another. Paradigms are distinct epistemologies, each providing a different set of assumptions, values, and methods for understanding reality. When perspectives emerge from different paradigms, they can appear contradictory, not because one is right and the other is wrong, but because they are coherent within different contexts.
 
-Consider the example of economic ideologies. In a socialist paradigm, the belief is that markets must be regulated to protect people from the excesses of capitalism. Conversely, in a liberal paradigm, the view is that markets should be deregulated to protect people from the overreach of the state. These perspectives are coherent within their respective paradigms but contradict each other when compared directly.
+Consider the example of economic ideologies. In a socialist paradigm, the belief is that markets must be regulated to protect people from the excesses of capitalism. Conversely, in a liberal paradigm, the view is that markets should be deregulated to protect people from the overreach of the state. These perspectives are coherent within their respective paradigms but contradict each other.
 
-The same principle applies in the scientific domain. Newton's laws of gravity provided an accurate and coherent framework for understanding the physical world for centuries. However, Einstein's theory of relativity, emerging from a different paradigm, made predictions that contradicted Newton's. The scientific method, with its emphasis on empirical evidence and predictive accuracy, eventually favored Einstein's paradigm. But this transition wasn't immediate; it required a shift in how scientists understood the universe, and this shift was better understood through a sociological lens.
+The same principle applies in the scientific domain. Newton's laws of gravity provided an accurate and coherent framework for understanding the physical world for centuries. Then Einstein's theory of relativity, emerging from a different paradigm, made predictions that contradicted Newton's. The scientific method, with its emphasis on empirical evidence and predictive accuracy, eventually favored Einstein's paradigm. But this transition wasn't immediate; it required a shift in how scientists understood the universe, and this shift is better understood through a sociological lens.
 
 When a new paradigm emerges, it often challenges established knowledge, leading to a period of tension and uncertainty. During this time, the new paradigm may not yet have the empirical support to fully displace the old one, and the debate over which paradigm should prevail can become as much about values and beliefs as about facts and evidence.
 
@@ -1058,8 +1062,6 @@ Imagine an entity within this system, distinct in its role, perhaps represented 
 
 Process management is closely related to metacognition. It involves the intentional facilitation of processes to ensure that they achieve their intended outcomes. Just as a conductor guides an orchestra to create harmonious music, process management within a system involves guiding and adjusting the various processes to maintain overall coherence and effectiveness.
 
-By understanding metacognition and process management, we gain insight into how complex systems can remain resilient and adaptive. These higher-order processes are crucial for maintaining balance, ensuring that the system not only functions but thrives amidst the constant flux and change that characterizes reality.
-
 # 54. Scene: Language
 ## 54.1. Objective
 Introduce dynamic ontology
@@ -1071,7 +1073,7 @@ Language is more than just words. It encompasses any use of symbols for communic
 
 Our language directs our attention and mediates our experience. English, for example, is well-suited for describing reality from an essentialist perspective, where things have fixed, unchanging essences. However, it is less equipped to express the fluid, dynamic nature of reality as seen through a process-centric lens.
 
-Recognizing language as a dynamic process allows us to become more aware of how it shapes our perception and understanding of reality. The meanings we ascribe to words and symbols are not inherent but are intimately tied to the contexts in which they are used and the processes they are part of.
+Recognizing language as a dynamic process allows us to become more aware of how it shapes our perception and understanding of reality. The meanings we ascribe to words and symbols are not inherent but are intimately tied to the contexts in which they are used and the processes we are part of.
 
 Because language is fundamentally about communication, it is inherently public, extending even our most private experiences into the social sphere. When we speak, gesture, or create, we participate in a shared process of meaning-making.
 
@@ -1121,7 +1123,7 @@ Relational ethics suggests that ethical decisions emerge from the ongoing proces
 
 By embracing relational ethics, we move away from rigid, one-size-fits-all rules and instead cultivate an awareness of the ever-changing dynamics of our relationships. We become more responsive, adaptable, and compassionate in our decision-making, acknowledging that our actions are part of a larger, interconnected process. Relational ethics can help create the space to address conflicts between different paradigms. 
 
-In this way, process philosophy invites us to see ethics not as a set of static principles but as a living, evolving practice — one that is deeply rooted in our sensitivity to the relationships that define our lives.
+In this way, process philosophy invites us to see morality not as a set of static principles but as a living, evolving practice — one that is deeply rooted in our sensitivity to the relationships that define our lives.
 
 # 58. Scene: Bridging the natural sciences and the humanities
 ## 58.1. Objective
@@ -1133,11 +1135,11 @@ There has long been an artificial divide between the natural sciences and the hu
 
 Here, we visualize the modeling relation in more detail, emphasizing the roles humans play in encoding and decoding the model. This process is not just a technical task; it is deeply embedded in a social context. The ability to map between the natural system and its abstract model is a skill that is socially acquired, informed by cultural and intellectual traditions. It is through this social context that meaning is imparted to the models we create.
 
-However, when we turn our attention to complex systems — those systems that involve self-referential processes, emergent behavior, and multiple interacting levels — we recognize that no single model can capture the full complexity. We know that if our model is purely algorithmic, it cannot fully express the intricate dynamics of a complex system.
+However, when we turn our attention to complex systems — those systems that involve self-referential processes, emergent behavior, and multiple interacting levels — we recognize that no single model can capture the full complexity. We know that if our model is purely algorithmic, it cannot  express the impredicative dynamics of a complex system.
 
-This is where the natural sciences and the humanities can find common ground. The humanities, with their focus on qualitative methods, offer insights into the subjective and relational aspects of human systems that quantitative models alone cannot capture. Meanwhile, the formal modeling techniques of the natural sciences provide a structured approach to understanding certain aspects of complexity.
+This is where the natural sciences and the humanities can find common ground. The humanities, with a focus on qualitative methods, offer insights into the subjective and relational aspects of human systems that quantitative models cannot capture. Meanwhile, the formal modeling techniques of the natural sciences provide a structured approach to understanding certain aspects of complex systems.
 
-It wasn't until the mid-20th century that the formal modeling of complex systems was even considered feasible. The most sophisticated formalism for understanding complexity was developed in the field of relational biology, a discipline that aligns closely with the principles of processism.
+It wasn't until the mid-20th century that the formal modeling of complex systems was even considered feasible. The most sophisticated formalism for understanding complexity is developed in the field of relational biology, a discipline that aligns closely with the principles of processism.
 
 Today, there is a profound opportunity for the natural sciences and the humanities to collaborate. By combining quantitative and qualitative approaches, we can develop more comprehensive theories of complex human systems. Moreover, through action research — where theory is applied in real-world contexts — we can ensure that our models are not only intellectually rigorous but also practically relevant.
 
@@ -1162,9 +1164,10 @@ This presentation has provided a framework — a visual language — for engagin
 # 60. Scene: Conclusion
 ## 60.1. Objective
 Provide potential next steps
-Narrative: 
-We have reached the end of this presentation on processism, one more step in your journey. You may choose to re-watch parts of the presentation and further explore the concepts with the AI tutor. You might also seek out other perspectives and paradigms on processism, and the AI tutor may help you find resources that best suit your context. 
+## 60.2. Animation
+## 60.3. Narration
+We have reached the end of this presentation on processism, one small step in your journey. You may choose to re-watch parts of the presentation and further explore the concepts with the AI tutor. You might also seek out other perspectives and paradigms on processism, and the AI tutor may help you find resources that best suit your context. 
 
-Remember, processism is far more than an intellectual understanding — it can lead to a new experience of self and a heightened sensitivity to relationships and processes that were previously hidden. This presentation can only point toward processism. True understanding comes through practice — engaging with the world in a process-centric way. Like learning to ride a bike, theory cannot replace hands-on experience. 
+Remember, processism is far more than an intellectual understanding — it can lead to a new experience of self and a heightened sensitivity to relationships and processes that were previously unconscious. This presentation can only point toward processism. True understanding comes through practice — engaging with the world in a process-centric way. Like learning to ride a bike, theory cannot replace hands-on experience. 
 
 Processism is a journey, not a destination. We are traveling together, and we are more than you and I can possibly imagine. While there are stages of development we are better served by mastering our level, rather than skipping over it in an imaginary race to the horizon. May you find more sensitive ways to see, feel, and engage with the world around you.
