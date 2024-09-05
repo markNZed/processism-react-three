@@ -1,4 +1,4 @@
-664
+Each scene has dependecies and can link to a number of thoer concepts. Could allow the user to make that choice. Can also highlight scenes that have alreday been observed.
 
 Prompt: This storyboard is in development. Align the style of "Scene: "  with the precedent scenes. I will be adding further scenes later. Focus on explaining the conceptual mapping from the visual scene to the objective of the scene, rather than describing the visual itself. Maintain the order of the sections in the scene description. 
 
