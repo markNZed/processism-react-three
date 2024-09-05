@@ -89,6 +89,7 @@ System-Based Board Games:
 
 * Interactive Visualizations
 "The Scale of the Universe" – an interactive website that visualizes scale from subatomic particles to galaxies, showing interconnectedness.
+https://htwins.net/scale2/
 * Educational Platforms
 "Khan Academy – Systems Thinking" – offers interactive lessons on systems and complexity.
 
@@ -105,3 +106,28 @@ System-Based Board Games:
 "Game of Life" (Cellular Automaton) – demonstrates emergence and complex behavior from simple rules.
 * Simulation Software
 "NetLogo" – a multi-agent programmable environment for simulating natural and social systems.
+
+# Personal Practices
+
+* Insight meditation (Vipassana)
+* Holotropic Breathwork
+* Dynamic Meditation
+* Psychedelics
+* Ecosomatic Practices
+* Exploring the natural world
+
+# Social Practices
+
+* Learn a langauge
+* Living in another civilization
+* Cultural Exchange Programs
+* Collective Decision-Making
+* Collaborative Art 
+* Create a learning circle
+
+# Study
+
+* Social Constructionism
+* Relational Biology
+* Philosophy of Process
+* Cultural Anthropology
