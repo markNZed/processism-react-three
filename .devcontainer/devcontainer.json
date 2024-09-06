@@ -4,8 +4,8 @@
     "cpus": 4
   },
   "waitFor": "onCreateCommand",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y gnupg2",
   "updateContentCommand": "npm install",
-  "postCreateCommand": "",
   "postAttachCommand": {
     "server": "npm start"
   },
