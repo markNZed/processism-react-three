@@ -11,7 +11,7 @@ const useAppStore = create(devtools(subscribeWithSelector((set, get) => ({
   pausePhysics: false,
   setPausePhysics: (pausePhysics) => set(() => ({ pausePhysics })),
   components: {},
-  physicsDebug: true,
+  physicsDebug: false,
   // Allows for calls like: setOption('pausePhysics', (prev) => !prev);
   setOption: (key, value) => set((state) => ({
     ...state,

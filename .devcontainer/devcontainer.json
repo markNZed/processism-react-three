@@ -22,5 +22,8 @@
       "onAutoForward": "openPreview"
     }
   },
-  "forwardPorts": [3000]
+  "forwardPorts": [3000],
+  "mounts": [
+    "source=${localEnv:HOME}/.vscode/openpgp-keys,target=/home/node/.vscode/openpgp-keys,type=bind"
+  ]
 }

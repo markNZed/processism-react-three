@@ -37,7 +37,7 @@ const Complexity = React.forwardRef(({id}, ref) => {
     const [showTwo, setShowTwo] = useState(false);
 
     const initialCreationPathOne = [[0, 0, 50], [0, 0, 25]];
-    const initialCreationPathTwo = [[0, 0, 50], [0, 0, -5]];
+    const initialCreationPathTwo = [[0, 0, 20], [0, 0, -5]];
 
     const storeOne = useMemo(() => useStoreEntity(), []);
     const storeTwo = useMemo(() => useStoreEntity(), []);
@@ -142,13 +142,13 @@ const Complexity = React.forwardRef(({id}, ref) => {
         ],
     ];
 
-    entityCountsOne = [3, 3, 3, 3];
+    //entityCountsOne = [3, 3, 3, 3];
     //entityCountsTwo = [];
     //entityCountsTwo = [3, 3, 3];
 
     // Build entityCountsOne from symmetrical config
     let entityCountsSymmetricalOne;
-    entityCountsSymmetricalOne = [3, 3, 3]
+    //entityCountsSymmetricalOne = [3, 3, 3]
     
     function buildEntityCounts(entityCountsSymmetrical) { 
         const entityCountsOne = [];   
