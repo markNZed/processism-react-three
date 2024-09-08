@@ -1,6 +1,8 @@
 {
     "recommendations": [
-      "ugosan.vscode-openpgp"
+      "ugosan.vscode-openpgp",
+      "yzhang.markdown-all-in-one",
+      "codeium.codeium"
     ],
   }
   

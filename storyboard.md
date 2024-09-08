@@ -76,22 +76,26 @@ General adult public in Western countries
     - [7.3.1. Objective](#731-objective)
     - [7.3.2. Animation](#732-animation)
     - [7.3.3. Narration](#733-narration)
-  - [7.4. Scene: Introduction to Relations](#74-scene-introduction-to-relations)
+  - [7.4. Scene: Introduction to Events](#74-scene-introduction-to-events)
     - [7.4.1. Objective](#741-objective)
     - [7.4.2. Animation](#742-animation)
     - [7.4.3. Narration](#743-narration)
-  - [7.5. Scene: Exploring the Properties of Relations](#75-scene-exploring-the-properties-of-relations)
+  - [7.5. Scene: Introduction to Relations](#75-scene-introduction-to-relations)
     - [7.5.1. Objective](#751-objective)
     - [7.5.2. Animation](#752-animation)
     - [7.5.3. Narration](#753-narration)
-  - [7.6. Scene: Process](#76-scene-process)
+  - [7.6. Scene: Exploring the Properties of Relations](#76-scene-exploring-the-properties-of-relations)
     - [7.6.1. Objective](#761-objective)
     - [7.6.2. Animation](#762-animation)
     - [7.6.3. Narration](#763-narration)
-  - [7.7. Scene: Complicated Relations](#77-scene-complicated-relations)
+  - [7.7. Scene: Process](#77-scene-process)
     - [7.7.1. Objective](#771-objective)
     - [7.7.2. Animation](#772-animation)
     - [7.7.3. Narration](#773-narration)
+  - [7.8. Scene: Complicated Relations](#78-scene-complicated-relations)
+    - [7.8.1. Objective](#781-objective)
+    - [7.8.2. Animation](#782-animation)
+    - [7.8.3. Narration](#783-narration)
 - [8. Section: Systems and Their Structure](#8-section-systems-and-their-structure)
   - [8.1. Objective](#81-objective)
   - [8.2. Scene: Accumulation](#82-scene-accumulation)
@@ -118,6 +122,10 @@ General adult public in Western countries
     - [8.7.1. Objective](#871-objective)
     - [8.7.2. Animation](#872-animation)
     - [8.7.3. Narration](#873-narration)
+  - [8.8. Scene: Structure \& Behavior](#88-scene-structure--behavior)
+    - [8.8.1. Objective](#881-objective)
+    - [8.8.2. Animation](#882-animation)
+    - [8.8.3. Narration](#883-narration)
 - [9. Section: Interplay of Structure and Change](#9-section-interplay-of-structure-and-change)
   - [9.1. Objective](#91-objective)
   - [9.2. Scene: Heterarchy](#92-scene-heterarchy)
@@ -306,7 +314,7 @@ General adult public in Western countries
 Provide an overview of the presentation at the level of sections thus demonstrating the notion of a part referencing the whole. The content has been split into sections which are outlined below:
 
 * Section: Relations and Processes
-  * Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes, which continuously shape and reshape our understanding of the world. These processes are the foundation upon which more complex systems emerge.
+  * Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes and the associated events.
 
 * Section: Systems and Their Structure
   * Building on the idea of relations, we’ll see how systems are formed through these interrelated processes. Systems are not fixed; they are fluid structures that evolve through the interaction of parts at different scales. This section will show how each part of a system is connected, influencing and being influenced by the whole, reinforcing that structure itself is a product of constant interaction.
@@ -351,7 +359,7 @@ We’ll be building a visual language to explain the concepts of processism. Thi
 
 # 7. Section: Relations and Processes
 ## 7.1. Objective
-Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes, which continuously shape and reshape our understanding of the world. These processes are the foundation upon which more complex systems emerge.
+Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes and the associated events.
 
 ## 7.2. Scene: Entity
 ### 7.2.1. Objective
@@ -367,6 +375,8 @@ For example, if this were a particle, it would be affected by quantum forces. If
 
 In processism, entities like this aren’t considered the most fundamental aspect of reality. Instead, we’ll see that the processes generating entities that are more important.
 
+Entities as abstractions of processes. They are not defined by a fixed essence but by their history of interactions and transformations. Each entity carries the cumulative effect of previous events.
+
 ## 7.3. Scene: Second Entity
 ### 7.3.1. Objective
 Introduction of multiple entities
@@ -381,24 +391,38 @@ You’ll notice that while the two entities look similar, they’re not identica
 
 Also, these entities are moving together on the same plane. This movement is another way to show their properties. For instance, the distance between them could represent how similar they are, rather than just physical distance.
 
-## 7.4. Scene: Introduction to Relations
+## 7.4. Scene: Introduction to Events
 ### 7.4.1. Objective
-Introduce the basic concept of a relation between two entities.
+Introduce the basic concept of an event
 ### 7.4.2. Animation
-An arc in the Z plane connects the centers of both entities, growing from the blue entity to the purple entity. An arc grows from the blue entity to the purple entity, with an arrow indicating the direction of the relation.
+An invisible arc in the Z plane connects the centers of both entities. A line grows out from the blue entity, following this arc, until it reaches a fraction of the arc’s length. The line then continues along the arc until it is absorbed into the purple entity.
 ### 7.4.3. Narration
+Now, let’s explore what happens when these entities interact. The line growing from the blue entity toward the purple one represents an event.
+
+Events refer to interactions. In this case, the event begins with the blue entity, follows the arc, and completes once it reaches the purple entity.
+
+This is how processes unfold over time. Events capture the moments where entities interact and change. They are critical points where entities evolve, their properties shift, and new possibilities emerge.
+
+## 7.5. Scene: Introduction to Relations
+### 7.5.1. Objective
+Introduce the basic concept of a relation between two entities.
+### 7.5.2. Animation
+An arc in the Z plane connects the centers of both entities, growing from the blue entity to the purple entity. An arc grows from the blue entity to the purple entity, with an arrow indicating the direction of the relation.
+### 7.5.3. Narration
 Let’s introduce the idea of a relation between two entities. Watch as an arc extends from the blue entity to the purple entity. This arc represents the relationship from the blue entity to the purple entity.
 
 Notice the arrow at one end, showing the direction of this connection. The arc curves through the third dimension, reminding us that a relation is different from the entities it connects. While the blue and purple shapes represent entities, this arc represents how they interact with each other.
 
+A relation is a concept that represents the history of events between entities and the potential for future events between entities. 
+
 A relation isn’t an entity by itself; instead, it’s how we observe and understand interactions within a system. These relations illustrate the interconnectedness of entities. In processism, entities do not stand alone; they are interdependent.
 
-## 7.5. Scene: Exploring the Properties of Relations
-### 7.5.1. Objective
+## 7.6. Scene: Exploring the Properties of Relations
+### 7.6.1. Objective
 Delve into the properties of relations, using the example of awareness and sensitivity.
-### 7.5.2. Animation
+### 7.6.2. Animation
 A second arc, this time a dotted line, grows from the purple entity back to the blue entity. A dotted line grows from the purple entity to the blue entity, following the same path as the previous arc.
-### 7.5.3. Narration
+### 7.6.3. Narration
 Now, let’s explore the properties of this relation. Imagine the blue entity is a person who sees the purple person. The solid arc represents this awareness — the blue person sees the purple person, but not the other way around.
 
 To make this clearer, we’ll add a dotted line from the purple entity back to the blue one. This dotted line represents the light reflecting from the purple person to the blue person’s eyes.
@@ -407,12 +431,12 @@ The different types of lines help us visualize different aspects of the relation
 
 One important point is that the blue person can relate to the purple person because they are aware of them. However, if the purple person isn’t aware of the blue one, they can’t enter into a relationship. This shows that our ability to form relations depends on our sensitivity to other entities.
 
-## 7.6. Scene: Process
-### 7.6.1. Objective
+## 7.7. Scene: Process
+### 7.7.1. Objective
 Distinguish between coordinated and uncoordinated processes and illustrate how processes represent sequences of relations within and between entities.
-### 7.6.2. Animation
+### 7.7.2. Animation
 Start with a single large entity becoming transparent to reveal the smaller entities within it. Show these smaller entities connected by lines representing their relationships. These connections begin to move in a repeating pattern, illustrating a coordinated process. Then, some lines fade or disconnect, showing uncoordinated processes where the movement becomes more chaotic. Finally, zoom out to see the entire system, with multiple coordinated and uncoordinated processes occurring simultaneously.
-### 7.6.3. Narration
+### 7.7.3. Narration
 In processism, a process is understood as a sequence of relations that we are sensitive to. Let’s explore what this means by examining how these relations play out within and between entities.
 
 First, we begin with a single large entity. As it becomes transparent, we reveal the smaller entities that make up this larger one. These smaller entities are connected by arcs, representing their relationships. As these connections start to move in a repeating pattern, we see an example of a coordinated process. This could be likened to the regular beating of a heart, where the cells work together in harmony to maintain a consistent rhythm.
@@ -425,12 +449,12 @@ It’s important to remember that in processism, an entity itself is understood 
 
 In summary, processes are sequences of relations that can be either coordinated, leading to predictable patterns, or uncoordinated, resulting in more unpredictable behavior.
 
-## 7.7. Scene: Complicated Relations
-### 7.7.1. Objective
+## 7.8. Scene: Complicated Relations
+### 7.8.1. Objective
 Demonstrate how relations between abstract entities can involve multiple components and levels of synchronization.
-### 7.7.2. Animation
+### 7.8.2. Animation
 Zoom into two intermediate entities that have multiple lines representing their relationship. These lines are synchronized, originating from various fundamental entities within each intermediate entity. Then, a single, thicker line appears from the center of each intermediate entity to represent the abstract, overarching relationship between them.
-### 7.7.3. Narration
+### 7.8.3. Narration
 Let’s explore the relationships between two entities. As we zoom in, you’ll notice that their interaction isn’t represented by just a single, simple connection. Instead, multiple lines appear, each one representing a different process occurring within these entities, but all these processes are synchronized.
 
 These synchronized arcs reflect the coordination happening inside each entity. For example, when two people interact, their relationship might involve spoken language, gestures, and even shared memories — all different aspects working together to form a connection.
@@ -467,13 +491,17 @@ How an entity can be composed of entities
 ### 8.3.2. Animation
 Fill in the space between the pentagon of blue entities to form a new blue shape
 ### 8.3.3. Narration
-When we notice an accumulation of entities, we often start thinking of them as a single, more abstract concept. For example, instead of focusing on each individual person, we might think of the group as a whole.
+When we notice an accumulation of entities, we often begin to think of them as a single, more abstract concept. For example, instead of focusing on each individual person, we might view the group as a whole.
 
-In our visualization, we now remove the representation of the individual entities within the group and join those entities on the boundary to form a new, single blue shape. This illustrates the concept of abstraction, where a new level of entity emerges through the relations within the group.
+In this visualization, we remove the individual representations of entities within the group and connect them at the boundary, forming a new, unified blue shape. This demonstrates abstraction — a new entity emerging from the interactions and relations of its smaller parts.
 
-Now, we can choose to see this new entity as a single, unified shape or as a collection of smaller entities interacting with each other. This highlights an important idea: every entity can be seen as being composed of a process. This was true for the first entity we looked at, and it will be true for any entity we depict.
+At this point, we have two perspectives: we can either see this as a single unified shape or as a collection of smaller entities interacting. This highlights an important idea — every entity can be understood as being composed of processes. This was true for the first entity we explored, and it holds true for any entity we depict.
 
-This leads us to a deeper question: Is there a fundamental layer to all these processes? We’ll return to that question after we’ve explored more concepts. For now, let’s keep in mind that, for all practical purposes, we can think of reality as being made up of processes all the way down.
+This leads us to a key question: is there a fundamental layer beneath all these processes? We’ll return to that later. For now, let’s remember that, for all practical purposes, reality can be viewed as processes all the way down.
+
+In processism, the concept of essence is reframed. Rather than being a fixed, timeless core, an entity’s essence is an abstraction of its past events. When entities share similar histories, abstractions help us map what we know about one entity to another with similar patterns.
+
+Abstraction simplifies and helps us make sense of complex environments. By compressing entities into higher-level concepts, we can more easily predict future behaviors. Without abstraction, we’d be overwhelmed by the sheer number of processes at play. However, abstraction comes with a trade-off — it can make us less sensitive to ongoing changes.
 
 ## 8.4. Scene: Levels
 ### 8.4.1. Objective
@@ -524,6 +552,18 @@ At first glance, this large, opaque entity might appear as just another standalo
 Although nothing in reality exists in complete isolation, we will use this concept of a system to help us better understand the relationships and processes we’re observing. By considering this entity as a system, we can appreciate how it is composed of many interconnected processes, each occurring at different levels. These processes collectively give rise to the entity's behavior and properties.
 
 As we continue, keep in mind that when we refer to a 'system', we're talking about this multi-leveled structure of interconnected processes, rather than just a single, isolated entity.
+
+## 8.8. Scene: Structure & Behavior
+### 8.8.1. Objective
+Introduce system structure as a snapshot of a history of events
+### 8.8.2. Animation
+The largest entity in the scene becomes opaque, filling the screen. The opacity transition emphasizes the whole entity as a system composed of various levels of entities interacting through processes.
+### 8.8.3. Narration
+The structure of a system, or entity, reflects the state of the process at any given moment. This state embodies a history of events and relations that have shaped the system, which is a snapshot of the ongoing processes.
+
+The behavior of a system, or entity, describes the dynamics of the process through its interactions and relations with other entities. Behavior not only reflects the history of these interactions but also provides insights into how the system may behave in the future.
+
+It’s important to note that a system's behavior is always defined in relation to its environment. For example, when we say a dog barks at strangers, it’s tempting to view this as an inherent trait of the dog. However, it’s actually a behavior that only makes sense within the context of the dog’s environment. We might be surprised when the dog doesn’t bark at a particular stranger, illustrating how behavior is shaped by past interactions and its context. 
 
 # 9. Section: Interplay of Structure and Change
 ## 9.1. Objective
