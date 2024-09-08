@@ -375,8 +375,6 @@ For example, if this were a particle, it would be affected by quantum forces. If
 
 In processism, entities like this aren’t considered the most fundamental aspect of reality. Instead, we’ll see that the processes generating entities that are more important.
 
-Entities as abstractions of processes. They are not defined by a fixed essence but by their history of interactions and transformations. Each entity carries the cumulative effect of previous events.
-
 ## 7.3. Scene: Second Entity
 ### 7.3.1. Objective
 Introduction of multiple entities
