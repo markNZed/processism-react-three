@@ -57,9 +57,10 @@ General adult public in Western countries
   * Co-evolution
   * Intra-action
   * Reality is that which we do not want to change
-  * 
+
 <!-- omit in toc -->
 # Overview
+
 * Section: Relations and Processes
   * Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes and the associated events.
 
@@ -499,9 +500,9 @@ At this point, we have two perspectives: we can either see this as a single unif
 
 This leads us to a key question: is there a fundamental layer beneath all these processes? We’ll return to that later. For now, let’s remember that, for all practical purposes, reality can be viewed as processes all the way down.
 
-In processism, the concept of essence is reframed. Rather than being a fixed, timeless core, an entity’s essence is an abstraction of its past events. When entities share similar histories, abstractions help us map what we know about one entity to another with similar patterns.
+In processism, the concept of essence is reframed. Rather than being a fixed, timeless core, an entity’s essence is an abstraction of its past events. When entities share similar histories, abstractions help us map what we know about one entity to another similar entity.
 
-Abstraction simplifies and helps us make sense of complex environments. By compressing entities into higher-level concepts, we can more easily predict future behaviors. Without abstraction, we’d be overwhelmed by the sheer number of processes at play. However, abstraction comes with a trade-off — it can make us less sensitive to ongoing changes.
+Abstraction simplifies and helps us make sense of complicated environments. By compressing systems into higher-level entities, we can more easily predict future behaviors. Without abstraction, we’d be overwhelmed by the sheer number of processes at play. However, abstraction comes with a trade-off — it makess us less sensitive to ongoing changes.
 
 ## 3.4. Scene: Levels
 ### 3.4.1. Objective
