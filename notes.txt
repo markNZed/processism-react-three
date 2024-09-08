@@ -1,5 +1,6 @@
-sudo apt-get update && sudo apt-get install -y gnupg2
-gpg --output notes.dec.md --decrypt notes.gpg.md && mv notes.dec.md notes.gpg.md
+Due to problems with running the OpenPGP Encryption extension in VS Code. 
+  Install gnupg2 via .vscode/launch.json
+  Created ./notes_decrpyt.sh to decrypt notes.gpg.md
 
 Each scene has dependecies and can link to a number of thoer concepts. Could allow the user to make that choice. Can also highlight scenes that have alreday been observed.
 
