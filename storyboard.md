@@ -54,7 +54,7 @@ General adult public in Western countries
 * The storyboard is largely didactic, focusing on delivering information rather than engaging the viewer interactively. Consider incorporating more interactive elements or questions that invite viewers to reflect on their understanding or relate the content to their own experiences.
 * At the end of the presentation, offer a brief recap of the key concepts
 * 
-## Potential further concepts:
+## 0.1. Potential further concepts:
 * Co-evolution
 * Intra-action
 * Reality is that which we do not want to change
@@ -273,6 +273,10 @@ As you can see, the sections of this presentation are not isolated but deeply in
     - [8.6.1. Objective](#861-objective)
     - [8.6.2. Animation](#862-animation)
     - [8.6.3. Narration](#863-narration)
+  - [8.7. Scene: Hierarchical Impredicativity](#87-scene-hierarchical-impredicativity)
+    - [8.7.1. Objective](#871-objective)
+    - [8.7.2. Animation](#872-animation)
+    - [8.7.3. Narration](#873-narration)
 - [9. Section:Agency, Consciousness, and the Self](#9-sectionagency-consciousness-and-the-self)
   - [9.1. Objective](#91-objective)
   - [9.2. Scene: Agency](#92-scene-agency)
@@ -309,33 +313,29 @@ As you can see, the sections of this presentation are not isolated but deeply in
     - [10.3.1. Objective](#1031-objective)
     - [10.3.2. Animation](#1032-animation)
     - [10.3.3. Narration](#1033-narration)
-  - [10.4. Scene: Hierarchical Impredicativity](#104-scene-hierarchical-impredicativity)
+  - [10.4. Scene: Non-Self](#104-scene-non-self)
     - [10.4.1. Objective](#1041-objective)
     - [10.4.2. Animation](#1042-animation)
     - [10.4.3. Narration](#1043-narration)
-  - [10.5. Scene: Non-Self](#105-scene-non-self)
+  - [10.5. Scene: Language](#105-scene-language)
     - [10.5.1. Objective](#1051-objective)
     - [10.5.2. Animation](#1052-animation)
     - [10.5.3. Narration](#1053-narration)
-  - [10.6. Scene: Language](#106-scene-language)
+  - [10.6. Scene: Non-Foundationalism](#106-scene-non-foundationalism)
     - [10.6.1. Objective](#1061-objective)
     - [10.6.2. Animation](#1062-animation)
     - [10.6.3. Narration](#1063-narration)
-  - [10.7. Scene: Non-Foundationalism](#107-scene-non-foundationalism)
+  - [10.7. Scene: Paradox vs Not-knowing](#107-scene-paradox-vs-not-knowing)
     - [10.7.1. Objective](#1071-objective)
     - [10.7.2. Animation](#1072-animation)
     - [10.7.3. Narration](#1073-narration)
-  - [10.8. Scene: Paradox vs Not-knowing](#108-scene-paradox-vs-not-knowing)
+  - [10.8. Scene: Process Philosophy and Ethics](#108-scene-process-philosophy-and-ethics)
     - [10.8.1. Objective](#1081-objective)
-    - [10.8.2. Animation](#1082-animation)
-    - [10.8.3. Narration](#1083-narration)
-  - [10.9. Scene: Process Philosophy and Ethics](#109-scene-process-philosophy-and-ethics)
+    - [10.8.2. Narration](#1082-narration)
+  - [10.9. Scene: Metacognition and Process Management](#109-scene-metacognition-and-process-management)
     - [10.9.1. Objective](#1091-objective)
-    - [10.9.2. Narration](#1092-narration)
-  - [10.10. Scene: Metacognition and Process Management](#1010-scene-metacognition-and-process-management)
-    - [10.10.1. Objective](#10101-objective)
-    - [10.10.2. Animation](#10102-animation)
-    - [10.10.3. Narration](#10103-narration)
+    - [10.9.2. Animation](#1092-animation)
+    - [10.9.3. Narration](#1093-narration)
 - [11. Section: Synthesis](#11-section-synthesis)
   - [11.1. Objective](#111-objective)
   - [11.2. Scene: Bridging the natural sciences and the humanities](#112-scene-bridging-the-natural-sciences-and-the-humanities)
@@ -1032,6 +1032,22 @@ In this view, identity is not a fixed essence but a process — one that is cont
 
 The risks of treating a comlpex system as a simple system become apparent. We know that our modelsof complex systems are themeselves simepl, so we know our actions will have unforseen consequences. Therefore large actions based on simple models risk large unpredicatable consequences. We would be wise to act in such as way that sees undesirable consequences before they become dominant.
 
+## 8.7. Scene: Hierarchical Impredicativity
+### 8.7.1. Objective
+To illustrate the connection between post-structuralism and the concept of impredicativity, particularly in the context of understanding complex, self-referential systems.
+### 8.7.2. Animation
+The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
+### 8.7.3. Narration
+In the late 20th century, philosophy developed a concept known as post-structuralism. Post-structuralism emerged during a time of great debate in academia, the debate centered on human behavior as conditioned by the environment or governed by innate, universal capacities, such as language.
+
+Post-structuralism challenged the notion of fixed structures, whether in language, society, or the mind. Instead os looking for internal or external structures, post-structuralism introduced the idea that structures are fluid, dynamic, and often self-referential, leading to a more complex understanding of human behavior and social systems.
+
+This idea of fluid, self-referential structures aligns with the concept of impredicativity in relational biology. Impredicativity describes situations where a process or entity is defined in terms of itself. Multiple impredicative loops can form hierarchies. For example, consider an individual within a society. The individual's behavior is shaped by social norms, but these norms are themselves influenced by the collective behaviors of individuals. This creates a loop of influence, where society and the individual continuously redefine each other.
+
+In this visual metaphor, we see how an entity exists within another entity, each influencing the other in a self-referential cycle. This hierarchical impredicativity echoes the post-structuralist view that structures are not fixed but are constantly being redefined by the very elements they contain.
+
+Post-structuralism and the concept of hierarchical impredicativity both challenge traditional, linear models of causation. They invite us to consider how complex systems — whether social, biological, or cognitive — are shaped by recursive, self-referential processes. These ideas expand our understanding of how entities relate to one another within hierarchies and how these relationships are far more interdependent than they might first appear. This opens up possibilities for resolving paradox such as individual agency within society, and extended cognition where the process of thinking extends beyond the boundary of an embodied brain.
+
 # 9. Section:Agency, Consciousness, and the Self
 ## 9.1. Objective
 Agency and consciousness do not emerge in isolation but through ongoing interactions within systems. This section will connect the ideas of intelligence and relational thinking to the processes that give rise to personal identity, showing how the self is continually shaped by interactions with the environment and other systems.
@@ -1051,7 +1067,7 @@ Yet, within this vast network, there are also processes unique to our personal e
 
 By understanding agency through the lens of hierarchical impredicativity, we can appreciate the complex interplay between the deterministic forces that shape us and the freedom we exercise within those constraints. Our actions are not merely the product of external forces; they are also the result of our participation in a dynamic, evolving network of relationships that spans the micro to the macro, the personal to the universal.
 
-In this way, agency is not just about conscious decisions — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence. 
+In this way, agency is not just the decision we remember — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence. 
 
 ## 9.3. Scene: Contextual autonomy
 ### 9.3.1. Objective
@@ -1062,7 +1078,7 @@ Processism allows us to understand agency through the lens of hierarchical impre
 
 This idea has important implications. If we see autonomy as independent, we might believe that intelligence — particularly artificial intelligence — is about acting on its own. But this misunderstanding risks disaster. Our intelligence is naturally collaborative, relying on language, which is a shared achievement. We develop our abilities within a social context that requires cooperation.
 
-By seeing autonomy as inherently contextual, we recognize that intelligence, whether human or artificial, is always collaborative, always interdependent, and always shaped by the processes and relationships surrounding it. So, while creating an independent artificial intelligence might be technically possible, it is immoral to pursue that goal. 
+By seeing autonomy as inherently contextual, we recognize that intelligence, whether human or artificial, is always collaborative, always interdependent, and always shaped by the processes and relationships surrounding it. So, while creating an independent artificial intelligence might be technically possible, it is immoral to pursue that goal. Avoiding the pursuit of independent artificial intelligence is neccesssary to avoid disaster but not sufficient. We may need to reimagine artificial intelligence as relational intelligence to survive the consequences.
 
 ## 9.4. Scene: Role of Observation and Participation
 ### 9.4.1. Objective
@@ -1166,27 +1182,11 @@ Recognizing stages of development helps us appreciate that complexity and higher
 
 This concept of staged development not only applies to individual learning and growth but also to the evolution of systems in nature and society. By understanding this process, we can better navigate the complexities of our own development and contribute to the growth of the systems we are part of.
 
-## 10.4. Scene: Hierarchical Impredicativity
+## 10.4. Scene: Non-Self
 ### 10.4.1. Objective
-To illustrate the connection between post-structuralism and the concept of impredicativity, particularly in the context of understanding complex, self-referential systems.
-### 10.4.2. Animation
-The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
-### 10.4.3. Narration
-In the late 20th century, philosophy developed a concept known as post-structuralism. Post-structuralism emerged during a time of great debate in academia, the debate centered on human behavior as conditioned by the environment or governed by innate, universal capacities, such as language.
-
-Post-structuralism challenged the notion of fixed structures, whether in language, society, or the mind. Instead os looking for internal or external structures, post-structuralism introduced the idea that structures are fluid, dynamic, and often self-referential, leading to a more complex understanding of human behavior and social systems.
-
-This idea of fluid, self-referential structures aligns with the concept of impredicativity in relational biology. Impredicativity describes situations where a process or entity is defined in terms of itself. Multiple impredicative loops can form hierarchies. For example, consider an individual within a society. The individual's behavior is shaped by social norms, but these norms are themselves influenced by the collective behaviors of individuals. This creates a loop of influence, where society and the individual continuously redefine each other.
-
-In this visual metaphor, we see how an entity exists within another entity, each influencing the other in a self-referential cycle. This hierarchical impredicativity echoes the post-structuralist view that structures are not fixed but are constantly being redefined by the very elements they contain.
-
-Post-structuralism and the concept of hierarchical impredicativity both challenge traditional, linear models of causation. They invite us to consider how complex systems — whether social, biological, or cognitive — are shaped by recursive, self-referential processes. These ideas expand our understanding of how entities relate to one another within hierarchies and how these relationships are far more interdependent than they might first appear. This opens up possibilities for resolving paradox such as individual agency within society, and extended cognition where the process of thinking extends beyond the boundary of an embodied brain.
-
-## 10.5. Scene: Non-Self
-### 10.5.1. Objective
 Introduce the concept of "non-self" as a nuanced understanding of the self, reflecting its emergent and interconnected nature.
-### 10.5.2. Animation
-### 10.5.3. Narration
+### 10.4.2. Animation
+### 10.4.3. Narration
 If we understand the self as an emergent process, shaped by complex, heterarchical impredicativities, it may seem incoherent to speak of 'the self' as a singular, static entity. At the same time, we cannot ignore the reality of our habits, biases, strengths, and weaknesses, which seem to define an identity. This apparent contradiction raises the question: How can we reconcile the fluid nature of the self with the tangible experience of subjectivity?
 
 Several philosophical and spiritual traditions offer a concept that captures this nuance: that of 'non-self.' The idea of non-self does not deny the existence of individual characteristics and experiences, but it challenges the notion that the self is the center of the universe, the fixed point around which everything else revolves.
@@ -1197,11 +1197,11 @@ This concept of non-self invites us to shift our perspective — from seeing the
 
 By embracing non-self, we can begin to see ourselves not as isolated individuals but as participants in a vast network of relationships, where our identity is not fixed but constantly evolving in response to the world around us. This shift in perspective can lead to a deeper understanding of our place in the world, fostering a sense of connection and interdependence that transcends the limitations of the individual isolated self.
 
-## 10.6. Scene: Language
-### 10.6.1. Objective
+## 10.5. Scene: Language
+### 10.5.1. Objective
 Introduce dynamic ontology
-### 10.6.2. Animation
-### 10.6.3. Narration
+### 10.5.2. Animation
+### 10.5.3. Narration
 As we interact with others, the symbols and words we use are not static — they evolve, adapt, and transform, influencing how we perceive the world and ourselves. The language we use is not merely a collection of fixed meanings; it is a dynamic process that shapes and reshapes our experience and our reality.
 
 Language is more than just words. It encompasses any use of symbols for communication — body language, dress codes, dance, music, mathematics, and more. These forms of language are deeply connected to our shared experiences and practices, influencing how we relate to one another and to the world.
@@ -1214,11 +1214,11 @@ Because language is fundamentally about communication, it is inherently public, 
 
 By acknowledging the dynamic and evolving nature of language, we can better appreciate its role in shaping our perceptions, our relationships, and our reality. This awareness invites us to engage more consciously with the language we use, understanding it as an active process that both reflects and creates the world we inhabit.
 
-## 10.7. Scene: Non-Foundationalism
-### 10.7.1. Objective
+## 10.6. Scene: Non-Foundationalism
+### 10.6.1. Objective
 Non-foundationalism challenges the idea of a single, unchanging foundation for knowledge or reality.
-### 10.7.2. Animation
-### 10.7.3. Narration
+### 10.6.2. Animation
+### 10.6.3. Narration
 Non-foundationalism rejects the idea of a single, unchanging foundation. Instead, it embraces the notion that stability and coherence can emerge from the interactions between parts, rather than from an unchanging base. By letting go of the need for a fixed foundation, non-foundationalism allows us to understand complex systems in a more flexible and dynamic way.
 
 In this framework, we recognize that what we often consider fundamental concepts — such as the meaning of words — are not foundational in a traditional sense. For example, at the beginning of this presentation, we used language as if it had fixed, static meanings. However, as we progressed, we introduced a perspective of language as a dynamic process, constantly evolving and reshaping our understanding.
@@ -1229,11 +1229,11 @@ Non-foundationalism also allows for a meta-level understanding of diverse paradi
 
 By embracing non-foundationalism, we open ourselves to the richness and complexity of the systems we inhabit, recognizing that coherence and meaning emerge from our interactions and relationships, not from an immovable foundation. This approach not only enhances our understanding of complex systems but also enriches our experience of the world.
 
-## 10.8. Scene: Paradox vs Not-knowing
-### 10.8.1. Objective
+## 10.7. Scene: Paradox vs Not-knowing
+### 10.7.1. Objective
 Address paradox and introduce not-knowing
-### 10.8.2. Animation
-### 10.8.3. Narration
+### 10.7.2. Animation
+### 10.7.3. Narration
 Paradoxes highlight the limits of a paradigm. Take, for example, the statement, "I always lie." If this statement is true, it contradicts itself, revealing the paradox. This type of paradox arises when we attempt to confine language and thought to strict, binary logic, where something must either be true or false.
 
 From a process-centric perspective, we see a different dynamic at play. Paradoxes emerge when we encounter the boundaries of a foundational paradigm — one that assumes there is an absolute truth or essence to be found. For instance, consider the question, "If the universe began with the Big Bang, where did the energy for the Big Bang come from?" This question seems coherent within certain paradigms, but it may be meaningless if the paradigm itself assumes that the universe began with the Big Bang.
@@ -1246,10 +1246,10 @@ In this space of not-knowing, we are open to new perspectives and possibilities.
 
 By becoming comfortable in this stance of not-knowing, we free ourselves from the constraints of rigid paradigms and open ourselves to the richness of a processual, evolving understanding of the world.
 
-## 10.9. Scene: Process Philosophy and Ethics
-### 10.9.1. Objective
+## 10.8. Scene: Process Philosophy and Ethics
+### 10.8.1. Objective
 Relational ethics and the value of sensitviity
-### 10.9.2. Narration
+### 10.8.2. Narration
 The idea that moral decisions are shaped by dynamic processes rather than fixed rules is particularly thought-provoking. In traditional ethical frameworks, decisions are often guided by predetermined principles or laws, seen as universal truths that apply across all situations. However, process philosophy offers a different perspective — one that emphasizes the importance of relationships and the fluid nature of our interactions.
 
 Non-foundationalism, as we've explored, is not the end of the journey but a stage of development that opens the door to new ways of thinking, including relational ethics. In this view, our understanding and actions are not guided by fixed rules or eternal truths but by the dynamic relationships we are part of.
@@ -1260,12 +1260,12 @@ By embracing relational ethics, we move away from rigid, one-size-fits-all rules
 
 In this way, process philosophy invites us to see morality not as a set of static principles but as a living, evolving practice — one that is deeply rooted in our sensitivity to the relationships that define our lives.
 
-## 10.10. Scene: Metacognition and Process Management
-### 10.10.1. Objective
+## 10.9. Scene: Metacognition and Process Management
+### 10.9.1. Objective
 Illustrate the concept of metacognition as a higher-order process that monitors and adjusts other processes within a system. Introduce the role of process management in facilitating and ensuring the effective functioning of these processes.
-### 10.10.2. Animation
+### 10.9.2. Animation
 The video begins by focusing on a complex system composed of various interconnected entities. A distinct entity, perhaps represented with a blue entity ("hat") to signify its unique role, moves through the system. This entity oversees the interactions between other entities, occasionally pausing to make adjustments or guide their interactions. The blue-hatted entity can be seen directing the flow of energy or information, ensuring that the system remains balanced and harmonious. The video concludes by zooming out to show the entire system working smoothly, with the blue-hatted entity continuing its oversight.
-### 10.10.3. Narration
+### 10.9.3. Narration
 In any complex system, not all processes operate in isolation. Some processes play a crucial role in overseeing and managing the interactions of others, ensuring that the system remains balanced and functions effectively. This act of 'thinking about thinking' is known as metacognition.
 
 Metacognition can be understood as a higher-order process, one that monitors and adjusts other processes to maintain harmony within the system. Just as we might reflect on our thoughts and behaviors to make better decisions, metacognition within a system reflects on the dynamics of the system itself, making adjustments as needed.
