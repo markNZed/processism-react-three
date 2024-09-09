@@ -53,22 +53,23 @@ General adult public in Western countries
 * Some concepts, like "Non-Foundationalism" and "Paradox vs Not-knowing," might be too abstract for the general audience without sufficient grounding in prior scenes. Introduce these abstract ideas by first revisiting more concrete examples discussed earlier in the presentation, then use those examples to illustrate the abstract concept. For example, revisit the "System" scene to introduce non-foundationalism, showing how the system operates without a single fixed foundation.
 * The storyboard is largely didactic, focusing on delivering information rather than engaging the viewer interactively. Consider incorporating more interactive elements or questions that invite viewers to reflect on their understanding or relate the content to their own experiences.
 * At the end of the presentation, offer a brief recap of the key concepts
-* Potential further concepts:
-  * Co-evolution
-  * Intra-action
-  * Reality is that which we do not want to change
+* 
+## Potential further concepts:
+* Co-evolution
+* Intra-action
+* Reality is that which we do not want to change
 
 <!-- omit in toc -->
 # Overview
 
 * Section: Relations and Processes
-  * Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes and the associated events.
+  * Reality emerges not from isolated entities but from the interactions and relations. In this section, we’ll explore how everything interacts through dynamic processes and the associated events.
 
 * Section: Systems and Their Structure
-  * Building on the idea of relations, we’ll see how systems are formed through these interrelated processes. Systems are not fixed; they are fluid structures that evolve through the interaction of parts at different scales. This section will show how each part of a system is connected, influencing and being influenced by the whole, reinforcing that structure itself is a product of constant interaction.
+  * Building on the idea of process, we’ll see how systems are formed through these interrelated processes. Systems are not fixed; they are fluid structures that evolve through the interaction of parts at different scales. This section will show how each part of a system is connected, influencing and being influenced by the whole, reinforcing that structure itself is a product of constant interaction.
 
 * Section: Interplay of Structure and Change
-  * Systems are not static; their structure is always changing. Here, we examine how structure and process are intertwined—structure emerges from processes and is constantly reshaped by them. We’ll also explore how the stability of a system is actually a result of ongoing change, demonstrating the continuous flow between structure and process.
+  * Systems are not static; their structure is always changing. Here, we examine how structure and process are intertwined — structure emerges from processes and is constantly reshaped by them. We’ll also explore how the stability of a system is actually a result of ongoing change, demonstrating the continuous flow between structure and process.
 
 * Section: Feedback, Adaptation, and System Dynamics
   * In complex systems, feedback loops and interactions drive adaptation and evolution. These dynamic processes create resilience, but also unpredictability. This section will connect the ideas of structure and change to the adaptive behaviors of systems, showing how small changes can cascade into larger shifts through interconnected feedback mechanisms.
@@ -77,21 +78,21 @@ General adult public in Western countries
   * Understanding how change happens in systems requires us to explore the nature of causality. In this section, we will dive deeper into how interconnected processes give rise to complex behaviors, with no single cause but rather a web of interactions. Complexity emerges from these layered, interdependent relations, reinforcing that no process or part stands alone.
 
 * Section: Intelligence and Information
-  * Intelligence and information are not isolated elements but emergent properties of interconnected systems. Here, we’ll explore how information flows through systems, continually evolving through learning and interaction. This section connects back to complexity, showing how the intelligent behavior of systems arises from their intricate network of processes.
+  * Intelligence and information are not isolated elements but emergent properties of interconnected systems. Here, we’ll explore how information flows through systems, continually evolving through learning and interaction. This section connects back to complexity, showing how the intelligent behavior of systems arises from a generic pattern of processes.
 
 * Section: Meta-Perspectives and Relationalism
-  * At a higher level, we’ll step back to examine how relational thinking reshapes our understanding of identity and structure. Just as systems and processes are interconnected, so too are the perspectives we use to understand them. This section will highlight how shifting perspectives can modify our understanding of systems, reinforcing the theme that nothing is fixed—everything is subject to change and reinterpretation.
+  * At a higher level, we’ll step back to examine how relational thinking reshapes our understanding of identity and structure. Just as systems and processes are interconnected, so too are the perspectives we use to understand them. This section will highlight how shifting perspectives can modify our understanding of systems, reinforcing the theme that nothing is fixed — everything is subject to change and reinterpretation.
 
 * Section: Agency, Consciousness, and the Self
   * Agency and consciousness do not emerge in isolation but through ongoing interactions within systems. This section will connect the ideas of intelligence and relational thinking to the processes that give rise to personal identity, showing how the self is continually shaped by interactions with the environment and other systems.
 
 * Section: Knowledge, Language, and Non-foundationalism
-  * Knowledge is not built on a foundation of fixed truths but evolves through a network of language, paradox, and uncertainty. In this section, we’ll explore how knowledge itself is interconnected and subject to continuous reinterpretation, echoing the themes of relationalism and process. Language plays a key role in shaping these relationships, constantly influencing and being influenced by the processes it describes.
+  * Knowledge is not built on a foundation of fixed truths but evolves through a process of language, paradox, and uncertainty. In this section, we’ll explore how knowledge itself is interconnected and subject to continuous reinterpretation, echoing the themes of relationalism and process. Language plays a key role in shaping these relationships, constantly influencing and being influenced by the processes it describes.
 
 * Section: Synthesis
-  * Finally, we’ll bring everything together, showing how all the concepts in this presentation are interconnected. We’ll embody the process paradigm by using the whole presentation from within a part of the presentation, demonstrating how knowledge, systems, and perspectives are all linked in an ongoing process of synthesis and reinterpretation.
+  * Finally, we bring everything together, noting how all the concepts in this presentation are interconnected. We’ll embody the process paradigm by using the whole presentation from within a part of the presentation, demonstrating how knowledge, systems, and perspectives are all linked in an ongoing process of synthesis and reinterpretation.
 
-As you can see, the sections of this presentation are not isolated but deeply interconnected, just as the processes and systems they describe. Each section builds on the previous one, and all come together to illustrate the core principles of processism: that everything is constantly evolving, interconnected, and shaped by dynamic interactions. As we move through these sections, keep in mind that no part stands alone—each idea flows into the next, just as in the world of processism, everything is in relation.
+As you can see, the sections of this presentation are not isolated but deeply interconnected, just as the processes and systems they describe. Each section builds on previous sections, and all come together to illustrate the core principles of processism: that everything is constantly evolving, interconnected, and shaped by dynamic interactions. As we move through these sections, keep in mind that no part stands alone — each idea flows into the next, just as in the world of processism, everything is in relation.
 
 <!-- omit in toc -->
 # 4. Table of Content
@@ -366,7 +367,7 @@ We’ll be building a visual language to explain the concepts of processism. Thi
 
 # 2. Section: Relations and Processes
 ## 2.1. Objective
-Understanding emerges not from isolated entities but from the interactions and relations between them. In this section, we’ll explore how everything is connected through dynamic processes and the associated events.
+Reality emerges not from isolated entities but from the interactions and relations. In this section, we’ll explore how everything interacts through dynamic processes and the associated events.
 
 ## 2.2. Scene: Entity
 ### 2.2.1. Objective
@@ -472,7 +473,7 @@ This layered coordination reminds us that even the most abstract relationships b
 
 # 3. Section: Systems and Their Structure
 ## 3.1. Objective
-Building on the idea of relations, we’ll see how systems are formed through these interrelated processes. Systems are not fixed; they are fluid structures that evolve through the interaction of parts at different scales. This section will show how each part of a system is connected, influencing and being influenced by the whole, reinforcing that structure itself is a product of constant interaction.
+Building on the idea of process, we’ll see how systems are formed through these interrelated processes. Systems are not fixed; they are fluid structures that evolve through the interaction of parts at different scales. This section will show how each part of a system is connected, influencing and being influenced by the whole, reinforcing that structure itself is a product of constant interaction.
 
 ## 3.2. Scene: Accumulation
 ### 3.2.1. Objective
@@ -890,7 +891,8 @@ Robert Rosen's book Anticipatory Systems, published in 1985, was the first trans
 
 # 7. Section: Intelligence and Information
 ## 7.1. Objective
-Intelligence and information are not isolated elements but emergent properties of interconnected systems. Here, we’ll explore how information flows through systems, continually evolving through learning and interaction. This section connects back to complexity, showing how the intelligent behavior of systems arises from their intricate network of processes.
+Intelligence and information are not isolated elements but emergent properties of interconnected systems. Here, we’ll explore how information flows through systems, continually evolving through learning and interaction. This section connects back to complexity, showing how the intelligent behavior of systems arises from a generic pattern of processes.
+
 ## 7.2. Scene: Intelligence
 ### 7.2.1. Objective
 The system’s ability to learn and adapt to changes
@@ -1126,7 +1128,7 @@ By embracing the self as an emergent process, we open ourselves to a more fluid 
 
 # 10. Section: Knowledge, Language, and Non-foundationalism
 ## 10.1. Objective
-Knowledge is not built on a foundation of fixed truths but evolves through a network of language, paradox, and uncertainty. In this section, we’ll explore how knowledge itself is interconnected and subject to continuous reinterpretation, echoing the themes of relationalism and process. Language plays a key role in shaping these relationships, constantly influencing and being influenced by the processes it describes.
+Knowledge is not built on a foundation of fixed truths but evolves through a process of language, paradox, and uncertainty. In this section, we’ll explore how knowledge itself is interconnected and subject to continuous reinterpretation, echoing the themes of relationalism and process. Language plays a key role in shaping these relationships, constantly influencing and being influenced by the processes it describes.
 
 ## 10.2. Scene: Paradigm
 ### 10.2.1. Objective
@@ -1272,7 +1274,7 @@ Process management is closely related to metacognition. It involves the intentio
 
 # 11. Section: Synthesis
 ## 11.1. Objective
-Finally, we’ll bring everything together, showing how all the concepts in this presentation are interconnected. We’ll embody the process paradigm by using the whole presentation from within a part of the presentation, demonstrating how knowledge, systems, and perspectives are all linked in an ongoing process of synthesis and reinterpretation.
+Finally, we bring everything together, noting how all the concepts in this presentation are interconnected. We’ll embody the process paradigm by using the whole presentation from within a part of the presentation, demonstrating how knowledge, systems, and perspectives are all linked in an ongoing process of synthesis and reinterpretation.
 
 ## 11.2. Scene: Bridging the natural sciences and the humanities
 ### 11.2.1. Objective
@@ -1317,6 +1319,6 @@ Provide potential next steps
 ### 11.4.3. Narration
 We have reached the end of this presentation on processism, one small step in your journey. You may choose to re-watch parts of the presentation and further explore the concepts with the AI tutor. You might also seek out other perspectives and paradigms on processism, and the AI tutor may help you find resources that best suit your context. 
 
-Remember, processism is far more than an intellectual understanding — it can lead to a new experience of self and a heightened sensitivity to relationships and processes that were previously unconscious. This presentation can only point toward processism. True understanding comes through practice — engaging with the world in a process-centric way. Like learning to ride a bike, theory cannot replace hands-on experience. 
+Remember, processism is far more than an intellectual understanding — it can lead to a different experience of self and a heightened sensitivity to relationships and processes that were previously unconscious. This presentation can only point toward processism. True understanding comes through practice — engaging with the world in a process-centric way. Like learning to ride a bike, theory cannot replace hands-on experience. 
 
-Processism is, at first, a way of understanding reality, then processism becomes a way of experiencing reality and not-knowing processism. This is a journey, not a destination. We are traveling together, and we are more than you and I can possibly imagine. There are stages of development. We are better served by mastering the level we find oursleves and letting the next level emerge, rather than attemting to skip that effort in an imaginary race to the horizon. May you find more sensitive ways to see, feel, and engage with the world around you.
+Processism is, at first, a way of understanding reality, then processism becomes a way of experiencing reality, then we get comfortable in not-knowing processism. This is a journey, not a destination. We are traveling together, and we are more than you and I can possibly imagine. There are stages of development and we are better served by mastering the stage where we find oursleves, letting the next level emerge, rather than skipping steps in an imaginary race to the horizon. May you find more sensitive ways to see, feel, and engage with the world around you.
