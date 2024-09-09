@@ -2,7 +2,8 @@
     "recommendations": [
       "ugosan.vscode-openpgp",
       "yzhang.markdown-all-in-one",
-      "codeium.codeium"
+      "codeium.codeium",
+      "formulahendry.code-runner"
     ],
   }
   

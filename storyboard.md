@@ -276,22 +276,26 @@ As you can see, the sections of this presentation are not isolated but deeply in
     - [9.2.1. Objective](#921-objective)
     - [9.2.2. Animation](#922-animation)
     - [9.2.3. Narration](#923-narration)
-  - [9.3. Scene: Role of Observation and Participation](#93-scene-role-of-observation-and-participation)
+  - [9.3. Scene: Contextual autonomy](#93-scene-contextual-autonomy)
     - [9.3.1. Objective](#931-objective)
     - [9.3.2. Animation](#932-animation)
     - [9.3.3. Narration](#933-narration)
-  - [9.4. Scene: Conscious vs Unconscious](#94-scene-conscious-vs-unconscious)
+  - [9.4. Scene: Role of Observation and Participation](#94-scene-role-of-observation-and-participation)
     - [9.4.1. Objective](#941-objective)
     - [9.4.2. Animation](#942-animation)
     - [9.4.3. Narration](#943-narration)
-  - [9.5. Scene: Subjective vs Unsubjective](#95-scene-subjective-vs-unsubjective)
+  - [9.5. Scene: Conscious vs Unconscious](#95-scene-conscious-vs-unconscious)
     - [9.5.1. Objective](#951-objective)
     - [9.5.2. Animation](#952-animation)
     - [9.5.3. Narration](#953-narration)
-  - [9.6. Scene: Self](#96-scene-self)
+  - [9.6. Scene: Subjective vs Unsubjective](#96-scene-subjective-vs-unsubjective)
     - [9.6.1. Objective](#961-objective)
     - [9.6.2. Animation](#962-animation)
     - [9.6.3. Narration](#963-narration)
+  - [9.7. Scene: Self](#97-scene-self)
+    - [9.7.1. Objective](#971-objective)
+    - [9.7.2. Animation](#972-animation)
+    - [9.7.3. Narration](#973-narration)
 - [10. Section: Knowledge, Language, and Non-foundationalism](#10-section-knowledge-language-and-non-foundationalism)
   - [10.1. Objective](#101-objective)
   - [10.2. Scene: Paradigm](#102-scene-paradigm)
@@ -1032,9 +1036,6 @@ Agency and consciousness do not emerge in isolation but through ongoing interact
 ### 9.2.1. Objective
 Expand on the concept of agency
 ### 9.2.2. Animation
-Visuals that represent different scales of systems, from the microscopic (e.g., cellular processes) to the macroscopic (e.g., societal structures).
-A dynamic animation that shows an individual as both influenced by and influencing these multiple levels, moving fluidly between them.
-Visuals that shift from cosmic scales to the personal, illustrating the interconnectedness of all things from stardust to individual experiences.
 ### 9.2.3. Narration
 The concept of hierarchical impredicativity offers profound insights for reimagining the notion of agency. We can even expand this concept to heterarchical impredicativity, accounting for the diverse levels of systems in which we participate and the intricate web of relations that emerge from these interactions.
 
@@ -1046,14 +1047,25 @@ Yet, within this vast network, there are also processes unique to our personal e
 
 By understanding agency through the lens of hierarchical impredicativity, we can appreciate the complex interplay between the deterministic forces that shape us and the freedom we exercise within those constraints. Our actions are not merely the product of external forces; they are also the result of our participation in a dynamic, evolving network of relationships that spans the micro to the macro, the personal to the universal.
 
-In this way, agency is not just about conscious decisions — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence.
+In this way, agency is not just about conscious decisions — it’s about recognizing our role within a larger process, where our actions are both shaped by and help to shape the systems we are part of. This broader understanding of agency allows us to see ourselves as co-creators of our reality, participating in a dance between freedom and determinism that defines our existence. 
 
-## 9.3. Scene: Role of Observation and Participation
+## 9.3. Scene: Contextual autonomy
 ### 9.3.1. Objective
-Illustrate how the observer is inherently part of the system they observe, emphasizing the participatory nature of observation.
+Expand on the concept of contextual autonomy
 ### 9.3.2. Animation
-The scene begins with an entity positioned outside of a system, observing it from a distance. The system under observation is initially presented as a closed loop of interacting entities. As the observation continues, additional entities and relations fade into view, revealing a larger system that includes both the observer and the system being observed. The observer is now shown as an active participant within this larger, interconnected system.
 ### 9.3.3. Narration
+Processism allows us to understand agency through the lens of hierarchical impredicativity, and we can associate this with what we might call "contextual autonomy." Autonomy isn’t something independent or isolated. It always exists within a specific context, shaped by a history of relationships.
+
+This idea has important implications. If we see autonomy as independent, we might believe that intelligence — particularly artificial intelligence — is about acting on its own. But this misunderstanding risks disaster. Our intelligence is naturally collaborative, relying on language, which is a shared achievement. We develop our abilities within a social context that requires cooperation.
+
+By seeing autonomy as inherently contextual, we recognize that intelligence, whether human or artificial, is always collaborative, always interdependent, and always shaped by the processes and relationships surrounding it. So, while creating an independent artificial intelligence might be technically possible, it is immoral to pursue that goal. 
+
+## 9.4. Scene: Role of Observation and Participation
+### 9.4.1. Objective
+Illustrate how the observer is inherently part of the system they observe, emphasizing the participatory nature of observation.
+### 9.4.2. Animation
+The scene begins with an entity positioned outside of a system, observing it from a distance. The system under observation is initially presented as a closed loop of interacting entities. As the observation continues, additional entities and relations fade into view, revealing a larger system that includes both the observer and the system being observed. The observer is now shown as an active participant within this larger, interconnected system.
+### 9.4.3. Narration
 Modern science has long relied on the concept of the independent observer, someone who stands apart from the system they study, analyzing it from an objective distance. For much of history, this perspective left human experience and consciousness beyond the reach of scientific inquiry. However, with the emergence of fields like social psychology, our understanding has begun to evolve, challenging the notion of the truly independent observer.
 
 The idea of an independent observer is largely an illusion. In reality, it is only by ignoring broader processes that we can even imagine such independence. As we fade in the broader context in this scene, it becomes clear that what we observe, how we observe it, the language we use to describe it, and what we choose to omit all play a role in shaping the observations we make.
@@ -1062,12 +1074,12 @@ In most human systems, the very act of observing is already a form of participat
 
 We can appreciate that our observations are not just passive acts of recording reality — they are active engagements that shape and are shaped by the systems we particpate in. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
 
-## 9.4. Scene: Conscious vs Unconscious
-### 9.4.1. Objective
+## 9.5. Scene: Conscious vs Unconscious
+### 9.5.1. Objective
 Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of processism.
-### 9.4.2. Animation
+### 9.5.2. Animation
 Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible — lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
-### 9.4.3. Narration
+### 9.5.3. Narration
 Consciousness is a subject of intense debate, especially in fields like philosophy and neuroscience. We won’t attempt to solve the 'hard problem of consciousness' here, but we can explore a useful way to distinguish between conscious and unconscious processes within the framework of processism.
 
 Imagine that this circular area represents our conscious awareness. Inside this circle, we can see relationships and processes clearly — they are within our conscious awareness. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
@@ -1080,11 +1092,11 @@ This brings us to the idea of the 'self.' We can define the self narrowly, consi
 
 By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding oursleves. It's not just about what we are aware of at any given moment, but about how we navigate the vast network of processes that make up our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
 
-## 9.5. Scene: Subjective vs Unsubjective
-### 9.5.1. Objective
+## 9.6. Scene: Subjective vs Unsubjective
+### 9.6.1. Objective
 Distinguish between subjective and unsubjective experiences, highlighting their implications for our understanding of the self.
-### 9.5.2. Animation
-### 9.5.3. Narration
+### 9.6.2. Animation
+### 9.6.3. Narration
 Our everyday conscious experience typically includes a sensation of subjectivity — the awareness that the experience I am having is uniquely my own. This is a fundamental aspect of what most of us consider to be consciousness: an experience of being present in relation to things that are distinctly not me.
 
 For many, this sense of subjectivity is so intrinsic to experience that it might seem strange to distinguish it. Conscious experience is usually synonymous with the feeling of being someone — a distinct observer, interacting with the world.
@@ -1097,11 +1109,11 @@ This phenomenon has profound implications for our understanding of the self. It 
 
 By recognizing that consciousness can exist without subjectivity, we open the door to a deeper exploration of what it means to be aware and how we construct our sense of self. This challenges the conventional view that the self is a fixed, central observer and instead invites us to consider the self as a more fluid and dynamic process, capable of both subjective and unsubjective experiences.
 
-## 9.6. Scene: Self
-### 9.6.1. Objective
+## 9.7. Scene: Self
+### 9.7.1. Objective
 To present the self as an emergent process rather than a fixed essence, challenging the notion of an "authentic self".
-### 9.6.2. Animation
-### 9.6.3. Narration
+### 9.7.2. Animation
+### 9.7.3. Narration
 Our exploration of processism brings us to a profound insight: the understanding of the self not as a fixed essence but as a complex, emergent process.
 
 The idea of the 'authentic self' is a powerful and pervasive concept in Western culture. It suggests that within each of us lies a core, unchanging identity — something pure and true that defines who we really are. This concept can be comforting, offering a sense of stability and purpose. We can have experiences that are deeply aligned with our conception of an 'authentic self.'
