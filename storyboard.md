@@ -62,6 +62,8 @@ General adult public in Western countries
 <!-- omit in toc -->
 # Overview
 
+In a world increasingly defined by change, it is easy to fall into the trap of seeing things as fixed, isolated entities. But what if understanding reality lies not in objects, but in dynamic processes and relationships? This presentation invites you to step into the world of processism, a way of thinking that reveals the interconnectedness and constant evolution of all things. As you journey through each section, you'll discover how systems, structures, intelligence, and even your sense of self emerge from an intricate web of relations, each shaping and being shaped by the other. This is not just a conceptual shift — it's a profound change in how we understand the world, and your place in it. Prepare to dive deeper into a vision where nothing is separate, and everything is in process.
+
 * Section: Relations and Processes
   * Reality emerges not from isolated entities but from the interactions and relations. In this section, we’ll explore how everything interacts through dynamic processes and the associated events.
 
