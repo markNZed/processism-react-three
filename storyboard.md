@@ -9,7 +9,7 @@ This presentation is tailored for a general adult audience. However, given the a
 Your feedback will be invaluable in refining this presentation. Here are a few specific areas where your input would be particularly beneficial
 
 * Summary and Reflection Points
-The presentation currently includes dense sections, such as those on "Heterarchy" and "Emergent Process". Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
+Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
 
 * Transitions
 The presentation aims to strengthen transitions by explicitly connecting how each new concept builds on or is informed by the previous one. We are curious if the narrative bridges effectively tie together the emerging complexities of structure and the relativity of processes in time.
@@ -19,9 +19,6 @@ Some concepts might be too abstract for a general audience. We've introduced the
 
 Interactive Elements
 The storyboard is designed to be largely didactic but considers incorporating more interactive elements to engage viewers. How might we further enhance interactivity or invite viewers to reflect on their understanding?
-
-* Sectioning
-The presentation is extensive, with numerous complex topics covered. Would you suggest breaking the presentation into smaller, more digestible sections? If so, how would you recommend structuring these sections?
 
 We also invite feedback on whether these additional concepts would add value to the presentation.
 
@@ -53,8 +50,8 @@ General adult public in Western countries
 * Some concepts, like "Non-Foundationalism" and "Paradox vs Not-knowing," might be too abstract for the general audience without sufficient grounding in prior scenes. Introduce these abstract ideas by first revisiting more concrete examples discussed earlier in the presentation, then use those examples to illustrate the abstract concept. For example, revisit the "System" scene to introduce non-foundationalism, showing how the system operates without a single fixed foundation.
 * The storyboard is largely didactic, focusing on delivering information rather than engaging the viewer interactively. Consider incorporating more interactive elements or questions that invite viewers to reflect on their understanding or relate the content to their own experiences.
 * At the end of the presentation, offer a brief recap of the key concepts
-* 
-## 0.1. Potential further concepts:
+<!-- omit in toc -->
+## Potential further concepts:
 * Co-evolution
 * Intra-action
 * Reality is that which we do not want to change
@@ -97,7 +94,7 @@ In a world increasingly defined by change, it is easy to fall into the trap of s
 As you can see, the sections of this presentation are not isolated but deeply interconnected, just as the processes and systems they describe. Each section builds on previous sections, and all come together to illustrate the core principles of processism: that everything is constantly evolving, interconnected, and shaped by dynamic interactions. As we move through these sections, keep in mind that no part stands alone — each idea flows into the next, just as in the world of processism, everything is in relation.
 
 <!-- omit in toc -->
-# 4. Table of Content
+# Table of Content
 - [1. Section: Overview](#1-section-overview)
   - [1.1. Objective](#11-objective)
   - [1.2. Scene: Overview](#12-scene-overview)
