@@ -28,7 +28,7 @@ Thank you for your time and insights.
 
 <!-- omit in toc -->
 # Context: 
-This is a storyboard for a video presentation of processsim.
+This is a storyboard for an animated, AI assisted, presentation about processsim.
 
 <!-- omit in toc -->
 # Tools:
