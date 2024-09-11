@@ -2,7 +2,7 @@ Dear Reviewer,
 
 Thank you for taking the time to review this draft storyboard for an animated presentation on Processism. This presentation aims to introduce the general adult public, particularly those in Western countries, to the complex and often abstract concepts of Processism. Processism offers a dynamic alternative to essentialist thinking, emphasizing the continuous evolution of entities and relationships rather than fixed, unchanging essences.
 
-The primary goal of this presentation is to build a visual language that makes these abstract concepts accessible and engaging. The presentation incorporates real-life examples and interactive elements to foster a deeper understanding of Processism. The final product will be wrapped in an app that allows users to pause the presentation and discuss key points with an LLM, creating opportunities for reflection and deeper engagement.
+The primary goal of this presentation is to build a visual language that makes these abstract concepts accessible and engaging. The presentation incorporates real-life examples and interactive elements to foster a deeper understanding of Processism. The final product will be wrapped in an app that allows users to pause the presentation and discuss key points with a chatbot, creating opportunities for reflection and deeper engagement.
 
 This presentation is tailored for a general adult audience. However, given the abstract nature of some concepts, this approach aims to ground the audience in familiar territory before challenging them with more complex notions.
 
