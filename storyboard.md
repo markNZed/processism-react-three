@@ -288,7 +288,7 @@ As you can see, the sections of this presentation are not isolated but deeply in
     - [9.4.1. Objective](#941-objective)
     - [9.4.2. Animation](#942-animation)
     - [9.4.3. Narration](#943-narration)
-  - [9.5. Scene: Conscious vs Unconscious](#95-scene-conscious-vs-unconscious)
+  - [9.5. Scene: Awareness](#95-scene-awareness)
     - [9.5.1. Objective](#951-objective)
     - [9.5.2. Animation](#952-animation)
     - [9.5.3. Narration](#953-narration)
@@ -1027,7 +1027,7 @@ As the relationships between entities evolve, they can lead to the emergence of 
 
 In this view, identity is not a fixed essence but a process — one that is continually shaped and reshaped by the relationships and interactions within a system. This understanding of identity as fluid and emergent opens up new possibilities for how we understand and engage with complex systems, whether in biology, society, or our own sense of self. 
 
-The risks of treating a comlpex system as a simple system become apparent. We know that our modelsof complex systems are themeselves simepl, so we know our actions will have unforseen consequences. Therefore large actions based on simple models risk large unpredicatable consequences. We would be wise to act in such as way that sees undesirable consequences before they become dominant.
+The risks of treating a complex system as a simple system become apparent. We know that our modelsof complex systems are themeselves simepl, so we know our actions will have unforeseen consequences. Therefore large actions based on simple models risk large unpredictable consequences. We would be wise to act in such as way that sees undesirable consequences before they become dominant.
 
 ## 8.7. Scene: Hierarchical Impredicativity
 ### 8.7.1. Objective
@@ -1091,13 +1091,13 @@ In most human systems, the very act of observing is already a form of participat
 
 We can appreciate that our observations are not just passive acts of recording reality — they are active engagements that shape and are shaped by the systems we particpate in. This perspective invites us to reconsider the role of the observer, not as a detached spectator, but as an integral participant.
 
-## 9.5. Scene: Conscious vs Unconscious
+## 9.5. Scene: Awareness
 ### 9.5.1. Objective
 Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of processism.
 ### 9.5.2. Animation
 Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible — lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
 ### 9.5.3. Narration
-Consciousness is a subject of intense debate, especially in fields like philosophy and neuroscience. We won’t attempt to solve the 'hard problem of consciousness' here, but we can explore a useful way to distinguish between conscious and unconscious processes within the framework of processism.
+The concept of awareness distinguishs between conscious and unconscious processes within the framework of processism. Consciousness is not a well defined term and here we are using it to distinguish between conscious experience, when we are aware of our experince, and unconscious experience, where we are unaware of our experience. An example of unconscious experience is any process that involves us, without us being aware of the interaction, for example, I might be unaware of the pressure of the chair I'm sitting in, and I might be unaware of how my taxes are being spent.
 
 Imagine that this circular area represents our conscious awareness. Inside this circle, we can see relationships and processes clearly — they are within our conscious awareness. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
 
@@ -1124,7 +1124,7 @@ In an unsubjective experience, there is still awareness, but the usual sense of 
 
 This phenomenon has profound implications for our understanding of the self. It suggests that subjectivity — the sense of being a distinct 'I' — is not a necessary condition for conscious experience. Instead, it is one mode of experience among others.
 
-By recognizing that consciousness can exist without subjectivity, we open the door to a deeper exploration of what it means to be aware and how we construct our sense of self. This challenges the conventional view that the self is a fixed, central observer and instead invites us to consider the self as a more fluid and dynamic process, capable of both subjective and unsubjective experiences.
+By recognizing that consciousness can occur without subjectivity, we open the door to a deeper exploration of what it means to be aware and how we construct our sense of self. This challenges the conventional view that the self is a fixed, central observer and instead invites us to consider the self as a more fluid and dynamic process, capable of both subjective and unsubjective experiences.
 
 ## 9.7. Scene: Self
 ### 9.7.1. Objective
