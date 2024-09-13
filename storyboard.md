@@ -50,11 +50,15 @@ General adult public in Western countries
 * Some concepts, like "Non-Foundationalism" and "Paradox vs Not-knowing," might be too abstract for the general audience without sufficient grounding in prior scenes. Introduce these abstract ideas by first revisiting more concrete examples discussed earlier in the presentation, then use those examples to illustrate the abstract concept. For example, revisit the "System" scene to introduce non-foundationalism, showing how the system operates without a single fixed foundation.
 * The storyboard is largely didactic, focusing on delivering information rather than engaging the viewer interactively. Consider incorporating more interactive elements or questions that invite viewers to reflect on their understanding or relate the content to their own experiences.
 * At the end of the presentation, offer a brief recap of the key concepts
+* Support Materials: Provide supplementary materials (e.g., glossaries, FAQs) to aid understanding.
 <!-- omit in toc -->
 ## Potential further concepts:
 * Co-evolution
 * Intra-action
 * Reality is that which we do not want to change
+* Historical Context: Briefly explore the origins of Processism and its development over time.
+* Applications of Processism: Highlight how process-oriented thinking impacts various fields such as science, technology, and social sciences.
+* Challenges and Critiques: Address common criticisms to provide a balanced perspective and deepen the audience's understanding.
 
 <!-- omit in toc -->
 # Overview
@@ -1097,34 +1101,32 @@ Introduce a practical and useful distinction between conscious and unconscious p
 ### 9.5.2. Animation
 Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible — lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
 ### 9.5.3. Narration
-The concept of awareness distinguishs between conscious and unconscious processes within the framework of processism. Consciousness is not a well defined term and here we are using it to distinguish between conscious experience, when we are aware of our experince, and unconscious experience, where we are unaware of our experience. An example of unconscious experience is any process that involves us, without us being aware of the interaction, for example, I might be unaware of the pressure of the chair I'm sitting in, and I might be unaware of how my taxes are being spent.
+Let's explore how awareness helps us distinguish between conscious and unconscious processes. In this context, 'consciousness' refers to experiences we're actively aware of, while 'unconsciousness' includes experiences and processes that occur without our immediate attention. For example, we might not notice the pressure of the chair we're sitting on or fully grasp how our taxes are being spent—these are processes involving us but often remain outside our conscious focus.
 
-Imagine that this circular area represents our conscious awareness. Inside this circle, we can see relationships and processes clearly — they are within our conscious awareness. However, outside this circle lies a vast array of relationships and processes that remain unconscious, operating below the level of our immediate awareness.
+Imagine this circular area represents our conscious awareness. Inside this circle, relationships and processes are clear—we're aware of them. Outside the circle lies a vast array of relationships and processes operating below our immediate awareness.
 
-Most of the processes we participate in are unconscious. These include the automatic functions within our bodies, the habitual behaviors in our relationships, and the broader dynamics within society and the environment. We’re often unaware of these processes unless something draws them into our conscious focus — such as a sudden change or a deliberate act of attention.
+Most processes we participate in are unconscious. They include automatic functions in our bodies, habitual behaviors in our relationships, and broader societal and environmental dynamics. We usually remain unaware of these unless something brings them into focus, like a sudden change or deliberate attention.
 
-Our sensitivity to these processes, whether conscious or unconscious, determines the range of options available to us. When we expand our awareness — enlarging the circle, so to speak — we increase our sensitivity to more processes, allowing us to engage with a broader range of relationships and influences. Conversely, when our focus narrows, we become more limited in what we can perceive and respond to.
+Our sensitivity to these processes—whether conscious or unconscious—determines the range of options available to us. When we expand our awareness, enlarging the circle, we become sensitive to more processes and can engage with a broader range of relationships and influences. Conversely, narrowing our focus limits what we can perceive and respond to.
 
-This brings us to the idea of the 'self.' We can define the self narrowly, consisting only of the ego and the stories we tell ourselves about who we are. In this view, consciousness is limited to a small set of personal narratives and immediate concerns. But we can also define the self more broadly, as encompassing all the processes we are sensitive to — both consciously and unconsciously.
+This leads us to consider the 'self.' In a narrow sense, the self might be viewed as just our ego and personal narratives—the stories we tell about who we are. Here, consciousness is confined to immediate concerns. Alternatively, we can broaden the definition to include all processes we're sensitive to, both conscious and unconscious, expanding our understanding of the self.
 
-By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding oursleves. It's not just about what we are aware of at any given moment, but about how we navigate the vast network of processes that make up our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
+By recognizing the fluid boundary between conscious and unconscious processes, we open up new possibilities for understanding ourselves. It's not just about what we're aware of at any given moment but about how we navigate the vast network of processes that shape our experience. Expanding our sensitivity and awareness allows us to engage more fully with the world, integrating a larger range of processes into our understanding of ourselves and our place in the world.
 
 ## 9.6. Scene: Subjective vs Unsubjective
 ### 9.6.1. Objective
 Distinguish between subjective and unsubjective experiences, highlighting their implications for our understanding of the self.
 ### 9.6.2. Animation
 ### 9.6.3. Narration
-Our everyday conscious experience typically includes a sensation of subjectivity — the awareness that the experience I am having is uniquely my own. This is a fundamental aspect of what most of us consider to be consciousness: an experience of being present in relation to things that are distinctly not me.
+In our everyday lives, we often experience ourselves as distinct observers moving through the world—there's a clear sense of 'I' experiencing things separate from everything else. This feeling of subjectivity is so familiar that we might take it for granted. It's the awareness that our experiences are uniquely our own, that we are individuals interacting with a world outside of ourselves.
 
-For many, this sense of subjectivity is so intrinsic to experience that it might seem strange to distinguish it. Conscious experience is usually synonymous with the feeling of being someone — a distinct observer, interacting with the world.
+However, there are moments when this sense of self isn't present at all. For example, when we're so deeply engrossed in a task, absorbed in a captivating story, or fully engaged in physical activity, we might lose track of time and completely forget about ourselves. In these instances, the usual boundaries between 'me' and 'not me' dissolve, and the experience of self fades away.
 
-However, if we examine the process of conscious experience in great detail — using, for example, specific meditation techniques intended to provide insight into the process of awareness — we stumble upon an extraordinary fact. It is possible to have an experience without the sensation of subjectivity.
+This brings us to the concept of unsubjective experiences. These are states where the typical sense of being a separate observer is absent. We're still conscious and aware, but the experience doesn't include the usual feeling of 'I' at the center. The experience becomes less about 'me' observing something and more about simply being part of what is happening.
 
-In an unsubjective experience, there is still awareness, but the usual sense of 'I' — the feeling of being a separate observer — is absent. This isn't a case of simply not noticing subjectivity; rather, in the moment, the distinction between self and other, observer and observed, dissolves. Only upon reflecting on the experience afterward might one realize that something was profoundly different — that the experience lacked the usual subject-object distinction.
+Such experiences highlight that the self is not always present in our consciousness. The experience of self can come and go, depending on our engagement with the world around us. This shows that our sense of self is not a constant, but something that can fluctuate and even disappear at times. This challenges the notion of a fixed, ever-present self and opens the possibility of recentering our experience around other priorities.
 
-This phenomenon has profound implications for our understanding of the self. It suggests that subjectivity — the sense of being a distinct 'I' — is not a necessary condition for conscious experience. Instead, it is one mode of experience among others.
-
-By recognizing that consciousness can occur without subjectivity, we open the door to a deeper exploration of what it means to be aware and how we construct our sense of self. This challenges the conventional view that the self is a fixed, central observer and instead invites us to consider the self as a more fluid and dynamic process, capable of both subjective and unsubjective experiences.
+As we continue our exploration, we'll delve deeper into how these insights relate to our understanding of self and our participation within larger systems.
 
 ## 9.7. Scene: Self
 ### 9.7.1. Objective
@@ -1184,15 +1186,25 @@ This concept of staged development not only applies to individual learning and g
 Introduce the concept of "non-self" as a nuanced understanding of the self, reflecting its emergent and interconnected nature.
 ### 10.4.2. Animation
 ### 10.4.3. Narration
-If we understand the self as an emergent process, shaped by complex, heterarchical impredicativities, it may seem incoherent to speak of 'the self' as a singular, static entity. At the same time, we cannot ignore the reality of our habits, biases, strengths, and weaknesses, which seem to define an identity. This apparent contradiction raises the question: How can we reconcile the fluid nature of the self with the tangible experience of subjectivity?
+Earlier, we explored how the self is an emergent process—shaped by countless interactions and experiences. We recognized that our identity isn't fixed but continuously evolving within the web of relationships we participate in.
 
-Several philosophical and spiritual traditions offer a concept that captures this nuance: that of 'non-self.' The idea of non-self does not deny the existence of individual characteristics and experiences, but it challenges the notion that the self is the center of the universe, the fixed point around which everything else revolves.
+Yet, we often feel there's a central "me" that remains constant—a core identity that defines who we are. This raises a question: How do we reconcile this sense of a stable self with the idea that we are ever-changing?
 
-In these traditions, the self is understood as a perspective on the many processes we are participating in, rather than a separate, independent entity. The self is not an isolated 'thing' but a dynamic intersection of relationships, continuously influenced by and influencing the processes around it.
+This is where the concept of "non-self" comes in. The idea of non-self doesn't deny our personal experiences or characteristics. Instead, it challenges the notion that the self is a singular, unchanging essence at the center of everything.
 
-This concept of non-self invites us to shift our perspective — from seeing the self as the protagonist of our story to recognizing it as one of many interconnected elements within a larger, ever-changing reality. It encourages us to let go of the idea that the self is something to be preserved or defended at all costs and to embrace the reality that we are part of something much larger and more fluid than we realized.
+Imagine the self not as a separate island but as a wave arising in the ocean. The wave has form and movement, but it's not separate from the water—it’s created by the conditions around it. In the same way, our sense of self arises from the multitude of processes we are part of.
 
-By embracing non-self, we can begin to see ourselves not as isolated individuals but as participants in a vast network of relationships, where our identity is not fixed but constantly evolving in response to the world around us. This shift in perspective can lead to a deeper understanding of our place in the world, fostering a sense of connection and interdependence that transcends the limitations of the individual isolated self.
+Much of what makes us who we are operates unconsciously. We engage in processes without being aware of them—like the automatic functions of our bodies or the societal influences that shape our beliefs. Additionally, we can have experiences without the usual sense of "I"—what we referred to earlier as unsubjective experiences.
+
+By recognizing that the self includes both conscious and unconscious processes, subjective and unsubjective experiences, we begin to see ourselves as more fluid and interconnected than we might have thought.
+
+Embracing the concept of non-self invites us to shift our perspective. Instead of seeing ourselves as isolated and unchanging, we start to view ourselves as dynamic participants in a larger, ever-evolving reality. This doesn't diminish our personal experiences; it enriches them by placing them within a broader context.
+
+Letting go of rigid notions of identity can be liberating. It allows us to adapt more easily to change, to be more open to new experiences, and to connect more deeply with others. We become more attuned to the processes happening within and around us, many of which operate beyond our immediate awareness.
+
+As we continue our exploration, we'll look at how language shapes our understanding of reality and how embracing uncertainty can lead to new insights. Just as the concept of non-self encourages us to release fixed ideas about who we are, we'll see how letting go of fixed foundations in knowledge can open up endless possibilities.
+
+By embracing non-self, we align ourselves with the continuous flow of life—finding harmony not in what is fixed, but in the beauty of ongoing transformation.
 
 ## 10.5. Scene: Language
 ### 10.5.1. Objective
