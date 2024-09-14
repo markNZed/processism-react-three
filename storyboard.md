@@ -378,13 +378,13 @@ Introduce "entity" concept.
 ### 2.2.2. Animation
 A single particle with an irregular oscillating boundary
 ### 2.2.3. Narration
-Here, we have a simple visual of an entity. Although, in reality, nothing exists entirely on its own, we’ll start with this idea to help us build our understanding.
+Let's begin by focusing on a single entity. On the screen, you see a simple shape with an irregular, oscillating boundary. This entity could represent anything—a physical object like a particle, an idea, or even a person. Notice how its boundary isn't fixed; it's constantly shifting and changing. This movement illustrates that the entity is not static but dynamic.
 
-This entity is shown as a two-dimensional shape, but it could represent anything — a physical object, an idea, or even a person. Notice how its boundary isn’t fixed; it’s constantly shifting. This shows that the entity isn’t static.
+For example, if we think of this entity as a particle, it's subject to quantum forces that make its position and state uncertain. If it's a concept, its meaning might evolve over time as new insights emerge. If it represents a person, consider how each of us is continually growing, learning, and experiencing life differently from one moment to the next.
 
-For example, if this were a particle, it would be affected by quantum forces. If it were a concept, its meaning could change over time. If it represents a person, they are growing, learning, and aging.
+While we're starting with the idea of an isolated entity to help build our understanding, it's important to recognize that, in reality, nothing exists entirely on its own. Every entity is part of a larger network of interactions and relationships. In the philosophy of processism, we shift our focus from static entities to the dynamic processes that create and connect them. These processes—the ongoing interactions and relationships—are considered the fundamental building blocks of reality.
 
-In processism, entities like this aren’t considered the most fundamental aspect of reality. Instead, we’ll see that the processes generating entities that are more important.
+As we move forward, we'll explore how these processes intertwine to form the systems around us. This perspective invites us to see the world not as a collection of separate, unchanging objects but as a dynamic web of interconnected and evolving relationships.
 
 ## 2.3. Scene: Second Entity
 ### 2.3.1. Objective
@@ -392,13 +392,13 @@ Introduction of multiple entities
 ### 2.3.2. Animation
 A second particle appears in a different color (purple) next to the original blue entity. Two particles move slowly in a shared plane without interacting.
 ### 2.3.3. Narration
-Now, let’s add a second entity, this time in purple, next to the original blue one. The color here represents a property of the entity. For example, we might imagine that purple represents electrons and blue represents protons.
+Now, let's introduce a second entity into the scene. This time, you’ll see a purple shape appear next to the original blue one. The different colors signify distinct properties or characteristics for each entity. For instance, the blue entity might represent one type of particle, idea, or person, while the purple one represents another.
 
-We only have a limited number of visual features — like color and shape — to represent the properties of these entities. In reality, entities might have many more properties than we can show visually.
+Although these two entities share similarities—they’re both dynamic shapes with shifting boundaries—they are not identical. Their differences in color and slight variations in movement emphasize their unique properties and behaviors.
 
-You’ll notice that while the two entities look similar, they’re not identical. This difference reflects that they represent different processes, so they can’t be exactly the same.
+Notice how the two entities exist side by side in the same space, moving slowly on a shared plane but not yet interacting. This setup highlights that while entities may be independent, they often share a common environment or context. The distance between them might represent physical separation, but it could also signify differences—or even similarities—in their properties.
 
-Also, these entities are moving together on the same plane. This movement is another way to show their properties. For instance, the distance between them could represent how similar they are, rather than just physical distance.
+By introducing this second entity, we open up the possibility of interaction. Even when entities remain separate, their presence within the same context creates the conditions for relationships to form. In the upcoming scenes, we’ll explore how these interactions unfold and why they are crucial to the processes that shape reality.
 
 ## 2.4. Scene: Introduction to Events
 ### 2.4.1. Objective
@@ -406,11 +406,13 @@ Introduce the basic concept of an event
 ### 2.4.2. Animation
 An invisible arc in the Z plane connects the centers of both entities. A line grows out from the blue entity, following this arc, until it reaches a fraction of the arc’s length. The line then continues along the arc until it is absorbed into the purple entity.
 ### 2.4.3. Narration
-Now, let’s explore what happens when these entities interact. The line growing from the blue entity toward the purple one represents an event.
+Now, let’s explore what happens when these entities interact. Imagine an arc connecting the blue entity to the purple one as a pathway—a route for interaction.
 
-Events refer to interactions. In this case, the event begins with the blue entity, follows the arc, and completes once it reaches the purple entity.
+The segment you see being sent from the blue entity represents the beginning of an event initiated by the blue entity. This segment follows the arc, traveling across the space between the two entities, and is finally absorbed by the purple entity.
 
-This is how processes unfold over time. Events capture the moments where entities interact and change. They are critical points where entities evolve, their properties shift, and new possibilities emerge.
+Think of an event as a transfer between two entities. It's the moment where something happens—where change is set in motion. For example, if these entities represented people, this event could be the transmission of information through a spoken word. If they were particles, it might represent an exchange of energy.
+
+In processism, events like this are fundamental. They mark the moments when entities interact, their properties shift, and new possibilities emerge. Through these events, entities evolve and relationships form. Each segment, no matter how small, plays a role in the continuous unfolding of processes that shape the reality around us.
 
 ## 2.5. Scene: Introduction to Relations
 ### 2.5.1. Objective
@@ -418,13 +420,15 @@ Introduce the basic concept of a relation between two entities.
 ### 2.5.2. Animation
 An arc in the Z plane connects the centers of both entities, growing from the blue entity to the purple entity. An arc grows from the blue entity to the purple entity, with an arrow indicating the direction of the relation.
 ### 2.5.3. Narration
-Let’s introduce the idea of a relation between two entities. Watch as an arc extends from the blue entity to the purple entity. This arc represents the relationship from the blue entity to the purple entity.
+Let’s now introduce the concept of a relation between two entities. Watch as a segment extends from the blue entity toward the purple entity, forming an arc. This arc represents the relationship between the two entities.
 
-Notice the arrow at one end, showing the direction of this connection. The arc curves through the third dimension, reminding us that a relation is different from the entities it connects. While the blue and purple shapes represent entities, this arc represents how they interact with each other.
+Notice the arrow on the arc, indicating that the relation has direction. This shows that a relation isn’t just a static connection—it’s dynamic, representing how one entity influences the other. The arc curves through the third dimension, reminding us that a relation is of a different nature than the entities it connects.
 
-A relation is a concept that represents the history of events between entities and the potential for future events between entities. 
+A relation isn’t an entity itself. Instead, it’s how we describe the structure of interactions within a system. It captures the history of past events between the two entities and holds the potential for future interactions. For example, if these entities were two people, this relation might represent their shared experiences, conversations, or even the subtle, unspoken understanding between them.
 
-A relation isn’t an entity by itself; instead, it’s how we observe and understand interactions within a system. These relations illustrate the interconnectedness of entities. In processism, entities do not stand alone; they are interdependent.
+In processism, entities do not exist in isolation. Their relationships with other entities define who or what they are. The patterns and processes that shape everything around us are understood through the lens of these relations.
+
+As we move forward, we’ll explore how these relations are not fixed but constantly changing as new events unfold.
 
 ## 2.6. Scene: Exploring the Properties of Relations
 ### 2.6.1. Objective
@@ -432,13 +436,15 @@ Delve into the properties of relations, using the example of awareness and sensi
 ### 2.6.2. Animation
 A second arc, this time a dotted line, grows from the purple entity back to the blue entity. A dotted line grows from the purple entity to the blue entity, following the same path as the previous arc.
 ### 2.6.3. Narration
-Now, let’s explore the properties of this relation. Imagine the blue entity is a person who sees the purple person. The solid arc represents this awareness — the blue person sees the purple person, but not the other way around.
+Now, let’s explore the properties of this relation. Imagine that the blue entity represents a person who becomes aware of the purple entity. The solid arc extending from the blue entity to the purple one represents this awareness—a direct connection. However, awareness is not always mutual.
 
-To make this clearer, we’ll add a dotted line from the purple entity back to the blue one. This dotted line represents the light reflecting from the purple person to the blue person’s eyes.
+To illustrate this, we’ll introduce a second, dotted arc extending from the purple entity back to the blue one. This dotted arc represents a new event—something from the purple entity that allows the blue entity to become aware. For example, it could be light reflecting from the purple entity, allowing the blue entity to see it.
 
-The different types of lines help us visualize different aspects of the relationship. In this case, the solid line represents observation, while the dotted line represents the physical process of light reflection.
+The difference between the solid and dotted lines shows us that relationships are multi-layered. One line might represent an action, like awareness, while the other could represent a physical process, such as light traveling between them. To simplify things, we can represent these two arcs as a single arc with arrows on both ends, indicating a mutual exchange or interaction.
 
-One important point is that the blue person can relate to the purple person because they are aware of them. However, if the purple person isn’t aware of the blue one, they can’t enter into a relationship. This shows that our ability to form relations depends on our sensitivity to other entities.
+The key point is that relationships depend on sensitivity. Without mutual sensitivity, we have a one-way, or uni-directional, relationship. This highlights an important idea in processism: entities and their interactions are shaped by their sensitivity to each other.
+
+As we continue, we’ll explore how these connections evolve over time, shaping the dynamic processes that define the world around us.
 
 ## 2.7. Scene: Process
 ### 2.7.1. Objective
@@ -446,17 +452,17 @@ Distinguish between coordinated and uncoordinated processes and illustrate how p
 ### 2.7.2. Animation
 Start with a single large entity becoming transparent to reveal the smaller entities within it. Show these smaller entities connected by lines representing their relationships. These connections begin to move in a repeating pattern, illustrating a coordinated process. Then, some lines fade or disconnect, showing uncoordinated processes where the movement becomes more chaotic. Finally, zoom out to see the entire system, with multiple coordinated and uncoordinated processes occurring simultaneously.
 ### 2.7.3. Narration
-In processism, a process is understood as a sequence of relations that we are sensitive to. Let’s explore what this means by examining how these relations play out within and between entities.
+In processism, a process is understood as a sequence of events. To help explain this, let’s explore how these relations unfold both within and between entities.
 
-First, we begin with a single large entity. As it becomes transparent, we reveal the smaller entities that make up this larger one. These smaller entities are connected by arcs, representing their relationships. As these connections start to move in a repeating pattern, we see an example of a coordinated process. This could be likened to the regular beating of a heart, where the cells work together in harmony to maintain a consistent rhythm.
+We’ll start with a single large entity. As it becomes transparent, we reveal the smaller entities that compose it. These smaller entities are connected by arcs, representing active relationships. When these connections move in a coordinated, repeating pattern, we observe what’s known as a coordinated process. A good example would be the regular beating of a heart, where cells work in harmony to maintain a consistent rhythm.
 
-However, not all processes are so neatly coordinated. As we continue, some of these lines fade or disconnect, representing uncoordinated processes. Here, the movement becomes more chaotic, reflecting situations where the entities are not synchronized. For instance, this might occur in a market where individual actions are not synchronized, leading to unpredictable outcomes.
+However, not all processes are coordinated. As we move forward, you’ll notice some connections randomly arise and cease, representing uncoordinated processes. Here, the movements are less predictable, more chaotic—similar to individual actions in a marketplace, where no consistent pattern governs the behavior.
 
-Finally, as we zoom out, we observe the entire system, where multiple processes — both coordinated and uncoordinated — are happening simultaneously. This broader view helps us understand that a process can involve various levels of organization and synchronization, depending on the relationships between the entities involved.
+Now, zooming out, we can observe the entire system in action. Multiple processes—both coordinated and uncoordinated—are happening simultaneously. The coordinated ones create stable, recurring patterns, while the uncoordinated ones introduce unpredictability into the system.
 
-It’s important to remember that in processism, an entity itself is understood as a process. The movement in our visual language reminds us that these processes are not static; they are continually evolving, shaped by the interactions within and between the entities involved.
+This broader view reveals a key insight: even within a single entity, there are layers of processes constantly interacting. Processes don’t just occur inside entities; they also occur between entities, creating networks of evolving interactions. Whether coordinated or uncoordinated, every process contributes to shaping the system as a whole.
 
-In summary, processes are sequences of relations that can be either coordinated, leading to predictable patterns, or uncoordinated, resulting in more unpredictable behavior.
+In processism, an entity itself is not a static object; it is the product of many ongoing processes. These processes, whether predictable or unpredictable, are always in flux—constantly shifting, evolving, and shaping the world around us.
 
 ## 2.8. Scene: Complicated Relations
 ### 2.8.1. Objective
@@ -464,15 +470,15 @@ Demonstrate how relations between abstract entities can involve multiple compone
 ### 2.8.2. Animation
 Zoom into two intermediate entities that have multiple lines representing their relationship. These lines are synchronized, originating from various fundamental entities within each intermediate entity. Then, a single, thicker line appears from the center of each intermediate entity to represent the abstract, overarching relationship between them.
 ### 2.8.3. Narration
-Let’s explore the relationships between two entities. As we zoom in, you’ll notice that their interaction isn’t represented by just a single, simple connection. Instead, multiple lines appear, each one representing a different process occurring within these entities, but all these processes are synchronized.
+Let’s take a closer look at the relationships between two entities and see how these interactions can involve multiple layers. As we zoom in, you’ll notice that their connection isn’t represented by just a single arc. Instead, multiple arcs appear, each representing a distinct process happening within and between these entities.
 
-These synchronized arcs reflect the coordination happening inside each entity. For example, when two people interact, their relationship might involve spoken language, gestures, and even shared memories — all different aspects working together to form a connection.
+These multiple arcs show us that different types of interactions are occurring simultaneously. For example, when two people communicate, their connection involves more than just exchanging words. It includes body language, shared memories, emotions—all of these layers work together to shape their relationship. The arcs you see represent these different aspects, all interacting in coordination.
 
-To help us visualize this more complicated relationship, we introduce a thicker line originating from the center of each intermediate entity. This thicker line represents the overarching connection between them, abstracting the multiple synchronized processes into a single relationship.
+To simplify this, we introduce a thicker arc that emerges from the center of each entity. This thicker arc represents the overall relationship between the two entities, combining all the different layers of interactions into a single, more abstract connection. It allows us to see the big picture—a unified relationship formed from the coordination of these smaller, individual processes.
 
-It’s important to understand that these complicated relations, represented by the thicker lines, don’t replace the simpler, more fundamental interactions. Instead, they emerge from the coordination of these basic processes. The relations of the intermediate entities are also external relations of the more fundamental entities within them.
+It's important to note that this overarching relationship doesn’t replace the simpler interactions; rather, it arises from them. The larger connection is sustained by the smaller, more fundamental processes. So when we observe a higher-level relationship, it’s an abstraction built upon many underlying interactions.
 
-This layered coordination reminds us that even the most abstract relationships between entities are built upon more basic, synchronized processes. By understanding these multiple levels of interaction, we gain insight into how complicated systems function in the real world. Each entity is not just connected but interdependent. The actions and states of one influence the others, creating a web of interconnectedness where the whole system's behavior emerges from these interwoven relations.
+This illustrates that relationships are not simple, one-dimensional connections. Each interaction has depth, shaped by various processes working together within and between the entities. These layers of interaction interweave to form the larger network of relationships that shapes the system as a whole.
 
 # 3. Section: Systems and Their Structure
 ## 3.1. Objective
