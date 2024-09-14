@@ -362,11 +362,11 @@ Overview of this presentation
 ### 1.2.2. Animation
 Text: "A visual language for processism"
 ### 1.2.3. Narration
-Welcome to our animated journey into processism. Processism is a way of thinking that’s been around for a long time, but it’s not well-known in Western culture. It offers an alternative to essentialism, which is the idea that things have a fixed, unchanging core or essence.
+WWelcome to this animated journey into processism. While processism has been around for a long time, it’s not widely recognized in Western culture. Unlike essentialism—the idea that things have a fixed, unchanging core or essence—processism focuses on how everything is constantly evolving and interconnected.
 
-In contrast, processism focuses on how everything is constantly changing and evolving. Our culture tends to lean heavily on essentialism, so understanding processism can be challenging. This presentation is designed to help you see the world in a new way.
+Our culture tends to lean toward essentialist thinking, making the perspective of processism feel unfamiliar. But through this presentation, we aim to help you explore this different way of understanding the world, one that emphasizes change and relationships over static definitions.
 
-We’ll be building a visual language to explain the concepts of processism. This visual language will be abstract, but we’ll use real-life examples to make things clearer. As you follow along, we hope you'll think about how these ideas might be useful for you.
+We’ll be creating a visual language to explain the key concepts of processism. While this language might seem abstract at first, we’ll ground it with real-life examples to make the ideas easier to grasp. As you watch, we encourage you to reflect on how these ideas might apply to your own life and the world around you.
 
 # 2. Section: Relations and Processes
 ## 2.1. Objective
