@@ -44,13 +44,8 @@ General adult public in Western countries
 
 <!-- omit in toc -->
 # Feedback so far
-
-* Consider adding brief summary or reflection points after particularly dense sections (e.g., after "Emergent Process" or "Heterarchy") to give the audience time to digest the information before moving on.
-* Strengthen transitions by explicitly connecting how each new concept builds on or is informed by the previous one. For instance, you could use a brief narrative bridge that ties the emerging complexities of structure directly into the relativity of processes in time.
-* Some concepts, like "Non-Foundationalism" and "Paradox vs Not-knowing," might be too abstract for the general audience without sufficient grounding in prior scenes. Introduce these abstract ideas by first revisiting more concrete examples discussed earlier in the presentation, then use those examples to illustrate the abstract concept. For example, revisit the "System" scene to introduce non-foundationalism, showing how the system operates without a single fixed foundation.
-* The storyboard is largely didactic, focusing on delivering information rather than engaging the viewer interactively. Consider incorporating more interactive elements or questions that invite viewers to reflect on their understanding or relate the content to their own experiences.
-* At the end of the presentation, offer a brief recap of the key concepts
 * Support Materials: Provide supplementary materials (e.g., glossaries, FAQs) to aid understanding.
+
 <!-- omit in toc -->
 ## Potential further concepts:
 * Co-evolution
@@ -403,6 +398,8 @@ Our culture tends to lean toward essentialist thinking, making the perspective o
 
 We’ll be creating a visual language to explain the key concepts of process philosophy. While this language might seem abstract at first, we’ll ground it with real-life examples to make the ideas easier to grasp. As you watch, we encourage you to reflect on how these ideas might apply to your own life and the world around you.
 
+Reflective Question: Reflect on a time in your life when something you believed to be stable or permanent began to change. How did you react?
+
 # 2. Section: Relations and Processes
 ## 2.1. Objective
 Reality emerges not from isolated entities but from the interactions and relations. In this section, we’ll explore how everything interacts through dynamic processes and the associated events.
@@ -435,6 +432,8 @@ Notice how the two entities exist side by side in the same space, moving slowly 
 
 By introducing this second entity, we open up the possibility of interaction. Even when entities remain separate, their presence within the same context creates the conditions for relationships to form. What happens when these entities begin to interact? In the upcoming scenes, we’ll explore how these interactions unfold and why they are crucial to the processes that shape reality.
 
+Reflective Question: Think of two seemingly separate areas in your life. Have they ever influenced each other unexpectedly?
+
 ## 2.4. Scene: Introduction to Events
 ### 2.4.1. Objective
 Introduce the basic concept of an event
@@ -464,6 +463,8 @@ A relation isn’t an entity itself. Instead, it’s how we describe the structu
 Relations act as the threads weaving the fabric of reality, connecting entities in meaningful ways. In process philosophy, entities do not exist in isolation. Their relationships with other entities define who or what they are. The patterns and processes that shape everything around us are understood through the lens of these relations.
 
 As we move forward, we’ll explore how these relations are not fixed but constantly changing as new events unfold.
+
+Reflective Question: Consider a significant relationship in your life. How has it evolved over time through different interactions and events?
 
 ## 2.6. Scene: Exploring the Properties of Relations
 ### 2.6.1. Objective
@@ -557,6 +558,8 @@ In process philosophy, the concept of essence is reframed. Rather than viewing e
 
 Abstraction helps us understand systems by revealing higher-level patterns and relationships that emerge from ongoing interactions. However, this simplification comes with trade-offs. By focusing on the abstracted whole, we might lose sight of the ongoing, dynamic changes occurring at smaller levels. Still, abstraction remains a useful tool for understanding complicated environments.
 
+Reflective Question: Can you think of a situation where you’ve seen a group act as a whole, even though it's made up of many individuals?
+
 ## 3.4. Scene: Levels
 ### 3.4.1. Objective
 Illustrate the concept of multiple levels of abstraction emerging through the accumulation and integration of entities.
@@ -570,6 +573,8 @@ As these new entities come together with the original blue entity, they form an 
 t each stage, new properties emerge as a result of new relationships and boundaries forming between entities, not just from the sum of their parts. For example, when individual cells come together to form tissues, the tissue exhibits properties that none of the cells could produce in isolation. This is an example of strong emergence: these emergent properties are fundamentally different from what existed at lower levels, representing a novel reality shaped by the way entities are organized and relate to each other.
 
 In this sense, these emergent properties are more than just the sum of the parts—they are a product of how the entities are organized and how their relations form new structures. These properties cannot be reduced to the underlying processes or explained purely by them, even though they arise from the system’s internal dynamics. The new properties represent something novel, brought into being by the way entities relate and interact within the system.
+
+Reflective Question: Consider a group or organization you’re part of. How does it exhibit properties that are greater than the sum of its parts?
 
 ## 3.5. Scene: Fundamental Level
 ### 3.5.1. Objective
@@ -685,19 +690,23 @@ This fluidity reflects the nature of the relationships we observe. Consider a so
 
 In process philosophy, boundaries are shaped by the relationships we choose to emphasize. The more we focus on certain interactions, the more those interactions define the boundary of the entity. This perspective challenges the idea of rigid separations, reminding us that every boundary is a reflection of the processes that shape it.
 
+Reflective Question: How do the boundaries of relationships in your life shift and change over time?
+
 ## 4.5. Scene: Emergent Process
 ### 4.5.1. Objective
 Distinguish between centralized and emergent processes, illustrating how systems can either be directed by a central authority or arise from the collective dynamics of their parts.
 ### 4.5.2. Animation
 Start with a large entity that becomes transparent, revealing the smaller entities within. These smaller entities then begin to separate, showing the individual processes within them. Some of these processes appear to be centrally coordinated, with clear direction and pattern, while others seem to emerge naturally as the smaller entities interact independently, forming patterns without a clear central control.
 ### 4.5.3. Narration
-Some processes in a system are planned and coordinated by a central authority, like a city’s traffic signals guiding the flow of cars. But not all systems work this way. Many patterns emerge without central control—arising naturally from the interactions of smaller parts.
+Not everything in the world is planned or controlled from the top down. In fact, many of the most interesting patterns we see around us come about naturally, through the interactions of smaller parts. This is what we call an emergent process.
 
-Watch as the entities on the screen begin to interact. At first, their movements seem random, with no clear direction. But over time, a pattern starts to emerge. This is an emergent process—a process that forms from local interactions without any top-down direction.
+Let’s think of a flock of birds. Each bird is following a few simple rules—keeping a certain distance from its neighbors and adjusting its direction as they do. There’s no leader bird directing the flock, yet together, they form a beautiful, coordinated pattern. The overall movement of the flock emerges from the individual actions of each bird.
 
-A flock of birds in flight or the spread of ideas in a community are examples of emergent processes. Each bird or person follows simple local rules, and yet, a larger, coordinated behavior takes shape.
+Emergent processes are everywhere. Consider the spread of ideas in a community. Each person may share a thought with a few friends, and those friends pass it along to others. No one is directing the whole process, but over time, the idea spreads and grows, sometimes even leading to significant social change.
 
-Emergent processes reveal that systems don’t always need a central authority to function. They show how order and organization can arise naturally from the collective actions of individuals, reminding us that sometimes complexity grows out of simplicity.
+The key to understanding emergence is realizing that the whole is more than the sum of its parts. These larger patterns—whether it’s a flock of birds or a viral idea—can’t be predicted just by looking at the individual pieces. They emerge naturally from the way the pieces interact.
+
+In process philosophy, this idea of emergence teaches us that systems don’t need a central controller to create order. Instead, patterns and organization can form naturally as smaller elements interact, giving rise to new possibilities and behaviors. Emergence shows us that complexity and beauty can grow out of simple interactions, reminding us of the creative potential that exists in all processes.
 
 ## 4.6. Scene: Stability
 ### 4.6.1. Objective
@@ -790,6 +799,8 @@ But systems also use negative feedback to maintain balance. In this loop, when a
 
 Feedback loops are the invisible forces behind how systems adapt, amplify, or stabilize over time. Recognizing these loops helps us understand how systems can either stay resilient or undergo dramatic shifts.
 
+Reflective Question: Think of a feedback loop in your life, perhaps where a small action led to big changes or where balance was maintained.
+
 ## 5.4. Scene: Competition and Collaboration
 ### 5.4.1. Objective
 To illustrate how feedback loops operate within the dynamics of competition and collaboration, and how these interactions at a lower level contribute to stability or change at a higher level.
@@ -868,6 +879,8 @@ Think about this presentation:
 
 By revisiting Aristotle’s four causes, we get a fuller understanding of how systems work, especially those that seem to have a purpose or goal.
 
+Reflective Question: Can you think of something you've created or been a part of where you could identify its purpose (final cause), what it's made of (material cause), how it was made (efficient cause), and its design (formal cause)?
+
 ## 6.3. Scene: Modeling Relation
 ### 6.3.1. Objective
 The modeling relation in category theory is a formal way to describe how a system (such as a biological organism) is related to its abstract model. This relation is established through mappings (functors) that preserve the structure and behavior of the system within its model. It’s a way of understanding how systems can be represented and analyzed mathematically.
@@ -895,6 +908,8 @@ Think of an organism that can repair itself. Unlike machines, living organisms h
 In Aristotle’s terms, we can see final causation at play—the organism acts with a purpose related to its future state. The efficient cause—the processes that generate change—is closely linked to this purpose, creating a cycle where the organism sustains itself through dynamic relationships.
 
 By understanding impredicativity, we gain deeper insight into how living systems operate—not as static objects but as processes that continuously anticipate and adapt to future needs. This gives us a new sensitivity to causality, where purpose and process are intertwined.
+
+Reflective Question: Have you ever been part of a self-sustaining process where your actions and the situation influenced each other in an ongoing loop? How did that feel?
 
 ## 6.5. Scene: Complex and Simple Systems
 ### 6.5.1. Objective
@@ -950,6 +965,8 @@ Intelligence, in this context, is not confined to a central controller. Instead,
 
 This process is intelligence at work, unfolding across timescales. It’s an adaptive mechanism that enables resilience—not by planning in the traditional sense, but by adjusting to ongoing patterns of change. Intelligence, then, is woven into the fabric of the system itself, emerging from its constant interactions and evolving responses.
 
+Reflective Question: Think of a situation where you had to adapt quickly to a new challenge. How did your past experiences shape how you approached it?
+
 ## 7.3. Scene: Evolution as Learning
 ### 7.3.1. Objective
 To illustrate the analogy between the process of intelligence (learning) and the process of evolution, highlighting how learning can occur across various scales and levels, from individual organisms to entire species.
@@ -977,6 +994,8 @@ Imagine two particles, both seemingly identical, sent to different entities. Eac
 Information, then, is not an inherent property. It’s something created in the moment, through the process of interpretation. The same message can be understood differently depending on who receives it, how it’s interpreted, and the past experiences that shape the receiver’s perspective.
 
 This view shifts us away from thinking of information as something static and universal. Instead, it’s dynamic and relational, constantly evolving as it’s encoded, transmitted, and decoded. Information is not something you have; it’s something you participate in—a process that’s shaped by the very interactions that define it.
+
+Reflective Question: Have you ever been in a situation where the same information meant different things to different people? What do you think caused these differences in interpretation?
 
 ## 7.5. Recap Scene: Connecting Minds and Processes
 ### 7.5.1. Objective
@@ -1011,6 +1030,8 @@ It's important to recognize that we cannot attend to every possible relation at 
 With practice, we learn to navigate multiple perspectives, selecting those most relevant to the context at hand. The perspectives we choose, and the timing of when we apply them, shape our understanding of the system and the options available to us.
 
 In process philosophy, embracing the ability to shift between perspectives allows us to appreciate the complex web of relations within systems while also acknowledging the limitations of our own perceptions.
+
+Reflective Question: Have you ever needed to shift your perspective to understand something or resolve a problem? What did changing your perspective reveal to you?
 
 ## 8.3. Scene: Reductionism
 ### 8.3.1. Objective
@@ -1047,6 +1068,8 @@ In process philosophy, a "meta-process" directs our attention to the processes t
 We might think of a meta-process as a process for selecting new perspectives—a mechanism that guides how we shift from one way of understanding the world to another. By recognizing and understanding these meta-processes, we gain deeper insights into the underlying dynamics that influence the systems we observe.
 
 This concept of meta and abstraction broadens our thinking about processes, allowing us to explore new levels of reality as we shift our focus from the specific to the general, from the concrete to the abstract.
+
+Reflective Question: When you face complex decisions, how do you decide which perspective to take or which process to prioritize?
 
 ## 8.5. Scene: Relationalism vs relativism
 ### 8.5.1. Objective
@@ -1137,6 +1160,8 @@ By viewing agency through the lens of hierarchical and heterarchical impredicati
 
 In this way, agency isn't just about isolated decisions; it's about recognizing ourselves as active participants in larger processes. Our actions both shape and are shaped by the systems we inhabit. Embracing this broader understanding allows us to see ourselves as co-creators of our reality, engaging in an ongoing dance between influence and autonomy that defines our existence.
 
+Reflective Question: How do you see yourself as part of larger processes—whether at work, in your family, or in your community? How does this understanding shape your sense of agency?
+
 ## 9.3. Scene: Contextual autonomy
 ### 9.3.1. Objective
 Expand on the concept of contextual autonomy
@@ -1220,6 +1245,8 @@ Embracing the self as an emergent process allows us to appreciate the richness o
 
 This perspective doesn't negate the importance of personal identity; rather, it enriches it by acknowledging the fluidity and adaptability inherent in being human. By letting go of the pursuit of an unchanging "authentic self," we open ourselves to growth, transformation, and deeper connections with the processes shaping our lives.
 
+Reflective Question: How do you feel about the idea that your identity is constantly evolving rather than fixed? How does this perspective change the way you think about yourself?
+
 ## 9.8. Recap Scene: Discovering the Self in Process
 ### 9.8.1. Objective
 Summarize the concepts of agency, consciousness, and the emergent self, setting the stage for exploring knowledge, language, and non-foundationalism.
@@ -1302,30 +1329,32 @@ Non-foundationalism frees us from the constraints of seeking ultimate, unchangin
 Non-foundationalism challenges the idea of a single, unchanging foundation for knowledge or reality.
 ### 10.6.2. Animation
 ### 10.6.3. Narration
-Non-foundationalism rejects the idea of a single, unchanging foundation. Instead, it embraces the notion that stability and coherence can emerge from the interactions between parts, rather than from an unchanging base. By letting go of the need for a fixed foundation, non-foundationalism allows us to understand complex systems in a more flexible and dynamic way.
+Many people think of knowledge as being built on solid foundations, like a house resting on firm ground. But non-foundationalism challenges this idea. Instead of relying on one unchanging base, it suggests that knowledge and understanding emerge from interactions and relationships between things.
 
-In this framework, we recognize that what we often consider fundamental concepts — such as the meaning of words — are not foundational in a traditional sense. For example, at the beginning of this presentation, we used language as if it had fixed, static meanings. However, as we progressed, we introduced a perspective of language as a dynamic process, constantly evolving and reshaping our understanding.
+Imagine you’re building a puzzle. There’s no single piece that holds everything together; it’s the way the pieces fit and connect that forms the picture. Knowledge works in a similar way—meaning and understanding don’t come from one fixed idea, but from how ideas and experiences interact with each other.
 
-From a foundational perspective, this might appear contradictory or paradoxical. How can something be both fixed and fluid? But from a process-centric perspective, it is a reasonable way of presenting a complex paradigm. It reflects the understanding that meanings and truths are not anchored in a single, unchanging foundation but are part of an ongoing, relational process.
+In the past, people often searched for a single, absolute truth—one unshakable foundation. But process philosophy teaches us that stability and meaning arise from ongoing processes, not from a fixed starting point. This makes room for complexity, change, and even contradictions.
 
-Non-foundationalism also allows for a meta-level understanding of diverse paradigms. It acknowledges that we are participants — whether we realize it or not — in a particular context of relations. This perspective frees us from the constraints of seeking an ultimate, singular truth and instead encourages us to engage with the world in a more open and adaptive way.
+For example, think of language. At the start of this presentation, we used words with specific meanings. But as we’ve explored different ideas, those meanings have shifted based on context, new ideas, and relationships between words. This fluidity might seem confusing from a foundational perspective, but from a non-foundationalist view, it’s natural and necessary.
 
-By embracing non-foundationalism, we open ourselves to the richness and complexity of the systems we inhabit, recognizing that coherence and meaning emerge from our interactions and relationships, not from an immovable foundation. This approach not only enhances our understanding of complex systems but also enriches our experience of the world.
+By letting go of the need for a solid, unchanging base, we become more open to exploring complex ideas and adapting to new perspectives. Non-foundationalism isn’t about abandoning the search for truth—it’s about recognizing that truth emerges through the dynamic process of interaction and understanding.
+
+In this way, we’re not confined to one rigid framework. Instead, we are free to explore and evolve, finding coherence and meaning in the connections and relationships between ideas.
+
+Reflective Question: Have you ever had to revise your understanding of something you thought was certain? How did that process of letting go of certainty feel?
 
 ## 10.7. Scene: Paradox vs Not-knowing
 ### 10.7.1. Objective
 Address paradox and introduce not-knowing
 ### 10.7.2. Animation
 ### 10.7.3. Narration
-Paradoxes often arise when our existing frameworks or paradigms reach their limits. They challenge us by presenting contradictions that cannot be resolved within our current understanding.
+Paradoxes often reveal the limitations of our current frameworks for understanding reality. When confronted with something like the statement ‘This sentence is false,’ we find ourselves caught in a contradiction that cannot be easily resolved. These paradoxes challenge the assumptions we rely on and suggest that our ways of knowing might not be sufficient to address every situation.
 
-For example, the statement "This sentence is false" creates a paradox—is it true or false? Such paradoxes highlight the boundaries of binary logic and fixed paradigms.
+This brings us to the concept of not-knowing. Instead of attempting to immediately resolve these contradictions, not-knowing encourages us to acknowledge the uncertainty and complexity inherent in many systems. It is a recognition that some answers cannot be found within our current frameworks, and that we must remain open to perspectives or processes that may not yet be fully understood.
 
-From a process-centric perspective, paradoxes signal opportunities to expand or shift our paradigms. They invite us to question our assumptions and explore new ways of understanding.
+In this way, paradoxes and not-knowing are deeply related: both point to the boundaries of our knowledge, inviting us to remain intellectually flexible and ready to explore alternative modes of understanding.
 
-Embracing not-knowing allows us to remain open in the face of paradox. Rather than forcing a resolution within existing frameworks, we accept uncertainty and remain receptive to new insights. This stance doesn't mean abandoning inquiry; instead, it fosters a mindset of curiosity and humility.
-
-By acknowledging that our knowledge is always partial and provisional, we create space for growth and transformation. Not-knowing becomes a powerful tool, encouraging us to explore beyond the confines of established paradigms.
+Reflective Question: How do you handle uncertainty or paradox in your own life? Do you feel comfortable with not knowing, or do you tend to seek definitive answers?
 
 ## 10.8. Scene: Process Philosophy and Ethics
 ### 10.8.1. Objective
@@ -1399,15 +1428,17 @@ Explain this presentation as one perspective on process philosophy, acknowledgin
 ### 11.3.2. Animation
 Begin with a zoom-out from the final scene of the presentation, revealing the entire sequence of scenes as part of a larger, interconnected network. This network forms a web of relations, with each scene represented as a node connected by lines (representing the flow of concepts). Gradually, the view shifts to highlight the presentation itself as a single node within an even broader context, suggesting that this presentation is one of many possible perspectives on process philosophy. The scene ends with the presentation’s visual elements morphing into different styles, illustrating their adaptability to other contexts and perspectives.
 ### 11.3.3. Narration
-As we conclude this exploration of process philosophy, it’s important to recognize that what you’ve experienced is one perspective—a particular way of engaging with and understanding the core ideas of process philosophy.
+As we come to the end of this presentation on process philosophy, it’s important to recognize that what you’ve experienced is just one perspective—a particular way of engaging with these ideas.
 
-This presentation is not a final statement or a fixed truth about process philosophy. Instead, it serves as a stepping stone, offering a structured approach to introducing these concepts. Its strength lies in its use of visual language to make abstract ideas more tangible, building a coherent narrative that connects various dimensions of process philosophy.
+This presentation is not a final statement or the only truth about process philosophy. Instead, it’s a tool—a starting point for your own journey. Think of it as the first step in exploring a landscape where every turn may reveal new insights. But, like any tool, you can adapt and customize it to suit your needs.
 
-Yet, like all perspectives, this presentation has its limitations. It focuses on certain aspects of process philosophy while potentially overlooking others. The visual language we've used, though helpful, is itself an abstraction — a tool to simplify complex ideas. In doing so, it inevitably leaves out some nuances and intricacies that are essential for a deeper understanding.
+Now, take a moment to reflect: How do the ideas you've encountered challenge the way you usually think? What processes in your own life seem to evolve over time rather than stay the same? These reflections are important, as they allow you to personalize what you’ve learned and make it more meaningful to your own experience.
 
-This brings us to the opportunities that lie ahead. The framework and visual tools introduced here are not static; they are flexible, open to adaptation, expansion, or even reimagination. Process Philosophy itself encourages change and evolution, reminding us that each perspective is part of a broader, evolving process.
+Remember, this presentation can guide you, but the real understanding comes through your own engagement with the world around you. It’s like having a compass—it points the way, but you’re the one who decides where to go next. The key to process philosophy is to stay open to change and not rush toward rigid conclusions.
 
-This presentation offers one lens to view process philosophy, but it is far from the only one. As you continue your journey, use this framework as a guide, but don’t hesitate to modify, challenge, or transform it. Process Philosophy thrives on reinterpretation, and the real insights come from your own engagement with these ideas in the context of your experiences and relationships.
+As you continue your journey, you might revisit parts of this presentation, experiment with different perspectives, or even build on what you've learned here to explore entirely new paths. The ideas we've discussed are flexible, just like the processes they describe.
+
+In this way, process philosophy invites you not just to learn but to live these concepts—adjusting and evolving your understanding as you go
 
 ## 11.4. Scene: Conclusion
 ### 11.4.1. Objective
@@ -1421,3 +1452,5 @@ Remember, process philosophy is not just an intellectual exercise. It offers a n
 Learning to live process philosophy is like learning to ride a bike. No matter how much theory you absorb, real comprehension emerges only through direct, hands-on experience. At first, process philosophy is a new way of understanding reality. Over time, it becomes a new way of experiencing reality. Eventually, you become comfortable with the not-knowing, allowing process philosophy to guide you beyond rigid certainty.
 
 This is not a destination, but a journey. There are stages of development, and mastery comes not from rushing forward but from fully engaging with where you are now, letting the next stages emerge naturally. As you continue, may you find ever more sensitive and profound ways to see, feel, and engage with the world around you.
+
+Reflective Question: After exploring process philosophy, how might you approach relationships, work, or personal decisions differently with this new perspective on change and interconnectedness?
