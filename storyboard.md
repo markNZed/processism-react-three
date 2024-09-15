@@ -1,8 +1,8 @@
 Dear Reviewer,
 
-Thank you for taking the time to review this draft storyboard for an animated presentation on Processism. This presentation aims to introduce the general adult public, particularly those in Western countries, to the complex and often abstract concepts of Processism. Processism offers a dynamic alternative to essentialist thinking, emphasizing the continuous evolution of entities and relationships rather than fixed, unchanging essences.
+Thank you for taking the time to review this draft storyboard for an animated presentation on Process Philosophy. This presentation aims to introduce the general adult public, particularly those in Western countries, to the complex and often abstract concepts of Process Philosophy. Process Philosophy offers a dynamic alternative to essentialist thinking, emphasizing the continuous evolution of entities and relationships rather than fixed, unchanging essences.
 
-The primary goal of this presentation is to build a visual language that makes these abstract concepts accessible and engaging. The presentation incorporates real-life examples and interactive elements to foster a deeper understanding of Processism. The final product will be wrapped in an app that allows users to pause the presentation and discuss key points with a chatbot, creating opportunities for reflection and deeper engagement.
+The primary goal of this presentation is to build a visual language that makes these abstract concepts accessible and engaging. The presentation incorporates real-life examples and interactive elements to foster a deeper understanding of Process Philosophy. The final product will be wrapped in an app that allows users to pause the presentation and discuss key points with a chatbot, creating opportunities for reflection and deeper engagement.
 
 This presentation is tailored for a general adult audience. However, given the abstract nature of some concepts, this approach aims to ground the audience in familiar territory before challenging them with more complex notions.
 
@@ -22,7 +22,7 @@ The storyboard is designed to be largely didactic but considers incorporating mo
 
 We also invite feedback on whether these additional concepts would add value to the presentation.
 
-This storyboard represents a structured approach to introducing Processism. However, we recognize that both the visual language and the narrative can evolve based on your feedback. We aim to create an engaging and thought-provoking experience that leaves the audience with a new perspective on how they see the world.
+This storyboard represents a structured approach to introducing Process Philosophy. However, we recognize that both the visual language and the narrative can evolve based on your feedback. We aim to create an engaging and thought-provoking experience that leaves the audience with a new perspective on how they see the world.
 
 Thank you for your time and insights.
 
@@ -56,14 +56,14 @@ General adult public in Western countries
 * Co-evolution
 * Intra-action
 * Reality is that which we do not want to change
-* Historical Context: Briefly explore the origins of Processism and its development over time.
-* Applications of Processism: Highlight how process-oriented thinking impacts various fields such as science, technology, and social sciences.
+* Historical Context: Briefly explore the origins of Process Philosophy and its development over time.
+* Applications of Process Philosophy: Highlight how process-oriented thinking impacts various fields such as science, technology, and social sciences.
 * Challenges and Critiques: Address common criticisms to provide a balanced perspective and deepen the audience's understanding.
 
 <!-- omit in toc -->
 # Overview
 
-In a world increasingly defined by change, it is easy to fall into the trap of seeing things as fixed, isolated entities. But what if understanding reality lies not in objects, but in dynamic processes and relationships? This presentation invites you to step into the world of processism, a way of thinking that reveals the interconnectedness and constant evolution of all things. As you journey through each section, you'll discover how systems, structures, intelligence, and even your sense of self emerge from an intricate web of relations, each shaping and being shaped by the other. This is not just a conceptual shift — it's a profound change in how we understand the world, and your place in it. Prepare to dive deeper into a vision where nothing is separate, and everything is in process.
+In a world increasingly defined by change, it is easy to fall into the trap of seeing things as fixed, isolated entities. But what if understanding reality lies not in objects, but in dynamic processes and relationships? This presentation invites you to step into the world of process philosophy, a way of thinking that reveals the interconnectedness and constant evolution of all things. As you journey through each section, you'll discover how systems, structures, intelligence, and even your sense of self emerge from an intricate web of relations, each shaping and being shaped by the other. This is not just a conceptual shift — it's a profound change in how we understand the world, and your place in it. Prepare to dive deeper into a vision where nothing is separate, and everything is in process.
 
 * Section: Relations and Processes
   * Reality emerges not from isolated entities but from the interactions and relations. In this section, we’ll explore how everything interacts through dynamic processes and the associated events.
@@ -95,7 +95,7 @@ In a world increasingly defined by change, it is easy to fall into the trap of s
 * Section: Synthesis
   * Finally, we bring everything together, noting how all the concepts in this presentation are interconnected. We’ll embody the process paradigm by using the whole presentation from within a part of the presentation, demonstrating how knowledge, systems, and perspectives are all linked in an ongoing process of synthesis and reinterpretation.
 
-As you can see, the sections of this presentation are not isolated but deeply interconnected, just as the processes and systems they describe. Each section builds on previous sections, and all come together to illustrate the core principles of processism: that everything is constantly evolving, interconnected, and shaped by dynamic interactions. As we move through these sections, keep in mind that no part stands alone — each idea flows into the next, just as in the world of processism, everything is in relation.
+As you can see, the sections of this presentation are not isolated but deeply interconnected, just as the processes and systems they describe. Each section builds on previous sections, and all come together to illustrate the core principles of process philosophy: that everything is constantly evolving, interconnected, and shaped by dynamic interactions. As we move through these sections, keep in mind that no part stands alone — each idea flows into the next, just as in the world of process philosophy, everything is in relation.
 
 <!-- omit in toc -->
 # Table of Content
@@ -395,13 +395,13 @@ Provide an overview of the presentation at the level of sections thus demonstrat
 ### 1.2.1. Objective
 Overview of this presentation
 ### 1.2.2. Animation
-Text: "A visual language for processism"
+Text: "A visual language for process philosophy"
 ### 1.2.3. Narration
-WWelcome to this animated journey into processism. While processism has been around for a long time, it’s not widely recognized in Western culture. Unlike essentialism—the idea that things have a fixed, unchanging core or essence—processism focuses on how everything is constantly evolving and interconnected.
+WWelcome to this animated journey into process philosophy. While process philosophy has been around for a long time, it’s not widely recognized in Western culture. Unlike essentialism—the idea that things have a fixed, unchanging core or essence—process philosophy focuses on how everything is constantly evolving and interconnected.
 
-Our culture tends to lean toward essentialist thinking, making the perspective of processism feel unfamiliar. But through this presentation, we aim to help you explore this different way of understanding the world, one that emphasizes change and relationships over static definitions.
+Our culture tends to lean toward essentialist thinking, making the perspective of process philosophy feel unfamiliar. But through this presentation, we aim to help you explore this different way of understanding the world, one that emphasizes change and relationships over static definitions.
 
-We’ll be creating a visual language to explain the key concepts of processism. While this language might seem abstract at first, we’ll ground it with real-life examples to make the ideas easier to grasp. As you watch, we encourage you to reflect on how these ideas might apply to your own life and the world around you.
+We’ll be creating a visual language to explain the key concepts of process philosophy. While this language might seem abstract at first, we’ll ground it with real-life examples to make the ideas easier to grasp. As you watch, we encourage you to reflect on how these ideas might apply to your own life and the world around you.
 
 # 2. Section: Relations and Processes
 ## 2.1. Objective
@@ -417,7 +417,7 @@ Let’s begin by focusing on a single entity. On the screen, you see a simple sh
 
 For example, if we think of this entity as a particle, it’s subject to quantum forces that make its position and state uncertain. If it’s a concept, its meaning might evolve over time as new insights emerge. If it represents a person, consider how each of us is continually growing, learning, and experiencing life differently from one moment to the next.
 
-While we’re starting with the idea of an isolated entity to help build our understanding, it’s important to recognize that, in reality, nothing exists entirely on its own. Every entity is part of a larger network of interactions and relationships. In the philosophy of processism, we shift our focus from static entities to the dynamic processes that create and connect them. These processes—the ongoing interactions and relationships—are considered the fundamental building blocks of reality.
+While we’re starting with the idea of an isolated entity to help build our understanding, it’s important to recognize that, in reality, nothing exists entirely on its own. Every entity is part of a larger network of interactions and relationships. In the philosophy of process philosophy, we shift our focus from static entities to the dynamic processes that create and connect them. These processes—the ongoing interactions and relationships—are considered the fundamental building blocks of reality.
 
 As we move forward, we’ll explore how these processes intertwine to form the systems around us. This perspective invites us to see the world not as a collection of separate, unchanging objects but as a dynamic web of interconnected and evolving relationships.
 
@@ -447,7 +447,7 @@ The segment you see being sent from the blue entity represents the beginning of 
 
 Think of an event as a transfer between two entities. It’s the moment where something happens—where change is set in motion. For example, if these entities represented people, this event could be the transmission of information through a spoken word. If they were particles, it might represent an exchange of energy.
 
-Events like this are fundamental in processism. They mark the moments when entities interact, their properties shift, and new possibilities emerge. Each event creates a ripple of change, affecting not just the entities involved but potentially the entire network they’re part of. Through these events, entities evolve, and relationships form. Every event, no matter how small, contributes to the continuous unfolding of processes that shape the reality around us.
+Events like this are fundamental in process philosophy. They mark the moments when entities interact, their properties shift, and new possibilities emerge. Each event creates a ripple of change, affecting not just the entities involved but potentially the entire network they’re part of. Through these events, entities evolve, and relationships form. Every event, no matter how small, contributes to the continuous unfolding of processes that shape the reality around us.
 
 ## 2.5. Scene: Introduction to Relations
 ### 2.5.1. Objective
@@ -461,7 +461,7 @@ Notice the arrow on the arc, indicating that the relation has direction. This sh
 
 A relation isn’t an entity itself. Instead, it’s how we describe the structure of interactions within a system. It captures the history of past events between the two entities and holds the potential for future interactions. For example, if these entities were two people, this relation might represent their shared experiences, conversations, or even the subtle, unspoken understanding between them.
 
-Relations act as the threads weaving the fabric of reality, connecting entities in meaningful ways. In processism, entities do not exist in isolation. Their relationships with other entities define who or what they are. The patterns and processes that shape everything around us are understood through the lens of these relations.
+Relations act as the threads weaving the fabric of reality, connecting entities in meaningful ways. In process philosophy, entities do not exist in isolation. Their relationships with other entities define who or what they are. The patterns and processes that shape everything around us are understood through the lens of these relations.
 
 As we move forward, we’ll explore how these relations are not fixed but constantly changing as new events unfold.
 
@@ -477,7 +477,7 @@ To illustrate this, we’ll introduce a second, dotted arc extending from the pu
 
 The difference between the solid and dotted lines shows us that relationships are multi-layered. One line might represent an action, like awareness, while the other could represent a physical process, such as light traveling between them. To simplify things, we can represent these two arcs as a single arc with arrows on both ends, indicating a mutual exchange or interaction.
 
-The key point is that relationships depend on sensitivity. Sensitivity here means the ability of an entity to detect and respond to another. Without mutual sensitivity, we have a one-way, or uni-directional, relationship. This highlights an important idea in processism: entities and their interactions are shaped by their sensitivity to each other.
+The key point is that relationships depend on sensitivity. Sensitivity here means the ability of an entity to detect and respond to another. Without mutual sensitivity, we have a one-way, or uni-directional, relationship. This highlights an important idea in process philosophy: entities and their interactions are shaped by their sensitivity to each other.
 
 As we continue, we’ll explore how these connections evolve over time, shaping the dynamic processes that define the world around us.
 
@@ -487,7 +487,7 @@ Distinguish between coordinated and uncoordinated processes and illustrate how p
 ### 2.7.2. Animation
 Start with a single large entity becoming transparent to reveal the smaller entities within it. Show these smaller entities connected by lines representing their relationships. These connections begin to move in a repeating pattern, illustrating a coordinated process. Then, some lines fade or disconnect, showing uncoordinated processes where the movement becomes more chaotic. Finally, zoom out to see the entire system, with multiple coordinated and uncoordinated processes occurring simultaneously.
 ### 2.7.3. Narration
-In processism, a process is understood as a sequence of events. To help explain this, let’s explore how these relations unfold both within and between entities.
+In process philosophy, a process is understood as a sequence of events. To help explain this, let’s explore how these relations unfold both within and between entities.
 
 We’ll start with a single large entity. As it becomes transparent, we reveal the smaller entities that compose it. These smaller entities are connected by arcs, representing active relationships. When these connections move in a coordinated, repeating pattern, we observe what’s known as a coordinated process. A good example would be the regular beating of a heart, where cells work in harmony to maintain a consistent rhythm.
 
@@ -497,7 +497,7 @@ Now, zooming out, we can observe the entire system in action. Multiple processes
 
 This broader view reveals a key insight: even within a single entity, there are layers of processes constantly interacting. These processes don’t just happen within entities but also between them, creating networks of evolving interactions. Whether coordinated or uncoordinated, every process contributes to shaping the system as a whole.
 
-In processism, an entity itself is not a static object; it is the product of many ongoing processes. These processes, whether predictable or unpredictable, are always in flux—constantly shifting, evolving, and shaping the world around us.
+In process philosophy, an entity itself is not a static object; it is the product of many ongoing processes. These processes, whether predictable or unpredictable, are always in flux—constantly shifting, evolving, and shaping the world around us.
 
 ## 2.8. Scene: Complicated Relations
 ### 2.8.1. Objective
@@ -517,9 +517,9 @@ This illustrates that relationships aren’t just simple, one-dimensional connec
 
 ## 2.9. Recap Scene: Building the Foundation
 ### 2.9.1. Objective
-Reinforce the fundamental concepts of processism, highlighting the shift from objects to processes and the importance of relationships, setting the stage for exploring systems and levels.
+Reinforce the fundamental concepts of process philosophy, highlighting the shift from objects to processes and the importance of relationships, setting the stage for exploring systems and levels.
 ### 2.9.2. Narration
-We've laid the groundwork for understanding processism by exploring its fundamental concepts. We've shifted our focus from viewing the world as composed of static objects to seeing it as a network of processes and relationships. We've learned that it's the interactions and dynamics between entities that give rise to the patterns and structures we observe.
+We've laid the groundwork for understanding process philosophy by exploring its fundamental concepts. We've shifted our focus from viewing the world as composed of static objects to seeing it as a network of processes and relationships. We've learned that it's the interactions and dynamics between entities that give rise to the patterns and structures we observe.
 
 By embracing this perspective, we're better equipped to understand the complexity of the systems around us. As we proceed, we'll build upon this foundation, examining how these processes interconnect across different levels and how they contribute to the emergence of complex systems.
 
@@ -553,7 +553,7 @@ When we observe an accumulation of entities, it’s common to start thinking of 
 
 Once again, we have two perspectives: we can either focus on the unified shape or acknowledge that it's composed of individual entities beneath the surface. This highlights a key idea: every entity can be understood as a collection of processes and relations. Just as the original entity was a product of its interactions, this new entity is the result of interactions between its smaller components.
 
-In processism, the concept of essence is reframed. Rather than viewing essence as a fixed, unchanging core, it is seen as an abstraction of past events and interactions. Entities with similar histories or processes can be grouped together through abstraction, helping us simplify and understand complex systems.
+In process philosophy, the concept of essence is reframed. Rather than viewing essence as a fixed, unchanging core, it is seen as an abstraction of past events and interactions. Entities with similar histories or processes can be grouped together through abstraction, helping us simplify and understand complex systems.
 
 Abstraction helps us understand systems by revealing higher-level patterns and relationships that emerge from ongoing interactions. However, this simplification comes with trade-offs. By focusing on the abstracted whole, we might lose sight of the ongoing, dynamic changes occurring at smaller levels. Still, abstraction remains a useful tool for understanding complicated environments.
 
@@ -673,17 +673,17 @@ By understanding these inside-out and outside-in dynamics, we gain a richer view
 
 ## 4.4. Scene: Boundaries and Permeability
 ### 4.4.1. Objective
-To explore how boundaries are defined, maintained, and perceived in processism, emphasizing their dynamic and permeable nature.
+To explore how boundaries are defined, maintained, and perceived in process philosophy, emphasizing their dynamic and permeable nature.
 ### 4.4.2. Animation
 A collection of particles connected by dynamic arcs representing relationships between them. These particles first assemble into distinct entities with clear boundaries. Afterward, the particles disassemble and then reassemble into a different set of entities, showing how boundaries shift depending on the relations that are emphasized.
 ### 4.4.3. Narration
-Boundaries help us define where one thing ends and another begins. But in processism, boundaries aren’t fixed; they are constantly shaped by relationships and interactions.
+Boundaries help us define where one thing ends and another begins. But in process philosophy, boundaries aren’t fixed; they are constantly shaped by relationships and interactions.
 
 On the screen, we see entities form, each with clear boundaries. But watch closely—these boundaries are not static. As relationships evolve, the boundaries begin to shift, and some even overlap. A boundary that once seemed solid now reveals its permeability, allowing interaction between what we previously saw as separate entities.
 
 This fluidity reflects the nature of the relationships we observe. Consider a social group—its boundaries might shift based on new members or changing dynamics within the group. Or think of a cell membrane, selectively allowing materials to pass in and out, maintaining the cell’s integrity while facilitating vital interactions with its environment.
 
-In processism, boundaries are shaped by the relationships we choose to emphasize. The more we focus on certain interactions, the more those interactions define the boundary of the entity. This perspective challenges the idea of rigid separations, reminding us that every boundary is a reflection of the processes that shape it.
+In process philosophy, boundaries are shaped by the relationships we choose to emphasize. The more we focus on certain interactions, the more those interactions define the boundary of the entity. This perspective challenges the idea of rigid separations, reminding us that every boundary is a reflection of the processes that shape it.
 
 ## 4.5. Scene: Emergent Process
 ### 4.5.1. Objective
@@ -717,7 +717,7 @@ In reality, what appears stable is often in flux. By changing our vantage point,
 
 ## 4.7. Scene: Change and Continuity
 ### 4.7.1. Objective
-To illustrate how processism acknowledges the constancy of change while also recognizing the presence of patterns of continuity within dynamic systems, emphasizing the impact of the Second Law of Thermodynamics.
+To illustrate how process philosophy acknowledges the constancy of change while also recognizing the presence of patterns of continuity within dynamic systems, emphasizing the impact of the Second Law of Thermodynamics.
 ### 4.7.2. Animation
 The animation begins with a sequence of entities arranged in a series, each one interacting with a particle that moves through the system. The particle drops into the first entity, which then emits two particle, one that moves to the next entity and the other that exists the system, and so on. This chain reaction continues until only a particle exiting the system is visible, illustrating the gradual loss of energy over time.
 ### 4.7.3. Narration
@@ -772,7 +772,7 @@ Illustrate how time is relative to processes, demonstrating that different entit
 ### 5.2.2. Animation
 Two distinct blobs represent two entities. The larger blob moves slowly, with detailed, intricate patterns, while the smaller blob oscillates quickly, with simpler, faster-moving patterns.
 ### 5.2.3. Narration
-Time, in processism, isn’t a fixed flow but something shaped by the internal rhythms of each entity. On the screen, you see two blobs representing different entities. The larger one moves slowly, the smaller one faster. To the larger entity, the smaller one seems to be racing ahead. To the smaller entity, the larger one seems to crawl. This difference shows how time is experienced differently based on each entity’s internal processes.
+Time, in process philosophy, isn’t a fixed flow but something shaped by the internal rhythms of each entity. On the screen, you see two blobs representing different entities. The larger one moves slowly, the smaller one faster. To the larger entity, the smaller one seems to be racing ahead. To the smaller entity, the larger one seems to crawl. This difference shows how time is experienced differently based on each entity’s internal processes.
 
 Although both entities follow the same sequence of states, their perception of time depends on their internal speeds. What we commonly think of as "measuring time" is actually just comparing one process to another — like comparing the ticking of a watch to the Earth's rotation. Neither system measures time; we simply use their regular patterns to mark change.
 
@@ -780,7 +780,7 @@ As we zoom out, notice how these entities are part of a larger system where many
 
 ## 5.3. Scene: Feedback Loops
 ### 5.3.1. Objective
-To illustrate the role of feedback loops in processism, explaining how positive feedback loops amplify changes within a system, while negative feedback loops stabilize or regulate the system.
+To illustrate the role of feedback loops in process philosophy, explaining how positive feedback loops amplify changes within a system, while negative feedback loops stabilize or regulate the system.
 ### 5.3.2. Animation
 Start with a simple process involving a few entities connected by dynamic relations. Introduce a positive feedback loop by showing one of these relations intensifying as it cycles back into the system, causing other relations to similarly intensify, eventually leading to a dramatic change in the system. Then, contrast this with a negative feedback loop where a relation initially intensifies but is then met with a balancing counter-relation that dampens the intensity, stabilizing the system.
 ### 5.3.3. Narration
@@ -808,7 +808,7 @@ Both competition and collaboration can coexist within the same system, often at 
 
 ## 5.5. Scene: Nonlinearity and Unpredictability
 ### 5.5.1. Objective
-To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in processism.
+To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in process philosophy.
 ### 5.5.2. Animation
 Two systems in parallel that evolve identically under identical inputs e.g .assembling and interacting from a stream of particles. Make a single change to that stream and see the effect being amplified.
 ### 5.5.3. Narration
@@ -816,18 +816,18 @@ Systems are often nonlinear, meaning that small changes can have big, unpredicta
 
 This shows us how sensitive systems can be to initial conditions. It’s often called the "butterfly effect"—the idea that a butterfly flapping its wings on one side of the world might eventually cause a storm on the other. In nonlinear systems, small actions can trigger massive consequences, making it hard to predict exactly how things will unfold.
 
-This unpredictability is a key feature of processism. Even when we understand the parts of a system, the way they interact can lead to outcomes far beyond what we expect. It reminds us that processes are dynamic and can behave in ways that are surprising, even with the smallest nudge.
+This unpredictability is a key feature of process philosophy. Even when we understand the parts of a system, the way they interact can lead to outcomes far beyond what we expect. It reminds us that processes are dynamic and can behave in ways that are surprising, even with the smallest nudge.
 
 ## 5.6. Scene: Resilience and Adaptation
 ### 5.6.1. Objective
-To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in processism.
+To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in process philosophy.
 ### 5.6.2. Animation
 ### 5.6.3. Narration
 Resilience is the ability of a system to absorb shocks, adapt to change, and keep going. In this scene, we see a system facing a disturbance. Some parts break down under the pressure, but others adapt. New connections form, and the system reorganizes itself into a different, stable arrangement.
 
 Resilience doesn’t mean returning to how things were before. It means evolving to meet new challenges. Systems that are flexible—able to adapt, reorganize, and find new ways to function—are the ones that survive. Think of a forest after a wildfire: while some parts are destroyed, new growth emerges, and the ecosystem slowly adapts to the changed environment.
 
-In processism, resilience is about navigating change, not avoiding it. Systems that are too rigid tend to break, while those that can evolve find new pathways to stability. This flexibility is what allows systems—whether ecological, social, or technological—to continue thriving in an ever-changing world.
+In process philosophy, resilience is about navigating change, not avoiding it. Systems that are too rigid tend to break, while those that can evolve find new pathways to stability. This flexibility is what allows systems—whether ecological, social, or technological—to continue thriving in an ever-changing world.
 
 ## 5.7. Recap Scene: Embracing Dynamics and Change
 ### 5.7.1. Objective
@@ -845,7 +845,7 @@ Understanding how change happens in systems requires us to explore the nature of
 
 ## 6.2. Scene: Aristotle's Four Causes
 ### 6.2.1. Objective
-To introduce and explain Aristotle's four causes — formal, material, efficient, and final — highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of processism.
+To introduce and explain Aristotle's four causes — formal, material, efficient, and final — highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of process philosophy.
 ### 6.2.2. Animation
 ### 6.2.3. Narration
 Let’s start with an idea from over 2,000 years ago: Aristotle’s four causes. He explained that everything has four kinds of causes that work together.
@@ -864,7 +864,7 @@ Think about this presentation:
     The formal cause is the storyboard that shapes its structure.
     The material cause is the video and files you’re watching.
     The efficient cause includes the people and tools that created it.
-    And the final cause is the reason we made it — to introduce you to the ideas of processism.
+    And the final cause is the reason we made it — to introduce you to the ideas of process philosophy.
 
 By revisiting Aristotle’s four causes, we get a fuller understanding of how systems work, especially those that seem to have a purpose or goal.
 
@@ -970,7 +970,7 @@ To convey the idea that information is a process rather than a static essence.
 ### 7.4.2. Animation
 Two similar particles are sent to two different entities. Upon receiving the particles, the entities change to different colors, illustrating how they interpret the same "information" differently.
 ### 7.4.3. Narration
-Let’s turn to the nature of information itself. In processism, information isn’t something fixed or static—it’s a process that emerges through interactions.
+Let’s turn to the nature of information itself. In process philosophy, information isn’t something fixed or static—it’s a process that emerges through interactions.
 
 Imagine two particles, both seemingly identical, sent to different entities. Each entity receives the particle, but instead of reacting the same way, they change to different colors. The 'information' they received wasn’t simply contained in the particles themselves. It arose through the interaction between the particle and the receiving entity, shaped by their unique histories and contexts.
 
@@ -998,7 +998,7 @@ A perspective imposes a structure on a system
 ### 8.2.2. Animation
 A central set of particles with dynamic arcs representing their relationships. From this central set, multiple copies of the particles are generated and organized into different clusters, each forming distinct entities based on specific relationships. These entities are semi-transparent and gradually move under a growing stack, representing multiple perspectives overlaying one another.
 ### 8.2.3. Narration
-In processism, the way we perceive and understand a system is deeply influenced by the perspectives we adopt. Each perspective highlights certain relationships while downplaying others, effectively shaping the structure we see.
+In process philosophy, the way we perceive and understand a system is deeply influenced by the perspectives we adopt. Each perspective highlights certain relationships while downplaying others, effectively shaping the structure we see.
 
 On the screen, we have a central set of entities interconnected through dynamic relations. As we apply different perspectives, these entities reorganize into various clusters, each forming distinct structures based on the relationships emphasized by that perspective.
 
@@ -1010,7 +1010,7 @@ It's important to recognize that we cannot attend to every possible relation at 
 
 With practice, we learn to navigate multiple perspectives, selecting those most relevant to the context at hand. The perspectives we choose, and the timing of when we apply them, shape our understanding of the system and the options available to us.
 
-In processism, embracing the ability to shift between perspectives allows us to appreciate the complex web of relations within systems while also acknowledging the limitations of our own perceptions.
+In process philosophy, embracing the ability to shift between perspectives allows us to appreciate the complex web of relations within systems while also acknowledging the limitations of our own perceptions.
 
 ## 8.3. Scene: Reductionism
 ### 8.3.1. Objective
@@ -1036,13 +1036,13 @@ Introduce the general concept of meta and abstraction
 ### 8.4.2. Animation
 Zoom out and show new relations that form a new entity
 ### 8.4.3. Narration
-Throughout our exploration of processism, we've noticed a recurring pattern: moving from the specific to the abstract, from individual entities to the larger structures they form when considered together. This movement is the essence of abstraction in action.
+Throughout our exploration of process philosophy, we've noticed a recurring pattern: moving from the specific to the abstract, from individual entities to the larger structures they form when considered together. This movement is the essence of abstraction in action.
 
 As entities accumulate and interact, they generate new patterns and structures. By stepping back and recognizing these patterns, we engage in abstraction, identifying broader concepts that emerge from specific details.
 
 At this more abstract level, we can apply the same perspectives and processes that we used at lower levels. When we do this, we enter the realm of "meta." For example, "meta-language" refers to language used to discuss language itself.
 
-In processism, a "meta-process" directs our attention to the processes that give rise to other processes. It invites us to consider the dynamics that shape the formation and evolution of processes within a system.
+In process philosophy, a "meta-process" directs our attention to the processes that give rise to other processes. It invites us to consider the dynamics that shape the formation and evolution of processes within a system.
 
 We might think of a meta-process as a process for selecting new perspectives—a mechanism that guides how we shift from one way of understanding the world to another. By recognizing and understanding these meta-processes, we gain deeper insights into the underlying dynamics that influence the systems we observe.
 
@@ -1050,7 +1050,7 @@ This concept of meta and abstraction broadens our thinking about processes, allo
 
 ## 8.5. Scene: Relationalism vs relativism
 ### 8.5.1. Objective
-To distinguish between relationalism and relativism in processism, emphasizing how relationalism avoids the pitfalls of nihilism and the paradox of imposing a singular perspective while maintaining a coherent and meaningful approach to understanding systems.
+To distinguish between relationalism and relativism in process philosophy, emphasizing how relationalism avoids the pitfalls of nihilism and the paradox of imposing a singular perspective while maintaining a coherent and meaningful approach to understanding systems.
 ### 8.5.2. Animation
 ### 8.5.3. Narration
 As we explore different perspectives, it's important to remember that we ourselves are viewing the system from a particular standpoint. If we overlook this, we might fall into the illusion that we've found the ultimate perspective, believing we see things exactly as they are, free from any bias.
@@ -1123,7 +1123,7 @@ Agency and consciousness do not emerge in isolation but through ongoing interact
 Expand on the concept of agency
 ### 9.2.2. Animation
 ### 9.2.3. Narration
-As we've journeyed through processism, we've seen that systems are intricate webs of relationships and processes. Now, let's delve into how this perspective reshapes our understanding of agency—the capacity to act and make choices.
+As we've journeyed through process philosophy, we've seen that systems are intricate webs of relationships and processes. Now, let's delve into how this perspective reshapes our understanding of agency—the capacity to act and make choices.
 
 Consider the concept of hierarchical impredicativity, where processes are defined in terms of themselves within a hierarchy. Expanding this idea to heterarchical impredicativity, we recognize that we participate in multiple systems simultaneously, each influencing and being influenced by others in complex ways.
 
@@ -1142,7 +1142,7 @@ In this way, agency isn't just about isolated decisions; it's about recognizing 
 Expand on the concept of contextual autonomy
 ### 9.3.2. Animation
 ### 9.3.3. Narration
-Building on our understanding of agency, let's explore the idea of contextual autonomy. In processism, autonomy isn't about being completely independent; it's about having the capacity to act within the web of relationships and histories that shape us.
+Building on our understanding of agency, let's explore the idea of contextual autonomy. In process philosophy, autonomy isn't about being completely independent; it's about having the capacity to act within the web of relationships and histories that shape us.
 
 Our autonomy is always embedded within a specific context—a tapestry woven from our past experiences, cultural influences, social interactions, and the environments we inhabit. This context doesn't diminish our ability to act; instead, it provides the framework within which our choices gain meaning.
 
@@ -1162,7 +1162,7 @@ The scene begins with an entity positioned outside of a system, observing it fro
 ### 9.4.3. Narration
 Traditionally, science has often portrayed the observer as a detached entity—a neutral party studying a system without influencing it. This perspective assumes we can fully understand a system from the outside, maintaining objectivity and independence.
 
-However, processism invites us to reconsider this notion. In reality, the observer is never truly separate from the system they observe. Our observations are shaped by our perspectives, tools, language, and prior experiences—all part of the larger system.
+However, process philosophy invites us to reconsider this notion. In reality, the observer is never truly separate from the system they observe. Our observations are shaped by our perspectives, tools, language, and prior experiences—all part of the larger system.
 
 As we observe, we participate. Our choices about what to focus on, the questions we ask, and the interpretations we make all influence the system. In social contexts, the act of observation can change behaviors; in physics, measuring a system can alter its state.
 
@@ -1172,7 +1172,7 @@ Recognizing we're participants in the systems we study enriches our understandin
 
 ## 9.5. Scene: Awareness
 ### 9.5.1. Objective
-Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of processism.
+Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of process philosophy.
 ### 9.5.2. Animation
 Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible — lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
 ### 9.5.3. Narration
@@ -1208,11 +1208,11 @@ Understanding the interplay between subjective and unsubjective experiences enri
 To present the self as an emergent process rather than a fixed essence, challenging the notion of an "authentic self".
 ### 9.7.2. Animation
 ### 9.7.3. Narration
-Our exploration of processism leads us to a profound insight: the self isn't a fixed essence but an emergent process continually shaped by interactions and experiences.
+Our exploration of process philosophy leads us to a profound insight: the self isn't a fixed essence but an emergent process continually shaped by interactions and experiences.
 
 In many cultures, especially in the West, there's a strong belief in an "authentic self"—a core, unchanging identity defining who we truly are. This notion can offer comfort and stability, suggesting that if we look deep enough, we'll find our true selves.
 
-However, processism invites us to reconsider this perspective. If the self is a dynamic process, constantly influenced by relationships, contexts, and experiences, then the idea of a fixed "authentic self" becomes less tenable.
+However, process philosophy invites us to reconsider this perspective. If the self is a dynamic process, constantly influenced by relationships, contexts, and experiences, then the idea of a fixed "authentic self" becomes less tenable.
 
 As we move through life, we change. Our beliefs, values, interests, and even personalities can evolve in response to new experiences and environments. Clinging to a notion of an unchanging self can lead to frustration when we inevitably encounter situations challenging or altering our identity.
 
@@ -1241,7 +1241,7 @@ Introduce the concept of different paradigms as distinct epistemologies, emphasi
 ### 10.2.2. Animation
 The video begins by showing a central entity with multiple lines branching out, each representing different perspectives. These perspectives, while varied, are all within the same paradigm and do not contradict each other. As the scene progresses, the image splits into two separate sections, each representing a different paradigm. The perspectives within each section are coherent internally but contradictory when compared across paradigms. The final visual shows these paradigms side by side, with a line illustrating the tension between them.
 ### 10.2.3. Narration
-In our exploration of processism, we've seen how perspectives shape our understanding of systems. Now, let's delve into the concept of paradigms—overarching frameworks that guide how we interpret the world.
+In our exploration of process philosophy, we've seen how perspectives shape our understanding of systems. Now, let's delve into the concept of paradigms—overarching frameworks that guide how we interpret the world.
 
 Within a single paradigm, multiple perspectives coexist harmoniously. These perspectives may focus on different aspects but share common underlying assumptions and methods. For example, within a scientific paradigm, various theories might explore different phenomena but rely on similar principles and methodologies.
 
@@ -1385,39 +1385,39 @@ Modeling relation with the personified encoding and decoding
 ### 11.2.3. Narration
 For much of history, the natural sciences and the humanities have been treated as separate domains. The natural sciences often focus on simple, measurable systems using formal models and quantitative methods, while the humanities explore human experiences, employing qualitative methods to understand our complex, subjective realities.
 
-Processism bridges this divide, recognizing that both disciplines are crucial for understanding the full complexity of the world. In simple systems, like those studied in physics or chemistry, we can often create formal, algorithmic models that give us accurate predictions. However, as we shift to more complex systems—those that involve self-referential processes, emergent behaviors, and multiple interacting levels—no single model can capture everything.
+Process Philosophy bridges this divide, recognizing that both disciplines are crucial for understanding the full complexity of the world. In simple systems, like those studied in physics or chemistry, we can often create formal, algorithmic models that give us accurate predictions. However, as we shift to more complex systems—those that involve self-referential processes, emergent behaviors, and multiple interacting levels—no single model can capture everything.
 
 This is where the natural sciences and the humanities converge. The humanities, with their focus on subjective and relational aspects, provide insights that formal models alone cannot grasp. Meanwhile, the structured, formal techniques of the natural sciences offer powerful tools for analyzing certain elements of complexity.
 
-In relational biology, a field closely aligned with processism, formal modeling of complex systems became possible only in the mid-20th century. Today, there is a unique opportunity for collaboration between these fields. By combining quantitative and qualitative approaches, we can build richer, more comprehensive models of complex human systems. Through action research, where theories are tested and refined in real-world contexts, we can ensure that our models are not only theoretically sound but also practically relevant.
+In relational biology, a field closely aligned with process philosophy, formal modeling of complex systems became possible only in the mid-20th century. Today, there is a unique opportunity for collaboration between these fields. By combining quantitative and qualitative approaches, we can build richer, more comprehensive models of complex human systems. Through action research, where theories are tested and refined in real-world contexts, we can ensure that our models are not only theoretically sound but also practically relevant.
 
-Processism encourages us to view the sciences and humanities as complementary forces. Together, they provide a more nuanced understanding of the intricate, evolving systems that shape our reality.
+Process Philosophy encourages us to view the sciences and humanities as complementary forces. Together, they provide a more nuanced understanding of the intricate, evolving systems that shape our reality.
 
 ## 11.3. Scene: Meta-presentation
 ### 11.3.1. Objective
-Explain this presentation as one perspective on processism, acknowledging its strengths, weaknesses, and opportunities. Introduce the idea that the visual language used can be adapted to other process-centric perspectives.
+Explain this presentation as one perspective on process philosophy, acknowledging its strengths, weaknesses, and opportunities. Introduce the idea that the visual language used can be adapted to other process-centric perspectives.
 ### 11.3.2. Animation
-Begin with a zoom-out from the final scene of the presentation, revealing the entire sequence of scenes as part of a larger, interconnected network. This network forms a web of relations, with each scene represented as a node connected by lines (representing the flow of concepts). Gradually, the view shifts to highlight the presentation itself as a single node within an even broader context, suggesting that this presentation is one of many possible perspectives on processism. The scene ends with the presentation’s visual elements morphing into different styles, illustrating their adaptability to other contexts and perspectives.
+Begin with a zoom-out from the final scene of the presentation, revealing the entire sequence of scenes as part of a larger, interconnected network. This network forms a web of relations, with each scene represented as a node connected by lines (representing the flow of concepts). Gradually, the view shifts to highlight the presentation itself as a single node within an even broader context, suggesting that this presentation is one of many possible perspectives on process philosophy. The scene ends with the presentation’s visual elements morphing into different styles, illustrating their adaptability to other contexts and perspectives.
 ### 11.3.3. Narration
-As we conclude this exploration of processism, it’s important to recognize that what you’ve experienced is one perspective—a particular way of engaging with and understanding the core ideas of processism.
+As we conclude this exploration of process philosophy, it’s important to recognize that what you’ve experienced is one perspective—a particular way of engaging with and understanding the core ideas of process philosophy.
 
-This presentation is not a final statement or a fixed truth about processism. Instead, it serves as a stepping stone, offering a structured approach to introducing these concepts. Its strength lies in its use of visual language to make abstract ideas more tangible, building a coherent narrative that connects various dimensions of processism.
+This presentation is not a final statement or a fixed truth about process philosophy. Instead, it serves as a stepping stone, offering a structured approach to introducing these concepts. Its strength lies in its use of visual language to make abstract ideas more tangible, building a coherent narrative that connects various dimensions of process philosophy.
 
-Yet, like all perspectives, this presentation has its limitations. It focuses on certain aspects of processism while potentially overlooking others. The visual language we've used, though helpful, is itself an abstraction — a tool to simplify complex ideas. In doing so, it inevitably leaves out some nuances and intricacies that are essential for a deeper understanding.
+Yet, like all perspectives, this presentation has its limitations. It focuses on certain aspects of process philosophy while potentially overlooking others. The visual language we've used, though helpful, is itself an abstraction — a tool to simplify complex ideas. In doing so, it inevitably leaves out some nuances and intricacies that are essential for a deeper understanding.
 
-This brings us to the opportunities that lie ahead. The framework and visual tools introduced here are not static; they are flexible, open to adaptation, expansion, or even reimagination. Processism itself encourages change and evolution, reminding us that each perspective is part of a broader, evolving process.
+This brings us to the opportunities that lie ahead. The framework and visual tools introduced here are not static; they are flexible, open to adaptation, expansion, or even reimagination. Process Philosophy itself encourages change and evolution, reminding us that each perspective is part of a broader, evolving process.
 
-This presentation offers one lens to view processism, but it is far from the only one. As you continue your journey, use this framework as a guide, but don’t hesitate to modify, challenge, or transform it. Processism thrives on reinterpretation, and the real insights come from your own engagement with these ideas in the context of your experiences and relationships.
+This presentation offers one lens to view process philosophy, but it is far from the only one. As you continue your journey, use this framework as a guide, but don’t hesitate to modify, challenge, or transform it. Process Philosophy thrives on reinterpretation, and the real insights come from your own engagement with these ideas in the context of your experiences and relationships.
 
 ## 11.4. Scene: Conclusion
 ### 11.4.1. Objective
 Provide potential next steps
 ### 11.4.2. Animation
 ### 11.4.3. Narration
-We've reached the end of this presentation on processism, but this is just one step in a much larger journey. You may choose to revisit parts of the presentation, reflecting on the ideas with the help of the AI tutor, or you might explore new perspectives and paradigms that resonate with your own context.
+We've reached the end of this presentation on process philosophy, but this is just one step in a much larger journey. You may choose to revisit parts of the presentation, reflecting on the ideas with the help of the AI tutor, or you might explore new perspectives and paradigms that resonate with your own context.
 
-Remember, processism is not just an intellectual exercise. It offers a new way of experiencing and engaging with the world. It invites you to heighten your sensitivity to relationships and processes, many of which operate unconsciously. This presentation can only point toward the experience of processism—true understanding comes through practice.
+Remember, process philosophy is not just an intellectual exercise. It offers a new way of experiencing and engaging with the world. It invites you to heighten your sensitivity to relationships and processes, many of which operate unconsciously. This presentation can only point toward the experience of process philosophy—true understanding comes through practice.
 
-Learning to live processism is like learning to ride a bike. No matter how much theory you absorb, real comprehension emerges only through direct, hands-on experience. At first, processism is a new way of understanding reality. Over time, it becomes a new way of experiencing reality. Eventually, you become comfortable with the not-knowing, allowing processism to guide you beyond rigid certainty.
+Learning to live process philosophy is like learning to ride a bike. No matter how much theory you absorb, real comprehension emerges only through direct, hands-on experience. At first, process philosophy is a new way of understanding reality. Over time, it becomes a new way of experiencing reality. Eventually, you become comfortable with the not-knowing, allowing process philosophy to guide you beyond rigid certainty.
 
 This is not a destination, but a journey. There are stages of development, and mastery comes not from rushing forward but from fully engaging with where you are now, letting the next stages emerge naturally. As you continue, may you find ever more sensitive and profound ways to see, feel, and engage with the world around you.

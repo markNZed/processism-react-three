@@ -644,7 +644,6 @@ const CompoundEntity = React.memo(React.forwardRef(({ id, initialPosition = [0, 
                 // Is the rigid body reference available
                 const particleRef = nextEntityRef.current.ref;
                 entityIdsCreatedRef.current.push(nextEntityIdRef.current);
-                frameStateRef.current = "replaceJoint";
                 node.particlesRef.current.push(particleRef);
                 const toInstantiateCount = entitiesToInstantiate.length;
                 switch (toInstantiateCount) {
