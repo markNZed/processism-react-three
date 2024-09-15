@@ -1313,16 +1313,22 @@ Embracing the concept of non-self allows us to see ourselves as interconnected w
 
 ## 10.5. Scene: Language
 ### 10.5.1. Objective
-Introduce dynamic ontology
+Introduce the idea of dynamic ontology
 ### 10.5.2. Animation
 ### 10.5.3. Narration
-Traditional views of knowledge often rest on the idea of a solid foundation—a set of absolute truths from which all else is derived. Non-foundationalism challenges this notion, proposing that stability and coherence emerge from the interactions and relationships between parts, not from an unchanging base.
+Let's explore how language itself embodies the principles of process philosophy. We often think of words as having fixed meanings, like entries in a dictionary. But in reality, language is constantly evolving, much like the processes we've been discussing.
 
-In this perspective, knowledge isn't built upon immutable truths but evolves through dynamic processes. Meanings, concepts, and truths are seen as provisional, open to revision as contexts change and new insights emerge.
+Imagine a web of words, each connected to others by threads of meaning. These connections aren't static; they shift and change over time. Some grow stronger, others fade away, and new ones form as our use of language evolves.
 
-Returning to our earlier discussions, we began by using language as if words had fixed meanings. As we progressed, we recognized that meanings are fluid, shaped by usage and context. This shift might seem paradoxical from a foundational standpoint, but within a process-centric view, it reflects the natural evolution of understanding.
+Take the word 'web' itself. Once, it primarily meant a spider's creation. Now, it's just as likely to make you think of the internet. The word hasn't changed, but its meaning has expanded through usage and new contexts.
 
-Non-foundationalism frees us from the constraints of seeking ultimate, unchanging answers. It encourages us to engage with complexity, uncertainty, and ambiguity, embracing the richness that comes from multiple perspectives and ongoing inquiry.
+Remember how we started this presentation using certain terms in specific ways? As we've progressed, you might have noticed these meanings shifting slightly. That's not a flaw; it's a feature of how language and understanding evolve together.
+
+By recognizing language as a dynamic process rather than a fixed system, we open ourselves to new ways of expressing and understanding ideas. It encourages us to listen more carefully, to be open to new interpretations, and to recognize that meaning emerges through ongoing dialogue and interaction.
+
+This perspective on language aligns with the broader themes of process philosophy. It reminds us that even our tools for understanding the world — our words and concepts — are part of the ever-changing flow of reality.
+
+Reflective Question: Can you think of a word whose meaning has changed significantly in your lifetime? How has this shift in meaning reflected broader changes in society or technology?
 
 ## 10.6. Scene: Non-Foundationalism
 ### 10.6.1. Objective
