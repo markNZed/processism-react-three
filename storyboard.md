@@ -1329,19 +1329,21 @@ Non-foundationalism frees us from the constraints of seeking ultimate, unchangin
 Non-foundationalism challenges the idea of a single, unchanging foundation for knowledge or reality.
 ### 10.6.2. Animation
 ### 10.6.3. Narration
-Many people think of knowledge as being built on solid foundations, like a house resting on firm ground. But non-foundationalism challenges this idea. Instead of relying on one unchanging base, it suggests that knowledge and understanding emerge from interactions and relationships between things.
+Many of us think about knowledge like building a house on solid ground. We assume there are fundamental truths that everything else rests on. But non-foundationalism challenges this idea. Instead of one unchanging base, it suggests that understanding comes from how ideas and experiences connect and interact.
 
-Imagine you’re building a puzzle. There’s no single piece that holds everything together; it’s the way the pieces fit and connect that forms the picture. Knowledge works in a similar way—meaning and understanding don’t come from one fixed idea, but from how ideas and experiences interact with each other.
+Imagine you're tending a garden. There's no single plant that defines the entire ecosystem. Instead, the garden thrives through the interactions between plants, soil, water, and sunlight. Some plants grow, others fade, and new ones emerge. The garden is always changing, yet it maintains a kind of balance through these ongoing relationships.
 
-In the past, people often searched for a single, absolute truth—one unshakable foundation. But process philosophy teaches us that stability and meaning arise from ongoing processes, not from a fixed starting point. This makes room for complexity, change, and even contradictions.
+Knowledge works similarly. Our understanding doesn't come from fixed, unchanging ideas, but from how concepts grow, interact, and sometimes even compete with each other. Just like a garden, our knowledge is alive, constantly evolving as we encounter new experiences and perspectives.
 
-For example, think of language. At the start of this presentation, we used words with specific meanings. But as we’ve explored different ideas, those meanings have shifted based on context, new ideas, and relationships between words. This fluidity might seem confusing from a foundational perspective, but from a non-foundationalist view, it’s natural and necessary.
+Throughout history, people often searched for absolute truths—unshakable foundations for knowledge. But process philosophy teaches us that stability and meaning arise from ongoing interactions, not from fixed starting points. This view makes room for complexity, change, and even apparent contradictions.
 
-By letting go of the need for a solid, unchanging base, we become more open to exploring complex ideas and adapting to new perspectives. Non-foundationalism isn’t about abandoning the search for truth—it’s about recognizing that truth emerges through the dynamic process of interaction and understanding.
+Let's look at how we've used language in this presentation. We started with certain word meanings, but as we explored different ideas, those meanings shifted based on context and new connections. From a traditional view, this might seem confusing. But from a non-foundationalist perspective, it's a natural part of learning and understanding—like how plants in a garden adapt to changing conditions.
 
-In this way, we’re not confined to one rigid framework. Instead, we are free to explore and evolve, finding coherence and meaning in the connections and relationships between ideas.
+By letting go of the need for unchanging foundations, we become more open to exploring complex ideas and adapting to new perspectives. This doesn't mean giving up on finding truth. Instead, it's about recognizing that truth often emerges through the dynamic process of questioning, connecting, and understanding—much like how the health of a garden emerges from the interplay of its many elements.
 
-Reflective Question: Have you ever had to revise your understanding of something you thought was certain? How did that process of letting go of certainty feel?
+This approach frees us from being stuck in one rigid way of thinking. We can nurture and evolve our ideas, finding meaning in how concepts connect and relate to each other. It encourages us to stay curious and open to new understandings, always ready to tend to our 'garden of knowledge.
+
+Reflective Question: Think about a time when you had to change your understanding of something you thought was certain. How did it feel to let go of that certainty? What new insights did you gain from this process of growth and change?
 
 ## 10.7. Scene: Paradox vs Not-knowing
 ### 10.7.1. Objective
