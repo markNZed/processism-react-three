@@ -1583,9 +1583,9 @@ Our beliefs, values, and even our personality shift as we encounter new circumst
 
 By seeing the self as an emergent process, we can free ourselves from the pressure of defining a fixed identity. Instead, we can engage with the dynamic process of becoming, appreciating the ways in which our identity is co-created through interactions with the world around us.
 
-This perspective enhances, rather than diminishes, our understanding of personal identity. It invites us to acknowledge the richness of our evolving nature and to find meaning in the ongoing transformations that shape who we are.
+This perspective is a shift from understanding identity as an individualistic concept to a more interconnected one, where relationships are not merely external factors but are constitutive of who we are.
 
-Reflective Question: How does the idea that your identity is continually evolving affect the way you view yourself? What possibilities for growth and change does this open up?
+Reflective Question: How does the idea that your identity is relational affect the way you view yourself? What possibilities for growth and change does this open up?
 
 ## 9.8. Recap Scene: Discovering the Self in Process
 
