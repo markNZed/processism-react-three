@@ -1,3 +1,6 @@
+PUBLIC NOTES
+------------
+
 Due to problems with running the OpenPGP Encryption extension in VS Code. 
   Install gnupg2 via .vscode/launch.json
   Created ./notes_decrpyt.sh to decrypt notes.gpg.md
