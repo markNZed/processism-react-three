@@ -84,6 +84,10 @@ To work with this project on a remote server (assuming the server has SSH, Docke
    - `git config --global user.email "your_email@example.com"`
    - `git config --global user.name "your_name"`
 
+## Git-crypt
+
+We use git-crypt for any files iwth `.gpg.md` extensions
+
 ## Additional Notes
 
 - Created with CodeSandbox
