@@ -102,290 +102,92 @@ As you can see, the sections of this presentation are not isolated but deeply in
 - [1. Section: Overview](#1-section-overview)
   - [1.1. Objective](#11-objective)
   - [1.2. Scene: Overview](#12-scene-overview)
-    - [1.2.1. Objective](#121-objective)
-    - [1.2.2. Animation](#122-animation)
-    - [1.2.3. Narration](#123-narration)
 - [2. Section: Relations and Processes](#2-section-relations-and-processes)
   - [2.1. Objective](#21-objective)
   - [2.2. Scene: Entity](#22-scene-entity)
-    - [2.2.1. Objective](#221-objective)
-    - [2.2.2. Animation](#222-animation)
-    - [2.2.3. Narration](#223-narration)
   - [2.3. Scene: Second Entity](#23-scene-second-entity)
-    - [2.3.1. Objective](#231-objective)
-    - [2.3.2. Animation](#232-animation)
-    - [2.3.3. Narration](#233-narration)
   - [2.4. Scene: Introduction to Events](#24-scene-introduction-to-events)
-    - [2.4.1. Objective](#241-objective)
-    - [2.4.2. Animation](#242-animation)
-    - [2.4.3. Narration](#243-narration)
   - [2.5. Scene: Introduction to Relations](#25-scene-introduction-to-relations)
-    - [2.5.1. Objective](#251-objective)
-    - [2.5.2. Animation](#252-animation)
-    - [2.5.3. Narration](#253-narration)
   - [2.6. Scene: Exploring the Properties of Relations](#26-scene-exploring-the-properties-of-relations)
-    - [2.6.1. Objective](#261-objective)
-    - [2.6.2. Animation](#262-animation)
-    - [2.6.3. Narration](#263-narration)
   - [2.7. Scene: Process](#27-scene-process)
-    - [2.7.1. Objective](#271-objective)
-    - [2.7.2. Animation](#272-animation)
-    - [2.7.3. Narration](#273-narration)
   - [2.8. Scene: Complicated Relations](#28-scene-complicated-relations)
-    - [2.8.1. Objective](#281-objective)
-    - [2.8.2. Animation](#282-animation)
-    - [2.8.3. Narration](#283-narration)
   - [2.9. Recap Scene: Building the Foundation](#29-recap-scene-building-the-foundation)
-    - [2.9.1. Objective](#291-objective)
-    - [2.9.2. Narration](#292-narration)
 - [3. Section: Systems and Their Structure](#3-section-systems-and-their-structure)
   - [3.1. Objective](#31-objective)
   - [3.2. Scene: Accumulation](#32-scene-accumulation)
-    - [3.2.1. Objective](#321-objective)
-    - [3.2.2. Animation](#322-animation)
-    - [3.2.3. Narration](#323-narration)
   - [3.3. Scene: Abstraction](#33-scene-abstraction)
-    - [3.3.1. Objective](#331-objective)
-    - [3.3.2. Animation](#332-animation)
-    - [3.3.3. Narration](#333-narration)
   - [3.4. Scene: Levels](#34-scene-levels)
-    - [3.4.1. Objective](#341-objective)
-    - [3.4.2. Animation](#342-animation)
-    - [3.4.3. Narration](#343-narration)
   - [3.5. Scene: Fundamental Level](#35-scene-fundamental-level)
-    - [3.5.1. Objective](#351-objective)
-    - [3.5.2. Animation](#352-animation)
-    - [3.5.3. Narration](#353-narration)
   - [3.6. Scene: Scale of Processes](#36-scene-scale-of-processes)
-    - [3.6.1. Objective](#361-objective)
-    - [3.6.2. Animation](#362-animation)
-    - [3.6.3. Narration](#363-narration)
   - [3.7. Scene: System](#37-scene-system)
-    - [3.7.1. Objective](#371-objective)
-    - [3.7.2. Animation](#372-animation)
-    - [3.7.3. Narration](#373-narration)
   - [3.8. Scene: Structure and Behavior](#38-scene-structure-and-behavior)
-    - [3.8.1. Objective](#381-objective)
-    - [3.8.2. Animation](#382-animation)
-    - [3.8.3. Narration](#383-narration)
   - [3.9. Recap Scene: Navigating Systems and Levels](#39-recap-scene-navigating-systems-and-levels)
-    - [3.9.1. Objective](#391-objective)
-    - [3.9.2. Animation](#392-animation)
-    - [3.9.3. Narration](#393-narration)
 - [4. Section: Interplay of Structure and Change](#4-section-interplay-of-structure-and-change)
   - [4.1. Objective](#41-objective)
   - [4.2. Scene: Heterarchy](#42-scene-heterarchy)
-    - [4.2.1. Objective](#421-objective)
-    - [4.2.2. Animation](#422-animation)
-    - [4.2.3. Narration](#423-narration)
   - [4.3. Scene: Inside-Out and Outside-In](#43-scene-inside-out-and-outside-in)
-    - [4.3.1. Objective](#431-objective)
-    - [4.3.2. Animation](#432-animation)
-    - [4.3.3. Narration](#433-narration)
   - [4.4. Scene: Boundaries and Permeability](#44-scene-boundaries-and-permeability)
-    - [4.4.1. Objective](#441-objective)
-    - [4.4.2. Animation](#442-animation)
-    - [4.4.3. Narration](#443-narration)
   - [4.5. Scene: Emergent Process](#45-scene-emergent-process)
-    - [4.5.1. Objective](#451-objective)
-    - [4.5.2. Animation](#452-animation)
-    - [4.5.3. Narration](#453-narration)
   - [4.6. Scene: Stability](#46-scene-stability)
-    - [4.6.1. Objective](#461-objective)
-    - [4.6.2. Animation](#462-animation)
-    - [4.6.3. Narration](#463-narration)
   - [4.7. Scene: Change and Continuity](#47-scene-change-and-continuity)
-    - [4.7.1. Objective](#471-objective)
-    - [4.7.2. Animation](#472-animation)
-    - [4.7.3. Narration](#473-narration)
   - [4.8. Scene: Process vs. Structure](#48-scene-process-vs-structure)
-    - [4.8.1. Objective](#481-objective)
-    - [4.8.2. Animation](#482-animation)
-    - [4.8.3. Narration](#483-narration)
   - [4.9. Recap Scene: Weaving the Web of Interactions](#49-recap-scene-weaving-the-web-of-interactions)
-    - [4.9.1. Objective](#491-objective)
-    - [4.9.2. Animation](#492-animation)
-    - [4.9.3. Narration](#493-narration)
 - [5. Section: Feedback, Adaptation, and System Dynamics](#5-section-feedback-adaptation-and-system-dynamics)
   - [5.1. Objective](#51-objective)
   - [5.2. Scene: Time and Process Relativity](#52-scene-time-and-process-relativity)
-    - [5.2.1. Objective](#521-objective)
-    - [5.2.2. Animation](#522-animation)
-    - [5.2.3. Narration](#523-narration)
   - [5.3. Scene: Feedback Loops](#53-scene-feedback-loops)
-    - [5.3.1. Objective](#531-objective)
-    - [5.3.2. Animation](#532-animation)
-    - [5.3.3. Narration](#533-narration)
   - [5.4. Scene: Competition and Collaboration](#54-scene-competition-and-collaboration)
-    - [5.4.1. Objective](#541-objective)
-    - [5.4.2. Animation](#542-animation)
-    - [5.4.3. Narration](#543-narration)
   - [5.5. Scene: Nonlinearity and Unpredictability](#55-scene-nonlinearity-and-unpredictability)
-    - [5.5.1. Objective](#551-objective)
-    - [5.5.2. Animation](#552-animation)
-    - [5.5.3. Narration](#553-narration)
   - [5.6. Scene: Resilience and Adaptation](#56-scene-resilience-and-adaptation)
-    - [5.6.1. Objective](#561-objective)
-    - [5.6.2. Animation](#562-animation)
-    - [5.6.3. Narration](#563-narration)
   - [5.7. Recap Scene: Embracing Dynamics and Change](#57-recap-scene-embracing-dynamics-and-change)
-    - [5.7.1. Objective](#571-objective)
-    - [5.7.2. Animation](#572-animation)
-    - [5.7.3. Narration](#573-narration)
 - [6. Section: Causality and Complexity](#6-section-causality-and-complexity)
   - [6.1. Objective](#61-objective)
   - [6.2. Scene: Aristotle's Four Causes](#62-scene-aristotles-four-causes)
-    - [6.2.1. Objective](#621-objective)
-    - [6.2.2. Animation](#622-animation)
-    - [6.2.3. Narration](#623-narration)
   - [6.3. Scene: Modeling Relation](#63-scene-modeling-relation)
-    - [6.3.1. Objective](#631-objective)
-    - [6.3.2. Animation](#632-animation)
-    - [6.3.3. Narration](#633-narration)
   - [6.4. Scene: Impredicativity](#64-scene-impredicativity)
-    - [6.4.1. Objective](#641-objective)
-    - [6.4.2. Animation](#642-animation)
-    - [6.4.3. Narration](#643-narration)
   - [6.5. Scene: Complex and Simple Systems](#65-scene-complex-and-simple-systems)
-    - [6.5.1. Objective](#651-objective)
-    - [6.5.2. Narration](#652-narration)
   - [6.6. Scene: Anticipation](#66-scene-anticipation)
-    - [6.6.1. Objective](#661-objective)
-    - [6.6.2. Animation](#662-animation)
-    - [6.6.3. Narration](#663-narration)
   - [6.7. Recap Scene: Unraveling Complex Causality](#67-recap-scene-unraveling-complex-causality)
-    - [6.7.1. Objective](#671-objective)
-    - [6.7.2. Animation](#672-animation)
-    - [6.7.3. Narration](#673-narration)
 - [7. Section: Intelligence and Information](#7-section-intelligence-and-information)
   - [7.1. Objective](#71-objective)
   - [7.2. Scene: Intelligence](#72-scene-intelligence)
-    - [7.2.1. Objective](#721-objective)
-    - [7.2.2. Animation](#722-animation)
-    - [7.2.3. Narration](#723-narration)
   - [7.3. Scene: Evolution as Learning](#73-scene-evolution-as-learning)
-    - [7.3.1. Objective](#731-objective)
-    - [7.3.2. Animation](#732-animation)
-    - [7.3.3. Narration](#733-narration)
   - [7.4. Scene: Information](#74-scene-information)
-    - [7.4.1. Objective](#741-objective)
-    - [7.4.2. Animation](#742-animation)
-    - [7.4.3. Narration](#743-narration)
   - [7.5. Recap Scene: Connecting Minds and Processes](#75-recap-scene-connecting-minds-and-processes)
-    - [7.5.1. Objective](#751-objective)
-    - [7.5.2. Animation](#752-animation)
-    - [7.5.3. Narration](#753-narration)
 - [8. Section: Meta-Perspectives and Relationalism](#8-section-meta-perspectives-and-relationalism)
   - [8.1. Objective](#81-objective)
   - [8.2. Scene: Perspectives](#82-scene-perspectives)
-    - [8.2.1. Objective](#821-objective)
-    - [8.2.2. Animation](#822-animation)
-    - [8.2.3. Narration](#823-narration)
   - [8.3. Scene: Reductionism](#83-scene-reductionism)
-    - [8.3.1. Objective](#831-objective)
-    - [8.3.2. Animation](#832-animation)
-    - [8.3.3. Narration](#833-narration)
   - [8.4. Scene: Meta-process](#84-scene-meta-process)
-    - [8.4.1. Objective](#841-objective)
-    - [8.4.2. Animation](#842-animation)
-    - [8.4.3. Narration](#843-narration)
   - [8.5. Scene: Relationalism vs relativism](#85-scene-relationalism-vs-relativism)
-    - [8.5.1. Objective](#851-objective)
-    - [8.5.2. Animation](#852-animation)
-    - [8.5.3. Narration](#853-narration)
   - [8.6. Scene: Relations Modifying Structure (Identity)](#86-scene-relations-modifying-structure-identity)
-    - [8.6.1. Objective](#861-objective)
-    - [8.6.2. Animation](#862-animation)
-    - [8.6.3. Narration](#863-narration)
   - [8.7. Scene: Hierarchical Impredicativity](#87-scene-hierarchical-impredicativity)
-    - [8.7.1. Objective](#871-objective)
-    - [8.7.2. Animation](#872-animation)
-    - [8.7.3. Narration](#873-narration)
   - [8.8. Recap Scene: Shifting Lenses](#88-recap-scene-shifting-lenses)
-    - [8.8.1. Objective](#881-objective)
-    - [8.8.2. Animation](#882-animation)
-    - [8.8.3. Narration](#883-narration)
 - [9. Section:Agency, Consciousness, and the Self](#9-sectionagency-consciousness-and-the-self)
   - [9.1. Objective](#91-objective)
   - [9.2. Scene: Agency](#92-scene-agency)
-    - [9.2.1. Objective](#921-objective)
-    - [9.2.2. Animation](#922-animation)
-    - [9.2.3. Narration](#923-narration)
   - [9.3. Scene: Contextual autonomy](#93-scene-contextual-autonomy)
-    - [9.3.1. Objective](#931-objective)
-    - [9.3.2. Animation](#932-animation)
-    - [9.3.3. Narration](#933-narration)
   - [9.4. Scene: Role of Observation and Participation](#94-scene-role-of-observation-and-participation)
-    - [9.4.1. Objective](#941-objective)
-    - [9.4.2. Animation](#942-animation)
-    - [9.4.3. Narration](#943-narration)
   - [9.5. Scene: Awareness](#95-scene-awareness)
-    - [9.5.1. Objective](#951-objective)
-    - [9.5.2. Animation](#952-animation)
-    - [9.5.3. Narration](#953-narration)
   - [9.6. Scene: Subjective vs Unsubjective](#96-scene-subjective-vs-unsubjective)
-    - [9.6.1. Objective](#961-objective)
-    - [9.6.2. Animation](#962-animation)
-    - [9.6.3. Narration](#963-narration)
   - [9.7. Scene: Self](#97-scene-self)
-    - [9.7.1. Objective](#971-objective)
-    - [9.7.2. Animation](#972-animation)
-    - [9.7.3. Narration](#973-narration)
   - [9.8. Recap Scene: Discovering the Self in Process](#98-recap-scene-discovering-the-self-in-process)
-    - [9.8.1. Objective](#981-objective)
-    - [9.8.2. Animation](#982-animation)
-    - [9.8.3. Narration](#983-narration)
 - [10. Section: Knowledge, Language, and Non-foundationalism](#10-section-knowledge-language-and-non-foundationalism)
   - [10.1. Objective](#101-objective)
   - [10.2. Scene: Paradigm](#102-scene-paradigm)
-    - [10.2.1. Objective](#1021-objective)
-    - [10.2.2. Animation](#1022-animation)
-    - [10.2.3. Narration](#1023-narration)
   - [10.3. Scene: Staged Development](#103-scene-staged-development)
-    - [10.3.1. Objective](#1031-objective)
-    - [10.3.2. Animation](#1032-animation)
-    - [10.3.3. Narration](#1033-narration)
   - [10.4. Scene: Non-Self](#104-scene-non-self)
-    - [10.4.1. Objective](#1041-objective)
-    - [10.4.2. Animation](#1042-animation)
-    - [10.4.3. Narration](#1043-narration)
   - [10.5. Scene: Language](#105-scene-language)
-    - [10.5.1. Objective](#1051-objective)
-    - [10.5.2. Animation](#1052-animation)
-    - [10.5.3. Narration](#1053-narration)
   - [10.6. Scene: Non-Foundationalism](#106-scene-non-foundationalism)
-    - [10.6.1. Objective](#1061-objective)
-    - [10.6.2. Animation](#1062-animation)
-    - [10.6.3. Narration](#1063-narration)
   - [10.7. Scene: Paradox vs Not-knowing](#107-scene-paradox-vs-not-knowing)
-    - [10.7.1. Objective](#1071-objective)
-    - [10.7.2. Animation](#1072-animation)
-    - [10.7.3. Narration](#1073-narration)
   - [10.8. Scene: Process Philosophy and Ethics](#108-scene-process-philosophy-and-ethics)
-    - [10.8.1. Objective](#1081-objective)
-    - [10.8.2. Narration](#1082-narration)
   - [10.9. Scene: Metacognition and Process Management](#109-scene-metacognition-and-process-management)
-    - [10.9.1. Objective](#1091-objective)
-    - [10.9.2. Animation](#1092-animation)
-    - [10.9.3. Narration](#1093-narration)
   - [10.10. Recap Scene: Discovering the Self in Process](#1010-recap-scene-discovering-the-self-in-process)
-    - [10.10.1. Objective](#10101-objective)
-    - [10.10.2. Animation](#10102-animation)
-    - [10.10.3. Narration](#10103-narration)
 - [11. Section: Synthesis](#11-section-synthesis)
   - [11.1. Objective](#111-objective)
   - [11.2. Scene: Bridging the natural sciences and the humanities](#112-scene-bridging-the-natural-sciences-and-the-humanities)
-    - [11.2.1. Objective](#1121-objective)
-    - [11.2.2. Animation](#1122-animation)
-    - [11.2.3. Narration](#1123-narration)
   - [11.3. Scene: Meta-presentation](#113-scene-meta-presentation)
-    - [11.3.1. Objective](#1131-objective)
-    - [11.3.2. Animation](#1132-animation)
-    - [11.3.3. Narration](#1133-narration)
   - [11.4. Scene: Conclusion](#114-scene-conclusion)
-    - [11.4.1. Objective](#1141-objective)
-    - [11.4.2. Animation](#1142-animation)
-    - [11.4.3. Narration](#1143-narration)
 
 # 1. Section: Overview
 
@@ -395,14 +197,17 @@ Provide an overview of the presentation at the level of sections thus demonstrat
 
 ## 1.2. Scene: Overview
 
+<!-- omit in toc -->
 ### 1.2.1. Objective
 
 Overview of this presentation
 
+<!-- omit in toc -->
 ### 1.2.2. Animation
 
 Text: "A visual language for process philosophy"
 
+<!-- omit in toc -->
 ### 1.2.3. Narration
 
 WWelcome to this animated journey into process philosophy. While process philosophy has been around for a long time, it’s not widely recognized in Western culture. Unlike essentialism—the idea that things have a fixed, unchanging core or essence—process philosophy focuses on how everything is constantly evolving and interconnected.
@@ -421,14 +226,17 @@ Reality emerges not from isolated entities but from the interactions and relatio
 
 ## 2.2. Scene: Entity
 
+<!-- omit in toc -->
 ### 2.2.1. Objective
 
 Introduce "entity" concept.
 
+<!-- omit in toc -->
 ### 2.2.2. Animation
 
 A single particle with an irregular oscillating boundary
 
+<!-- omit in toc -->
 ### 2.2.3. Narration
 
 Let’s begin by focusing on a single entity. On the screen, you see a simple shape with an irregular, oscillating boundary. This entity could represent anything—a physical object like a particle, an idea, or even a person. Notice how its boundary isn’t fixed; it’s constantly shifting and changing. This constant movement signifies that change is inherent to the very nature of the entity.
@@ -441,14 +249,17 @@ As we move forward, we’ll explore how these processes intertwine to form the s
 
 ## 2.3. Scene: Second Entity
 
+<!-- omit in toc -->
 ### 2.3.1. Objective
 
 Introduction of multiple entities
 
+<!-- omit in toc -->
 ### 2.3.2. Animation
 
 A second particle appears in a different color (purple) next to the original blue entity. Two particles move slowly in a shared plane without interacting.
 
+<!-- omit in toc -->
 ### 2.3.3. Narration
 
 Now, let’s introduce a second entity into the scene. This time, you’ll see a purple shape appear next to the original blue one. The different colors signify distinct properties or characteristics for each entity. For instance, the blue entity might represent one type of particle, idea, or person, while the purple one represents another.
@@ -463,14 +274,17 @@ Reflective Question: Think of two seemingly separate areas in your life. Have th
 
 ## 2.4. Scene: Introduction to Events
 
+<!-- omit in toc -->
 ### 2.4.1. Objective
 
 Introduce the basic concept of an event
 
+<!-- omit in toc -->
 ### 2.4.2. Animation
 
 An invisible arc in the Z plane connects the centers of both entities. A line grows out from the blue entity, following this arc, until it reaches a fraction of the arc’s length. The line then continues along the arc until it is absorbed into the purple entity.
 
+<!-- omit in toc -->
 ### 2.4.3. Narration
 
 Now, let’s explore what happens when these entities interact. Imagine an arc connecting the blue entity to the purple one as a pathway—a route for interaction.
@@ -483,14 +297,17 @@ Events like this are fundamental in process philosophy. They mark the moments wh
 
 ## 2.5. Scene: Introduction to Relations
 
+<!-- omit in toc -->
 ### 2.5.1. Objective
 
 Introduce the basic concept of a relation between two entities.
 
+<!-- omit in toc -->
 ### 2.5.2. Animation
 
 An arc in the Z plane connects the centers of both entities, growing from the blue entity to the purple entity. An arc grows from the blue entity to the purple entity, with an arrow indicating the direction of the relation.
 
+<!-- omit in toc -->
 ### 2.5.3. Narration
 
 Let’s now introduce the concept of a relation between two entities. Watch as a segment extends from the blue entity toward the purple entity, forming an arc. This arc represents the relationship between the two entities.
@@ -507,14 +324,17 @@ Reflective Question: Consider a significant relationship in your life. How has i
 
 ## 2.6. Scene: Exploring the Properties of Relations
 
+<!-- omit in toc -->
 ### 2.6.1. Objective
 
 Delve into the properties of relations, using the example of awareness and sensitivity.
 
+<!-- omit in toc -->
 ### 2.6.2. Animation
 
 A second arc, this time a dotted line, grows from the purple entity back to the blue entity. A dotted line grows from the purple entity to the blue entity, following the same path as the previous arc.
 
+<!-- omit in toc -->
 ### 2.6.3. Narration
 
 Now, let’s explore the properties of this relation. Imagine that the blue entity represents a person who becomes aware of the purple entity. The solid arc extending from the blue entity to the purple one represents this awareness—a direct connection. However, awareness is not always mutual.
@@ -529,14 +349,17 @@ As we continue, we’ll explore how these connections evolve over time, shaping 
 
 ## 2.7. Scene: Process
 
+<!-- omit in toc -->
 ### 2.7.1. Objective
 
 Distinguish between coordinated and uncoordinated processes and illustrate how processes represent sequences of relations within and between entities.
 
+<!-- omit in toc -->
 ### 2.7.2. Animation
 
 Start with a single large entity becoming transparent to reveal the smaller entities within it. Show these smaller entities connected by lines representing their relationships. These connections begin to move in a repeating pattern, illustrating a coordinated process. Then, some lines fade or disconnect, showing uncoordinated processes where the movement becomes more chaotic. Finally, zoom out to see the entire system, with multiple coordinated and uncoordinated processes occurring simultaneously.
 
+<!-- omit in toc -->
 ### 2.7.3. Narration
 
 In process philosophy, a process is understood as a sequence of events. To help explain this, let’s explore how these relations unfold both within and between entities.
@@ -553,14 +376,17 @@ In process philosophy, an entity itself is not a static object; it is the produc
 
 ## 2.8. Scene: Complicated Relations
 
+<!-- omit in toc -->
 ### 2.8.1. Objective
 
 Demonstrate how relations between abstract entities can involve multiple components and levels of synchronization.
 
+<!-- omit in toc -->
 ### 2.8.2. Animation
 
 Zoom into two intermediate entities that have multiple lines representing their relationship. These lines are synchronized, originating from various fundamental entities within each intermediate entity. Then, a single, thicker line appears from the center of each intermediate entity to represent the abstract, overarching relationship between them.
 
+<!-- omit in toc -->
 ### 2.8.3. Narration
 
 Let’s take a closer look at the relationships between two entities and see how these interactions can involve multiple layers. As we zoom in, you’ll notice that their connection isn’t represented by just a single arc. Instead, multiple arcs appear, each representing a distinct process happening within and between these entities.
@@ -575,10 +401,12 @@ This illustrates that relationships aren’t just simple, one-dimensional connec
 
 ## 2.9. Recap Scene: Building the Foundation
 
+<!-- omit in toc -->
 ### 2.9.1. Objective
 
 Reinforce the fundamental concepts of process philosophy, highlighting the shift from objects to processes and the importance of relationships, setting the stage for exploring systems and levels.
 
+<!-- omit in toc -->
 ### 2.9.2. Narration
 
 We've laid the groundwork for understanding process philosophy by exploring its fundamental concepts. We've shifted our focus from viewing the world as composed of static objects to seeing it as a network of processes and relationships. We've learned that it's the interactions and dynamics between entities that give rise to the patterns and structures we observe.
@@ -593,14 +421,17 @@ Building on the idea of process, we’ll see how systems are formed through thes
 
 ## 3.2. Scene: Accumulation
 
+<!-- omit in toc -->
 ### 3.2.1. Objective
 
 How similar entities can accumulate giving rise to new properties
 
+<!-- omit in toc -->
 ### 3.2.2. Animation
 
 Fade out the purple entity and 5 blue entities drop into the Z plane and form a pentagon around the original blue entity. There is some space between every entity.
 
+<!-- omit in toc -->
 ### 3.2.3. Narration
 
 Let’s explore the idea of accumulation. Watch as five more blue entities descend into the scene and arrange themselves in a pentagon around the original blue entity. There is some space between them, emphasizing that each entity is distinct and has not yet established direct connections.
@@ -615,14 +446,17 @@ The group of blue entities is now poised to form something more complicated, wit
 
 ## 3.3. Scene: Abstraction
 
+<!-- omit in toc -->
 ### 3.3.1. Objective
 
 How an entity can be composed of entities
 
+<!-- omit in toc -->
 ### 3.3.2. Animation
 
 Fill in the space between the pentagon of blue entities to form a new blue shape
 
+<!-- omit in toc -->
 ### 3.3.3. Narration
 
 When we observe an accumulation of entities, it’s common to start thinking of them as a unified whole. In this visualization, watch as the spaces between the blue entities are filled in, connecting them at the edges and forming a single blue shape. This transformation illustrates the concept of abstraction: a new, higher-level entity emerges from the collective presence of smaller, interacting parts.
@@ -637,14 +471,17 @@ Reflective Question: Can you think of a situation where you’ve seen a group ac
 
 ## 3.4. Scene: Levels
 
+<!-- omit in toc -->
 ### 3.4.1. Objective
 
 Illustrate the concept of multiple levels of abstraction emerging through the accumulation and integration of entities.
 
+<!-- omit in toc -->
 ### 3.4.2. Animation
 
 Particles flow from a point above the plane, forming 8 new entities, each composed of between 5 and 20 particles. Each group of particles forms a single entity of a different color, representing distinct new entities. These new entities then combine with the original blue entity, resulting in a larger, more complex entity that encompasses all particles.
 
+<!-- omit in toc -->
 ### 3.4.3. Narration
 
 As we accumulate entities, new levels of abstraction naturally emerge. Here, we start with individual particles flowing from above. Each group of particles forms a distinct entity, represented by its unique color. These new entities, composed of smaller parts, now take on their own identity, distinct from the individual particles.
@@ -659,14 +496,17 @@ Reflective Question: Consider a group or organization you’re part of. How does
 
 ## 3.5. Scene: Fundamental Level
 
+<!-- omit in toc -->
 ### 3.5.1. Objective
 
 Illustrate the concept of a fundamental level within multiple levels of abstraction.
 
+<!-- omit in toc -->
 ### 3.5.2. Animation
 
 The large red blob representing the highest level entity gradually becomes transparent, revealing the next level underneath. This process continues, with each subsequent level of abstraction becoming transparent, eventually exposing the most fundamental entities.
 
+<!-- omit in toc -->
 ### 3.5.3. Narration
 
 Now, let’s take a closer look at the layers within an entity. Watch as the large red shape gradually becomes transparent, revealing the level beneath it. As we peel back these layers, what appeared to be a single, unified entity is revealed to be composed of smaller entities, each interacting and relating to one another in intricate ways.
@@ -679,14 +519,17 @@ This exploration illustrates an essential point: there is no ultimate, fixed fou
 
 ## 3.6. Scene: Scale of Processes
 
+<!-- omit in toc -->
 ### 3.6.1. Objective
 
 Illustrate the observation of relations at different scales.
 
+<!-- omit in toc -->
 ### 3.6.2. Animation
 
 Lines representing relations dynamically appear and disappear across different levels of entities.
 
+<!-- omit in toc -->
 ### 3.6.3. Narration
 
 For this scene, let's assume that we’ve chosen our fundamental entities, let’s explore the dynamics of their relationships at different scales. Imagine arcs or lines representing the interactions between these entities appearing and disappearing dynamically.
@@ -701,14 +544,17 @@ This illustration reminds us that processes operate simultaneously on multiple l
 
 ## 3.7. Scene: System
 
+<!-- omit in toc -->
 ### 3.7.1. Objective
 
 Introduce the concept of a "system" as a set of processes encompassing multiple levels of entities and their relations.
 
+<!-- omit in toc -->
 ### 3.7.2. Animation
 
 The largest entity in the scene becomes opaque, filling the screen. The opacity transition emphasizes the whole entity as a system composed of various levels of entities interacting through processes.
 
+<!-- omit in toc -->
 ### 3.7.3. Narration
 
 At this point in our journey, ee’ve moved from individual entities to networks of dynamic relationships and interactions.. Now, let’s bring these ideas together by introducing the concept of a system.
@@ -721,14 +567,17 @@ In reality, nothing exists in isolation. Every system is part of a larger networ
 
 ## 3.8. Scene: Structure and Behavior
 
+<!-- omit in toc -->
 ### 3.8.1. Objective
 
 Introduce system structure as a snapshot of a history of events
 
+<!-- omit in toc -->
 ### 3.8.2. Animation
 
 The largest entity in the scene becomes opaque, filling the screen. The opacity transition emphasizes the whole entity as a system composed of various levels of entities interacting through processes.
 
+<!-- omit in toc -->
 ### 3.8.3. Narration
 
 The structure of a system represents its state at a specific moment, reflecting a history of ongoing processes and interactions that continue to evolve over time. This structure reflects a history of past events and interactions, capturing the current arrangement of the system’s components.
@@ -741,14 +590,17 @@ By understanding both the structure and behavior of systems as ongoing processes
 
 ## 3.9. Recap Scene: Navigating Systems and Levels
 
+<!-- omit in toc -->
 ### 3.9.1. Objective
 
 Summarize the concepts of systems, levels, and their interconnections, preparing the audience to explore relations and interactions in more depth.
 
+<!-- omit in toc -->
 ### 3.9.2. Animation
 
 A multi-layered diagram unfolds, showing systems within systems. Arrows indicate interactions across different levels, and certain elements highlight how changes at one level affect others. The visual emphasizes the nested and interconnected nature of systems.
 
+<!-- omit in toc -->
 ### 3.9.3. Narration
 
 We've journeyed through the concept of systems and levels, recognizing that processes are not isolated—they exist within nested systems that interact across various scales. We've seen how changes at one level can influence others, highlighting the importance of considering context and scale when examining processes.
@@ -763,14 +615,17 @@ Systems are not static; their structure is always changing. Here, we examine how
 
 ## 4.2. Scene: Heterarchy
 
+<!-- omit in toc -->
 ### 4.2.1. Objective
 
 Introduce heterarchy as an alternative to hierarchy, emphasizing the possibility of relations that cross different levels.
 
+<!-- omit in toc -->
 ### 4.2.2. Animation
 
 The word "Heterarchy" appears at the top of the screen. Highlight all the fundamental entities at the boundary of the topmost entity by coloring them white. Then, zoom in to show a connection between two intermediate entities, each involving a fundamental entity that is part of the topmost entity. Show a new external fundamental entity entering the scene and forming a relation with one of the highlighted fundamental entities, influencing both the intermediate and topmost entities.
 
+<!-- omit in toc -->
 ### 4.2.3. Narration
 
 In thinking about systems, it’s tempting to arrange everything into neat layers—a hierarchy where each level affects the one below. But this view limits our understanding. Let's shift our attention to heterarchy, which highlights relationships that cross these levels and go beyond simple hierarchy.
@@ -783,14 +638,17 @@ Heterarchy draws our attention to these hidden connections, reminding us that sy
 
 ## 4.3. Scene: Inside-Out and Outside-In
 
+<!-- omit in toc -->
 ### 4.3.1. Objective
 
 Illustrate the concepts of "inside-out" and "outside-in" as alternative ways to understand relations within a system, allowing for interactions that skip levels, consistent with the idea of heterarchy.
 
+<!-- omit in toc -->
 ### 4.3.2. Animation
 
 Visualize a hierarchical system with a large entity at the top and smaller entities below. Show arrows indicating top-down causation (from the large entity to the smaller entities) and bottom-up causation (from the smaller entities to the large entity). Transition to arrows that move from inside an entity outward (inside-out), affecting both other entities at the same level and entities at higher levels, including instances where the influence skips levels entirely. Finally, show arrows moving from outside an entity inward (outside-in), again crossing different levels, sometimes skipping levels.
 
+<!-- omit in toc -->
 ### 4.3.3. Narration
 
 In hierarchical systems, we often think of influence flowing from the top down or from the bottom up. But these aren’t the only directions through which relations can move. Let’s take a moment to explore inside-out and outside-in relations.
@@ -803,14 +661,17 @@ By understanding these inside-out and outside-in dynamics, we gain a richer view
 
 ## 4.4. Scene: Boundaries and Permeability
 
+<!-- omit in toc -->
 ### 4.4.1. Objective
 
 To explore how boundaries are defined, maintained, and perceived in process philosophy, emphasizing their dynamic and permeable nature.
 
+<!-- omit in toc -->
 ### 4.4.2. Animation
 
 A collection of particles connected by dynamic arcs representing relationships between them. These particles first assemble into distinct entities with clear boundaries. Afterward, the particles disassemble and then reassemble into a different set of entities, showing how boundaries shift depending on the relations that are emphasized.
 
+<!-- omit in toc -->
 ### 4.4.3. Narration
 
 Boundaries help us define where one thing ends and another begins. But in process philosophy, boundaries aren’t fixed; they are constantly shaped by relationships and interactions.
@@ -825,14 +686,17 @@ Reflective Question: How do the boundaries of relationships in your life shift a
 
 ## 4.5. Scene: Emergent Process
 
+<!-- omit in toc -->
 ### 4.5.1. Objective
 
 Distinguish between centralized and emergent processes, illustrating how systems can either be directed by a central authority or arise from the collective dynamics of their parts.
 
+<!-- omit in toc -->
 ### 4.5.2. Animation
 
 Start with a large entity that becomes transparent, revealing the smaller entities within. These smaller entities then begin to separate, showing the individual processes within them. Some of these processes appear to be centrally coordinated, with clear direction and pattern, while others seem to emerge naturally as the smaller entities interact independently, forming patterns without a clear central control.
 
+<!-- omit in toc -->
 ### 4.5.3. Narration
 
 Not everything in the world is planned or controlled from the top down. In fact, many of the most interesting patterns we see around us come about naturally, through the interactions of smaller parts. This is what we call an emergent process.
@@ -847,14 +711,17 @@ In process philosophy, this idea of emergence teaches us that systems don’t ne
 
 ## 4.6. Scene: Stability
 
+<!-- omit in toc -->
 ### 4.6.1. Objective
 
 Explain how entities can appear static or stable over time, highlighting how perception is influenced by both the scale of observation and the relative motion of the observer.
 
+<!-- omit in toc -->
 ### 4.6.2. Animation
 
 Start with the slow movement of the boundary of a large central entity. Gradually zoom in until only the blue color of the entity fills the screen, making it appear stable and unchanging. Then, slowly zoom out and move the entity off-screen to reveal its motion, illustrating both scale and relativity.
 
+<!-- omit in toc -->
 ### 4.6.3. Narration
 
 At first glance, many things around us seem solid, fixed, and unchanging. But what if this stability is not as absolute as it appears? Let's explore how stability is, in fact, a matter of perspective and relativity.
@@ -869,14 +736,17 @@ In reality, what appears stable is often in flux. By changing our vantage point,
 
 ## 4.7. Scene: Change and Continuity
 
+<!-- omit in toc -->
 ### 4.7.1. Objective
 
 To illustrate how process philosophy acknowledges the constancy of change while also recognizing the presence of patterns of continuity within dynamic systems, emphasizing the impact of the Second Law of Thermodynamics.
 
+<!-- omit in toc -->
 ### 4.7.2. Animation
 
 The animation begins with a sequence of entities arranged in a series, each one interacting with a particle that moves through the system. The particle drops into the first entity, which then emits two particle, one that moves to the next entity and the other that exists the system, and so on. This chain reaction continues until only a particle exiting the system is visible, illustrating the gradual loss of energy over time.
 
+<!-- omit in toc -->
 ### 4.7.3. Narration
 
 When we see a process repeating itself over time, it can feel like it will continue forever. But in reality, even continuous processes require constant input to keep going.
@@ -889,10 +759,12 @@ This understanding of continuity reminds us that nothing is ever truly static. W
 
 ## 4.8. Scene: Process vs. Structure
 
+<!-- omit in toc -->
 ### 4.8.1. Objective
 
 Disintguish process and structure
 
+<!-- omit in toc -->
 ### 4.8.2. Animation
 
 The video begins with particles being emitted from a source and gradually assembling into a plane of interconnected 2D entities. The process is fluid, showing how the particles come together to form a stable structure.
@@ -900,6 +772,7 @@ Once the plane is established, the source continues to emit particles. These new
 The video may briefly show what the scene would look like if the viewer had started watching after the plane was already formed, emphasizing the difference in perception.
 The video ends by zooming out, showing the plane within a broader context, hinting at its connection to even larger processes.
 
+<!-- omit in toc -->
 ### 4.8.3. Narration
 
 Every structure we encounter—whether it’s a physical object or an idea—has its roots in an ongoing process. Yet once a structure is in place, it can seem static, as if it has always been there. But no structure is permanent; each one is shaped by the processes that created it and continues to interact with the processes around it.
@@ -918,14 +791,17 @@ We are all part of these unfolding stories, both shaping and being shaped by the
 
 ## 4.9. Recap Scene: Weaving the Web of Interactions
 
+<!-- omit in toc -->
 ### 4.9.1. Objective
 
 Reinforce the understanding of relations and interactions within and between systems, setting the stage for exploring feedback, adaptation, and system dynamics.
 
+<!-- omit in toc -->
 ### 4.9.2. Animation
 
 A web of nodes connected by dynamic lines illustrates various types of relationships—linear, circular, inside-out, and outside-in. The web pulsates, showing the flow of interactions and the complexity of connections within and between systems.
 
+<!-- omit in toc -->
 ### 4.9.3. Narration
 
 We've dived into the intricate world of relations and interactions, discovering how entities connect and influence each other in diverse ways. We've explored different types of relationships, including linear, circular, inside-out, and outside-in interactions, recognizing that these connections form the very fabric of systems.
@@ -940,14 +816,17 @@ In complicated systems, feedback loops and interactions drive adaptation and evo
 
 ## 5.2. Scene: Time and Process Relativity
 
+<!-- omit in toc -->
 ### 5.2.1. Objective
 
 Illustrate how time is relative to processes, demonstrating that different entities experience and measure time differently based on the speed and nature of their internal processes.
 
+<!-- omit in toc -->
 ### 5.2.2. Animation
 
 Two distinct blobs represent two entities. The larger blob moves slowly, with detailed, intricate patterns, while the smaller blob oscillates quickly, with simpler, faster-moving patterns.
 
+<!-- omit in toc -->
 ### 5.2.3. Narration
 
 Time, in process philosophy, isn’t a fixed flow but something shaped by the internal rhythms of each entity. On the screen, you see two blobs representing different entities. The larger one moves slowly, the smaller one faster. To the larger entity, the smaller one seems to be racing ahead. To the smaller entity, the larger one seems to crawl. This difference shows how time is experienced differently based on each entity’s internal processes.
@@ -958,14 +837,17 @@ As we zoom out, notice how these entities are part of a larger system where many
 
 ## 5.3. Scene: Feedback Loops
 
+<!-- omit in toc -->
 ### 5.3.1. Objective
 
 To illustrate the role of feedback loops in process philosophy, explaining how positive feedback loops amplify changes within a system, while negative feedback loops stabilize or regulate the system.
 
+<!-- omit in toc -->
 ### 5.3.2. Animation
 
 Start with a simple process involving a few entities connected by dynamic relations. Introduce a positive feedback loop by showing one of these relations intensifying as it cycles back into the system, causing other relations to similarly intensify, eventually leading to a dramatic change in the system. Then, contrast this with a negative feedback loop where a relation initially intensifies but is then met with a balancing counter-relation that dampens the intensity, stabilizing the system.
 
+<!-- omit in toc -->
 ### 5.3.3. Narration
 
 In any system, feedback loops are crucial for shaping how things evolve and adapt. Let’s start with positive feedback. Here, a small change grows as it cycles back into the system. One relation intensifies, which then triggers others, creating a reinforcing loop. The system responds by amplifying this change, like a snowball rolling downhill, growing as it gathers momentum. This kind of feedback drives rapid growth or even sudden collapse.
@@ -978,10 +860,12 @@ Reflective Question: Think of a feedback loop in your life, perhaps where a smal
 
 ## 5.4. Scene: Competition and Collaboration
 
+<!-- omit in toc -->
 ### 5.4.1. Objective
 
 To illustrate how feedback loops operate within the dynamics of competition and collaboration, and how these interactions at a lower level contribute to stability or change at a higher level.
 
+<!-- omit in toc -->
 ### 5.4.2. Animation
 
 The scene begins with a set of entities engaged in competition, each trying to outperform the others, symbolizing a competitive feedback loop where entities intensify their efforts in response to others.
@@ -990,6 +874,7 @@ Competitive Feedback Loop: There are different colored particles arriving into a
 
 Collaborative Feedback Loop: Each particle generates particle sof multiple colors. When the stream of particles lacks a color then the collaborative system continues and the competitive system slowly disapppears as the particles that arrive oscillate in color and entities fade.
 
+<!-- omit in toc -->
 ### 5.4.3. Narration
 
 Competition and collaboration are two powerful dynamics that shape how systems behave. In competition, entities push each other to improve or outdo one another. This creates a feedback loop where each response intensifies the next, leading to rapid changes. Picture companies racing to develop new technologies—each innovation forces competitors to adapt quickly or be left behind.
@@ -1000,14 +885,17 @@ Both competition and collaboration can coexist within the same system, often at 
 
 ## 5.5. Scene: Nonlinearity and Unpredictability
 
+<!-- omit in toc -->
 ### 5.5.1. Objective
 
 To illustrate how nonlinear processes within systems can lead to unpredictable outcomes, demonstrating how small changes or actions can have disproportionately large effects, thereby highlighting the inherent unpredictability in process philosophy.
 
+<!-- omit in toc -->
 ### 5.5.2. Animation
 
 Two systems in parallel that evolve identically under identical inputs e.g .assembling and interacting from a stream of particles. Make a single change to that stream and see the effect being amplified.
 
+<!-- omit in toc -->
 ### 5.5.3. Narration
 
 Systems are often nonlinear, meaning that small changes can have big, unpredictable effects. At first, the two systems on screen evolve identically, following the same patterns. But then, we introduce a tiny change into one of them—a small tweak. Watch how that little change ripples through the system, gradually growing into something much larger. Over time, the two systems diverge dramatically.
@@ -1018,12 +906,15 @@ This unpredictability is a key feature of process philosophy. Even when we under
 
 ## 5.6. Scene: Resilience and Adaptation
 
+<!-- omit in toc -->
 ### 5.6.1. Objective
 
 To illustrate how systems maintain resilience and adapt to changes, emphasizing the importance of flexibility and the ability to withstand or recover from disturbances in process philosophy.
 
+<!-- omit in toc -->
 ### 5.6.2. Animation
 
+<!-- omit in toc -->
 ### 5.6.3. Narration
 
 Resilience is the ability of a system to absorb shocks, adapt to change, and keep going. In this scene, we see a system facing a disturbance. Some parts break down under the pressure, but others adapt. New connections form, and the system reorganizes itself into a different, stable arrangement.
@@ -1034,14 +925,17 @@ In process philosophy, resilience is about navigating change, not avoiding it. S
 
 ## 5.7. Recap Scene: Embracing Dynamics and Change
 
+<!-- omit in toc -->
 ### 5.7.1. Objective
 
 Summarize the concepts of feedback loops, adaptation, and the dynamic nature of systems, preparing the audience to explore causality and complexity.
 
+<!-- omit in toc -->
 ### 5.7.2. Animation
 
 Visual representations of feedback loops—both positive and negative—are shown influencing a system. The system adapts and changes in response, demonstrating resilience and the emergence of complex behaviors.
 
+<!-- omit in toc -->
 ### 5.7.3. Narration
 
 We've explored how feedback loops and interactions drive the dynamics of systems, leading to adaptation and evolution. Positive feedback loops amplify changes, while negative feedback loops regulate and stabilize systems. We've seen how these dynamics contribute to the resilience and complexity of systems, but also to their unpredictability.
@@ -1056,12 +950,15 @@ Understanding how change happens in systems requires us to explore the nature of
 
 ## 6.2. Scene: Aristotle's Four Causes
 
+<!-- omit in toc -->
 ### 6.2.1. Objective
 
 To introduce and explain Aristotle's four causes — formal, material, efficient, and final — highlighting their roles in understanding causation and the historical shift in their application within modern science. The scene also aims to reintroduce the importance of final causation in contemporary scientific discourse, particularly in the context of process philosophy.
 
+<!-- omit in toc -->
 ### 6.2.2. Animation
 
+<!-- omit in toc -->
 ### 6.2.3. Narration
 
 Let’s start with an idea from over 2,000 years ago: Aristotle’s four causes. He explained that everything has four kinds of causes that work together.
@@ -1088,14 +985,17 @@ Reflective Question: Can you think of something you've created or been a part of
 
 ## 6.3. Scene: Modeling Relation
 
+<!-- omit in toc -->
 ### 6.3.1. Objective
 
 The modeling relation in category theory is a formal way to describe how a system (such as a biological organism) is related to its abstract model. This relation is established through mappings (functors) that preserve the structure and behavior of the system within its model. It’s a way of understanding how systems can be represented and analyzed mathematically.
 
+<!-- omit in toc -->
 ### 6.3.2. Animation
 
 Visualize a natural system (such as a biological organism) on one side and its abstract model on the other. Arrows (functors) map the states and processes from the system to the model, preserving the relationships and structures between them. Show how changes in the system are reflected in the model and vice versa, illustrating the bidirectional nature of the modeling relation.
 
+<!-- omit in toc -->
 ### 6.3.3. Narration
 
 In science, we often use models to help us understand systems. A model is a simplified representation of a real system that captures its processes and behaviors. This is a central aspect of science and it can help us understand modern science if we understnad this process. This is where the modeling relation comes in.
@@ -1108,14 +1008,17 @@ It's important to remember that the modeling relation itself is a kind of proces
 
 ## 6.4. Scene: Impredicativity
 
+<!-- omit in toc -->
 ### 6.4.1. Objective
 
 This could be explored more explicitly as self-referential processes within the system, where entities or processes refer back to themselves.
 
+<!-- omit in toc -->
 ### 6.4.2. Animation
 
 Visualize an entity where its output continuously becomes its own input, creating a self-referential loop. This can be represented by an arrow looping back on itself or an entity feeding into its own creation. Then, illustrate this further by showing a system that, through a process, generates a component of itself that is necessary for its own repair. Highlight how this self-referential cycle is more complex than a typical feedback loop and involves the concept of impredicativity.
 
+<!-- omit in toc -->
 ### 6.4.3. Narration
 
 In our exploration of systems, we sometimes encounter processes that refer back to themselves — what we call self-referential processes. A similar concept that expands on this notion is impredicativity. This refers to processes that changes its own structure. It’s more than just a feedback loop — it involves a system acting on itself.
@@ -1130,10 +1033,12 @@ Reflective Question: Have you ever been part of a self-sustaining process where 
 
 ## 6.5. Scene: Complex and Simple Systems
 
+<!-- omit in toc -->
 ### 6.5.1. Objective
 
 To draw a fundamental distinction between complex systems, which involve impredicative processes, and simple systems, which do not. The scene will explain how relational biology categorizes systems and how modern science has historically been more successful in modeling simple systems due to the limitations in mathematics and the exclusion of final causation.
 
+<!-- omit in toc -->
 ### 6.5.2. Narration
 
 Now that we’ve introduced impredicativity, let’s talk about what makes a system complex versus simple.
@@ -1146,14 +1051,17 @@ So, when we say a system is complex, we don’t just mean it has many parts. Wha
 
 ## 6.6. Scene: Anticipation
 
+<!-- omit in toc -->
 ### 6.6.1. Objective
 
 The ability of a system to predict future states and act accordingly, through maintaining a model of another part of the system.
 
+<!-- omit in toc -->
 ### 6.6.2. Animation
 
 Show one cluster maintaining a smaller, faster-moving model of another cluster. This model could simulate future states and then feed back into the system to influence real-time decisions.
 
+<!-- omit in toc -->
 ### 6.6.3. Narration
 
 Anticipation is a system’s ability to predict future states and act based on those predictions. In our animation, one cluster maintains an internal model of another system. This model simulates different future scenarios and helps guide the system’s actions in real-time.
@@ -1168,14 +1076,17 @@ By understanding anticipation, we can better appreciate how complex systems oper
 
 ## 6.7. Recap Scene: Unraveling Complex Causality
 
+<!-- omit in toc -->
 ### 6.7.1. Objective
 
 Reinforce the understanding of causality in complex systems, highlighting the interconnected web of interactions and setting the stage for exploring intelligence and information.
 
+<!-- omit in toc -->
 ### 6.7.2. Animation
 
 A complex network of interconnected nodes illustrates the web of causality, where multiple causes contribute to outcomes in non-linear ways. Arrows show multi-directional influences, and certain nodes glow to represent emergent properties.
 
+<!-- omit in toc -->
 ### 6.7.3. Narration
 
 We've unraveled the intricate nature of causality and complexity, recognizing that in complex systems, outcomes arise not from single causes but from a web of interconnected processes. We've explored concepts like impredicativity and anticipation, understanding how systems can be self-referential and adaptive.
@@ -1190,14 +1101,17 @@ Intelligence and information are not isolated elements but emergent properties o
 
 ## 7.2. Scene: Intelligence
 
+<!-- omit in toc -->
 ### 7.2.1. Objective
 
 The system’s ability to learn and adapt to changes
 
+<!-- omit in toc -->
 ### 7.2.2. Animation
 
 Introduce a "black blob" entity that represents an adaptive process, monitoring changes and updating the system’s models. This entity could be shown interacting with different parts of the system, making adjustments in response to observed changes.
 
+<!-- omit in toc -->
 ### 7.2.3. Narration
 
 Let’s begin by examining intelligence as an emergent process—a system’s capacity to learn and adapt. In this visualization, a 'black blob' moves through the system, representing an ongoing adaptive process. Watch as it interacts with various components, adjusting their behavior in response to shifts and changes in its environment.
@@ -1210,14 +1124,17 @@ Reflective Question: Think of a situation where you had to adapt quickly to a ne
 
 ## 7.3. Scene: Evolution as Learning
 
+<!-- omit in toc -->
 ### 7.3.1. Objective
 
 To illustrate the analogy between the process of intelligence (learning) and the process of evolution, highlighting how learning can occur across various scales and levels, from individual organisms to entire species.
 
+<!-- omit in toc -->
 ### 7.3.2. Animation
 
 Begin by showing an entity, such as a small plant or organism, that seeds another entity, which then grows, seeds another, and gradually fades away. Over several cycles of this process, introduce a subtle change in color or form with each new generation, symbolizing adaptation and learning. As the process continues, zoom out to reveal that the color changes represent a broader, evolving pattern.
 
+<!-- omit in toc -->
 ### 7.3.3. Narration
 
 Next, let’s look at how learning occurs not just at the level of individuals but across entire species, cultures, and systems. In this scene, a plant grows, seeds another, and eventually fades away. With each generation, small variations appear—like shifts in color or form—representing how species adapt and evolve over time.
@@ -1230,14 +1147,17 @@ By recognizing these patterns, we see that learning isn’t limited to individua
 
 ## 7.4. Scene: Information
 
+<!-- omit in toc -->
 ### 7.4.1. Objective
 
 To convey the idea that information is a process rather than a static essence.
 
+<!-- omit in toc -->
 ### 7.4.2. Animation
 
 Two similar particles are sent to two different entities. Upon receiving the particles, the entities change to different colors, illustrating how they interpret the same "information" differently.
 
+<!-- omit in toc -->
 ### 7.4.3. Narration
 
 Let’s turn to the nature of information itself. In process philosophy, information isn’t something fixed or static—it’s a process that emerges through interactions.
@@ -1252,14 +1172,17 @@ Reflective Question: Have you ever been in a situation where the same informatio
 
 ## 7.5. Recap Scene: Connecting Minds and Processes
 
+<!-- omit in toc -->
 ### 7.5.1. Objective
 
 Summarize how intelligence and information emerge from processes, preparing the audience to explore meta-perspectives and relationalism.
 
+<!-- omit in toc -->
 ### 7.5.2. Animation
 
 An animated flow of information moves through a network, with nodes representing intelligent processes adapting and learning. Data transforms as it moves, symbolizing the dynamic nature of information.
 
+<!-- omit in toc -->
 ### 7.5.3. Narration
 
 We've discovered that intelligence and information are not isolated elements but emerge from the ongoing interactions within systems. We've seen how systems learn and adapt, processing information in ways that lead to evolution and growth.
@@ -1274,14 +1197,17 @@ At a higher level, we’ll step back to examine how relational thinking reshapes
 
 ## 8.2. Scene: Perspectives
 
+<!-- omit in toc -->
 ### 8.2.1. Objective
 
 A perspective imposes a structure on a system
 
+<!-- omit in toc -->
 ### 8.2.2. Animation
 
 A central set of particles with dynamic arcs representing their relationships. From this central set, multiple copies of the particles are generated and organized into different clusters, each forming distinct entities based on specific relationships. These entities are semi-transparent and gradually move under a growing stack, representing multiple perspectives overlaying one another.
 
+<!-- omit in toc -->
 ### 8.2.3. Narration
 
 In process philosophy, the way we perceive and understand a system is deeply influenced by the perspectives we adopt. Each perspective highlights certain relationships while downplaying others, effectively shaping the structure we see.
@@ -1302,14 +1228,17 @@ Reflective Question: Have you ever needed to shift your perspective to understan
 
 ## 8.3. Scene: Reductionism
 
+<!-- omit in toc -->
 ### 8.3.1. Objective
 
 Demonstrate the limits of reductionist analysis.
 
+<!-- omit in toc -->
 ### 8.3.2. Animation
 
 Gradually zoom in on the large entity until only one of the intermediate entities is visible. Then, further zoom into the internal components of that intermediate entity, showing only a single fundamental entity. Finally, zoom out quickly to reveal the entire system, highlighting the previously hidden relations.
 
+<!-- omit in toc -->
 ### 8.3.3. Narration
 
 When we adopt a reductionist approach, we focus on the individual components that make up a system. By zooming in on the larger entity, we observe the intermediate entities that comprise it, allowing us to study these parts in isolation and gain detailed insights into their properties and behaviors.
@@ -1326,14 +1255,17 @@ In summary, while reductionism offers valuable insights into the building blocks
 
 ## 8.4. Scene: Meta-process
 
+<!-- omit in toc -->
 ### 8.4.1. Objective
 
 Introduce the general concept of meta and abstraction
 
+<!-- omit in toc -->
 ### 8.4.2. Animation
 
 Zoom out and show new relations that form a new entity
 
+<!-- omit in toc -->
 ### 8.4.3. Narration
 
 Throughout our exploration of process philosophy, we've noticed a recurring pattern: moving from the specific to the abstract, from individual entities to the larger structures they form when considered together. This movement is the essence of abstraction in action.
@@ -1352,12 +1284,15 @@ Reflective Question: When you face complex decisions, how do you decide which pe
 
 ## 8.5. Scene: Relationalism vs relativism
 
+<!-- omit in toc -->
 ### 8.5.1. Objective
 
 To distinguish between relationalism and relativism in process philosophy, emphasizing how relationalism avoids the pitfalls of nihilism and the paradox of imposing a singular perspective while maintaining a coherent and meaningful approach to understanding systems.
 
+<!-- omit in toc -->
 ### 8.5.2. Animation
 
+<!-- omit in toc -->
 ### 8.5.3. Narration
 
 As we explore different perspectives, it's important to remember that we ourselves are viewing the system from a particular standpoint. If we overlook this, we might fall into the illusion that we've found the ultimate perspective, believing we see things exactly as they are, free from any bias.
@@ -1374,14 +1309,17 @@ In adopting relationalism, we maintain a meaningful and coherent way of understa
 
 ## 8.6. Scene: Relations Modifying Structure (Identity)
 
+<!-- omit in toc -->
 ### 8.6.1. Objective
 
 Illustrate how relations between entities can alter the structure and identity of a system, contributing to emergent behavior and complexity.
 
+<!-- omit in toc -->
 ### 8.6.2. Animation
 
 The video starts with a few distinct entities connected by lines representing relationships. As these relationships intensify, the entities begin to merge, split, or reconfigure into new shapes. Clusters of entities that were once separate come together to form new structures, while others break apart, showing how the interactions between them dynamically modify the system's overall structure and identity. The final image reveals a new, emergent system that is different from what was originally present.
 
+<!-- omit in toc -->
 ### 8.6.3. Narration
 
 Building on our exploration of the self as an emergent process, we can extend this idea to understand how relationships between entities can modify the very structure of a system, influencing its identity and contributing to emergent behaviors.
@@ -1400,14 +1338,17 @@ Recognizing this, we see the risks of treating a complex system as if it were si
 
 ## 8.7. Scene: Hierarchical Impredicativity
 
+<!-- omit in toc -->
 ### 8.7.1. Objective
 
 To illustrate the connection between post-structuralism and the concept of impredicativity, particularly in the context of understanding complex, self-referential systems.
 
+<!-- omit in toc -->
 ### 8.7.2. Animation
 
 The video begins with a visual sequence of dynamic relations that animate an entity within another entity. This animation highlights the recursive nature of the relations, forming a hierarchical loop where the processes at one level influence and are influenced by processes at another level. The camera might zoom in and out to show how these nested entities interact in a self-referential cycle.
 
+<!-- omit in toc -->
 ### 8.7.3. Narration
 
 In the late 20th century, philosophy introduced the concept of post-structuralism during intense debates about whether human behavior is conditioned by the environment or governed by innate, universal capacities like language.
@@ -1424,14 +1365,17 @@ This perspective opens up possibilities for resolving paradoxes, such as individ
 
 ## 8.8. Recap Scene: Shifting Lenses
 
+<!-- omit in toc -->
 ### 8.8.1. Objective
 
 Reinforce the importance of perspectives and relational thinking, leading into the exploration of agency, consciousness, and the self.
 
+<!-- omit in toc -->
 ### 8.8.2. Animation
 
 A lens or spotlight moves over a complex scene, highlighting different aspects of a system. As the lens shifts, the relationships and structures change, illustrating how perspectives alter our understanding.
 
+<!-- omit in toc -->
 ### 8.8.3. Narration
 
 We've explored how our perspectives shape the structures we perceive, emphasizing that shifting viewpoints can reveal new relationships and understandings. By adopting relationalism, we've recognized that meaning and truth emerge from the network of relationships rather than isolated viewpoints.
@@ -1446,12 +1390,15 @@ Agency and consciousness do not emerge in isolation but through ongoing interact
 
 ## 9.2. Scene: Agency
 
+<!-- omit in toc -->
 ### 9.2.1. Objective
 
 Expand on the concept of agency
 
+<!-- omit in toc -->
 ### 9.2.2. Animation
 
+<!-- omit in toc -->
 ### 9.2.3. Narration
 
 As we've journeyed through process philosophy, we've seen that systems are intricate webs of relationships and processes. Now, let's delve into how this perspective reshapes our understanding of agency—the capacity to act and make choices.
@@ -1472,12 +1419,15 @@ Reflective Question: How do you see yourself as part of larger processes—wheth
 
 ## 9.3. Scene: Contextual autonomy
 
+<!-- omit in toc -->
 ### 9.3.1. Objective
 
 Expand on the concept of contextual autonomy
 
+<!-- omit in toc -->
 ### 9.3.2. Animation
 
+<!-- omit in toc -->
 ### 9.3.3. Narration
 
 Building on our understanding of agency, let's explore the idea of contextual autonomy. In process philosophy, autonomy isn't about being completely independent; it's about having the capacity to act within the web of relationships and histories that shape us.
@@ -1494,14 +1444,17 @@ Understanding autonomy as inherently contextual helps us navigate the complex in
 
 ## 9.4. Scene: Role of Observation and Participation
 
+<!-- omit in toc -->
 ### 9.4.1. Objective
 
 Illustrate how the observer is inherently part of the system they observe, emphasizing the participatory nature of observation.
 
+<!-- omit in toc -->
 ### 9.4.2. Animation
 
 The scene begins with an entity positioned outside of a system, observing it from a distance. The system under observation is initially presented as a closed loop of interacting entities. As the observation continues, additional entities and relations fade into view, revealing a larger system that includes both the observer and the system being observed. The observer is now shown as an active participant within this larger, interconnected system.
 
+<!-- omit in toc -->
 ### 9.4.3. Narration
 
 Traditionally, science has often portrayed the observer as a detached entity—a neutral party studying a system without influencing it. This perspective assumes we can fully understand a system from the outside, maintaining objectivity and independence.
@@ -1516,14 +1469,17 @@ Recognizing we're participants in the systems we study enriches our understandin
 
 ## 9.5. Scene: Awareness
 
+<!-- omit in toc -->
 ### 9.5.1. Objective
 
 Introduce a practical and useful distinction between conscious and unconscious processes, offering a way to think about consciousness within the framework of process philosophy.
 
+<!-- omit in toc -->
 ### 9.5.2. Animation
 
 Begin with a circular "viewfinder" in the center of the screen. Inside this circle, relationships and processes are clearly visible — lines and nodes are actively connecting and interacting. Outside the circle, the screen is dimmed or blurred, indicating the presence of relationships and processes that are not immediately visible or attended to. As the viewfinder moves across the screen, different parts of the system come into focus, while others fade into the background, symbolizing the conscious and unconscious aspects of experience. Occasionally, the circle expands, revealing more of the system, then contracts, narrowing the focus again.
 
+<!-- omit in toc -->
 ### 9.5.3. Narration
 
 Let's explore how awareness shapes our experience of processes. In our daily lives, some processes occur within our conscious awareness—we're actively attentive to them. Others operate unconsciously, outside our immediate focus.
@@ -1540,12 +1496,15 @@ Recognizing the fluid boundary between conscious and unconscious processes allow
 
 ## 9.6. Scene: Subjective vs Unsubjective
 
+<!-- omit in toc -->
 ### 9.6.1. Objective
 
 Distinguish between subjective and unsubjective experiences, highlighting their implications for our understanding of the self.
 
+<!-- omit in toc -->
 ### 9.6.2. Animation
 
+<!-- omit in toc -->
 ### 9.6.3. Narration
 
 In everyday life, we often experience ourselves as distinct individuals—a clear sense of "I" observing and interacting with the world. This subjectivity is familiar, anchoring us in personal experiences.
@@ -1560,12 +1519,15 @@ Understanding the interplay between subjective and unsubjective experiences enri
 
 ## 9.7. Scene: Self
 
+<!-- omit in toc -->
 ### 9.7.1. Objective
 
 To present the self as an emergent process rather than a fixed essence, challenging the notion of an "authentic self".
 
+<!-- omit in toc -->
 ### 9.7.2. Animation
 
+<!-- omit in toc -->
 ### 9.7.3. Narration
 
 In process philosophy, the self is understood not as a fixed essence but as an emergent process, continuously shaped by interactions with the world. This idea challenges the traditional belief in an "authentic self"—a stable, core identity that defines who we truly are.
@@ -1582,14 +1544,17 @@ Reflective Question: How does the idea that your identity is relational affect t
 
 ## 9.8. Recap Scene: Discovering the Self in Process
 
+<!-- omit in toc -->
 ### 9.8.1. Objective
 
 Summarize the concepts of agency, consciousness, and the emergent self, setting the stage for exploring knowledge, language, and non-foundationalism.
 
+<!-- omit in toc -->
 ### 9.8.2. Animation
 
 An individual's silhouette dissolves into a flow of interconnected processes, symbolizing the self as an emergent property. Threads represent experiences, relationships, and internal processes weaving together.
 
+<!-- omit in toc -->
 ### 9.8.3. Narration
 
 We've delved into the nature of agency, understanding it as an emergent property arising from dynamic relationships within systems. We've explored consciousness and the self, recognizing that identity is not a fixed essence but a continuous process shaped by interactions and experiences.
@@ -1604,14 +1569,17 @@ Knowledge is not built on a foundation of fixed truths but evolves through a pro
 
 ## 10.2. Scene: Paradigm
 
+<!-- omit in toc -->
 ### 10.2.1. Objective
 
 Introduce the concept of different paradigms as distinct epistemologies, emphasizing how different paradigms shape perspectives and can lead to contradictory viewpoints.
 
+<!-- omit in toc -->
 ### 10.2.2. Animation
 
 The video begins by showing a central entity with multiple lines branching out, each representing different perspectives. These perspectives, while varied, are all within the same paradigm and do not contradict each other. As the scene progresses, the image splits into two separate sections, each representing a different paradigm. The perspectives within each section are coherent internally but contradictory when compared across paradigms. The final visual shows these paradigms side by side, with a line illustrating the tension between them.
 
+<!-- omit in toc -->
 ### 10.2.3. Narration
 
 In our exploration of process philosophy, we've seen how perspectives shape our understanding of systems. Now, let's delve into the concept of paradigms—overarching frameworks that guide how we interpret the world.
@@ -1628,14 +1596,17 @@ When new paradigms emerge, they often challenge established knowledge, leading t
 
 ## 10.3. Scene: Staged Development
 
+<!-- omit in toc -->
 ### 10.3.1. Objective
 
 Illustrate the concept that systems evolve through stages, with each stage introducing new levels of complexity, abstraction, and perspectives.
 
+<!-- omit in toc -->
 ### 10.3.2. Animation
 
 The video begins with a simple compound entity composed of a few basic parts. As the entity evolves, new layers of entities and relationships are added in stages, each time making the system more complex. Initially, the entity's structure is straightforward, but as it moves through each stage, additional components and connections emerge, forming new patterns. These stages are visually represented by layers of increasing complexity, each building on the previous one. The final image shows a highly intricate system that has evolved through multiple stages, with each layer representing a new level of abstraction and integration.
 
+<!-- omit in toc -->
 ### 10.3.3. Narration
 
 Systems, whether they are organisms, societies, or ideas, often evolve through staged development. Each stage introduces new complexities, abstractions, and perspectives, transforming the system in fundamental ways.
@@ -1650,12 +1621,15 @@ This concept applies broadly—from personal development to the evolution of eco
 
 ## 10.4. Scene: Non-Self
 
+<!-- omit in toc -->
 ### 10.4.1. Objective
 
 Introduce the concept of "non-self" as a nuanced understanding of the self, reflecting its emergent and interconnected nature.
 
+<!-- omit in toc -->
 ### 10.4.2. Animation
 
+<!-- omit in toc -->
 ### 10.4.3. Narration
 
 Earlier, we considered the self as an emergent process—constantly shaped by interactions and relationships. Now, let's explore the concept of non-self, which invites us to reconsider our understanding of identity.
@@ -1670,12 +1644,15 @@ Embracing the concept of non-self allows us to see ourselves as interconnected w
 
 ## 10.5. Scene: Language
 
+<!-- omit in toc -->
 ### 10.5.1. Objective
 
 Introduce the idea of dynamic ontology
 
+<!-- omit in toc -->
 ### 10.5.2. Animation
 
+<!-- omit in toc -->
 ### 10.5.3. Narration
 
 Let's explore how language itself embodies the principles of process philosophy. We often think of words as having fixed meanings, like entries in a dictionary. But in reality, language is constantly evolving, much like the processes we've been discussing.
@@ -1694,12 +1671,15 @@ Reflective Question: Can you think of a word whose meaning has changed significa
 
 ## 10.6. Scene: Non-Foundationalism
 
+<!-- omit in toc -->
 ### 10.6.1. Objective
 
 Non-foundationalism challenges the idea of a single, unchanging foundation for knowledge or reality.
 
+<!-- omit in toc -->
 ### 10.6.2. Animation
 
+<!-- omit in toc -->
 ### 10.6.3. Narration
 
 Many of us think about knowledge like building a house on solid ground. We assume there are fundamental truths that everything else rests on. But non-foundationalism challenges this idea. Instead of one unchanging base, it suggests that understanding comes from how ideas and experiences connect and interact.
@@ -1720,12 +1700,15 @@ Reflective Question: Think about a time when you had to change your understandin
 
 ## 10.7. Scene: Paradox vs Not-knowing
 
+<!-- omit in toc -->
 ### 10.7.1. Objective
 
 Address paradox and introduce not-knowing
 
+<!-- omit in toc -->
 ### 10.7.2. Animation
 
+<!-- omit in toc -->
 ### 10.7.3. Narration
 
 Paradoxes often reveal the limitations of our current frameworks for understanding reality. When confronted with something like the statement ‘This sentence is false,’ we find ourselves caught in a contradiction that cannot be easily resolved. These paradoxes challenge the assumptions we rely on and suggest that our ways of knowing might not be sufficient to address every situation.
@@ -1738,10 +1721,12 @@ Reflective Question: How do you handle uncertainty or paradox in your own life? 
 
 ## 10.8. Scene: Process Philosophy and Ethics
 
+<!-- omit in toc -->
 ### 10.8.1. Objective
 
 Relational ethics and the value of sensitviity
 
+<!-- omit in toc -->
 ### 10.8.2. Narration
 
 In traditional ethics, moral decisions are often guided by fixed principles or rules considered universally applicable. These rules provide clear guidelines but can be rigid, sometimes failing to account for the complexities of real-life situations.
@@ -1762,14 +1747,17 @@ Embracing this perspective allows us to participate actively in the continuous e
 
 ## 10.9. Scene: Metacognition and Process Management
 
+<!-- omit in toc -->
 ### 10.9.1. Objective
 
 Illustrate the concept of metacognition as a higher-order process that monitors and adjusts other processes within a system. Introduce the role of process management in facilitating and ensuring the effective functioning of these processes.
 
+<!-- omit in toc -->
 ### 10.9.2. Animation
 
 The video begins by focusing on a complex system composed of various interconnected entities. A distinct entity, perhaps represented with a blue entity ("hat") to signify its unique role, moves through the system. This entity oversees the interactions between other entities, occasionally pausing to make adjustments or guide their interactions. The blue-hatted entity can be seen directing the flow of energy or information, ensuring that the system remains balanced and harmonious. The video concludes by zooming out to show the entire system working smoothly, with the blue-hatted entity continuing its oversight.
 
+<!-- omit in toc -->
 ### 10.9.3. Narration
 
 In complex systems, some processes oversee and regulate others to maintain balance and functionality. This act of "thinking about thinking" is known as metacognition.
@@ -1784,14 +1772,17 @@ By incorporating metacognition and process management, systems become better equ
 
 ## 10.10. Recap Scene: Discovering the Self in Process
 
+<!-- omit in toc -->
 ### 10.10.1. Objective
 
 Summarize the concepts of agency, consciousness, and the emergent self, setting the stage for exploring knowledge, language, and non-foundationalism.
 
+<!-- omit in toc -->
 ### 10.10.2. Animation
 
 An individual's silhouette dissolves into a flow of interconnected processes, symbolizing the self as an emergent property. Threads represent experiences, relationships, and internal processes weaving together.
 
+<!-- omit in toc -->
 ### 10.10.3. Narration
 
 We've delved into the nature of agency, understanding it as an emergent property arising from dynamic relationships within systems. We've explored consciousness and the self, recognizing that identity is not a fixed essence but a continuous process shaped by interactions and experiences.
@@ -1806,14 +1797,17 @@ Finally, we bring everything together, noting how all the concepts in this prese
 
 ## 11.2. Scene: Bridging the natural sciences and the humanities
 
+<!-- omit in toc -->
 ### 11.2.1. Objective
 
 Bridge between the natural sciences and the humanities
 
+<!-- omit in toc -->
 ### 11.2.2. Animation
 
 Modeling relation with the personified encoding and decoding
 
+<!-- omit in toc -->
 ### 11.2.3. Narration
 
 For much of history, the natural sciences and the humanities have been treated as separate domains. The natural sciences often focus on simple, measurable systems using formal models and quantitative methods, while the humanities explore human experiences, employing qualitative methods to understand our complex, subjective realities.
@@ -1828,14 +1822,17 @@ Process Philosophy encourages us to view the sciences and humanities as compleme
 
 ## 11.3. Scene: Meta-presentation
 
+<!-- omit in toc -->
 ### 11.3.1. Objective
 
 Explain this presentation as one perspective on process philosophy, acknowledging its strengths, weaknesses, and opportunities. Introduce the idea that the visual language used can be adapted to other process-centric perspectives.
 
+<!-- omit in toc -->
 ### 11.3.2. Animation
 
 Begin with a zoom-out from the final scene of the presentation, revealing the entire sequence of scenes as part of a larger, interconnected network. This network forms a web of relations, with each scene represented as a node connected by lines (representing the flow of concepts). Gradually, the view shifts to highlight the presentation itself as a single node within an even broader context, suggesting that this presentation is one of many possible perspectives on process philosophy. The scene ends with the presentation’s visual elements morphing into different styles, illustrating their adaptability to other contexts and perspectives.
 
+<!-- omit in toc -->
 ### 11.3.3. Narration
 
 As we come to the end of this presentation on process philosophy, it’s important to recognize that what you’ve experienced is just one perspective—a particular way of engaging with these ideas.
@@ -1852,12 +1849,15 @@ In this way, process philosophy invites you not just to learn but to live these 
 
 ## 11.4. Scene: Conclusion
 
+<!-- omit in toc -->
 ### 11.4.1. Objective
 
 Provide potential next steps
 
+<!-- omit in toc -->
 ### 11.4.2. Animation
 
+<!-- omit in toc -->
 ### 11.4.3. Narration
 
 We've reached the end of this presentation on process philosophy, but this is just one step in a much larger journey. You may choose to revisit parts of the presentation, reflecting on the ideas with the help of the AI tutor, or you might explore new perspectives and paradigms that resonate with your own context.
