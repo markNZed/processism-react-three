@@ -6,20 +6,6 @@ The primary goal of this presentation is to build a visual language that makes t
 
 This presentation is tailored for a general adult audience. However, given the abstract nature of some concepts, this approach aims to ground the audience in familiar territory before challenging them with more complex notions.
 
-Your feedback will be invaluable in refining this presentation. Here are a few specific areas where your input would be particularly beneficial
-
-* Summary and Reflection Points
-  Would you recommend incorporating brief summaries or reflection points after these sections to help the audience digest the information before moving on?
-* Transitions
-  The presentation aims to strengthen transitions by explicitly connecting how each new concept builds on or is informed by the previous one. We are curious if the narrative bridges effectively tie together the emerging complexities of structure and the relativity of processes in time.
-* Abstract Concepts
-  Some concepts might be too abstract for a general audience. We've introduced these ideas by revisiting more concrete examples earlier in the presentation. Does this approach effectively prepare the audience, or do you have suggestions for further grounding these abstract concepts?
-
-Interactive Elements
-The storyboard is designed to be largely didactic but considers incorporating more interactive elements to engage viewers. How might we further enhance interactivity or invite viewers to reflect on their understanding?
-
-We also invite feedback on whether these additional concepts would add value to the presentation.
-
 This storyboard represents a structured approach to introducing Process Philosophy. However, we recognize that both the visual language and the narrative can evolve based on your feedback. We aim to create an engaging and thought-provoking experience that leaves the audience with a new perspective on how they see the world.
 
 Thank you for your time and insights.
@@ -28,7 +14,7 @@ Thank you for your time and insights.
 
 # Context:
 
-This is a storyboard for an animated, AI assisted, presentation about processsim.
+This is a storyboard for an animated, AI assisted, presentation about process philosophy.
 
 <!-- omit in toc -->
 
@@ -106,6 +92,13 @@ As you can see, the sections of this presentation are not isolated but deeply in
 
 # Table of Content
 
+- [Context:](#context)
+- [Tools:](#tools)
+- [Audience](#audience)
+- [Feedback so far](#feedback-so-far)
+  - [Potential further concepts:](#potential-further-concepts)
+- [Overview](#overview)
+- [Table of Content](#table-of-content)
 - [1. Section: Overview](#1-section-overview)
   - [1.1. Objective](#11-objective)
   - [1.2. Scene: Overview](#12-scene-overview)
@@ -241,7 +234,7 @@ As you can see, the sections of this presentation are not isolated but deeply in
     - [5.7.3. Narration](#573-narration)
 - [6. Section: Causality and Complexity](#6-section-causality-and-complexity)
   - [6.1. Objective](#61-objective)
-  - [6.2. Scene: Aristotle&#39;s Four Causes](#62-scene-aristotles-four-causes)
+  - [6.2. Scene: Aristotle's Four Causes](#62-scene-aristotles-four-causes)
     - [6.2.1. Objective](#621-objective)
     - [6.2.2. Animation](#622-animation)
     - [6.2.3. Narration](#623-narration)
