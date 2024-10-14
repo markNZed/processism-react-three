@@ -80,7 +80,7 @@ Bernie Krause’s "The Great Animal Orchestra" – explores the feedback loops a
 
 # Board Games/Tabletop Simulations
 
-System-Based Board Games:
+* System-Based Board Games:
 "Pandemic" – players work together to contain a global outbreak, simulating evolving systems and adaptation.
 * Collaborative Games
 "The Quiet Year" – players collaboratively build and destroy a society over one year, emphasizing adaptability and change.
